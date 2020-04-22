@@ -16,6 +16,34 @@ import PyQt5.QtCore as qc
 
 import numpy as np
 
+# data struct for a use selected rectangle in numpy unsigned int format.
+from collections import namedtuple
+BaseRect = namedtuple("base_rect", "top, bottom, left, right")
+class DrawRect(BaseRect):
+    """data struct for a rectangle"""
+    
+    def scale(self, factor):
+        """
+        scale the rectangle by factor
+
+        Parameters
+        ----------
+        factor : real or integer number
+            the scaling factor for the rectangle.
+
+        Returns
+        -------
+        DrawRect
+            the scaled rectangle.
+
+        """
+        t = np.uint32(np.round(self.top*factor))
+        b = np.uint32(np.round(self.bottom*factor))
+        l = np.uint32(np.round(self.left*factor))
+        r = np.uint32(np.round(self.right*factor))
+        
+        return DrawRect(t, b, l, r)
+
 # import UI
 from Ui_CrystalGrowthTrackerMain import Ui_CrystalGrowthTrackerMain
 
@@ -37,8 +65,11 @@ class ImageLabel(qw.QLabel):
         
         self._rectangles = []
         
+    def __iter__(self):
+        return iter(self._rectangles)
+        
     # signal to indicate user selection
-    selected = qc.pyqtSignal(qg.QMouseEvent, qg.QMouseEvent)
+    new_selection = qc.pyqtSignal()
 
     def mousePressEvent(self, e):
         """
@@ -66,20 +97,34 @@ class ImageLabel(qw.QLabel):
             self.repaint()
             reply = qw.QMessageBox.question(
                     self,
-                    "Crystal Growth Analyser",
+                    "Crystal Growth Tracker",
                     "Do you wish to select region?")
             
             if reply == qw.QMessageBox.Yes:
-                self._parent.extract_subimage(self._start, self._end)
+                #self._parent.extract_subimage(self._start, self._end)
+                self.add_rectangle()
                 
             self._selecting = False
             
-    def add_rectangle(self, rect):
-        print("add_rectangle({}, {}, {}, {})".format(rect.left(), 
-                                                     rect.top(),
-                                                     rect.right(),
-                                                     rect.bottom()))
+    def add_rectangle(self):
+        # get horizontal range
+        horiz = (self._start.x(), self._end.x())
+        zoom = self._parent.get_zoom()
+        
+        sh = np.uint32(np.round(min(horiz)/zoom))
+        eh = np.uint32(np.round(max(horiz)/zoom))
+        
+        # get vertical range
+        vert = (self._start.y(), self._end.y())
+        sv = np.uint32(np.round(min(vert)/zoom))
+        ev = np.uint32(np.round(max(vert)/zoom))
+                
+        # add the rectangle to the ImageLabel
+
+        rect = DrawRect(sv, ev, sh, eh)
+
         self._rectangles.append(rect)
+        self.new_selection.emit()
             
     def paintEvent(self, e):
         """
@@ -90,7 +135,14 @@ class ImageLabel(qw.QLabel):
         self.draw_rectangles()
         
     def draw_rectangles(self):
-        
+        """
+        Draw the alreay selected rectangles and, if in selecting mode
+        the current selection
+
+        Returns
+        -------
+        None.
+        """
         if not self._selecting and not len(self._rectangles):
             return
         
@@ -101,11 +153,31 @@ class ImageLabel(qw.QLabel):
         painter.setBrush(brush)
         
         for rect in self._rectangles:
-            painter.drawRect(rect)
+            zoomed = rect.scale(self._parent.get_zoom())
+            qr = qc.QRect(
+                qc.QPoint(int(zoomed.left), int(zoomed.top)), 
+                qc.QPoint(int(zoomed.right), int(zoomed.bottom)))
+            
+            painter.drawRect(qr)
         
         if self._selecting:
             selectionRect = qc.QRect(self._start, self._end)
             painter.drawRect(selectionRect)
+            
+    @property      
+    def number_rectangles(self):
+        """
+        getter for the number of rectangles
+
+        Returns
+        -------
+        int
+            the number of rectangles currently stored.
+        """
+        return len(self._rectangles)
+    
+    def get_rectangle(self, index):
+        return self._rectangles[index]
         
 
 class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
@@ -121,11 +193,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 
         self.setupUi(self)
         
-        self._sourceLabel = ImageLabel(self)        
-        self._sourceLabel.setAlignment(qc.Qt.AlignTop | qc.Qt.AlignLeft)
-        self._sourceLabel.setSizePolicy(
-                qw.QSizePolicy.Ignored, qw.QSizePolicy.Fixed)
-        self._sourceLabel.selected.connect(self.extract_subimage)
+        self._sourceLabel = None
         
         self._subimageLabel = qw.QLabel(self)
         self._subimageLabel.setAlignment(qc.Qt.AlignTop | qc.Qt.AlignLeft)
@@ -142,14 +210,12 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         sizes.append(200)
         
         self._splitter.setSizes(sizes)
-        
-        self._sourceScrollArea.setWidget(self._sourceLabel)        
+               
         self._subScrollArea.setWidget(self._subimageLabel)
         
         self._raw_image = None
         self._image_source = None
         self._zoom = 1.0
-        self._subimages = []
 
     def set_title(self, source):
         """
@@ -229,23 +295,46 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self.display_image()
         self.set_title(fileName)
         
+    def get_zoom(self):
+        """getter for the zoom"""
+        return self._zoom
+        
     @property
     def has_image(self):
         return isinstance(self._raw_image, np.ndarray)
             
     def display_image(self):
         """
-        display the raw image in the label
-        """
-        import array as arr
-        
+        creeate a new label 
+        """        
         if not self.has_image:
             return
+        
+        self._sourceLabel = ImageLabel(self)
+        self._sourceLabel.setAlignment(qc.Qt.AlignTop | qc.Qt.AlignLeft)
+        self._sourceLabel.setSizePolicy(
+                qw.QSizePolicy.Ignored, qw.QSizePolicy.Fixed)
+        self._sourceLabel.new_selection.connect(self.new_subimage)
+        self._sourceScrollArea.setWidget(self._sourceLabel) 
+        
+        self.redisplay_image()
+        
+    def redisplay_image(self):
+        """
+        display the raw image in the existing label 
+
+        Returns
+        -------
+        None.
+
+        """
+        import array as arr
         
         # cash the zoom
         self._zoom = self._sourceZoomSpinBox.value()
         
         height, width = self._raw_image.shape
+        
         self._display_image = arr.array(
                 'B', 
                 self._raw_image.reshape(self._raw_image.size))
@@ -274,51 +363,18 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 qw.QSizePolicy.Fixed, qw.QSizePolicy.Fixed)
         self._sourceLabel.setMargin(0);
     
-    @qc.pyqtSlot(qg.QMouseEvent, qg.QMouseEvent)
-    def extract_subimage(self, start, end):
+    @qc.pyqtSlot()
+    def new_subimage(self):
         """
-        generate slice of raw image using pixel coordinages supplied
+        update the combobox of subimages
         """
-        
-        if not self.has_image:
-            return
-        
-        # get horizontal range
-        horiz = (start.x(), end.x())
-        sh = np.uint32(np.round(min(horiz)/self._zoom))
-        eh = np.uint32(np.round(max(horiz)/self._zoom))
-        
-        # get vertical range
-        vert = (start.y(), end.y())
-        sv = np.uint32(np.round(min(vert)/self._zoom))
-        ev = np.uint32(np.round(max(vert)/self._zoom))
-        
-        # store as raw data because pickel will not export Qt objects
-        tmp = {}
-        tmp["top left (v,h)"] = (sv, sh)
-        tmp["source"] = self._image_source
-        tmp["image"] = self._raw_image[sv:ev, sh:eh]
-        
-        # Qt objects
-        start = qc.QPoint(int(sh), int(sv))
-        stop = qc.QPoint(int(eh), int(ev))
-        sub_image_rect = qc.QRect(start, stop)
-        
-        self._subimages.append(tmp)
-        self.update_subimages() 
-        self._sourceLabel.add_rectangle(sub_image_rect)
-            
-    def update_subimages(self):
-        """
-        clear the subimages combobox then fill
-        """
-        num_subimages = len(self._subimages)
         
         self._subimageComboBox.clear()
-        for i in range(num_subimages):
+        for i in range(self._sourceLabel.number_rectangles):
             self._subimageComboBox.addItem(str(i+1))
             
-        self._subimageComboBox.setCurrentIndex(num_subimages-1)
+        self._subimageComboBox.setCurrentIndex(
+            self._sourceLabel.number_rectangles-1)
         
     @qc.pyqtSlot()
     def source_zoom(self):
@@ -326,31 +382,25 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         callback for change of zoom on source image
         """
         if self.has_image:
-            self.display_image()
+            self.redisplay_image()
             
     @qc.pyqtSlot()
     def subimage_zoom(self):
         """
         callback for change of zoom on subimage image
         """
-        if len(self._subimages) > 0:
+        
+        if self._sourceLabel.number_rectangles:
             self.display_subimage()
     
     @qc.pyqtSlot()
-    def save_subimage(self, index=None):
+    def save_subimages(self):
         """
         save the selected sub-image
         """
         import pickle as pk
-        
-        if not index:
-            index = self._subimageComboBox.currentIndex()
-        
-        assert(index < len(self._subimages) and index >= 0)
-        
-        image = self._subimages[index]
-        
-        if image["image"].size:
+
+        if self._sourceLabel.number_rectangles > 0:
             options = qw.QFileDialog.Options()
             options |= qw.QFileDialog.DontUseNativeDialog
             fileName, fileType = qw.QFileDialog().getSaveFileName(
@@ -363,8 +413,17 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             if fileName:
                 if not fileName.endswith('.ga'):
                     fileName = fileName + '.ga'
+                    
                 with open(fileName, 'wb') as out_f:
-                    pk.dump(image, out_f)
+                    for index in range(self._sourceLabel.number_rectangles):
+                        rect = self._sourceLabel.get_rectangle(index)
+                        # store as raw data because pickel will not export Qt objects
+                        tmp = {}
+                        tmp["top left (v,h)"] = (rect.left, rect.bottom)
+                        tmp["source"] = self._image_source
+                        tmp["image"] = self._raw_image[rect.left:rect.right, rect.top:rect.bottom]
+                        pk.dump(tmp, out_f)
+                        
                     qw.QMessageBox.information(self, 
                                         'Save', 
                                         "Subimage written to: " + fileName)
@@ -383,8 +442,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         
         # get the zoom
         zoom = self._subimageZoomSpinBox.value()
+        rect = self._sourceLabel.get_rectangle(index)
         
-        img = self._subimages[index]["image"]
+        img = self._raw_image[rect.top:rect.bottom, rect.left:rect.right]
         
         height, width = img.shape
         tmp = arr.array(
@@ -417,13 +477,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._subScrollArea.setWidget(self._subimageLabel)
         
         self._findButton.setEnabled(True)
-        
-    @qc.pyqtSlot()
-    def save_subimage2(self, dialog):
-        """
-        slot for recieving signal from sub-image viewer
-        """
-        self.save_subimage(dialog.source_index)
 
     @qc.pyqtSlot()
     def closeEvent(self, event):

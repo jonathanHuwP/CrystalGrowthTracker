@@ -228,7 +228,7 @@
      <string>Open </string>
     </property>
     <addaction name="_actionOpen"/>
-    <addaction name="_actionSaveSubimage"/>
+    <addaction name="_actionSaveSubimages"/>
     <addaction name="separator"/>
     <addaction name="_actionExit"/>
     <addaction name="separator"/>
@@ -246,9 +246,9 @@
     <string>Exit</string>
    </property>
   </action>
-  <action name="_actionSaveSubimage">
+  <action name="_actionSaveSubimages">
    <property name="text">
-    <string>Save Subimage</string>
+    <string>Save Subimages</string>
    </property>
   </action>
  </widget>
@@ -319,10 +319,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>_actionSaveSubimage</sender>
+   <sender>_actionSaveSubimages</sender>
    <signal>triggered()</signal>
    <receiver>CrystalGrowthTrackerMain</receiver>
-   <slot>save_subimage()</slot>
+   <slot>save_subimages()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
