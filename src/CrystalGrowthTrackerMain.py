@@ -2,6 +2,9 @@
 """
 Created on Mon Feb 24 15:45:07 2020
 
+This code is made available by the University of Leeds under the Apache License,
+see associated licence documents, all rights are reserved.
+
 @author: j.h.pickering@leeds.ac.uk
 """
 
