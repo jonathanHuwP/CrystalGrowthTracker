@@ -21,7 +21,8 @@ from Ui_CrystalGrowthTrackerMain import Ui_CrystalGrowthTrackerMain
 
 class ImageLabel(qw.QLabel):
     """
-    subclass of label allowing selection of region by drawing rectangle
+    subclass of label allowing selection of region by drawing rectangle and 
+    displaying a list of already selected rectangles.
     """
     def __init__(self, parent=None):
         """
@@ -33,6 +34,8 @@ class ImageLabel(qw.QLabel):
         self._selecting = False
         self._start = None
         self._end = None
+        
+        self._rectangles = []
         
     # signal to indicate user selection
     selected = qc.pyqtSignal(qg.QMouseEvent, qg.QMouseEvent)
@@ -71,21 +74,39 @@ class ImageLabel(qw.QLabel):
                 
             self._selecting = False
             
+    def add_rectangle(self, rect):
+        print("add_rectangle({}, {}, {}, {})".format(rect.left(), 
+                                                     rect.top(),
+                                                     rect.right(),
+                                                     rect.bottom()))
+        self._rectangles.append(rect)
+            
     def paintEvent(self, e):
         """
         if selecting than draw a rectagle
         """
         qw.QLabel.paintEvent(self, e)
         
+        self.draw_rectangles()
+        
+    def draw_rectangles(self):
+        
+        if not self._selecting and not len(self._rectangles):
+            return
+        
+        pen = qg.QPen(qg.QColor(qc.Qt.black), 1, qc.Qt.DashLine)
+        brush = qg.QBrush(qg.QColor(255,255,255,120))
+        painter = qg.QPainter(self)
+        painter.setPen(pen)
+        painter.setBrush(brush)
+        
+        for rect in self._rectangles:
+            painter.drawRect(rect)
+        
         if self._selecting:
-            pen = qg.QPen(qg.QColor(qc.Qt.black), 1, qc.Qt.DashLine)
-            brush = qg.QBrush(qg.QColor(255,255,255,120))
-            painter = qg.QPainter(self)
-            painter.setPen(pen)
-            painter.setBrush(brush)
-            
             selectionRect = qc.QRect(self._start, self._end)
             painter.drawRect(selectionRect)
+        
 
 class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     """
@@ -272,13 +293,20 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         sv = np.uint32(np.round(min(vert)/self._zoom))
         ev = np.uint32(np.round(max(vert)/self._zoom))
         
+        # store as raw data because pickel will not export Qt objects
         tmp = {}
         tmp["top left (v,h)"] = (sv, sh)
         tmp["source"] = self._image_source
         tmp["image"] = self._raw_image[sv:ev, sh:eh]
         
+        # Qt objects
+        start = qc.QPoint(int(sh), int(sv))
+        stop = qc.QPoint(int(eh), int(ev))
+        sub_image_rect = qc.QRect(start, stop)
+        
         self._subimages.append(tmp)
-        self.update_subimages()        
+        self.update_subimages() 
+        self._sourceLabel.add_rectangle(sub_image_rect)
             
     def update_subimages(self):
         """
@@ -291,7 +319,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self._subimageComboBox.addItem(str(i+1))
             
         self._subimageComboBox.setCurrentIndex(num_subimages-1)
-        #self.display_subimage()
         
     @qc.pyqtSlot()
     def source_zoom(self):
