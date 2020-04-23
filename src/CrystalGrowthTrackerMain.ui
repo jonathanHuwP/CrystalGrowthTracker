@@ -132,12 +132,12 @@
              <widget class="QComboBox" name="_subimageComboBox"/>
             </item>
             <item>
-             <widget class="QPushButton" name="_findButton">
+             <widget class="QPushButton" name="_detectButton">
               <property name="enabled">
                <bool>false</bool>
               </property>
               <property name="text">
-               <string>Find</string>
+               <string>Detect</string>
               </property>
              </widget>
             </item>
@@ -229,6 +229,7 @@
     </property>
     <addaction name="_actionOpen"/>
     <addaction name="_actionSaveSubimages"/>
+    <addaction name="_actionSaveCurrentSubimage"/>
     <addaction name="separator"/>
     <addaction name="_actionExit"/>
     <addaction name="separator"/>
@@ -251,6 +252,11 @@
     <string>Save Subimages</string>
    </property>
   </action>
+  <action name="_actionSaveCurrentSubimage">
+   <property name="text">
+    <string>Save Subimage</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections>
@@ -271,7 +277,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>_findButton</sender>
+   <sender>_detectButton</sender>
    <signal>pressed()</signal>
    <receiver>CrystalGrowthTrackerMain</receiver>
    <slot>feature_detect()</slot>
@@ -375,6 +381,22 @@
     <hint type="sourcelabel">
      <x>424</x>
      <y>216</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>511</x>
+     <y>169</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_actionSaveCurrentSubimage</sender>
+   <signal>triggered()</signal>
+   <receiver>CrystalGrowthTrackerMain</receiver>
+   <slot>save_current_subimage()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
     </hint>
     <hint type="destinationlabel">
      <x>511</x>

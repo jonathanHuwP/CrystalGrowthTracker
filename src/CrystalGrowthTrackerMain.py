@@ -227,7 +227,31 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         
     @qc.pyqtSlot()
     def feature_detect(self):
-        print("feature_detect")
+        """
+        find the outlines of any crystals in the currently selected sub-image
+
+        Returns
+        -------
+        None.
+
+        """
+        from PolyLineExtract import PolyLineExtract
+        
+        index = self._subimageComboBox.currentIndex()
+        print("feature({})".format(index))
+        if index < 0:
+            return
+        
+        rect = self._sourceLabel.get_rectangle(index)
+        
+        ple = PolyLineExtract()
+        ple.image = self._raw_image[rect.top:rect.bottom, rect.left:rect.right]
+    
+        ple.find_lines()
+    
+        print("Vertices: {}".format(ple.size))
+        for vert in ple:
+            print(vert)
      
     @qc.pyqtSlot()
     def load_image(self):
@@ -376,6 +400,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._subimageComboBox.setCurrentIndex(
             self._sourceLabel.number_rectangles-1)
         
+        if self._sourceLabel.number_rectangles and not self._detectButton.isEnabled():
+            self._detectButton.setEnabled(True)
+    
     @qc.pyqtSlot()
     def source_zoom(self):
         """
@@ -475,8 +502,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 qw.QSizePolicy.Fixed, qw.QSizePolicy.Fixed)
         self._subimageLabel.setMargin(0);
         self._subScrollArea.setWidget(self._subimageLabel)
-        
-        self._findButton.setEnabled(True)
 
     @qc.pyqtSlot()
     def closeEvent(self, event):
