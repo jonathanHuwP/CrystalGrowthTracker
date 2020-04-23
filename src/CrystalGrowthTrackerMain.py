@@ -252,6 +252,40 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         print("Vertices: {}".format(ple.size))
         for vert in ple:
             print(vert)
+            
+    @qc.pyqtSlot()
+    def save_current_subimage(self):
+        import pickle as pk
+        
+        if self._sourceLabel.number_rectangles < 1:
+            qw.QMessageBox.information(
+                self, 
+                'Save', 
+                "You have not made any subimages yet!")
+            return
+            
+        options = qw.QFileDialog.Options()
+        options |= qw.QFileDialog.DontUseNativeDialog
+        file_name, file_type = qw.QFileDialog().getSaveFileName(
+                self,
+                "Select File",
+                "",
+                "Growth Analyser Files (*.npy);;All Files (*)", 
+                options=options)
+        
+        if file_name:
+            if not file_name.endswith('.npy'):
+                file_name = file_name + '.npy'
+                    
+            img = self.get_current_subimage()
+            
+            with open(file_name, 'wb') as out_f:
+                pk.dump(img, out_f)
+            
+            qw.QMessageBox.information(
+                self, 
+                'Save', 
+                "Subimage written to: " + file_name)
      
     @qc.pyqtSlot()
     def load_image(self):
@@ -261,48 +295,60 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         
         # file types
         fi = "Image Files (*.png *.jpg)"
-        fn = "Growth Analyser Files (*.ga)"
+        fg = "Growth Tracker Files (*.ga)"
+        fn = "numpy array files (*.npy)"
         fa = "All Files (*)"
         
-        files_all = [fi, fn, fa]
+        files_all = [fi, fg, fn, fa]
         files = ";;".join(files_all)
         
         options = qw.QFileDialog.Options()
         options |= qw.QFileDialog.DontUseNativeDialog
-        fileName, fileType = qw.QFileDialog.getOpenFileName(
+        file_name, file_type = qw.QFileDialog.getOpenFileName(
                 self,
                 "Select File",
                 "",
                 files, 
                 options=options)
         
-        if not fileName:
+        if not file_name:
             return
-        elif fileType == fi:
-            self.read_image(fileName)
-        elif fileType == fn:
-            self.read_ga_image(fileName)
+        elif file_type == fi:
+            self.read_image(file_name)
+        elif file_type == fg:
+            self.read_ga_image(file_name)
+        elif file_type == fn:
+            self.read_numpy_image(file_name)
         else:
-            message = "Unknown file type: {}".format(fileName)
+            message = "Unknown file type: {}".format(file_name)
             qw.QMessageBox.warning(self,
                                    "Crystal Growth Analyser",
                                    message)
-
-    def read_ga_image(self, fileName):
+            
+    def read_numpy_image(self, file_name):
+        import pickle as pk
+        
+        with open(file_name, 'rb') as in_f:
+            self._raw_image = pk.load(in_f)
+            
+        self.display_image()
+        self.set_title(file_name)
+        
+    def read_ga_image(self, file_name):
         """
         read a numpy array
         """        
         import pickle as pk
         
-        with open(fileName, 'rb') as in_f:
+        with open(file_name, 'rb') as in_f:
             tmp = pk.load(in_f)
             
         self._raw_image = tmp["image"]
         
         self.display_image()
-        self.set_title(fileName)
+        self.set_title(file_name)
 
-    def read_image(self, fileName):
+    def read_image(self, file_name):
         """
         Load an image file (jpg or png), convert to numpy grayscal in process
         """        
@@ -313,11 +359,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         def to_gray(value):
             return np.uint8(np.round(value*255))
 
-        img = color.rgb2gray(mpimg.imread(fileName))
+        img = color.rgb2gray(mpimg.imread(file_name))
         self._raw_image = to_gray(img)   
         
         self.display_image()
-        self.set_title(fileName)
+        self.set_title(file_name)
         
     def get_zoom(self):
         """getter for the zoom"""
@@ -427,33 +473,40 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         import pickle as pk
 
-        if self._sourceLabel.number_rectangles > 0:
-            options = qw.QFileDialog.Options()
-            options |= qw.QFileDialog.DontUseNativeDialog
-            fileName, fileType = qw.QFileDialog().getSaveFileName(
-                self,
-                "Select File",
-                "",
-                "Growth Analyser Files (*.ga);;All Files (*)", 
-                options=options)
+        if self._sourceLabel.number_rectangles < 1:
+            qw.QMessageBox.information(
+                self, 
+                'Save', 
+                "You have not made any subimages yet!")
+            return
         
-            if fileName:
-                if not fileName.endswith('.ga'):
-                    fileName = fileName + '.ga'
+        options = qw.QFileDialog.Options()
+        options |= qw.QFileDialog.DontUseNativeDialog
+        file_name, file_type = qw.QFileDialog().getSaveFileName(
+            self,
+            "Select File",
+            "",
+            "Growth Analyser Files (*.ga);;All Files (*)", 
+            options=options)
+    
+        if file_name:
+            if not file_name.endswith('.ga'):
+                file_name = file_name + '.ga'
+                
+            with open(file_name, 'wb') as out_f:
+                for index in range(self._sourceLabel.number_rectangles):
+                    rect = self._sourceLabel.get_rectangle(index)
+                    # store as raw data because pickel will not export Qt objects
+                    tmp = {}
+                    tmp["top left (v,h)"] = (rect.left, rect.bottom)
+                    tmp["source"] = self._image_source
+                    tmp["image"] = self._raw_image[rect.left:rect.right, rect.top:rect.bottom]
+                    pk.dump(tmp, out_f)
                     
-                with open(fileName, 'wb') as out_f:
-                    for index in range(self._sourceLabel.number_rectangles):
-                        rect = self._sourceLabel.get_rectangle(index)
-                        # store as raw data because pickel will not export Qt objects
-                        tmp = {}
-                        tmp["top left (v,h)"] = (rect.left, rect.bottom)
-                        tmp["source"] = self._image_source
-                        tmp["image"] = self._raw_image[rect.left:rect.right, rect.top:rect.bottom]
-                        pk.dump(tmp, out_f)
-                        
-                    qw.QMessageBox.information(self, 
-                                        'Save', 
-                                        "Subimage written to: " + fileName)
+                qw.QMessageBox.information(
+                    self, 
+                    'Save', 
+                    "Subimages written to: " + file_name)
                     
     @qc.pyqtSlot()
     def display_subimage(self):
@@ -462,16 +515,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         import array as arr
         
-        index = self._subimageComboBox.currentIndex()
-        
-        if index < 0:
-            return
-        
-        # get the zoom
-        zoom = self._subimageZoomSpinBox.value()
-        rect = self._sourceLabel.get_rectangle(index)
-        
-        img = self._raw_image[rect.top:rect.bottom, rect.left:rect.right]
+        img = self.get_current_subimage()
         
         height, width = img.shape
         tmp = arr.array(
@@ -488,7 +532,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         
         pixmap = qg.QPixmap.fromImage(image)
         size = pixmap.size()
-        size *= zoom
+        size *= self._subimageZoomSpinBox.value()
 
         pixmap = pixmap.scaled(
                 size, 
@@ -502,6 +546,25 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 qw.QSizePolicy.Fixed, qw.QSizePolicy.Fixed)
         self._subimageLabel.setMargin(0);
         self._subScrollArea.setWidget(self._subimageLabel)
+        
+    def get_current_subimage(self):
+        """
+        get the pixels of the currently displayed subimage
+
+        Returns
+        -------
+        np.array
+            the pixels in the current subimage
+
+        """
+        index = self._subimageComboBox.currentIndex()
+        
+        if index < 0:
+            return None
+        
+        rect = self._sourceLabel.get_rectangle(index)
+        
+        return self._raw_image[rect.top:rect.bottom, rect.left:rect.right]
 
     @qc.pyqtSlot()
     def closeEvent(self, event):
