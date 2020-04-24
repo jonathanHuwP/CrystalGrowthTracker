@@ -270,12 +270,12 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 self,
                 "Select File",
                 "",
-                "Growth Analyser Files (*.npy);;All Files (*)", 
+                "Growth Analyser Files (*.pki);;All Files (*)", 
                 options=options)
         
         if file_name:
-            if not file_name.endswith('.npy'):
-                file_name = file_name + '.npy'
+            if not file_name.endswith('.pki'):
+                file_name = file_name + '.pki'
                     
             img = self.get_current_subimage()
             
@@ -296,7 +296,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         # file types
         fi = "Image Files (*.png *.jpg)"
         fg = "Growth Tracker Files (*.ga)"
-        fn = "numpy array files (*.npy)"
+        fn = "Growth Tracker subimage (*.pki)"
         fa = "All Files (*)"
         
         files_all = [fi, fg, fn, fa]
