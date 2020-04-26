@@ -164,7 +164,7 @@ class ImageLabel(qw.QLabel):
             selectionRect = qc.QRect(self._start, self._end)
             painter.drawRect(selectionRect)
             
-    @property      
+    @property
     def number_rectangles(self):
         """
         getter for the number of rectangles
@@ -247,7 +247,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         ple = PolyLineExtract()
         ple.image = self._raw_image[rect.top:rect.bottom, rect.left:rect.right]
     
-        ple.find_lines()
+        ple.find_lines_2()
     
         print("Vertices: {}".format(ple.size))
         for vert in ple:

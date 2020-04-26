@@ -30,7 +30,29 @@ class PolyLineExtract(object):
     def size(self):
         return len(self._vertices)
         
-    def find_lines(self):
+    def find_lines(self, i):
+        """
+        Implements indirection by returning the find_lines_i function
+
+        Parameters
+        ----------
+        i : int
+            the number of the find_lines function you desire.
+        """
+        
+        pass
+        
+        
+        
+    def find_lines_1(self):
+        """
+        Example from websize, works on coins
+
+        Returns
+        -------
+        None.
+
+        """
         self._vertices.clear()
         
         # apply threshold
@@ -45,8 +67,36 @@ class PolyLineExtract(object):
         
         for region in regionprops(label_image):
             # take regions with large enough areas
-            if region.area >= 100:
+            if region.area >= 8:
                self._vertices.append(region.centroid)
+               
+    def find_lines_2(self):
+        """
+        Alternative vertex detector
+
+        Returns
+        -------
+        None.
+        """
+        
+        import numpy as np
+        from skimage.feature import corner_harris, corner_peaks
+        
+        enhanced = corner_harris(self._image)
+        corners = corner_peaks(enhanced, min_distance=3)
+        
+        c_img = np.zeros(self._image.shape)
+        for i in corners:
+            c_img[i[0], i[1]] = 255
+            
+        # label image regions
+        label_image = label(c_img)
+        
+        for region in regionprops(label_image):
+            # take regions with large enough areas
+            if region.area >= 5:
+               self._vertices.append(region.centroid) 
+
         
     def __iter__(self):
         return iter(self._vertices)
@@ -56,8 +106,9 @@ def test():
     
     p.image = data.coins()
     
-    p.find_lines()
+    p.find_lines_2()
     
+    print("Vert list:")
     for vert in p:
         print(vert)
     
