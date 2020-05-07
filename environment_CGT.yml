@@ -26,8 +26,9 @@ dependencies:
 #  - sys=28.1.*
   - numpy=1.18.*
   - scikit-image=0.16.2
-  - spyder=3.3.*
   - pip=19.1*
   - doxygen=1.8.*
   - pip:
-    -   - pyqt5=15.14.*
+    - pyqt5-installer
+    - pyqt5
+    - pyqt5-tools
