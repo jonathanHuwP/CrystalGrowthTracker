@@ -40,9 +40,11 @@ class PolyLineExtract(object):
             the number of the find_lines function you desire.
         """
         
-        pass
+        method_name='find_lines_'+str(i)
+        method=getattr(self, method_name, lambda :'Invalid')
         
-        
+        # run the method and return results.
+        return method()
         
     def find_lines_1(self):
         """

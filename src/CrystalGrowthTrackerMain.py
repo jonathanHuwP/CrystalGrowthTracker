@@ -257,16 +257,13 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self.setWindowTitle(title)
         
     @qc.pyqtSlot()
-    def feature_detect(self):
+    def feature_detect(self, method=1):
         """
-        find the outlines of any crystals in the currently selected sub-image
-
-        Returns
-        -------
-        None.
-
+        @brief find the outlines of any crystals in the currently selected sub-image
+        @param method the number of the method to be used
         """
         from PolyLineExtract import PolyLineExtract
+        print("feature_detect method: {}".format(method))
         
         index = self._subimageComboBox.currentIndex()
         print("feature({})".format(index))
@@ -278,7 +275,12 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         ple = PolyLineExtract()
         ple.image = self._raw_image[rect.top:rect.bottom, rect.left:rect.right]
     
-        ple.find_lines_2()
+        try:
+            ple.find_lines(method) == 'Invalid'
+        except AttributeError as error:
+            print("Unknown image analysis function: {}".format(error), 
+                  file=sys.stderr)
+            return
     
         print("Vertices: {}".format(ple.size))
         for vert in ple:
