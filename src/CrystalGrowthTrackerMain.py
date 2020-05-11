@@ -18,13 +18,18 @@ import numpy as np
 
 # data struct for a use selected rectangle in numpy unsigned int format.
 from collections import namedtuple
-BaseRect = namedtuple("base_rect", "top, bottom, left, right")
+BaseRect = namedtuple("BaseRect", "top, bottom, left, right")
+
 class DrawRect(BaseRect):
-    """data struct for a rectangle"""
+    """
+       extends the BaseRect structure with a scale function, the intention
+       is to define a rectangle within a grayscale image defined as a numpy 
+       array, and allow for rescaling of the image.
+    """
     
     def scale(self, factor):
         """
-        scale the rectangle by factor
+        make a new rectangle that is a scaled copy of the existing rectangle 
 
         Parameters
         ----------
@@ -35,7 +40,6 @@ class DrawRect(BaseRect):
         -------
         DrawRect
             the scaled rectangle.
-
         """
         t = np.uint32(np.round(self.top*factor))
         b = np.uint32(np.round(self.bottom*factor))
@@ -43,7 +47,34 @@ class DrawRect(BaseRect):
         r = np.uint32(np.round(self.right*factor))
         
         return DrawRect(t, b, l, r)
-
+    
+    def shift(self, x, y):
+        """
+        shift the rectangle by the x and y (placeholder)
+        """
+        pass
+    
+    def reshape(self, del_x, del_y):
+        """
+        rescale differently in x and y (placeholder)
+        """
+        pass
+    
+    def __repr__(self):
+        """
+        string representation for debugging
+        """
+        
+        return "<DrawRect at {}: ({}, {}, {}, {})>".format(
+            id(self), self.top, self.bottom, self.left, self.right)
+        
+    def __str__(self):
+        """
+        string representationf for user
+        """
+        return "({}, {}, {}, {})".format(
+            self.top, self.bottom, self.left, self.right)
+    
 # import UI
 from Ui_CrystalGrowthTrackerMain import Ui_CrystalGrowthTrackerMain
 
@@ -438,7 +469,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         update the combobox of subimages
         """
-        
+        print("new_subimage")
         self._subimageComboBox.clear()
         for i in range(self._sourceLabel.number_rectangles):
             self._subimageComboBox.addItem(str(i+1))
@@ -557,12 +588,14 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             the pixels in the current subimage
 
         """
+        print("get_current_subimage")
         index = self._subimageComboBox.currentIndex()
-        
+        print("get subimage index: {}".format(index))
         if index < 0:
             return None
         
         rect = self._sourceLabel.get_rectangle(index)
+        print("get subimage rectangl: {}".format(repr(rect)))
         
         return self._raw_image[rect.top:rect.bottom, rect.left:rect.right]
 
