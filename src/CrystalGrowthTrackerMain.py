@@ -469,17 +469,14 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         update the combobox of subimages
         """
-        print("new_subimage")
-        self._subimageComboBox.clear()
-        for i in range(self._sourceLabel.number_rectangles):
-            self._subimageComboBox.addItem(str(i+1))
+        self._subimageComboBox.addItem(str(self._sourceLabel.number_rectangles))
             
         self._subimageComboBox.setCurrentIndex(
             self._sourceLabel.number_rectangles-1)
         
         if self._sourceLabel.number_rectangles and not self._detectButton.isEnabled():
             self._detectButton.setEnabled(True)
-    
+        
     @qc.pyqtSlot()
     def source_zoom(self):
         """
@@ -588,14 +585,12 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             the pixels in the current subimage
 
         """
-        print("get_current_subimage")
         index = self._subimageComboBox.currentIndex()
-        print("get subimage index: {}".format(index))
+
         if index < 0:
             return None
         
         rect = self._sourceLabel.get_rectangle(index)
-        print("get subimage rectangl: {}".format(repr(rect)))
         
         return self._raw_image[rect.top:rect.bottom, rect.left:rect.right]
 
