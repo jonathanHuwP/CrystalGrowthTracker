@@ -9,6 +9,7 @@ see associated licence documents, all rights are reserved.
 """
 
 import sys
+import lazylogger
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
@@ -95,6 +96,9 @@ class ImageLabel(qw.QLabel):
         self._end = None
         
         self._rectangles = []
+        
+        self._logger = lazylogger.logging.getLogger("ImageLabel")
+        self._logger.setLevel(lazylogger.logging.WARNING)       
         
     def __iter__(self):
         return iter(self._rectangles)
@@ -247,6 +251,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._raw_image = None
         self._image_source = None
         self._zoom = 1.0
+        
+        self._logger = lazylogger.logging.getLogger("NAME")
+        self._logger.setLevel(lazylogger.logging.WARNING) 
 
     def set_title(self, source):
         """
@@ -257,16 +264,17 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self.setWindowTitle(title)
         
     @qc.pyqtSlot()
-    def feature_detect(self, method=1):
+    def feature_detect(self, method=2):
         """
         @brief find the outlines of any crystals in the currently selected sub-image
         @param method the number of the method to be used
         """
         from PolyLineExtract import PolyLineExtract
-        print("feature_detect method: {}".format(method))
+        self._logger.debug("feature_detect method: {}".format(method))
         
         index = self._subimageComboBox.currentIndex()
-        print("feature({})".format(index))
+        self._logger.debug("feature({})".format(index))
+        
         if index < 0:
             return
         
@@ -276,13 +284,13 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         ple.image = self._raw_image[rect.top:rect.bottom, rect.left:rect.right]
     
         try:
-            ple.find_lines(method) == 'Invalid'
+            ple.find_lines(method)
         except AttributeError as error:
-            print("Unknown image analysis function: {}".format(error), 
-                  file=sys.stderr)
+            self._logger.error(
+                "Unknown image analysis function: {}".format(error))
             return
     
-        print("Vertices: {}".format(ple.size))
+        print("Number of vertices found: {}".format(ple.size))
         for vert in ple:
             print(vert)
             
@@ -627,7 +635,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
 ######################################
             
-def run_growth_analayser():
+def run_growth_tracker():
     """
     use a local function to make an isolated the QApplication object
     """
@@ -638,7 +646,10 @@ def run_growth_analayser():
         window.show()
         app.exec_()
         
+    file_name = "growth_tracker.log"
+    lazylogger.set_up_logging(file_name, append=True)
     inner_run()
+    lazylogger.end_logging(file_name)
 
 if __name__ == "__main__":
-    run_growth_analayser()
+    run_growth_tracker()

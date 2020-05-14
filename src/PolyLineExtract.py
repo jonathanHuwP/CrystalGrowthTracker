@@ -11,12 +11,17 @@ from skimage.segmentation import clear_border
 from skimage.measure import label, regionprops
 from skimage.morphology import square, closing
 
+import logging
+
 class PolyLineExtract(object):
     """Object providing the functions for extractig polylines from images"""
     
     def __init__(self):
         self._image = None
         self._vertices = []
+                    
+        self._logger = logging.getLogger("PolyLineExtract")
+        self._logger.setLevel(logging.DEBUG)
         
     @property
     def image(self):
@@ -41,7 +46,7 @@ class PolyLineExtract(object):
         """
         
         method_name='find_lines_'+str(i)
-        method=getattr(self, method_name, lambda :'Invalid')
+        method=getattr(self, method_name)
         
         # run the method and return results.
         return method()
@@ -55,6 +60,7 @@ class PolyLineExtract(object):
         None.
 
         """
+        self._logger.debug("find_lines: 1")
         self._vertices.clear()
         
         # apply threshold
@@ -83,6 +89,7 @@ class PolyLineExtract(object):
         
         import numpy as np
         from skimage.feature import corner_harris, corner_peaks
+        self._logger.debug("find_lines: 2")
         
         enhanced = corner_harris(self._image)
         corners = corner_peaks(enhanced, min_distance=3)
