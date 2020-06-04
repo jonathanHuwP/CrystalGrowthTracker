@@ -68,7 +68,7 @@ To run the Qt Designer tool open a terminal (this could be an anaconda power she
 
 `designer`
 
-Button, slicers and other QWidgets communicate via message passing (signals to slots), which can is set up using the Qt connect function. This can be specified in the ui by Designer, but (without extra custom scripting) Designer will not know the names of the functions you have written as slots. You can add them by right clicking on the design in Designer, select "Change signals/slots" then adding your slot. Alternativly you can connect the widget to the close function, save and close the design, and then hand edit the XML inserting the name of your function in place of close().
+Button, slicers and other QWidgets communicate via message passing (signals to slots), which is set up using the Qt connect function. This can be specified in the ui by Designer, but (without extra custom scripting) Designer will not know the names of the functions you have written as slots. You can add them by right clicking on the design in Designer, select "Change signals/slots" then adding your slot. Alternativly you can connect the widget to the close function, save and close the design, and then hand edit the XML inserting the name of your function in place of close().
 
 ### IDEs (Integrated Development Environments)
 Some IDE such as Spyder use QT5 for their GUI (Graphical User Interface). This can cause complications. The conda environment created for this application does not have Spyder included in it and if it were included it would not run. You will need to start Spyder from the Start menu or from a conda shell that does not use the environment for this application. 
