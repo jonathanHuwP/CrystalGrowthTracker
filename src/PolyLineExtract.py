@@ -19,8 +19,9 @@ class PolyLineExtract(object):
     def __init__(self):
         self._image = None
         self._vertices = []
+        self.NAME = self.tr("PolyLineExtract")
                     
-        self._logger = logging.getLogger("PolyLineExtract")
+        self._logger = logging.getLogger(self.NAME)
         self._logger.setLevel(logging.DEBUG)
         
     @property

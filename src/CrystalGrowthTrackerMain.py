@@ -90,6 +90,7 @@ class ImageLabel(qw.QLabel):
         """
         super(qw.QLabel, self).__init__()
         self._parent = parent
+        self.NAME = self.tr("ImageLabel")
         
         self._selecting = False
         self._start = None
@@ -97,7 +98,7 @@ class ImageLabel(qw.QLabel):
         
         self._rectangles = []
         
-        self._logger = lazylogger.logging.getLogger("ImageLabel")
+        self._logger = lazylogger.logging.getLogger(self.NAME)
         self._logger.setLevel(lazylogger.logging.WARNING)       
         
     def __iter__(self):
@@ -132,8 +133,8 @@ class ImageLabel(qw.QLabel):
             self.repaint()
             reply = qw.QMessageBox.question(
                     self,
-                    "Crystal Growth Tracker",
-                    "Do you wish to select region?")
+                    self.tr("Region Selection"),
+                    self.tr("Do you wish to select region?"))
             
             if reply == qw.QMessageBox.Yes:
                 #self._parent.extract_subimage(self._start, self._end)
@@ -220,12 +221,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     The implementation of the GUI, all the functions and 
     data-structures required to implement the intended behaviour
     """
-    NAME = "CrystalGrowthTracker"
-    
+
     def __init__(self, parent=None):
         super(CrystalGrowthTrackerMain, self).__init__()
         self._parent = parent
-                
+        self.NAME = self.tr("CrystalGrowthTracker")
         self.setupUi(self)
         
         self._sourceLabel = None
@@ -252,7 +252,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._image_source = None
         self._zoom = 1.0
         
-        self._logger = lazylogger.logging.getLogger("NAME")
+        self._logger = lazylogger.logging.getLogger(self.NAME)
         self._logger.setLevel(lazylogger.logging.WARNING) 
 
     def set_title(self, source):
@@ -270,10 +270,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         @param method the number of the method to be used
         """
         from PolyLineExtract import PolyLineExtract
-        self._logger.debug("feature_detect method: {}".format(method))
+        self._logger.debug(self.tr("feature_detect method: {}").format(method))
         
         index = self._subimageComboBox.currentIndex()
-        self._logger.debug("feature({})".format(index))
+        self._logger.debug(self.tr("feature({})").format(index))
         
         if index < 0:
             return
@@ -287,7 +287,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             ple.find_lines(method)
         except AttributeError as error:
             self._logger.error(
-                "Unknown image analysis function: {}".format(error))
+                self.tr("Unknown image analysis function: {}").format(error))
             return
     
         print("Number of vertices found: {}".format(ple.size))
@@ -301,17 +301,17 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         if self._sourceLabel.number_rectangles < 1:
             qw.QMessageBox.information(
                 self, 
-                'Save', 
-                "You have not made any subimages yet!")
+                self.tr('Save'), 
+                self.tr("You have not made any subimages yet!"))
             return
             
         options = qw.QFileDialog.Options()
         options |= qw.QFileDialog.DontUseNativeDialog
         file_name, file_type = qw.QFileDialog().getSaveFileName(
                 self,
-                "Select File",
+                self.tr("Select File"),
                 "",
-                "Growth Analyser Files (*.pki);;All Files (*)", 
+                self.tr("Growth Analyser Files (*.pki);;All Files (*)"), 
                 options=options)
         
         if file_name:
@@ -325,8 +325,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             
             qw.QMessageBox.information(
                 self, 
-                'Save', 
-                "Subimage written to: " + file_name)
+                self.tr('Save'), 
+                self.tr("Subimage written to: {}").format(file_name))
      
     @qc.pyqtSlot()
     def load_image(self):
@@ -335,10 +335,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         
         # file types
-        fi = "Image Files (*.png *.jpg)"
-        fg = "Growth Tracker Files (*.ga)"
-        fn = "Growth Tracker subimage (*.pki)"
-        fa = "All Files (*)"
+        fi = self.tr("Image Files (*.png *.jpg))")
+        fg = self.tr("Growth Tracker Files (*.ga))")
+        fn = self.tr("Growth Tracker subimage (*.pki))")
+        fa = self.tr("All Files (*)")
         
         files_all = [fi, fg, fn, fa]
         files = ";;".join(files_all)
@@ -347,7 +347,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         options |= qw.QFileDialog.DontUseNativeDialog
         file_name, file_type = qw.QFileDialog.getOpenFileName(
                 self,
-                "Select File",
+                self.tr("Select File"),
                 "",
                 files, 
                 options=options)
@@ -361,9 +361,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         elif file_type == fn:
             self.read_numpy_image(file_name)
         else:
-            message = "Unknown file type: {}".format(file_name)
+            message = self.tr("Unknown file type: {}").format(file_name)
             qw.QMessageBox.warning(self,
-                                   "Crystal Growth Analyser",
+                                   self.NAME,
                                    message)
             
     def read_numpy_image(self, file_name):
@@ -522,9 +522,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         options |= qw.QFileDialog.DontUseNativeDialog
         file_name, file_type = qw.QFileDialog().getSaveFileName(
             self,
-            "Select File",
+            self.tr("Select File"),
             "",
-            "Growth Analyser Files (*.ga);;All Files (*)", 
+            self.tr("Growth Analyser Files (*.ga);;All Files (*)"), 
             options=options)
     
         if file_name:
@@ -543,8 +543,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                     
                 qw.QMessageBox.information(
                     self, 
-                    'Save', 
-                    "Subimages written to: " + file_name)
+                    self.tr('Save'), 
+                    self.tr("Subimages written to: {}").format(file_name))
                     
     @qc.pyqtSlot()
     def display_subimage(self):
@@ -611,8 +611,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         All actions required befor closing widget are here.
         """
         mb_reply = qw.QMessageBox.question(self, 
-                                        'Leave Question', 
-                                        "Do you want to leave?", 
+                                        self.tr('Leave Question'), 
+                                        self.tr("Do you want to leave?"), 
                                         qw.QMessageBox.Yes | qw.QMessageBox.No, 
                                         qw.QMessageBox.No)
         
