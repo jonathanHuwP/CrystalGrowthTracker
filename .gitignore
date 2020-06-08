@@ -2,3 +2,7 @@ __pycache__/
 docs/
 Ui_*
 src/growth_tracker.log*
+.project
+.pydevproject
+.spyproject
+.settings
