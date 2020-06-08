@@ -77,4 +77,14 @@ Some IDE such as Spyder use QT5 for their GUI (Graphical User Interface). This c
 You may like to use a IDE that does not use QT5 - some IDE that work well with Anaconda are given right at the very bottom of this web page:
 
 https://docs.anaconda.com/anaconda/user-guide/getting-started/
- 
+
+#### Eclipse
+Eclipe uses Java rather than QT5 for its windowing system and offers some advanced level of support for software devlopment. Details on its installation and setup are available here:
+http://cis.bentley.edu/tbabaian/cs602/notes/setup-anaconda-eclipse-pydev.pdf
+
+I had problems with this because I am running a Windows 10 system with a previously installed version of anaconda. For Eclipe to pick up the Anconda python interpreter correctly the Anaconda install needs to have the Anaconda Path added to the PATH environment variables. This is an Advanced option in the Anaconda install which is not normally recommended. To correct this I had to uninstall Anaconda and reinstall with this new option. I chose to do a full uninstall as given here:
+https://stackoverflow.com/questions/48236584/python-how-can-i-completely-uninstall-anaconda-on-windows-10
+
+This gives Eclipe the path for the base Anaconda environment but it best to work on the CGT environment. The environment install on a Windows system for the user called john is C:\Users\john\anaconda3\python.exe while for that use the CGT environment would be C:\Users\john\anaconda3\envs\CGT\python.exe. This needs to be added manually as an environment variable through the Control Panel. Editing the environment variables in Windows is considered an Advanced operation so be careful.
+
+When you create the Eclipe project use the path code\CrystalGrowthTracker\src as the location for the project, this cannot be edited later.
