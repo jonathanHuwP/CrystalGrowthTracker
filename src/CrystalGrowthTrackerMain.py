@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+## -*- coding: utf-8 -*-
 """
 Created on Mon Feb 24 15:45:07 2020
 
@@ -9,8 +9,7 @@ see associated licence documents, all rights are reserved.
 """
 
 import sys
-import lazylogger
-
+import lazylogger 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
@@ -647,7 +646,7 @@ def run_growth_tracker():
         app.exec_()
         
     file_name = "growth_tracker.log"
-    lazylogger.set_up_logging(file_name, append=True)
+#    lazylogger.set_up_logging(file_name, append=True)
     inner_run()
     lazylogger.end_logging(file_name)
 
