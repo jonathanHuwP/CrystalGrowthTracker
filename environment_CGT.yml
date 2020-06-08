@@ -20,15 +20,15 @@
 name: CGT
 channels:
   - conda-forge
+  - anaconda
   - defaults
 dependencies:
   - python=3.7
-#  - sys=28.1.*
   - numpy=1.18.*
   - scikit-image=0.16.2
-  - pip=19.1*
+  - pip
   - doxygen=1.8.*
   - pip:
-    - pyqt5-installer
+#    - pyqt5-installer
     - pyqt5
-    - pyqt5-tools
+#    - pyqt5-tools
