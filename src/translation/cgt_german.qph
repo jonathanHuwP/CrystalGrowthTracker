@@ -1,0 +1,123 @@
+<!DOCTYPE QPH>
+<QPH sourcelanguage="en" language="de">
+<phrase>
+    <source>CrystalGrowthTracker</source>
+    <target>Kristallwachstumsspur</target>
+</phrase>
+<phrase>
+    <source>feature_detect method: {}</source>
+    <target></target>
+</phrase>
+<phrase>
+    <source>feature({})</source>
+    <target></target>
+</phrase>
+<phrase>
+    <source>Unknown image analysis function: {}</source>
+    <target>Unbekannte Bildanalysefunktion: {}</target>
+</phrase>
+<phrase>
+    <source>Save</source>
+    <target>Speichern</target>
+</phrase>
+<phrase>
+    <source>You have not made any subimages yet!</source>
+    <target>Sie haben noch keine Unterbilder gemacht!</target>
+</phrase>
+<phrase>
+    <source>Select File</source>
+    <target>Datei aussuchen</target>
+</phrase>
+<phrase>
+    <source>CrystalGrowthTracker Files (*.pki);;All Files (*)</source>
+    <target>Kristallwachstumsspur Dateien (*.pki);;Alle Dateien (*)</target>
+</phrase>
+<phrase>
+    <source>Subimage written to: {}</source>
+    <target>Unterbild geschrieben an: {}</target>
+</phrase>
+<phrase>
+    <source>Image Files (*.png *.jpg)</source>
+    <target>Bild Dateien  (*.png *.jpg)</target>
+</phrase>
+<phrase>
+    <source>CrystalGrowthTracker Files (*.ga)</source>
+    <target>Kristallwachstumsspur</target>
+</phrase>
+<phrase>
+    <source>CrystalGrowthTracker Subimage Files(*.pki)</source>
+    <target>Kristallwachstumsspur UnterBild Dateien (*.pki)</target>
+</phrase>
+<phrase>
+    <source>All Files (*)</source>
+    <target>Alle Dateien (*)</target>
+</phrase>
+<phrase>
+    <source>Unknown file type: {}</source>
+    <target>Unbekannter Dateityp: {}</target>
+</phrase>
+<phrase>
+    <source>CrystalGrowthTracker Files (*.ga);;All Files (*)</source>
+    <target>Kristallwachstumsspur Dateien (*.ga);;Alle Dateien (*)</target>
+</phrase>
+<phrase>
+    <source>Subimages written to: {}</source>
+    <target>Unterbilden geschrieben an: {}</target>
+</phrase>
+<phrase>
+    <source>Source</source>
+    <target>Quelle</target>
+</phrase>
+<phrase>
+    <source>Zoom</source>
+    <target>Zoom</target>
+</phrase>
+<phrase>
+    <source>Subimages</source>
+    <target>Unterbilder</target>
+</phrase>
+<phrase>
+    <source>Detect</source>
+    <target>erkennen</target>
+</phrase>
+<phrase>
+    <source>Quit</source>
+    <target>Verlassen</target>
+</phrase>
+<phrase>
+    <source>Open </source>
+    <target>Offen</target>
+</phrase>
+<phrase>
+    <source>Open</source>
+    <target>Offen</target>
+</phrase>
+<phrase>
+    <source>Exit</source>
+    <target>Verlassen</target>
+</phrase>
+<phrase>
+    <source>Save Subimages</source>
+    <target>Unterbilder Speichern</target>
+</phrase>
+<phrase>
+    <source>Save Subimage</source>
+    <target>Unterbild Speichern</target>
+</phrase>
+<phrase>
+    <source>ImageLabel</source>
+    <target>Bildetikett</target>
+</phrase>
+<phrase>
+    <source>Region Selection</source>
+    <target>Regionsauswahl</target>
+</phrase>
+<phrase>
+    <source>Do you wish to select region?</source>
+    <target>Möchten Sie eine Region auswählen?</target>
+</phrase>
+<phrase>
+    <source>Do you want to leave?</source>
+    <target>Möchtest du gehen?</target>
+</phrase>
+</QPH>

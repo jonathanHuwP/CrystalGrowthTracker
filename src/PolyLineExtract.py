@@ -19,7 +19,7 @@ class PolyLineExtract(object):
     def __init__(self):
         self._image = None
         self._vertices = []
-        self.NAME = self.tr("PolyLineExtract")
+        self.NAME = "PolyLineExtract"
                     
         self._logger = logging.getLogger(self.NAME)
         self._logger.setLevel(logging.DEBUG)
@@ -105,8 +105,7 @@ class PolyLineExtract(object):
         for region in regionprops(label_image):
             # take regions with large enough areas
             if region.area >= 5:
-               self._vertices.append(region.centroid) 
-
+               self._vertices.append(region.centroid)
         
     def __iter__(self):
         return iter(self._vertices)
