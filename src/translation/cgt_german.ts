@@ -96,7 +96,7 @@
     <message>
         <location filename="CrystalGrowthTrackerMain.ui" line="107"/>
         <source>Subimages</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Unterbilden</translation>
     </message>
     <message>
         <location filename="CrystalGrowthTrackerMain.ui" line="140"/>

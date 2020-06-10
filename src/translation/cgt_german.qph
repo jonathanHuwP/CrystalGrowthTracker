@@ -1,5 +1,5 @@
 <!DOCTYPE QPH>
-<QPH sourcelanguage="en" language="de">
+<QPH language="de" sourcelanguage="en">
 <phrase>
     <source>CrystalGrowthTracker</source>
     <target>Kristallwachstumsspur</target>
@@ -38,7 +38,7 @@
 </phrase>
 <phrase>
     <source>Image Files (*.png *.jpg)</source>
-    <target>Bild Dateien  (*.png *.jpg)</target>
+    <target>Bild Dateien (*.png *.jpg)</target>
 </phrase>
 <phrase>
     <source>CrystalGrowthTracker Files (*.ga)</source>
@@ -70,15 +70,15 @@
 </phrase>
 <phrase>
     <source>Zoom</source>
-    <target>Zoom</target>
+    <target>Zoomen</target>
 </phrase>
 <phrase>
     <source>Subimages</source>
-    <target>Unterbilder</target>
+    <target>Unterbilden</target>
 </phrase>
 <phrase>
     <source>Detect</source>
-    <target>erkennen</target>
+    <target>Erkennen</target>
 </phrase>
 <phrase>
     <source>Quit</source>
@@ -105,19 +105,19 @@
     <target>Unterbild Speichern</target>
 </phrase>
 <phrase>
+    <source>Do you want to leave?</source>
+    <target>Möchtest du gehen?</target>
+</phrase>
+<phrase>
     <source>ImageLabel</source>
-    <target>Bildetikett</target>
+    <target></target>
 </phrase>
 <phrase>
     <source>Region Selection</source>
-    <target>Regionsauswahl</target>
+    <target></target>
 </phrase>
 <phrase>
     <source>Do you wish to select region?</source>
-    <target>Möchten Sie eine Region auswählen?</target>
-</phrase>
-<phrase>
-    <source>Do you want to leave?</source>
-    <target>Möchtest du gehen?</target>
+    <target></target>
 </phrase>
 </QPH>

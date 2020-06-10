@@ -457,7 +457,8 @@ def get_translators(lang):
 def select_translator():
     languages = ["English", "German"]
     
-    lang = qw.QInputDialog.getItem(None, "Select Language", "Language", languages)
+    lang = qw.QInputDialog.getItem(
+        None, "Select Language", "Language", languages)
     
     if not lang[1]:
         return None
