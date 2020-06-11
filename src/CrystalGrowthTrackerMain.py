@@ -103,7 +103,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     def save_current_subimage(self):
         import pickle as pk
         
-        if self._sourceLabel.number_rectangles < 1:
+        if self._sourceLabel is None or self._sourceLabel.number_rectangles < 1:
             qw.QMessageBox.information(
                 self, 
                 self.tr('Save'), 
@@ -318,7 +318,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         import pickle as pk
 
-        if self._sourceLabel.number_rectangles < 1:
+        if self._sourceLabel is None or self._sourceLabel.number_rectangles < 1:
             qw.QMessageBox.information(
                 self, 
                 'Save', 
