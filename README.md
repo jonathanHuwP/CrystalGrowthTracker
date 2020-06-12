@@ -2,7 +2,7 @@
 
 This project extracts data on the growth rates of individual faces from x-ray video shadowgraphs of growing crystals.
 
-This algorithm and software was developed by Jonathan Pickering and Joanna Leng at the University of Leeds. They are both funded by EPSRC as part of Joanna Leng's Research Software Engineering Fellowship (EP/R025819/1).
+The algorithm and software in this project were developed by Jonathan Pickering and Joanna Leng at the University of Leeds. They are both funded by EPSRC as part of Joanna Leng's Research Software Engineering Fellowship (EP/R025819/1).
 
 Copyright 2020 Jonathan Pickering and Joanna Leng.
 
@@ -51,7 +51,7 @@ To start using the environment, run the command
 
 `conda activate CGT`
 
-To stop using that enviroment:
+To stop using that environment:
 
 `conda deactivate`
 
@@ -62,21 +62,37 @@ To remove the environment, if you no longer want to use CGT:
 ## Notes for Developers
 
 ### QT5
-The project uses the Python version of Qt for its GUI. This window is designed visually using a Qt Designer, and saved as a .ui file (XML descriptio of the window). The file is then compiled to an object stump that can be subcalssed.
+The project uses the Python version of Qt for its GUI. This window is designed visually using a Qt Designer, and saved as a .ui file (XML description of the window). The file is then compiled to an object stump that can be subclassed.
 
 To run the Qt Designer tool open a terminal (this could be an anaconda power shell) and run designer.exe:
 
 `designer`
 
-Button, slicers and other QWidgets communicate via message passing (signals to slots), which is set up using the Qt connect function. This can be specified in the ui by Designer, but (without extra custom scripting) Designer will not know the names of the functions you have written as slots. You can add them by right clicking on the design in Designer, select "Change signals/slots" then adding your slot. Alternativly you can connect the widget to the close function, save and close the design, and then hand edit the XML inserting the name of your function in place of close().
+Button, slicers and other QWidgets communicate via message passing (signals to slots), which is set up using the Qt connect function. This can be specified in the ui by Designer, but (without extra custom scripting) Designer will not know the names of the functions you have written as slots. You can add them by right clicking on the design in Designer, select "Change signals/slots" then adding your slot. Alternatively, you can connect the widget to the close function, save and close the design, and then hand edit the XML inserting the name of your function in place of close().
+
+### QT Translation
+
+The code has been designed to allow translations of the user interface. The process of producing a translation is to extract the text strings needing translation from the .py and .ui files using the Qt program pylupdate5; then use Qt Linguist to read the strings file and add the translations; and finally save the translations as a binary .qm file. It is important to save the latest translation as a phrase book .qph file.  Linguist can open a phrase book alongside a translation file to allow quick filling of unchanged text, this avoids retranslating the entire interface because of the correction of a single typo.  The following describes the production of a translation for German, using an Anaconda PowerShell.
+
+1. Use pylupdate5 to make a .ts file
+
+    '''
+    pylupdate5 .\CrystalGrowthTrackerMain.py .\CrystalGrowthTrackerMain.ui .\PolyLineExtract.py .\DrawRect.py .\ImageLabel.py -ts cgt_german.ts
+    '''
+2. Run 'linguist.exe', open the 'cgt_german.ts', if there is an existing phrase book load that as well.  Carry out the translation, and save the .ts file and save it again as a phrase book, overwriting the existing if necessary.
+
+3. Save the .ts file a third time by selecting 'Release' or 'Release As' on Linguist's 'File' menu. 
+
+4. Add the appropriate code to the *get_translators* function. Note if you want the buttons of Qt dialogs to be labelled you will have to load the appropriate *qtbase* file.
 
 ### IDEs (Integrated Development Environments)
 Some IDE such as Spyder use QT5 for their GUI (Graphical User Interface). This can cause complications. The conda environment created for this application does not have Spyder included in it and if it were included it would not run. You will need to start Spyder from the Start menu or from a conda shell that does not use the environment for this application. 
 
 
-You may like to use a IDE that does not use QT5 - some IDE that work well with Anaconda are given right at the very bottom of this web page:
+You may like to use an IDE that does not use QT5 - some IDE that work well with Anaconda are given right at the very bottom of this web page:
 
 https://docs.anaconda.com/anaconda/user-guide/getting-started/
+
 
 #### Eclipse
 Eclipe uses Java rather than QT5 for its windowing system and offers some advanced level of support for software devlopment. Details on its installation and setup are available here:
@@ -88,3 +104,4 @@ https://stackoverflow.com/questions/48236584/python-how-can-i-completely-uninsta
 This gives Eclipe the path for the base Anaconda environment but it best to work on the CGT environment. The environment install on a Windows system for the user called john is C:\Users\john\anaconda3\python.exe while for that use the CGT environment would be C:\Users\john\anaconda3\envs\CGT\python.exe. This needs to be added manually as an environment variable through the Control Panel. Editing the environment variables in Windows is considered an Advanced operation so be careful.
 
 When you create the Eclipe project use the path code\CrystalGrowthTracker\src as the location for the project, this cannot be edited later.
+

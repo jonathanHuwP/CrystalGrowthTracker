@@ -6,6 +6,7 @@ Created on Mon May 11 22:53:07 2020
 """
 
 import logging
+import logging.handlers
 
 def set_up_logging(
         file_name, 
