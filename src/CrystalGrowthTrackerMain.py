@@ -34,7 +34,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._parent = parent
         self.NAME = self.tr("CrystalGrowthTracker")
         self.setupUi(self)
-        self._sourceLabel = None
+        self._sourceLabel1 = None
+        self._sourceLabel2 = None
         
         self._subimageLabel = qw.QLabel(self)
         self._subimageLabel.setAlignment(qc.Qt.AlignTop | qc.Qt.AlignLeft)
@@ -70,6 +71,21 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self.setWindowTitle(title)
         
     @qc.pyqtSlot()
+    def tab_changed(self):
+        """
+        callback for the tab widget to use when the tab is changed, put all
+        state change required between the two tabs in here. the currentIndex 
+        function in _tabWidger will act as a state variable.
+        
+        Returns
+        -------
+        None.
+        """ 
+        
+        self._logger.info(
+            "tab changed to {}".format(self._tabWidget.currentIndex()))
+        
+    @qc.pyqtSlot()
     def feature_detect(self, method=2):
         """
         @brief find the outlines of any crystals in the currently selected sub-image
@@ -84,7 +100,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         if index < 0:
             return
         
-        rect = self._sourceLabel.get_rectangle(index)
+        rect = self._sourceLabel1.get_rectangle(index)
         
         ple = PolyLineExtract()
         ple.image = self._raw_image[rect.top:rect.bottom, rect.left:rect.right]
@@ -104,7 +120,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     def save_current_subimage(self):
         import pickle as pk
         
-        if self._sourceLabel is None or self._sourceLabel.number_rectangles < 1:
+        if self._sourceLabel1 is None or self._sourceLabel1.number_rectangles < 1:
             qw.QMessageBox.information(
                 self, 
                 self.tr('Save'), 
@@ -229,12 +245,12 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         if not self.has_image:
             return
         
-        self._sourceLabel = ImageLabel(self)
-        self._sourceLabel.setAlignment(qc.Qt.AlignTop | qc.Qt.AlignLeft)
-        self._sourceLabel.setSizePolicy(
+        self._sourceLabel1 = ImageLabel(self)
+        self._sourceLabel1.setAlignment(qc.Qt.AlignTop | qc.Qt.AlignLeft)
+        self._sourceLabel1.setSizePolicy(
                 qw.QSizePolicy.Ignored, qw.QSizePolicy.Fixed)
-        self._sourceLabel.new_selection.connect(self.new_subimage)
-        self._sourceScrollArea.setWidget(self._sourceLabel) 
+        self._sourceLabel1.new_selection.connect(self.new_subimage)
+        self._sourceScrollArea.setWidget(self._sourceLabel1) 
         
         self.redisplay_image()
         
@@ -275,24 +291,24 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 qc.Qt.KeepAspectRatio, 
                 qc.Qt.SmoothTransformation)
         
-        self._sourceLabel.setPixmap(pixmap)
+        self._sourceLabel1.setPixmap(pixmap)
         
-        self._sourceLabel.setScaledContents(True);
-        self._sourceLabel.setSizePolicy(
+        self._sourceLabel1.setScaledContents(True);
+        self._sourceLabel1.setSizePolicy(
                 qw.QSizePolicy.Fixed, qw.QSizePolicy.Fixed)
-        self._sourceLabel.setMargin(0);
+        self._sourceLabel1.setMargin(0);
     
     @qc.pyqtSlot()
     def new_subimage(self):
         """
         update the combobox of subimages
         """
-        self._subimageComboBox.addItem(str(self._sourceLabel.number_rectangles))
+        self._subimageComboBox.addItem(str(self._sourceLabel1.number_rectangles))
             
         self._subimageComboBox.setCurrentIndex(
-            self._sourceLabel.number_rectangles-1)
+            self._sourceLabel1.number_rectangles-1)
         
-        if self._sourceLabel.number_rectangles and not self._detectButton.isEnabled():
+        if self._sourceLabel1.number_rectangles and not self._detectButton.isEnabled():
             self._detectButton.setEnabled(True)
         
     @qc.pyqtSlot()
@@ -309,7 +325,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         callback for change of zoom on subimage image
         """
         
-        if self._sourceLabel.number_rectangles:
+        if self._sourceLabel1.number_rectangles:
             self.display_subimage()
     
     @qc.pyqtSlot()
@@ -319,7 +335,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         import pickle as pk
 
-        if self._sourceLabel is None or self._sourceLabel.number_rectangles < 1:
+        if self._sourceLabel1 is None or self._sourceLabel1.number_rectangles < 1:
             qw.QMessageBox.information(
                 self, 
                 'Save', 
@@ -340,8 +356,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 file_name = file_name + '.ga'
                 
             with open(file_name, 'wb') as out_f:
-                for index in range(self._sourceLabel.number_rectangles):
-                    rect = self._sourceLabel.get_rectangle(index)
+                for index in range(self._sourceLabel1.number_rectangles):
+                    rect = self._sourceLabel1.get_rectangle(index)
                     # store as raw data because pickel will not export Qt objects
                     tmp = {}
                     tmp["top left (v,h)"] = (rect.left, rect.bottom)
@@ -407,7 +423,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         if index < 0:
             return None
         
-        rect = self._sourceLabel.get_rectangle(index)
+        rect = self._sourceLabel1.get_rectangle(index)
         
         return self._raw_image[rect.top:rect.bottom, rect.left:rect.right]
 
@@ -483,7 +499,7 @@ def run_growth_tracker():
         app.exec_()
         
     file_name = "growth_tracker.log"
-#    lazylogger.set_up_logging(file_name, append=True)
+    lazylogger.set_up_logging(file_name, append=True)
     inner_run()
     lazylogger.end_logging(file_name)
 

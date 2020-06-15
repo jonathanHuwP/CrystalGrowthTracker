@@ -5,18 +5,6 @@
     <target>Kristallwachstumsspur</target>
 </phrase>
 <phrase>
-    <source>feature_detect method: {}</source>
-    <target></target>
-</phrase>
-<phrase>
-    <source>feature({})</source>
-    <target></target>
-</phrase>
-<phrase>
-    <source>Unknown image analysis function: {}</source>
-    <target>Unbekannte Bildanalysefunktion: {}</target>
-</phrase>
-<phrase>
     <source>Save</source>
     <target>Speichern</target>
 </phrase>
@@ -65,6 +53,14 @@
     <target>Unterbilden geschrieben an: {}</target>
 </phrase>
 <phrase>
+    <source>Do you want to leave?</source>
+    <target>Möchtest du gehen?</target>
+</phrase>
+<phrase>
+    <source>Face Tracking</source>
+    <target>Gesichtserkennung</target>
+</phrase>
+<phrase>
     <source>Source</source>
     <target>Quelle</target>
 </phrase>
@@ -79,6 +75,10 @@
 <phrase>
     <source>Detect</source>
     <target>Erkennen</target>
+</phrase>
+<phrase>
+    <source>Video Statistics</source>
+    <target>Videostatistik</target>
 </phrase>
 <phrase>
     <source>Quit</source>
@@ -103,10 +103,6 @@
 <phrase>
     <source>Save Subimage</source>
     <target>Unterbild Speichern</target>
-</phrase>
-<phrase>
-    <source>Do you want to leave?</source>
-    <target>Möchtest du gehen?</target>
 </phrase>
 <phrase>
     <source>ImageLabel</source>
