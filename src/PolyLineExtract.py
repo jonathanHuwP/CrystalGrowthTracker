@@ -4,22 +4,33 @@ Created on Thu Apr 23 15:05:47 2020
 
 @author: j.h.pickering@leeds.ac.uk
 """
-from skimage import data
 
-from skimage.filters import threshold_otsu
-from skimage.segmentation import clear_border
-from skimage.measure import label, regionprops
-from skimage.morphology import square, closing
+import numpy as np
 
 import logging
+import lazylogger
+
+import PolarLine
+
+from collections import namedtuple
+
+# data-struct for image analysis parameters
+IAParameters = namedtuple("IAParameters", 
+        ["line_threshold", "line_length", "line_gap", "verts_min_distance"])
 
 class PolyLineExtract(object):
     """Object providing the functions for extractig polylines from images"""
     
-    def __init__(self):
+    def __init__(self, parameters=None):
         self._image = None
         self._vertices = []
+        self._lines = PolarLine.PolarLineList()
         self.NAME = "PolyLineExtract"
+        
+        if parameters is None:
+            self._parameters = IAParameters(5, 20, 2, 3)
+        else:
+            self._parameters = parameters
                     
         self._logger = logging.getLogger(self.NAME)
         self._logger.setLevel(logging.DEBUG)
@@ -33,93 +44,119 @@ class PolyLineExtract(object):
         self._image = image
         
     @property
-    def size(self):
+    def number_vertices(self):
         return len(self._vertices)
+    
+    @property
+    def number_lines(self):
+        return len(self._lines)
+    
+    @property
+    def image_vertices(self):
+        v_image = np.empty(self._image.shape, dtype=np.uint8)
+        v_image.fill(255)
         
-    def find_lines(self, i):
-        """
-        Implements indirection by returning the find_lines_i function
+        for v in self._vertices:
+            v_image[v[0], v[1]] = 0
 
-        Parameters
-        ----------
-        i : int
-            the number of the find_lines function you desire.
-        """
-        
-        method_name='find_lines_'+str(i)
-        method=getattr(self, method_name)
-        
-        # run the method and return results.
-        return method()
-        
-    def find_lines_1(self):
-        """
-        Example from websize, works on coins
+        return v_image
+    
+    @property
+    def image_lines(self):
+        from skimage.draw import line
 
-        Returns
-        -------
-        None.
+        l_image = np.empty(self._image.shape, dtype=np.uint8)
+        l_image.fill(255)
+        
+        for l in self._lines:
+            rr, cc = line(
+                l.start[0], l.start[1], 
+                l.end[0], l.end[1])
+            l_image[cc, rr] = 0
 
+        return l_image
+    
+    def find_lines(self):
         """
-        self._logger.debug("find_lines: 1")
-        self._vertices.clear()
-        
-        # apply threshold
-        thresh = threshold_otsu(self._image)
-        bw = closing(self._image > thresh, square(3))
-        
-        # remove artifacts connected to image border
-        cleared = clear_border(bw)
-        
-        # label image regions
-        label_image = label(cleared)
-        
-        for region in regionprops(label_image):
-            # take regions with large enough areas
-            if region.area >= 8:
-               self._vertices.append(region.centroid)
-               
-    def find_lines_2(self):
-        """
-        Alternative vertex detector
+        detect lines in the image
 
         Returns
         -------
         None.
         """
+        from skimage.transform import probabilistic_hough_line
+        from skimage.morphology import skeletonize
         
-        import numpy as np
+        img = np.empty(self._image.shape, dtype = np.uint8) 
+        img.fill(0)  
+
+        for i in range(img.shape[0]):
+            for j in range(img.shape[1]):
+                if self._image[i, j] == 255:
+                    img[i, j] = 0
+                else:
+                    img[i, j] = 1
+
+        edges = skeletonize(img)
+
+        tmp = probabilistic_hough_line(
+            edges, 
+            threshold=self._parameters.line_threshold,    # the size of the count to detect a line
+            line_length=self._parameters.line_length, # the minimum line length to be detected
+            line_gap=self._parameters.line_gap)     # maximum gap allowed in line
+
+        for line in tmp:
+            start, end = line
+            self._lines.append(PolarLine.line_to_theta_r(line[0], line[1]))
+        
+    def find_vertices(self):
+        """
+        Vertex detector
+
+        Returns
+        -------
+        None.
+        """
         from skimage.feature import corner_harris, corner_peaks
-        self._logger.debug("find_lines: 2")
+        self._logger.debug("find_vertices")
         
         enhanced = corner_harris(self._image)
-        corners = corner_peaks(enhanced, min_distance=3)
+        self._vertices = corner_peaks(
+            enhanced, self._parameters.verts_min_distance)
         
-        c_img = np.zeros(self._image.shape)
-        for i in corners:
-            c_img[i[0], i[1]] = 255
-            
-        # label image regions
-        label_image = label(c_img)
-        
-        for region in regionprops(label_image):
-            # take regions with large enough areas
-            if region.area >= 5:
-               self._vertices.append(region.centroid)
-        
-    def __iter__(self):
-        return iter(self._vertices)
+    @property
+    def vertices(self):
+        return self._vertices
     
+    @property
+    def lines(self):
+        return self._lines
+
 def test():
+    from skimage import data
+    
     p = PolyLineExtract()
     
-    p.image = data.coins()
+    p.image = data.camera()
     
-    p.find_lines_2()
+    p.find_vertices()
+    p.find_lines()
     
-    print("Vert list:")
-    for vert in p:
+    print("Vertices:")
+    for vert in p.vertices:
         print(vert)
-    
+        
+    print("Lines")
+    print("y, x, y, x, theta, r, length")
+    for line in p.lines:
+        s = "{}, {}, {}, {}, {}, {}, {}".format(
+            line.start[0], line.start[1], 
+            line.end[0], line.end[1],
+            line.theta, line.r, line.length)
+        print(s)
+        
 if __name__ == "__main__":
+    file_name = "PolyLineExtract.log"
+    lazylogger.set_up_logging(file_name, append=True)
     test()
+    lazylogger.end_logging(file_name)

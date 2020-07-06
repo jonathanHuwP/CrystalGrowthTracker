@@ -18,8 +18,7 @@ import numpy as np
 
 import lazylogger
 from ImageLabel import ImageLabel
-
-    
+  
 # import UI
 from Ui_CrystalGrowthTrackerMain import Ui_CrystalGrowthTrackerMain
 
@@ -86,16 +85,15 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             "tab changed to {}".format(self._tabWidget.currentIndex()))
         
     @qc.pyqtSlot()
-    def feature_detect(self, method=2):
+    def feature_detect(self):
         """
         @brief find the outlines of any crystals in the currently selected sub-image
         @param method the number of the method to be used
         """
         from PolyLineExtract import PolyLineExtract
-        self._logger.debug("feature_detect method: {}".format(method))
         
         index = self._subimageComboBox.currentIndex()
-        self._logger.debug("feature({})".format(index))
+        self._logger.debug("running on subimage ({})".format(index))
         
         if index < 0:
             return
@@ -104,17 +102,25 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         
         ple = PolyLineExtract()
         ple.image = self._raw_image[rect.top:rect.bottom, rect.left:rect.right]
-    
-        try:
-            ple.find_lines(method)
-        except AttributeError as error:
-            self._logger.error(
-                "Unknown image analysis function: {}".format(error))
-            return
-    
-        print("Number of vertices found: {}".format(ple.size))
-        for vert in ple:
+        
+        ple.find_vertices()
+        ple.find_lines()
+        
+        print("Number of vertices found: {}".format(ple.number_vertices))
+        for vert in ple.vertices:
             print(vert)
+            
+        print("Number of lines found: {}".format(ple.number_lines))
+        print("Start, , End")
+        print("y, x, y, x, theta, r, length")
+        for l in ple.lines:
+            s = "{}, {}, {}, {}, {}, {}, {}".format(
+                l.start[0], l.start[1], 
+                l.end[0], l.end[1],
+                l.theta, l.r, l.length)
+            print(s)
+            
+        self.display_subimage(ple.image_lines)
             
     @qc.pyqtSlot()
     def save_current_subimage(self):
@@ -371,13 +377,14 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                     self.tr("Subimages written to: {}").format(file_name))
                     
     @qc.pyqtSlot()
-    def display_subimage(self):
+    def display_subimage(self, img=None):
         """
         view the selected subimge
         """
         import array as arr
         
-        img = self.get_current_subimage()
+        if img is None:
+            img = self.get_current_subimage()
         
         height, width = img.shape
         tmp = arr.array(
