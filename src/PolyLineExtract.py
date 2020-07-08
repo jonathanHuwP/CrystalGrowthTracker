@@ -76,6 +76,32 @@ class PolyLineExtract(object):
 
         return l_image
     
+    @property
+    def image_polar_lines(self):
+        from skimage.draw import line
+
+        l_image = np.empty(self._image.shape, dtype=np.uint8)
+        l_image.fill(255)
+        
+        for l in self._lines:
+            rr, cc = line(
+                l.start[0], l.start[1], 
+                l.end[0], l.end[1])
+            l_image[cc, rr] = 0
+
+        return l_image
+    
+    @property
+    def image_all(self):
+        image = self.image_lines
+        
+        for v in self._vertices:
+            image[v[0], v[1]] = 0
+
+        return image
+        
+        
+    
     def find_lines(self):
         """
         detect lines in the image
@@ -123,6 +149,16 @@ class PolyLineExtract(object):
         enhanced = corner_harris(self._image)
         self._vertices = corner_peaks(
             enhanced, self._parameters.verts_min_distance)
+        
+    def merge(self):
+        # PROBLEM
+        for p in self._vertices:
+            tmp = []
+            for l in self._lines:
+                tmp.append(l.point_to_line(p))
+                
+            print(tmp)
+            
         
     @property
     def vertices(self):

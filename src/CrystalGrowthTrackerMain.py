@@ -90,7 +90,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         @brief find the outlines of any crystals in the currently selected sub-image
         @param method the number of the method to be used
         """
-        from PolyLineExtract import PolyLineExtract
+        from PolyLineExtract import PolyLineExtract, IAParameters
+        from ImageEnhancer import ImageEnhancer
+        
+        from skimage.restoration import denoise_bilateral, denoise_wavelet
         
         index = self._subimageComboBox.currentIndex()
         self._logger.debug("running on subimage ({})".format(index))
@@ -100,27 +103,47 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         
         rect = self._sourceLabel1.get_rectangle(index)
         
-        ple = PolyLineExtract()
-        ple.image = self._raw_image[rect.top:rect.bottom, rect.left:rect.right]
+        # line_threshold, line_length, line_gap, verts_min_distance
+        params = IAParameters(10, 50, 5, 5)
+        ple = PolyLineExtract(params)
+        ie = ImageEnhancer(
+            self._raw_image[rect.top:rect.bottom, rect.left:rect.right])
         
+        tmp1 = ie.constrast_stretch((25, 75))
+        tmp2 = denoise_wavelet(
+            tmp1, 
+            multichannel=False, 
+            rescale_sigma=True)
+
+        tmp2 = tmp2 / np.amax(tmp2) # normalize the data to 0 - 1
+        tmp2 = 255.0 * tmp2 # Now scale by 255
+        tmp2 = tmp2.astype(np.uint8)
+        #tmp2 = ie.adaptive_equalization()
+        #tmp3 = ie.adaptive_equalization(0.1)
+        
+        ple.image = tmp2
         ple.find_vertices()
         ple.find_lines()
         
-        print("Number of vertices found: {}".format(ple.number_vertices))
-        for vert in ple.vertices:
-            print(vert)
+        # print("Number of vertices found: {}".format(ple.number_vertices))
+        # for vert in ple.vertices:
+        #     print(vert)
             
-        print("Number of lines found: {}".format(ple.number_lines))
-        print("Start, , End")
-        print("y, x, y, x, theta, r, length")
-        for l in ple.lines:
-            s = "{}, {}, {}, {}, {}, {}, {}".format(
-                l.start[0], l.start[1], 
-                l.end[0], l.end[1],
-                l.theta, l.r, l.length)
-            print(s)
-            
-        self.display_subimage(ple.image_lines)
+        # print("Number of lines found: {}".format(ple.number_lines))
+        # print("Start, , End")
+        # print("y, x, y, x, theta, r, length")
+        # for l in ple.lines:
+        #     s = "{}, {}, {}, {}, {}, {}, {}".format(
+        #         l.start[0], l.start[1], 
+        #         l.end[0], l.end[1],
+        #         l.theta, l.r, l.length)
+        #     print(s)
+        # print("End")
+        
+        self.display_subimage(ple.image_all)
+        #self.display_subimage(ple.image_lines)
+        
+        #ple.merge()
             
     @qc.pyqtSlot()
     def save_current_subimage(self):
