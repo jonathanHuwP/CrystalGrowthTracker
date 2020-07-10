@@ -26,9 +26,11 @@ dependencies:
   - python=3.7
   - numpy=1.18.*
   - scikit-image=0.16.2
+  - imageio-ffmpeg
   - pip
   - doxygen=1.8.*
   - pip:
 #    - pyqt5-installer
     - pyqt5
 #    - pyqt5-tools
+
