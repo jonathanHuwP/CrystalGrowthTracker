@@ -147,5 +147,17 @@ class ImageLabel(qw.QLabel):
         return len(self._rectangles)
     
     def get_rectangle(self, index):
+        """
+        getter for a specified DrawRect
+
+        Parameters
+        ----------
+        index : int
+            index of the desired DrawRect.
+
+        Returns
+        -------
+        DrawRect=
+        """
         return self._rectangles[index]
         

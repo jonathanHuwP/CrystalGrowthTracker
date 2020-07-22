@@ -93,8 +93,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         from PolyLineExtract import PolyLineExtract, IAParameters
         from ImageEnhancer import ImageEnhancer
         
-        from skimage.restoration import denoise_bilateral, denoise_wavelet
-        
         index = self._subimageComboBox.currentIndex()
         self._logger.debug("running on subimage ({})".format(index))
         
@@ -106,22 +104,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         # line_threshold, line_length, line_gap, verts_min_distance
         params = IAParameters(10, 50, 5, 5)
         ple = PolyLineExtract(params)
-        ie = ImageEnhancer(
-            self._raw_image[rect.top:rect.bottom, rect.left:rect.right])
-        
-        tmp1 = ie.constrast_stretch((25, 75))
-        tmp2 = denoise_wavelet(
-            tmp1, 
-            multichannel=False, 
-            rescale_sigma=True)
+        #ie = ImageEnhancer(
+        #    self._raw_image[rect.top:rect.bottom, rect.left:rect.right])
+        #ple.image = ie.constrast_stretch((25, 75))
 
-        tmp2 = tmp2 / np.amax(tmp2) # normalize the data to 0 - 1
-        tmp2 = 255.0 * tmp2 # Now scale by 255
-        tmp2 = tmp2.astype(np.uint8)
-        #tmp2 = ie.adaptive_equalization()
-        #tmp3 = ie.adaptive_equalization(0.1)
-        
-        ple.image = tmp2
+        ple.image = self._raw_image[rect.top:rect.bottom, rect.left:rect.right]
         ple.find_vertices()
         ple.find_lines()
         
@@ -140,14 +127,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         #     print(s)
         # print("End")
         
-        self.display_subimage(ple.image_all)
-        #self.display_subimage(ple.image_lines)
+        tmp_img = ple.image_all
+        self.display_subimage(tmp_img)
         
-        #ple.merge()
-            
     @qc.pyqtSlot()
     def save_current_subimage(self):
-        import pickle as pk
         
         if self._sourceLabel1 is None or self._sourceLabel1.number_rectangles < 1:
             qw.QMessageBox.information(
@@ -162,23 +146,77 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 self,
                 self.tr("Select File"),
                 "",
-                self.tr("CrystalGrowthTracker Files (*.pki);;All Files (*)"), 
+                self.tr("CrystalGrowthTracker Files (*.pki);;JPG Files (*.jpg)"), 
                 options=options)
         
+        print(file_type)
         if file_name:
-            if not file_name.endswith('.pki'):
-                file_name = file_name + '.pki'
-                    
-            img = self.get_current_subimage()
+            if file_type == "CrystalGrowthTracker Files (*.pki)":
+                self.save_image_pickel(self.get_current_subimage(), file_name)
+            elif file_type == "JPG Files (*.jpg)":
+                self.save_image_jpg(self.get_current_subimage(), file_name)
+                
+    def save_image_pickel(self, image, file_name):
+        """
+        Save image a pickeled np.array
+
+        Parameters
+        ----------
+        image : np.array
+            the image to be saved.
             
-            with open(file_name, 'wb') as out_f:
-                pk.dump(img, out_f)
+        file_name : string
+            the file into which the image is to be saved
+
+        Returns
+        -------
+        None.
+
+        """
+        import pickle as pk
+        print("pickle")
+        if not file_name.endswith('.pki'):
+            file_name = file_name + '.pki'
+                
+        img = self.get_current_subimage()
+        
+        with open(file_name, 'wb') as out_f:
+            pk.dump(img, out_f)
+        
+        qw.QMessageBox.information(
+            self, 
+            self.tr('Save Pickle'), 
+            self.tr("Subimage written to: {}").format(file_name))
+    
+    def save_image_jpg(self, image, file_name):
+        """
+        save image in JPG format
+
+        Parameters
+        ----------
+        image : np.array
+            the image to be saved.
+        file_name : string
+            the file to which the image is to be aved.
+
+        Returns
+        -------
+        None.
+        """
+        from PIL import Image
+
+        print("jpg")
+        if not file_name.endswith('.jpg'):
+            file_name = file_name + '.jpg'
             
-            qw.QMessageBox.information(
-                self, 
-                self.tr('Save'), 
-                self.tr("Subimage written to: {}").format(file_name))
-     
+        im = Image.fromarray(image)
+        im.save(file_name)
+        
+        qw.QMessageBox.information(
+            self, 
+            self.tr('Save JPG'), 
+            self.tr("Subimage written to: {}").format(file_name))
+
     @qc.pyqtSlot()
     def load_image(self):
         """
