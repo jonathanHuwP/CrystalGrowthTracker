@@ -92,3 +92,4 @@ Then run the main class
 
 1. it is possible for the user to move the mouse outside the image.
 2. In copying mode the user can only make one adjustment to a line before having to accept or reject it. This prevents multiple adjustments, and is likely to infuriate users.
+3. the Drawing/Adjusting and Creating/copying states should be combined.

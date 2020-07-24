@@ -19,10 +19,16 @@ ImagePointBase = namedtuple("ImagePointBase", ["x", "y"])
 class ImagePoint(ImagePointBase):
     @property
     def floatY(self):
+        """
+        getter for float value of Y
+        """
         return np.float64(self.y)
     
     @property
     def floatX(self):
+        """
+        getter for float value of X
+        """
         return np.float64(self.x)
     
     @property
@@ -34,6 +40,9 @@ class ImagePoint(ImagePointBase):
 
     @property
     def vectorLength2(self):
+        """
+        getter for the square of the length
+        """
         x = self.floatX
         y = self.floatY
         
@@ -41,12 +50,30 @@ class ImagePoint(ImagePointBase):
     
     @property
     def vectorLength(self):
+        """
+        getter for the length
+        """
         return np.sqrt(self.vectorLength2)
     
     def scale(self, zoom):
+        """
+        make and return a scaled copy
+        """
         return ImagePoint(self.x*zoom, self.y*zoom)
     
     def distanceFrom(self, rhs):
+        """
+        find the distance from self to a point
+        
+        Parameters
+        ----------
+        rhs: ImagePoint
+            the target point
+            
+        Returns
+        -------
+            distance between self and rhs
+        """
         tmp = self - rhs
         return tmp.vectorLength
     
@@ -91,7 +118,7 @@ class ImagePoint(ImagePointBase):
         l = self.vectorLength
         return ImagePoint(self.floatX/l, self.floatY/l)
     
-    def __repr__(self):
+    def __str__(self):
         """
         make a string representation of the object
         """
@@ -254,6 +281,13 @@ class ImageLineSegment(ImageLineBase):
     
     @property
     def isVertical(self):
+        """
+        getter for verticality
+        
+        Returns
+        -------
+            True if vertical else false
+        """
         if not self.dx:
             return True
         else:
@@ -261,10 +295,24 @@ class ImageLineSegment(ImageLineBase):
         
     @property
     def dx(self):
+        """
+        getter for change in x
+        
+        Returns
+        -------
+            change in x between start and end
+        """
         return np.int64(self.start.x) - np.int64(self.end.x)
     
     @property
-    def dy(self):        
+    def dy(self):
+        """
+        getter for change in x
+        
+        Returns
+        -------
+            change in x between start and end
+        """    
         return np.int64(self.start.y) - np.int64(self.end.y)
     
     @property
@@ -331,6 +379,13 @@ class ImageLineSegment(ImageLineBase):
         return (flag, closest)
     
     def lineLabelEquals(self, line):
+        """
+        test equality of line labels
+        
+        Returns
+        -------
+            True if lines have the same label else false
+        """
         return self.label == line.label
 
     def labelInSet(self, in_lines):
@@ -343,28 +398,73 @@ class ImageLineSegment(ImageLineBase):
             
         return None
 
-    def __repr__(self):
+    def __str__(self):
+        """
+        override Python.object user string representation.
+        """
         return "Line(Start: {}, End {}, {})".format(
             self.start, self.end, self.label)
     
+# base for the line segment differen data structure
 DifferenceBase = namedtuple("DifferenceBase", ["start_d", "end_d", "lines_label"])
 
 class ImageLineDifference(DifferenceBase):
+    """
+    data structure for differenced between two lines the data are:
     
+    Contents
+    --------
+        start_d: float the distance apart of the start points
+        end_d: float the distance apart of the end points
+        lines_label: the joint label of the two lines
+    """
     @property
     def average(self):
+        """
+        find the average of the start and end differences
+        """
         return (self.start_d + self.end_d)/2.0
 
 class ArtifactStore(dict):
-    
+    """
+    a store for the sets of lines used in the analysis of one crystal in one video
+    """
     def __init__(self, name):
+        """
+        initalize the class
+        
+        Parameters
+        ----------
+        name: string
+            a name uniquily identifying the video and crystal
+        """
+        
         self._name = name
         
     @property
     def name(self):
+        """
+        getter for the name
+        """
         return self._name
     
     def differences(self, key0, key1):
+        """
+        find the differenced between the equivalent lines in two sets, 
+        equivalence based on the lines own labels
+        
+        Parameters
+        ----------
+        key0: dictionary key
+            the key for the first set of lines
+        key1: dictionary key
+            the key for the second set of lines
+            
+        Returns
+        -------
+        
+        
+        """
         tmp = self.matchPairs(key0, key1)
         
         diffs = []

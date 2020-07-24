@@ -13,6 +13,17 @@ BaseLine = namedtuple("BaseLine",
                        ["start", "end", "theta", "r", "m", "c", "length"])
 
 class PolarLine(BaseLine):
+    """
+    representation of a line in polar coordinates and gradient intercept coordinates
+    
+    Contents
+    --------
+    theta: float
+        the angle the line makes with x axis
+        
+    r: float
+        the shortes distance from the origin to the line
+    """
         
     def equals(self, l2, e_theta=0.05, e_r=5.0):
         """
@@ -47,12 +58,18 @@ class PolarLine(BaseLine):
         return t and r
     
     def point_to_line(self, p):
+        """
+        find the shortes distanc from p to the line
+        """
         x = p[1]
         y = p[0]
         
         return abs(self.m*x - y + self.c)/math.sqrt(self.m*self.m + 1)
     
     def y_polar(self, x):
+        """
+        find the y value for an x value
+        """
         y = self.r - x*math.cos(self.theta)
         y /= math.sin(self.theta)
         
@@ -94,6 +111,7 @@ class PolarLineList(list):
 
     @property
     def epsilon_theta(self):
+        
         return self._e_theta
     
     @property
@@ -156,6 +174,9 @@ class PolarLineList(list):
 
     
 def line_length(start, end):
+    """
+    find length of line
+    """
     dx = start[1] - end[1]
     dy = start[0] - end[0]
     

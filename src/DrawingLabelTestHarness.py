@@ -20,20 +20,28 @@ from DrawingLabel import DrawingLabel
 from Ui_DrawingLabelTestHarness import Ui_DrawingLabelTestHarness
 
 class DrawingLabelTestHarness(qw.QDialog, Ui_DrawingLabelTestHarness):
+    """
+    a QDialog that demonstrates teh DrawingLabel class
+    """
     
     def __init__(self, parent=None):
+        """
+        set up the dialog
+        """
         super(DrawingLabelTestHarness, self).__init__()
         self._parent = parent
         self.NAME = self.tr("DrawingLabelTestHarness")
         self.setupUi(self)
         self._drawing = DrawingLabel(self._scrollArea)
         
+        # 
         im = Image.fromarray(data.clock())
         im = im.convert("RGBA")
         ims = im.convert("RGBA").tobytes("raw", "RGBA")
         qim = qg.QImage(ims, im.size[0], im.size[1], qg.QImage.Format_ARGB32)
         
         self._drawing.setBackgroudPixmap(qg.QPixmap.fromImage(qim))
+        #self._drawing.setPixmap(qg.QPixmap("whatever.jpg"))
         
         self._scrollArea.setWidget(self._drawing)
         
@@ -41,6 +49,9 @@ class DrawingLabelTestHarness(qw.QDialog, Ui_DrawingLabelTestHarness):
         
     @qc.pyqtSlot()
     def state_toggle(self):
+        """
+        callback for the changing the Drawing/Adjusting state
+        """
         if self._drawButton.isChecked():
             self._drawing.setDrawing()
         else:
@@ -48,6 +59,9 @@ class DrawingLabelTestHarness(qw.QDialog, Ui_DrawingLabelTestHarness):
             
     @qc.pyqtSlot()
     def labels_toggled(self):
+        """
+        callback for the toggeling the display of line labels 
+        """
         if self._labelsBox.isChecked():
             self._drawing.showLabels(True)
         else:
@@ -55,6 +69,9 @@ class DrawingLabelTestHarness(qw.QDialog, Ui_DrawingLabelTestHarness):
             
     @qc.pyqtSlot()
     def createCopyToggled(self):
+        """
+        callback for the changing the Crating/Copying state
+        """
         if self._createButton.isChecked():
             self._drawing.setCreating()
             self.setDrawAdjustEnabled(True)
@@ -64,12 +81,17 @@ class DrawingLabelTestHarness(qw.QDialog, Ui_DrawingLabelTestHarness):
             self.setDrawAdjustEnabled(False)
             
     def setDrawAdjustEnabled(self, state):
+        """
+        enable/disable the Draw/Adjust buttons
+        """
         self._drawButton.setEnabled(state)
         self._adjustButton.setEnabled(state)
         
     @qc.pyqtSlot()
     def calculate(self):
-        print("calculate")
+        """
+        calculate the differences and display then in the table.
+        """
         tmp = self._drawing.size
         if not tmp[0] > 0 and tmp[1] > 0:
             print("you must have lines and new lines")
@@ -100,11 +122,17 @@ class DrawingLabelTestHarness(qw.QDialog, Ui_DrawingLabelTestHarness):
         
     @qc.pyqtSlot()      
     def saveImage(self):
+        """
+        save image callback 
+        """
         file = qc.QFile("my_image.png")
         self._drawing.save(file)
 
     @qc.pyqtSlot()
     def zoom_changed(self):
+        """
+        callback for changes to the zoom slider
+        """
         self._drawing.setZoom(self._zoomSpinBox.value())
         
 def run():

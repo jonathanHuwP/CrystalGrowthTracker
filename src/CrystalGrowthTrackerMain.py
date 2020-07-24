@@ -132,7 +132,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         
     @qc.pyqtSlot()
     def save_current_subimage(self):
-        
+        """
+        callback for saving the current image
+        """
         if self._sourceLabel1 is None or self._sourceLabel1.number_rectangles < 1:
             qw.QMessageBox.information(
                 self, 
@@ -258,6 +260,14 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                                    message)
             
     def read_numpy_image(self, file_name):
+        """
+        read a pickeled numpy image array
+        
+        Parameters
+        ----------
+        file_name: string
+            the file name
+        """
         import pickle as pk
         
         with open(file_name, 'rb') as in_f:
@@ -303,6 +313,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         
     @property
     def has_image(self):
+        """
+        returns true if the label has an image
+        """
         return isinstance(self._raw_image, np.ndarray)
             
     def display_image(self):
@@ -527,6 +540,18 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 ######################################
 
 def get_translators(lang):
+    """
+    find the available translations files for a languages
+    
+    Parameters
+    ----------
+    lang: string
+        the name of the language
+        
+    Returns
+    -------
+        list [<translator>, <system translator>]
+    """
     qt_translator = qc.QTranslator()
     system_trans = qc.QTranslator()
     
@@ -540,6 +565,9 @@ def get_translators(lang):
     return [qt_translator, system_trans]
     
 def select_translator():
+    """
+    get a lsit of 
+    """
     languages = ["English", "German"]
     
     lang = qw.QInputDialog.getItem(

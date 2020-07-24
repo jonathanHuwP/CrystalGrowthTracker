@@ -22,6 +22,9 @@ class PolyLineExtract(object):
     """Object providing the functions for extractig polylines from images"""
     
     def __init__(self, parameters=None):
+        """
+        set up object
+        """
         self._image = None
         self._vertices = []
         self._lines = PolarLine.PolarLineList()
@@ -37,22 +40,41 @@ class PolyLineExtract(object):
         
     @property
     def image(self):
+        """
+        getter for the image
+        """
         return self._image
     
     @image.setter
     def image(self, image):
+        """
+        setter for the image
+        """
         self._image = image
         
     @property
     def number_vertices(self):
+        """
+        getterf for the number of vertices in feature
+        """
         return len(self._vertices)
     
     @property
     def number_lines(self):
+        """
+        getter for the number of lines in feature
+        """
         return len(self._lines)
     
     @property
     def image_vertices(self):
+        """
+        getter for image of the vertices only
+        
+        Returns
+        -------
+            a numpy image array set to 255 except for vertices set to 0
+        """
         v_image = np.empty(self._image.shape, dtype=np.uint8)
         v_image.fill(255)
         
@@ -63,6 +85,13 @@ class PolyLineExtract(object):
     
     @property
     def image_lines(self):
+        """
+        getter for image of the line segments only
+        
+        Returns
+        -------
+            a numpy image array set to 255 except for lines set to 0
+        """
         from skimage.draw import line
 
         l_image = np.empty(self._image.shape, dtype=np.uint8)
@@ -78,6 +107,13 @@ class PolyLineExtract(object):
     
     @property
     def image_polar_lines(self):
+        """
+        getter for image of the polar lines only
+        
+        Returns
+        -------
+            a numpy image array set to 255 except for lines set to 0
+        """
         from skimage.draw import line
 
         l_image = np.empty(self._image.shape, dtype=np.uint8)
@@ -93,6 +129,13 @@ class PolyLineExtract(object):
     
     @property
     def image_all(self):
+        """
+        getter for image of the vertices and lines
+        
+        Returns
+        -------
+            a numpy image array set to 255 except for lines and vertices set to 0
+        """
         image = self.image_lines
         
         for v in self._vertices:
@@ -162,10 +205,16 @@ class PolyLineExtract(object):
         
     @property
     def vertices(self):
+        """
+        getter for the array of vertices
+        """
         return self._vertices
     
     @property
     def lines(self):
+        """
+        getter for the array of lines
+        """
         return self._lines
 
 def test():

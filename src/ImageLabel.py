@@ -77,6 +77,13 @@ class ImageLabel(qw.QLabel):
             self._selecting = False
             
     def add_rectangle(self):
+        """
+        add a new rectangl to the store and emit a QSignal to notify other QWidgets
+        
+        Emits
+        -----
+            new_selection signal
+        """
         # get horizontal range
         horiz = (self._start.x(), self._end.x())
         zoom = self._parent.get_zoom()
