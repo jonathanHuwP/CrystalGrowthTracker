@@ -31,7 +31,6 @@ import pickle as pk
 from imageio import get_reader
 from skimage.io import imread
 from skimage import color
-import matplotlib.pyplot as plt
 #import PyQt5.QtWidgets as qw
 from PyQt5 import QtWidgets as qw
 #import PyQt5.QtGui as qg
@@ -176,7 +175,6 @@ class VideoOverviewWindow(qw.QMainWindow, Ui_VideoOverviewWindow):
         img = None
         for img in video.iter_data():
             if num == int(frame_number):
-                self.save_grayscale_frame(self._outpath, img, num, self._frame_rate)
                 overviewplots.plot_histogram(self._outpath, img, num, img.mean(), img.std())
                 break
 
@@ -226,7 +224,7 @@ class VideoOverviewWindow(qw.QMainWindow, Ui_VideoOverviewWindow):
         for img in video.iter_data():
             self._frame_numbers.append(num)
             if num == 0:
-                self.save_grayscale_frame(self._outpath, img, num, self._frame_rate)
+                overviewplots.save_grayscale_frame(self._outpath, img, num, self._frame_rate)
             mean = img.mean()
             std = img.std()
             if num == 0:
@@ -242,7 +240,10 @@ class VideoOverviewWindow(qw.QMainWindow, Ui_VideoOverviewWindow):
         metadata = video.get_meta_data()
         print(metadata)
 
-        overviewplots.plot_means(self._outpath, self._frame_numbers, self._frame_means, self._frame_rate)
+        overviewplots.plot_means(self._outpath,
+                                 self._frame_numbers,
+                                 self._frame_means,
+                                 self._frame_rate)
 
         self._frame_total = num
 
@@ -262,62 +263,6 @@ class VideoOverviewWindow(qw.QMainWindow, Ui_VideoOverviewWindow):
         self.HistogramDisplay.setPixmap(qg.QPixmap("temp/HistogramFrame00000.png"))
 
 
-
-    def save_grayscale_frame(self, outpath, img, frame_number, frame_rate):
-        '''
-        Takes an image and turns it into a gray scale plot with a title
-        and scale information.
-        '''
-        #print("hi from save_grayscale_frame")
-        fig_grayscale = plt.figure(facecolor='w', edgecolor='k')
-        if frame_number == 0:
-            time = 0
-        else:
-            time = frame_number/int(frame_rate)
-        plt.title('Grayscale for frame {:d} at time {:0.3f} s'.format(frame_number, time))
-        plt.imshow(img, cmap='gray', vmin=100, vmax=175)
-        number = r"{0:05d}".format(frame_number)
-
-        filename = outpath+r'/GrayscaleFrame'+number+'.png'
-
-        print(filename)
-
-        if os.path.isfile(filename):
-            os.remove(filename)
-
-        fig_grayscale.savefig(filename, bbox_inches='tight')
-        plt.close(fig_grayscale)
-
-
-
-#     def plot_histogram(self, outpath, img, n, mean, std):
-#         '''
-#         Plots histogram of image values for one frame (an image).
-#         '''
-#         #print("hi from plot_histogram")
-#         img = img.ravel()
-#         fig_hist = plt.figure()
-#         title = r"Histogram for image {:d}: mean={:0.3f} std={:0.3f}".format(n, mean, std)
-#         plt.title(title)
-#         plt.xlabel('Data Value (0 is black and 255 is white)')
-#         plt.ylabel('Normalised Probability Density')
-#         sns.distplot(img.ravel(),
-#                      hist=True,
-#                      kde=True,
-#                      bins=int(180/5),
-#                      color='darkblue',
-#                      hist_kws={'edgecolor':'black'},
-#                      kde_kws={'linewidth': 1})
-#         #fig_hist.show()
-#         number = r"{0:05d}".format(n)
-#
-#         filename = outpath+'/HistogramFrame'+str(number)+'.png'
-#
-#         if os.path.isfile(filename):
-#             os.remove(filename)
-#
-#         fig_hist.savefig(filename, bbox_inches='tight')
-#         plt.close(fig_hist)
 
 
     def read_image(self, file_name):
