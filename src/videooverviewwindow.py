@@ -1,10 +1,26 @@
 '''
+videooverviewwindow.py
+
 This is a stand alone Windowed application that looks at
 how the image mean value changes over the course of a video.
-This is used an unprocessed (with Euler's Magnifier) video file
+This is used an unprocessed (without Euler's Magnifier) video file
 showing dynamic crystallisation of X-ray synchrotron videos.
 
-This was created by Joanna Leng at the University of leeds in June 2020
+Joanna Leng (an EPSRC funded Research Software Engineering Fellow (EP/R025819/1)
+University of Leeds
+June 2020
+
+Copyright 2020
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this file except in compliance with the License. You may obtain a copy of the
+License at
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed
+under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+CONDITIONS OF ANY KIND, either express or implied. See the License for the
+specific language governing permissions and limitations under the License.
 
 '''
 import sys
@@ -15,7 +31,6 @@ import pickle as pk
 from imageio import get_reader
 from skimage.io import imread
 from skimage import color
-import seaborn as sns
 import matplotlib.pyplot as plt
 #import PyQt5.QtWidgets as qw
 from PyQt5 import QtWidgets as qw
@@ -24,6 +39,7 @@ from PyQt5 import QtGui as qg
 #import PyQt5.QtCore as qc
 from PyQt5 import QtCore as qc
 from Ui_VideoOverviewWindow import Ui_VideoOverviewWindow
+import overviewplots
 
 
 class VideoOverviewWindow(qw.QMainWindow, Ui_VideoOverviewWindow):
@@ -161,7 +177,7 @@ class VideoOverviewWindow(qw.QMainWindow, Ui_VideoOverviewWindow):
         for img in video.iter_data():
             if num == int(frame_number):
                 self.save_grayscale_frame(self._outpath, img, num, self._frame_rate)
-                plot_histogram(self._outpath, img, num, img.mean(), img.std())
+                overviewplots.plot_histogram(self._outpath, img, num, img.mean(), img.std())
                 break
 
             num = num+1
@@ -214,7 +230,7 @@ class VideoOverviewWindow(qw.QMainWindow, Ui_VideoOverviewWindow):
             mean = img.mean()
             std = img.std()
             if num == 0:
-                plot_histogram(self._outpath, img, num, mean, std)
+                overviewplots.plot_histogram(self._outpath, img, num, mean, std)
             self._frame_means.append(mean)
             self._frame_stds.append(std)
             if num < 5:
@@ -226,7 +242,7 @@ class VideoOverviewWindow(qw.QMainWindow, Ui_VideoOverviewWindow):
         metadata = video.get_meta_data()
         print(metadata)
 
-        plot_means(self._outpath, self._frame_numbers, self._frame_means, self._frame_rate)
+        overviewplots.plot_means(self._outpath, self._frame_numbers, self._frame_means, self._frame_rate)
 
         self._frame_total = num
 
@@ -372,57 +388,7 @@ class VideoOverviewWindow(qw.QMainWindow, Ui_VideoOverviewWindow):
 
 
 #
-def plot_means(outpath, numbers, means, frame_rate):
-    '''
-    Function to plot graph of mean image values.
-    '''
-    print("hi from plot_means")
-    fig_mean = plt.figure(facecolor='w', edgecolor='k')
-    plt.title('Mean Across All Video Frames', {'fontsize':'22'})
-    plt.plot(numbers, means, 'b', label='Frame Mean')
-    plt.xlabel('Frame\n (' + str(frame_rate) + ' frames per second)', {'fontsize':'22'})
-    plt.ylabel('Grayscale value', {'fontsize':'22'})
-    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), prop={'size': 14})
-    plt.xticks(fontsize=18)
-    plt.yticks(fontsize=18)
 
-    filename = outpath + r'/Mean1.png'
-
-    if os.path.isfile(filename):
-        os.remove(filename)
-
-    fig_mean.savefig(filename, bbox_inches='tight')
-    plt.close(fig_mean)
-
-
-def plot_histogram(outpath, img, frame_number, mean, std):
-    '''
-    Function to plot histogram of image values for one frame (an image).
-    '''
-    print("hi from plot_histogram")
-    img = img.ravel()
-    fig_hist = plt.figure()
-    title = r"Histogram for image {:d}: mean={:0.3f} std={:0.3f}".format(frame_number, mean, std)
-    plt.title(title)
-    plt.xlabel('Data Value (0 is black and 255 is white)')
-    plt.ylabel('Normalised Probability Density')
-    sns.distplot(img.ravel(),
-                 hist=True,
-                 kde=True,
-                 bins=int(180/5),
-                 color='darkblue',
-                 hist_kws={'edgecolor':'black'},
-                 kde_kws={'linewidth': 1})
-    #fig_hist.show()
-    number = r"{0:05d}".format(frame_number)
-
-    filename = outpath+'/HistogramFrame'+str(number)+'.png'
-
-    if os.path.isfile(filename):
-        os.remove(filename)
-
-        fig_hist.savefig(filename, bbox_inches='tight')
-        plt.close(fig_hist)
 
 
 ######################################
