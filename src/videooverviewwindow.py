@@ -41,15 +41,11 @@ class VideoOverviewWindow(qw.QMainWindow, Ui_VideoOverviewWindow):
         self._frame_numbers = []
         self._frame_means = []
         self._frame_stds = []
-        self._frame_images = []
         dir_path = os.path.dirname(os.path.realpath(__file__))
         self._outpath = dir_path + '\\temp'
-        self._outpath1 = 'E:\\Projects\\learn_qt5_designer\\temp'
         self._in_file_name = ""
         self._frame_rate = 20
         self._frame_total = 0
-        self._frame_min = 0
-        self._frame_max = 1000
         self._video_there = False
 
 
@@ -122,7 +118,8 @@ class VideoOverviewWindow(qw.QMainWindow, Ui_VideoOverviewWindow):
 
         if not file_name:
             return
-        elif file_type == image_file_type:
+
+        if file_type == image_file_type:
             self.read_image(file_name)
         elif file_type == video_file_type:
             self.read_video(file_name)
@@ -196,8 +193,6 @@ class VideoOverviewWindow(qw.QMainWindow, Ui_VideoOverviewWindow):
 
         if self._frame_numbers:
             self._frame_numbers.clear()
-        if self._frame_images:
-            self._frame_images.clear()
         if self._frame_means:
             self._frame_means.clear()
         if self._frame_stds:
@@ -252,20 +247,20 @@ class VideoOverviewWindow(qw.QMainWindow, Ui_VideoOverviewWindow):
 
 
 
-    def save_grayscale_frame(self, outpath, img, n, frame_rate):
+    def save_grayscale_frame(self, outpath, img, frame_number, frame_rate):
         '''
         Takes an image and turns it into a gray scale plot with a title
         and scale information.
         '''
         #print("hi from save_grayscale_frame")
         fig_grayscale = plt.figure(facecolor='w', edgecolor='k')
-        if n == 0:
+        if frame_number == 0:
             time = 0
         else:
-            time = n/int(frame_rate)
-        plt.title('Grayscale for frame {:d} at time {:0.3f} s'.format(n, time))
+            time = frame_number/int(frame_rate)
+        plt.title('Grayscale for frame {:d} at time {:0.3f} s'.format(frame_number, time))
         plt.imshow(img, cmap='gray', vmin=100, vmax=175)
-        number = r"{0:05d}".format(n)
+        number = r"{0:05d}".format(frame_number)
 
         filename = outpath+r'/GrayscaleFrame'+number+'.png'
 
@@ -400,14 +395,14 @@ def plot_means(outpath, numbers, means, frame_rate):
     plt.close(fig_mean)
 
 
-def plot_histogram(outpath, img, n, mean, std):
+def plot_histogram(outpath, img, frame_number, mean, std):
     '''
     Function to plot histogram of image values for one frame (an image).
     '''
     print("hi from plot_histogram")
     img = img.ravel()
     fig_hist = plt.figure()
-    title = r"Histogram for image {:d}: mean={:0.3f} std={:0.3f}".format(n, mean, std)
+    title = r"Histogram for image {:d}: mean={:0.3f} std={:0.3f}".format(frame_number, mean, std)
     plt.title(title)
     plt.xlabel('Data Value (0 is black and 255 is white)')
     plt.ylabel('Normalised Probability Density')
@@ -419,7 +414,7 @@ def plot_histogram(outpath, img, n, mean, std):
                  hist_kws={'edgecolor':'black'},
                  kde_kws={'linewidth': 1})
     #fig_hist.show()
-    number = r"{0:05d}".format(n)
+    number = r"{0:05d}".format(frame_number)
 
     filename = outpath+'/HistogramFrame'+str(number)+'.png'
 
