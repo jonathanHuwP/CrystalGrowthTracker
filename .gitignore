@@ -1,5 +1,5 @@
 __pycache__/
-docs/
+doc/
 Ui_*
 cgt/growth_tracker.log*
 .project
