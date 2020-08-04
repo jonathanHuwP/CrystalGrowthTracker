@@ -246,7 +246,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         if not file_name:
             return
-        elif file_type == image_files:
+
+        if file_type == image_files:
             self.read_image(file_name)
         elif file_type == tracker_files:
             self.read_ga_image(file_name)
