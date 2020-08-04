@@ -17,6 +17,9 @@ from collections import namedtuple
 ImagePointBase = namedtuple("ImagePointBase", ["x", "y"])
 
 class ImagePoint(ImagePointBase):
+    """
+    class for storing and manipulating a point in the image
+    """
     @property
     def floatY(self):
         """

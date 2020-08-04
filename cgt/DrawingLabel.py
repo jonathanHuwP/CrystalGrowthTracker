@@ -12,20 +12,40 @@ import numpy as np
 
 from enum import IntEnum
 
-# a state for the user interaction with the lines
 class WidgetState(IntEnum):
+    """
+    the state of the users interaction 
+    """
+    
+    ## the user will create a new line by downclick and drag
     DRAWING   = 10
+    
+    ## the user will select a line and adjust the whole line or an endpoint
     ADJUSTING = 20
 
-# a state for the objective 
 class StorageState(IntEnum):
+    """
+    the state of the line storage
+    """
+    
+    ## new lines are added to the current set
     CREATING_LINES = 10
+    
+    ## the adjusted lines are copyed to a new set
     COPYING_LINES  = 20
 
-# a state for the adjusting 
 class AdjustingState(IntEnum):
-    LINE  = 10
+    """
+    records what part of a line the user is adjusting
+    """
+    
+    ## the whole line should move
+    LINE  = 10 
+    
+    ## the start point should be moved
     START = 20
+    
+    ## the end point should be moved
     END   = 30
     
 from image_artifacts import ImagePoint, ImageLineSegment
@@ -40,43 +60,45 @@ class DrawingLabel(qw.QLabel):
         """
         super(qw.QLabel, self).__init__()
         self._parent = parent
-        self.NAME = self.tr("DrawingLabel")
         
-        # store the Drawing/Adjusting state
+        ## the class name as in translation, used in dialogs
+        self._translated_name = self.tr("DrawingLabel")
+        
+        ## store the Drawing/Adjusting state
         self._state = WidgetState.DRAWING
         
-        # store the Creating/Copying state
+        ## store the Creating/Copying state
         self._storageState = StorageState.CREATING_LINES
         
-        # start point of the current line
+        ## start point of the current line
         self._start = None
-        # end point of the current line
+        ## end point of the current line
         self._end = None
-        # the initial value of the magnification
+        ## the initial value of the magnification
         self._currentZoom = 1.0
-        # records if the left mouse button is currently held down
-        # Qt does not allow interrogation of the current state of 
-        # the mouse buttons, so a state variable must be 
-        # provided to record the state for 'drag' operations
+        ## records if the left mouse button is currently held down
+        ## Qt does not allow interrogation of the current state of 
+        ## the mouse buttons, so a state variable must be 
+        ## provided to record the state for 'drag' operations
         self._mouseLeftDown = False
-        # if true then the label must redraw on the next paint event
+        ## if true then the label must redraw on the next paint event
         self._redraw = True
         
-        # the following two variables govern the adjustmen of an existing line
-        # if true the whole line is shifted else an end is shifted
+        ## the following two variables govern the adjustmen of an existing line
+        ## if true the whole line is shifted else an end is shifted
         self._adjustLine = True 
-        # the _linesBase array index of the line being adjusted
+        ## the _linesBase array index of the line being adjusted
         self._adjustIndex = 0
         
-        # if true display the line labesl on the pixmap
+        ## if true display the line labesl on the pixmap
         self._showLabels = False
         
-        # array for the created lines or the base from which the lines are being adjusted
+        ## array for the created lines or the base from which the lines are being adjusted
         self._linesBase = []
-        # array for the new lines resulting from adjustment
+        ## array for the new lines resulting from adjustment
         self._linesNew = []
         
-        # the line being worked on, is created by mouse move or mouse release events
+        ## the line being worked on, is created by mouse move or mouse release events
         self._currentLine = None
         
         self.setAlignment(
