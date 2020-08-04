@@ -2,6 +2,19 @@
 """
 Created on Thu Apr 23 15:05:47 2020
 
+a class intended to extract lines representing crystal edges from an image
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this file except in compliance with the License. You may obtain a copy of the
+License at
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed
+under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+CONDITIONS OF ANY KIND, either express or implied. See the License for the
+specific language governing permissions and limitations under the License.
+
+@copyright 2020
 @author: j.h.pickering@leeds.ac.uk
 """
 
@@ -19,7 +32,7 @@ IAParameters = namedtuple("IAParameters",
         ["line_threshold", "line_length", "line_gap", "verts_min_distance"])
 
 class PolyLineExtract(object):
-    """Object providing the functions for extractig polylines from images"""
+    """Object providing the functions for extracting polylines from images"""
     
     def __init__(self, parameters=None):
         """
