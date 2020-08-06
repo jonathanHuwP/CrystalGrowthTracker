@@ -31,8 +31,6 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
-
-
 import lazylogger
 from ImageLabel import ImageLabel
 from PolyLineExtract import PolyLineExtract, IAParameters
@@ -45,6 +43,14 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     """
     The implementation of the GUI, all the functions and
     data-structures required to implement the intended behaviour
+    
+    Parameters
+    ----------
+        parent (QObject): the parent QObject for this window
+    
+    Return
+    ------
+        None
     """
 
     def __init__(self, parent=None):
