@@ -124,7 +124,7 @@ class DrawingLabel(qw.QLabel):
         self._lines_base = []
 
         ## array for the new lines resulting from adjustment
-        self.lines_new = []
+        self._lines_new = []
 
         ## the line being worked on, is created by mouse move or mouse release events
         self._current_line = None
@@ -179,7 +179,7 @@ class DrawingLabel(qw.QLabel):
             Returns
                 a tuple consisting of (number line segments in base, number in new list)
         """
-        return (len(self._lines_base), len(self.lines_new))
+        return (len(self._lines_base), len(self._lines_new))
 
     @property
     def lines_base(self):
@@ -199,7 +199,7 @@ class DrawingLabel(qw.QLabel):
             Returns:
                 the array of lines
         """
-        return self.lines_new
+        return self._lines_new
 
     def set_drawing(self):
         """
@@ -369,13 +369,13 @@ class DrawingLabel(qw.QLabel):
             line = self._lines_base[i]
 
             tmp = in_r(
-                line.start.scale(self._currentZoom), position)
+                line.start.scale(self._current_zoom), position)
             if tmp[0]:
                 points.append((i, "start"))
                 distances.append(tmp[1])
             else:
                 tmp = in_r(
-                    line.end.scale(self._currentZoom), position)
+                    line.end.scale(self._current_zoom), position)
                 if tmp[0]:
                     points.append((i, "end"))
                     distances.append(tmp[1])
@@ -433,12 +433,12 @@ class DrawingLabel(qw.QLabel):
             Returns:
                 None
         """
-        if self._state == WidgetState.DRAWING and self._mouseLeftDown:
+        if self._state == WidgetState.DRAWING and self._mouse_left_down:
             self._end = event.pos()
             self.make_line()
             self.redisplay()
 
-        elif self._state == WidgetState.ADJUSTING and self._mouseLeftDown:
+        elif self._state == WidgetState.ADJUSTING and self._mouse_left_down:
             self.alter_chosen_line(event)
 
     def alter_chosen_line(self, event):
@@ -469,9 +469,9 @@ class DrawingLabel(qw.QLabel):
         """
         point = ImagePoint(event.x(), event.y())
         if self._adjust_line == AdjustingState.START:
-            self._current_line = self._lines_base[self._adjust_index].newStart(point)
+            self._current_line = self._lines_base[self._adjust_index].new_start(point)
         else:
-            self._current_line = self._lines_base[self._adjust_index].newEnd(point)
+            self._current_line = self._lines_base[self._adjust_index].new_end(point)
 
         self.redisplay()
 
@@ -547,7 +547,7 @@ class DrawingLabel(qw.QLabel):
             if self._storage_state == StorageState.CREATING_LINES:
                 self._lines_base[self._adjust_index] = self._current_line
             else:
-                self.lines_new.append(self._current_line)
+                self._lines_new.append(self._current_line)
 
         self.clear_current()
         self._adjust_line = True # if true the whole line is shifted
@@ -631,8 +631,8 @@ class DrawingLabel(qw.QLabel):
 
     def draw_lines(self):
         """
-        Draw the lines: iterates the _lines_base, then, if COPYING_LINES
-        the _linesNew finally the current line
+        Draw the lines: iterates the _lines_base, and if COPYING_LINES,
+        the iterate the_lines_new, finally draw the current line
 
             Returns:
                 None
@@ -643,8 +643,8 @@ class DrawingLabel(qw.QLabel):
         new_pen = qg.QPen(qg.QColor(qc.Qt.black), 1, qc.Qt.DashLine)
         painter = qg.QPainter()
 
-        height = self._background_pixmap.height()*self._currentZoom
-        width = self._background_pixmap.width()*self._currentZoom
+        height = self._background_pixmap.height()*self._current_zoom
+        width = self._background_pixmap.width()*self._current_zoom
         pix = self._background_pixmap.scaled(width, height)
 
         painter.begin(pix) # make copy
@@ -655,12 +655,12 @@ class DrawingLabel(qw.QLabel):
 
         if self._storage_state == StorageState.COPYING_LINES:
             painter.setPen(new_pen)
-            for line in self._linesNew:
+            for line in self._lines_new:
                 self.draw_single_line(line, painter)
 
         if self._current_line is not None:
             painter.setPen(red_pen)
-            zoomed = self._current_line.scale(self._currentZoom)
+            zoomed = self._current_line.scale(self._current_zoom)
             qt_line = qc.QLine(
                 qc.QPoint(int(zoomed.start.x), int(zoomed.start.y)),
                 qc.QPoint(int(zoomed.end.x), int(zoomed.end.y)))
@@ -682,12 +682,12 @@ class DrawingLabel(qw.QLabel):
             Returns:
                 None
         """
-        zoomed = line.scale(self._currentZoom)
+        zoomed = line.scale(self._current_zoom)
         qt_line = qc.QLine(
             qc.QPoint(int(zoomed.start.x), int(zoomed.start.y)),
             qc.QPoint(int(zoomed.end.x), int(zoomed.end.y)))
         painter.drawLine(qt_line)
-        if self._showLabels:
+        if self._show_labels:
             # find the bounding box for the text
             bounding_box = qc.QRect(1, 1, 1, 1)
             bounding_box = painter.boundingRect(

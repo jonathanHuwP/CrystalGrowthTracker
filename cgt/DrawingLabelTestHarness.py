@@ -34,7 +34,7 @@ from Ui_DrawingLabelTestHarness import Ui_DrawingLabelTestHarness
 
 class DrawingLabelTestHarness(qw.QDialog, Ui_DrawingLabelTestHarness):
     """
-    a QDialog that demonstrates teh DrawingLabel class
+    a QDialog that demonstrates the DrawingLabel class
     """
     
     def __init__(self, parent=None):
@@ -53,7 +53,7 @@ class DrawingLabelTestHarness(qw.QDialog, Ui_DrawingLabelTestHarness):
         ims = im.convert("RGBA").tobytes("raw", "RGBA")
         qim = qg.QImage(ims, im.size[0], im.size[1], qg.QImage.Format_ARGB32)
         
-        self._drawing.setBackgroudPixmap(qg.QPixmap.fromImage(qim))
+        self._drawing.set_backgroud_pixmap(qg.QPixmap.fromImage(qim))
         #self._drawing.setPixmap(qg.QPixmap("whatever.jpg"))
         
         self._scrollArea.setWidget(self._drawing)
@@ -66,9 +66,9 @@ class DrawingLabelTestHarness(qw.QDialog, Ui_DrawingLabelTestHarness):
         callback for the changing the Drawing/Adjusting state
         """
         if self._drawButton.isChecked():
-            self._drawing.setDrawing()
+            self._drawing.set_drawing()
         else:
-            self._drawing.setAdjusting()
+            self._drawing.set_adjusting()
             
     @qc.pyqtSlot()
     def labels_toggled(self):
@@ -76,9 +76,9 @@ class DrawingLabelTestHarness(qw.QDialog, Ui_DrawingLabelTestHarness):
         callback for the toggeling the display of line labels 
         """
         if self._labelsBox.isChecked():
-            self._drawing.showLabels(True)
+            self._drawing.show_labels(True)
         else:
-            self._drawing.showLabels(False)
+            self._drawing.show_labels(False)
             
     @qc.pyqtSlot()
     def createCopyToggled(self):
@@ -86,10 +86,10 @@ class DrawingLabelTestHarness(qw.QDialog, Ui_DrawingLabelTestHarness):
         callback for the changing the Crating/Copying state
         """
         if self._createButton.isChecked():
-            self._drawing.setCreating()
+            self._drawing.set_creating()
             self.setDrawAdjustEnabled(True)
         else:
-            self._drawing.setCopying()
+            self._drawing.set_copying()
             self._adjustButton.setChecked(True)
             self.setDrawAdjustEnabled(False)
             
@@ -110,14 +110,14 @@ class DrawingLabelTestHarness(qw.QDialog, Ui_DrawingLabelTestHarness):
             print("you must have lines and new lines")
             return
             
-        if self._drawing.linesBase is None:
+        if self._drawing.lines_base is None:
             print("lines none")
             
-        if self._drawing.linesNew is None:
+        if self._drawing.lines_new is None:
             print("new lines none")
             
-        self._store[0] = self._drawing.linesBase
-        self._store[1] = self._drawing.linesNew
+        self._store[0] = self._drawing.lines_base
+        self._store[1] = self._drawing.lines_new
         
         diffs = self._store.differences(0, 1)
         

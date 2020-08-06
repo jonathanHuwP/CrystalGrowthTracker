@@ -33,7 +33,7 @@ import PyQt5.QtCore as qc
 
 import lazylogger
 from ImageLabel import ImageLabel
-from PolyLineExtract import PolyLineExtract, IA    Args:
+from PolyLineExtract import PolyLineExtract, IAParameters
 from ImageEnhancer import ImageEnhancer
 
 # import UI
@@ -148,7 +148,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         rect = self._source_label1.get_rectangle(index)
 
         # line_threshold, line_length, line_gap, verts_min_distance
-        params = IA    Args:(10, 50, 5, 5)
+        params = IAParameters(10, 50, 5, 5)
         ple = PolyLineExtract(params)
         #ie = ImageEnhancer(
         #    self._raw_image[rect.top:rect.bottom, rect.left:rect.right])

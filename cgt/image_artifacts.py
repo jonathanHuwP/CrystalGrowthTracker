@@ -248,7 +248,7 @@ class ImageLineSegment(ImageLineBase):
         else:
             return ImageLineSegment(start, end, new_label)
 
-    def newStart(self, new_s, new_label=None):
+    def new_start(self, new_s, new_label=None):
         """
         make a copy with a new start position, and optionally a new label
 
@@ -264,7 +264,7 @@ class ImageLineSegment(ImageLineBase):
         else:
             return ImageLineSegment(new_s, self.end, new_label)
 
-    def newEnd(self, new_e, new_label=None):
+    def new_end(self, new_e, new_label=None):
         """
         make a copy with a new end position, and optionally a new label
 
