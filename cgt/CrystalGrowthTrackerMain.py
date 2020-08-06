@@ -33,7 +33,7 @@ import PyQt5.QtCore as qc
 
 import lazylogger
 from ImageLabel import ImageLabel
-from PolyLineExtract import PolyLineExtract, IAParameters
+from PolyLineExtract import PolyLineExtract, IAArgs:
 from ImageEnhancer import ImageEnhancer
 
 # import UI
@@ -43,17 +43,18 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     """
     The implementation of the GUI, all the functions and
     data-structures required to implement the intended behaviour
-    
-    Parameters
-    ----------
-        parent (QObject): the parent QObject for this window
-    
-    Return
-    ------
-        None
     """
 
     def __init__(self, parent=None):
+        """
+        the object initalization function
+        
+            Args:
+                parent (QObject): the parent QObject for this window
+    
+            Returns:
+                None
+        """
         super(CrystalGrowthTrackerMain, self).__init__()
         self._parent = parent
         self._translated_name = self.tr("CrystalGrowthTracker")
@@ -101,7 +102,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         state change required between the two tabs in here. the currentIndex
         function in _tabWidger will act as a state variable.
 
-        Returns
+        Returns:s
         -------
         None.
         """
@@ -124,7 +125,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         rect = self._source_label1.get_rectangle(index)
 
         # line_threshold, line_length, line_gap, verts_min_distance
-        params = IAParameters(10, 50, 5, 5)
+        params = IAArgs:(10, 50, 5, 5)
         ple = PolyLineExtract(params)
         #ie = ImageEnhancer(
         #    self._raw_image[rect.top:rect.bottom, rect.left:rect.right])
@@ -184,7 +185,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         Save image a pickeled np.array
 
-        Parameters
+        Args:
         ----------
         image : np.array
             the image to be saved.
@@ -192,7 +193,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         file_name : string
             the file into which the image is to be saved
 
-        Returns
+        Returns:s
         -------
         None.
 
@@ -214,14 +215,14 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         save image in JPG format
 
-        Parameters
+        Args:
         ----------
         image : np.array
             the image to be saved.
         file_name : string
             the file to which the image is to be aved.
 
-        Returns
+        Returns:s
         -------
         None.
         """
@@ -280,7 +281,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         read a pickeled numpy image array
 
-        Parameters
+        Args:
         ----------
         file_name: string
             the file name
@@ -349,7 +350,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         display the raw image in the existing label
 
-        Returns
+        Returns:s
         -------
         None.
 
@@ -501,7 +502,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         get the pixels of the currently displayed subimage
 
-        Returns
+        Returns:s
         -------
         np.array
             the pixels in the current subimage
@@ -522,7 +523,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         This will be called whenever a MyApp object recieves a QCloseEvent.
         All actions required befor closing widget are here.
 
-        Parameters
+        Args:
         ----------
         event (QEvent):
             the Qt event object
@@ -554,12 +555,12 @@ def get_translators(lang):
     """
     find the available translations files for a languages
 
-    Parameters
+    Args:
     ----------
     lang: string
         the name of the language
 
-    Returns
+    Returns:s
     -------
         list [<translator>, <system translator>]
     """
