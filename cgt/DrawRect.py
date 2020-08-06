@@ -20,20 +20,32 @@ specific language governing permissions and limitations under the License.
 
 import numpy as np
 
-# data struct for a use selected rectangle in numpy unsigned int format.
 from collections import namedtuple
+
+## data struct for a rectangle defined on a pixmap, this will serve
+## as base for more sophisticated subclasses
+##
+## Args:
+##
+##     top (int) Y coordinate of the top boundary of the rectangle
+##
+##     bottom (int) Y coordinate of the bottom boundary of the rectangle
+##
+##     left (int) X coordinate of the left boundary of the rectangle
+##
+##     right (int) X coordinate of the right boundary of the rectangle
 BaseRect = namedtuple("BaseRect", "top, bottom, left, right")
 
 class DrawRect(BaseRect):
     """
        extends the BaseRect structure with a scale function, the intention
-       is to define a rectangle within a grayscale image defined as a numpy 
+       is to define a rectangle within a grayscale image defined as a numpy
        array, and allow for rescaling of the image.
     """
-    
+
     def scale(self, factor):
         """
-        make a new rectangle that is a scaled copy of the existing rectangle 
+        make a new rectangle that is a scaled copy of the existing rectangle
 
             Args:
                 factor (real or integer number) the scaling factor for the rectangle.
@@ -45,50 +57,50 @@ class DrawRect(BaseRect):
         b = np.uint32(np.round(self.bottom*factor))
         l = np.uint32(np.round(self.left*factor))
         r = np.uint32(np.round(self.right*factor))
-        
+
         return DrawRect(t, b, l, r)
-    
+
     def shift(self, x, y):
         """
         shift the rectangle by the x and y (placeholder)
-        
+
             Args:
                 x (number) the shift on X axis
                 y (number) the shift on Y axis
-                
+
             Retuns:
                 None
         """
         pass
-    
+
     def reshape(self, del_x, del_y):
         """
         rescale differently in x and y (placeholder)
-        
+
             Args:
                 del_x (number) the scale factor for the X axis
                 del_y (number) the scale factor for the Y axis
-                
+
             Retuns:
                 None
         """
         pass
-    
+
     def __repr__(self):
         """
         string representation for debugging
-        
+
             Returns:
                 string describing object (including memory address)
         """
-        
+
         return "<DrawRect at {}: ({}, {}, {}, {})>".format(
             id(self), self.top, self.bottom, self.left, self.right)
-        
+
     def __str__(self):
         """
         string representationf for user
-        
+
             Returns:
                 string describing object
         """

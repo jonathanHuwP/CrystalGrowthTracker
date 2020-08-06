@@ -2,31 +2,19 @@
 """
 Created on Tuesday July 21 13:42: 2020
 
-classes for representing points and line segments in pixmap coordinates
-
-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
-this file except in compliance with the License. You may obtain a copy of the
-License at
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software distributed
-under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-CONDITIONS OF ANY KIND, either express or implied. See the License for the
-specific language governing permissions and limitations under the License.
-
-@copyright 2020
 @author: j.h.pickering@leeds.ac.uk
 """
 
 import numpy as np
 from collections import namedtuple
 
-# data-structs for a line segment defined by its end points,
-# which must be in pixel coordinages of the underlying image, 
-# in order to allow for the math to remain correct while the 
-#user zooms in or out on the image
-
-#datastruct for an image point
+## data-struct for point in pixel coordinates
+##
+## Args:
+##
+##     x (int) Y coordinate of the top boundary of the rectangle
+##
+##     y (int) Y coordinate of the bottom boundary of the rectangle
 ImagePointBase = namedtuple("ImagePointBase", ["x", "y"])
 
 class ImagePoint(ImagePointBase):
@@ -37,20 +25,29 @@ class ImagePoint(ImagePointBase):
     def floatY(self):
         """
         getter for float value of Y
+
+            Returns:
+                the value of Y (numpy.float64)
         """
         return np.float64(self.y)
-    
+
     @property
     def floatX(self):
         """
         getter for float value of X
+
+            Returns:
+                the value of X (numpy.float64)
         """
         return np.float64(self.x)
-    
+
     @property
     def floatCopy(self):
         """
         make a copy with floating point numbers
+
+            Returns:
+                the point converted to numpy.float64
         """
         return ImagePoint(self.floatX, self.floatY)
 
@@ -58,386 +55,405 @@ class ImagePoint(ImagePointBase):
     def vectorLength2(self):
         """
         getter for the square of the length
+
+            Returns:
+                the square of the length of the vector from the origin to the point (numpy.float64)
         """
         x = self.floatX
         y = self.floatY
-        
+
         return x*x + y*y
-    
+
     @property
     def vectorLength(self):
         """
         getter for the length
+
+            Returns:
+                the length of the vector from the origin to the point (numpy.float64)
         """
         return np.sqrt(self.vectorLength2)
-    
+
     def scale(self, zoom):
         """
         make and return a scaled copy
+
+            Args:
+                zoom (number) the scalling factor
+
+            Returns:
+                a new ImagePoint with self's coordinates scalled by zoom
         """
         return ImagePoint(self.x*zoom, self.y*zoom)
-    
+
     def distanceFrom(self, rhs):
         """
         find the distance from self to a point
-        
-        Parameters
-        ----------
-        rhs: ImagePoint
-            the target point
-            
-        Returns
-        -------
-            distance between self and rhs
+
+            Args:
+            rhs (ImagePoint) the target point
+
+            Returns:
+                distance between self and rhs (numpy.float64)
         """
         tmp = self - rhs
         return tmp.vectorLength
-    
+
     def __add__(self, rhs):
         """
-        vector addition
+        operator override '+' vector addition
+
+            Args:
+                rhs (ImagePoint) the second point in the addition
+
+            Returns:
+                a new point with coordinates the sum of self and rhs
         """
         return ImagePoint(self.floatX + rhs.floatX, self.floatY + rhs.floatY)
 
     def __sub__(self, rhs):
         """
-        vector subtraction
+        operator override '-' vector subtraction
+
+            Args:
+                rhs (ImagePoint) the second point in the subtraction
+
+            Returns:
+                a new point with coordinates the difference of self and rhs
         """
         return ImagePoint(self.floatX - rhs.floatX, self.floatY - rhs.floatY)
-    
+
     def __mul__(self, rhs):
-        """ 
-        dot product
+        """
+        operator override '*' vector inner (dot) product
+
+            Args:
+                rhs (ImagePoint) the second point in the product
+
+            Returns:
+                the inner product of the self and rhs (numpy.float64)
         """
         return self.floatX*rhs.floatX + self.floatY*rhs.floatY
-    
+
     def __div__(self, rhs):
         """
-        divide x and y by factor 
+        operator override '/' devide self's coordinate by a factor
 
-        Parameters
-        ----------
-        rhs : number
-            the factor by which the components are to be devided.
+            Args:
+                rhs (number) the devisor
 
-        Returns
-        -------
-        normalized floating point copy
+            Returns:
+                a new point with self's coordinates devided by rhs (numpy.float64)
         """
         return ImagePoint(self.floatX/rhs, self.floatY/rhs)
-    
+
     @property
     def normalize(self):
         """
         return a normalized floating point copy
+
+            Returns:
+                (ImagePoint numpy.float64) self scaled to a length of one
         """
         l = self.vectorLength
         return ImagePoint(self.floatX/l, self.floatY/l)
-    
+
     def __str__(self):
         """
         make a string representation of the object
+
+            Returns:
+                string describing object
+
         """
         return "Point({}, {})".format(self.x, self.y)
-        
-# datastruct for a directed line segment displayed on an image
-# start the start point
-# end the end point
-# label the string identifying the line
+
+## data-struct for a directed line segment in pixel coordinates,
+## basis for classes providing more functionality
+##
+## Args:
+##
+## start (ImagePoint) the start point of the segment
+##
+## end (ImagePoint) the end point of the segment
+##
+## label (string )the string identifying the line
 ImageLineBase = namedtuple("ImageLineBase", ["start", "end", "label"])
 
 class ImageLineSegment(ImageLineBase):
-    
+    """
+    class providing a representation of a directed line segment
+    """
+
     def relabel(self, label):
         """
         return copy with a different label
 
-        Parameters
-        ----------
-        label : string
-            the new label.
+            Args:
+                label (string) the new label.
 
-        Returns
-        -------
-        ImageLineSegment
-            copy of same line segment with new label.
+            Returns:
+                copy of same line segment with new label (mageLineSegment).
         """
         return ImageLineSegment(self.start, self.end, label)
-    
+
     def scale(self, zoom, new_label=None):
         """
-        make scaled copy
+        make scaled copy of this line segment, re-labelled if required
 
-        Parameters
-        ----------
-        zoom : number
-            the scale factor.
-        new_label : string, optional
-            a new lable. The default is None.
+            Args:
+                zoom (number) the scale factor.
 
-        Returns
-        -------
-        ImageLineSegment
-            scaled copy of line segment.
+                new_label (string) a new lable (optional)
+
+            Returns:
+                scaled copy of line segment (ImageLineSegment)
+
         """
         x0 = np.uint32(np.round(self.start.x * zoom))
         y0 = np.uint32(np.round(self.start.y * zoom))
-        
+
         x1 = np.uint32(np.round(self.end.x * zoom))
         y1 = np.uint32(np.round(self.end.y * zoom))
-        
+
         start = ImagePoint(x0, y0)
         end   = ImagePoint(x1, y1)
-        
+
         if new_label is None:
             return ImageLineSegment(start, end, self.label)
         else:
             return ImageLineSegment(start, end, new_label)
-    
+
     def shift(self, shift_vector, new_label=None):
         """
-        make shifted copy
+        make shifted copy of this line segment
 
-        Parameters
-        ----------
-        zoom : ImagePoint
-            the shift vector.
-        new_label : string, optional
-            a new lable. The default is None.
+            Args:
+                zoom (ImagePoint) the shift vector.
+                new_label (string) a new lable. The default is None (optional)
 
-        Returns
-        -------
-        ImageLineSegment
-            shifted copy of line segment.
+            Returns:
+                shifted copy of line segment (ImageLineSegment)
         """
         x0 = self.start.x + shift_vector.x
         y0 = self.start.y + shift_vector.y
-        
+
         x1 = self.end.x + shift_vector.x
         y1 = self.end.y + shift_vector.y
-        
+
         start = ImagePoint(x0, y0)
         end   = ImagePoint(x1, y1)
         if new_label is None:
             return ImageLineSegment(start, end, self.label)
         else:
             return ImageLineSegment(start, end, new_label)
-    
+
     def newStart(self, new_s, new_label=None):
         """
-        make a copy with a new start position
+        make a copy with a new start position, and optionally a new label
 
-        Parameters
-        ----------
-        new_s : ImagePoint
-            the new start positin.
-        new_label : string, optional
-            a new lable. The default is None.
+            Args:
+                new_s : ImagePoint the new start positin.
+                new_label (string) a new label (optional)
 
-        Returns
-        -------
-        ImageLineSegment
-            altered copy of line segment.
+            Returns:
+                altered copy of line segment (ImageLineSegment)
         """
         if new_label is None:
             return ImageLineSegment(new_s, self.end, self.label)
         else:
             return ImageLineSegment(new_s, self.end, new_label)
-    
+
     def newEnd(self, new_e, new_label=None):
         """
-        make a copy with a new end position
+        make a copy with a new end position, and optionally a new label
 
-        Parameters
-        ----------
-        new_e : ImagePoint
-            the new end positin.
-        new_label : string, optional
-            a new lable. The default is None.
+            Args:
+                new_s : ImagePoint the new end positin.
+                new_label (string) a new label (optional)
 
-        Returns
-        -------
-        ImageLineSegment
-            altered copy of line segment.
+            Returns:
+                altered copy of line segment (ImageLineSegment)
         """
         if new_label is None:
             return ImageLineSegment(self.start, new_e, self.label)
         else:
             return ImageLineSegment(self.start, new_e, new_label)
-    
+
     def distancePointToLine(self, point):
         """
-        find the distance from a point to the line, 
+        find the distance from a point to the line,
 
-        Parameters
-        ----------
-        point : pqqt point
-            the centre of the region.
-        radius : int
-            the region will be a square of size (radius+1)^2.
+            Args:
+                point (QPoint) the target point.
 
-        Returns
-        -------
-        numpy.float64
-            min distance of point from line in pixels.
+        Returns:
+            minimum distance from line to point, in pixel coordinates (numpy.float64)
         """
-        # deal with degenerate case 
+
+        # deal with degenerate case
         if self.isVertical:
             return abs(self.start.floatX - np.float64(point.x()))
-        
+
         # calculate y - mx -c = 0
         m = np.float64(self.dy)/np.float64(self.dx)
         c = self.start.floatY - m * self.start.floatX
-        
+
         #pt(xp, yp) d = (yp-mxp-c)/sqrt(1^2 + m^2)
-        lower = np.sqrt(1.0 + m*m)        
+        lower = np.sqrt(1.0 + m*m)
         upper = abs(np.float64(point.y()) - m*np.float64(point.x()) - c)
-        
+
         return upper/lower
-    
+
     @property
     def isVertical(self):
         """
-        getter for verticality
-        
-        Returns
-        -------
-            True if vertical else false
+        getter for verticality of the line
+
+            Returns:
+                True if the line segment is vertical, else false
         """
         if not self.dx:
             return True
         else:
             return False
-        
+
     @property
     def dx(self):
         """
-        getter for change in x
-        
-        Returns
-        -------
-            change in x between start and end
+        getter for change in x along the line segment
+
+            Returns:
+                the x value at the start minus that at the end (numpy.float64)
         """
         return np.int64(self.start.x) - np.int64(self.end.x)
-    
+
     @property
     def dy(self):
         """
-        getter for change in x
-        
-        Returns
-        -------
-            change in x between start and end
-        """    
+        getter for change in y along the line segment
+
+            Returns:
+                the y value at the start minus that at the end (numpy.float64)
+        """
         return np.int64(self.start.y) - np.int64(self.end.y)
-    
+
     @property
     def normalLine(self):
         """
-        find the normal line given by (start, (-dy, dx))
+        find the normal to the line segment, given by (start, (-dy, dx))
 
-        Returns
-        -------
-        ImagePoint.
-            the normal line
+            Returns:
+                the normal line (ImageLineSegment)
         """
-        
+
         label = "{}-normal".format(self.label)
         end = ImagePoint(-self.dy, self.dx)
-        
+
         return ImageLineSegment(self.start, end, label)
-    
+
     @property
     def vectorDirection(self):
         """
         the dirction of the line as a vector
 
-        Returns
-        -------
-        ImagePoint
-            the line direction.
-        """        
+            Returns:
+                the line direction (ImagePoint)
+        """
         return self.end - self.start
-    
+
     def isClosestPointOnSegment(self, point):
         """
-        find the point on the line closest to the target
+        find the point on the line (not segment) closest to the target point, and
+        provide a boolean that is true if the closest point lies on self's segment
 
-        Parameters
-        ----------
-        point : ImagePoint
-            the target.
+            Args:
+                point the target (ImagePoint)
 
-        Returns
-        -------
-        tuple (bool, ImagePoint)
-            the bool is true if the point is on the line segment else false.
+            Returns:
+                a tuple of a boolean and an ImagePoint (tuple (bool, ImagePoint))
         """
-        
+
         vp = point - self.start
         vp = vp.floatCopy
-        
+
         vd = self.vectorDirection.floatCopy
         vdn = vd.normalize
 
         d = vdn*vp
         offset = vdn.scale(d)
         closest = self.start + offset
-        
+
         flag = True
         if d<=0.0:
             # point is befor start
-            flag = False 
+            flag = False
         elif offset.vectorLength2 > vd.vectorLength2:
             # point is beyone end
             flag = False
-            
+
         return (flag, closest)
-    
+
     def lineLabelEquals(self, line):
         """
         test equality of line labels
-        
-        Returns
-        -------
-            True if lines have the same label else false
+
+            Args:
+                line (ImageLineSegment) the test line
+
+            Returns:
+                True if self and line have the same label, else false
         """
         return self.label == line.label
 
     def labelInSet(self, in_lines):
         """
-        Find the first line with a matchin label, if no such return None
+        find the first line with a matching label, if no such return None
+
+            Args:
+                in_lines (iterable of ImageLineSegment's) a collection of lines
+
+            Returns:
+                the first line that matches selfs label, else None
         """
         for line in in_lines:
             if self.lineLabelEquals(line):
                 return line
-            
+
         return None
 
     def __str__(self):
         """
         override Python.object user string representation.
+
+        Returns:
+            string representation of line segment (string)
         """
         return "Line(Start: {}, End {}, {})".format(
             self.start, self.end, self.label)
-    
-# base for the line segment differen data structure
+
+## data-structure representing the differences between two line segment's, serves as a base
+##
+## Args:
+##
+## start_d (number) the distance between the start points
+##
+## end_d (number) the distance between the end points
+##
+## lines_label (string) a label combining the two line's own labels
 DifferenceBase = namedtuple("DifferenceBase", ["start_d", "end_d", "lines_label"])
 
 class ImageLineDifference(DifferenceBase):
     """
     data structure for differenced between two lines the data are:
-    
-    Contents
-    --------
-        start_d: float the distance apart of the start points
-        end_d: float the distance apart of the end points
-        lines_label: the joint label of the two lines
     """
     @property
     def average(self):
         """
         find the average of the start and end differences
+
+            Returns:
+                the average of the start and end distances (numpy.float64)
         """
         return (self.start_d + self.end_d)/2.0
 
@@ -448,108 +464,141 @@ class ArtifactStore(dict):
     def __init__(self, name):
         """
         initalize the class
-        
-        Parameters
-        ----------
-        name: string
-            a name uniquily identifying the video and crystal
+
+            Args:
+                name (string) a name uniquily identifying the video and crystal
+
+            Returns:
+                None
         """
-        
+
         self._name = name
-        
+
     @property
     def name(self):
         """
         getter for the name
+
+            Returns:
+                the name (string)
         """
         return self._name
-    
+
     def differences(self, key0, key1):
         """
-        find the differenced between the equivalent lines in two sets, 
+        find the differenced between the equivalent lines in two sets,
         equivalence based on the lines own labels
-        
-        Parameters
-        ----------
-        key0: dictionary key
-            the key for the first set of lines
-        key1: dictionary key
-            the key for the second set of lines
-            
-        Returns
-        -------
-        
-        
+
+            Args:
+            key0 (dictionary key) the key for the first set of lines
+            key1 (dictionary key) the key for the second set of lines
+
+            Returns:
+                a list of differences (list(ImageLineDifference))
+
         """
         tmp = self.matchPairs(key0, key1)
-        
+
         diffs = []
         for i in tmp:
             sd = i[0].start.distanceFrom(i[1].start)
             ed = i[0].end.distanceFrom(i[1].end)
             diffs.append(ImageLineDifference(sd, ed, i[0].label))
-            
+
         return diffs
-    
+
     def matchPairs(self, key0, key1):
         """
         returns a list of pairs each holding a line from the list at key0,
         and the matching line from the list at key1
 
-        Parameters
-        ----------
-        key0 : TYPE
-            the first time key.
-        key1 : TYPE
-            the second time key.
+            Args:
+                key0 : (time key) the first time key.
+                key1 : (time key) the second time key.
 
-        Returns
-        -------
-        a list of pairs
+            Returns:
+                a list of pairs each having the key0 line first (list(tuple(ImageLineSegment, ImageLineSegment)))
         """
-        
+
         tmp = []
         for i in self[key0]:
             l = i.labelInSet(self[key1])
             if l is not None:
                 tmp.append((i, l))
-                
+
         return tmp
 
-## TESTING
-class altQPoint():
-    #substitute for qpqtcore QPoint 
+# TESTING
+#########
+class AltQPoint():
+    """
+    substitute for qpqtcore QPoint, allows tests to be run without Qt
+    """
     def __init__(self, x, y):
+        """
+        initalize the object
+
+            Args:
+                x (int) the x coordinate
+                y (int) the y coordinate
+
+            Returns:
+                None
+        """
         self._x = x
         self._y = y
-        
+
     def x(self):
+        """
+        getter for x coordinate
+
+            Returns:
+                the x coordinate (int)
+        """
         return self._x
-    
+
     def y(self):
+        """
+        getter for y coordinate
+
+            Returns:
+                the y coordinate (int)
+        """
         return self._y
-    
+
     def __repr__(self):
+        """
+        string representation of point
+
+            Returns
+                text representation of point (string)
+        """
         return "({}, {})".format(self._x, self._y)
-    
+
 def test():
+    """
+    simple test function
+
+        Returns:
+            None
+    """
     st = ImagePoint(100, 200)
     ed = ImagePoint(200, 300)
-    
+
     line = ImageLineSegment(st, ed, "test00")
-    
+
     print(line)
     if line.isVertical:
-        print("vertical")
+        print("isVatical Fail")
     else:
-        print("not vertical")
-        
-    print(line.dy)
-    
-    tmp = altQPoint(100, 100)
-    
-    print("{} -> {}".format(tmp, line.distancePointToLine(tmp)))
-        
-    
+        print("isVerticl Pass")
+
+    tmp = AltQPoint(100, 100)
+
+    if line.distancePointToLine(tmp) - 100.0 > 0.0001:
+        print("distancePointToLine Fail")
+    else:
+        print("distancePointToLine Pass")
+
 if __name__ == "__main__":
-    test()             
+    test()

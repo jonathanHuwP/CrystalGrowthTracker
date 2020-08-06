@@ -27,13 +27,15 @@ import numpy as np
 
 from enum import IntEnum
 
+from image_artifacts import ImagePoint, ImageLineSegment
+
 class WidgetState(IntEnum):
     """
     the state of the users interaction
     """
 
     ## the user will create a new line by downclick and drag
-    DRAWING   = 10
+    DRAWING = 10
 
     ## the user will select a line and adjust the whole line or an endpoint
     ADJUSTING = 20
@@ -47,7 +49,7 @@ class StorageState(IntEnum):
     CREATING_LINES = 10
 
     ## the adjusted lines are copyed to a new set
-    COPYING_LINES  = 20
+    COPYING_LINES = 20
 
 class AdjustingState(IntEnum):
     """
@@ -55,15 +57,14 @@ class AdjustingState(IntEnum):
     """
 
     ## the whole line should move
-    LINE  = 10
+    LINE = 10
 
     ## the start point should be moved
     START = 20
 
     ## the end point should be moved
-    END   = 30
+    END = 30
 
-from image_artifacts import ImagePoint, ImageLineSegment
 
 class DrawingLabel(qw.QLabel):
     """
@@ -121,11 +122,11 @@ class DrawingLabel(qw.QLabel):
         self._currentLine = None
 
         self.setAlignment(
-                qc.Qt.AlignTop | qc.Qt.AlignLeft)
+            qc.Qt.AlignTop | qc.Qt.AlignLeft)
         self.setSizePolicy(
-                qw.QSizePolicy.Ignored, qw.QSizePolicy.Fixed)
+            qw.QSizePolicy.Ignored, qw.QSizePolicy.Fixed)
         self.setSizePolicy(
-                qw.QSizePolicy.Minimum, qw.QSizePolicy.Minimum)
+            qw.QSizePolicy.Minimum, qw.QSizePolicy.Minimum)
 
     def setBackgroudPixmap(self, pix):
         """
@@ -498,9 +499,9 @@ class DrawingLabel(qw.QLabel):
             self.make_line()
             self.redisplay()
             reply = qw.QMessageBox.question(
-                    self,
-                    self.tr("Create Line"),
-                    self.tr("Do you wish to save the line?"))
+                self,
+                self.tr("Create Line"),
+                self.tr("Do you wish to save the line?"))
 
             if reply == qw.QMessageBox.Yes:
                 self.add_line()
@@ -697,4 +698,3 @@ class DrawingLabel(qw.QLabel):
 
         file.open(qc.QIODevice.WriteOnly)
         self.pixmap().save(file, "PNG")
-

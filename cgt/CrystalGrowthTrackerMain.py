@@ -2,7 +2,7 @@
 """
 Created on Mon Feb 24 15:45:07 2020
 
-This module contains the top level graphical user interface for measuring the 
+This module contains the top level graphical user interface for measuring the
 growth rates of crystals observed in videos taken using an X-ray synchrotron source
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -48,25 +48,25 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     def __init__(self, parent=None):
         """
         the object initalization function
-        
+
             Args:
                 parent (QObject): the parent QObject for this window
-    
+
             Returns:
                 None
         """
         super(CrystalGrowthTrackerMain, self).__init__()
         ## the parent object
         self._parent = parent
-        
+
         ## the name in the current translation
         self._translated_name = self.tr("CrystalGrowthTracker")
-        
+
         self.setupUi(self)
-        
+
         ## the label for displaying the current main image
         self._source_label1 = None
-        
+
         ## @todo is this really needed (check/remove)
         self._source_label2 = None
 
@@ -88,13 +88,13 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._splitter.setSizes(sizes)
 
         self._subScrollArea.setWidget(self._subimage_label)
-        
-        ## the image as numpy.array 
+
+        ## the image as numpy.array
         self._raw_image = None
-        
+
         ## the path to the image source
         self._image_source = None
-        
+
         ## the current zoom  @todo do we need this as is should always be the same as the spinBox
         self._zoom = 1.0
 
@@ -105,10 +105,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     def set_title(self, source):
         """
         assignes the source and sets window title
-        
+
             Args:
                 source (string): the path (or file name) of the current main image
-    
+
             Returns:
                 None
         """
@@ -214,7 +214,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Args:
                 file_name (string) the file into which the image is to be saved
 
-        Returns: 
+        Returns:
             None
         """
         if not file_name.endswith('.pki'):
@@ -236,7 +236,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
             Args:
                 image (numpy.array) the image to be saved.
-                
+
             file_name (string) the file to which the image is to be aved.
 
             Returns:
@@ -257,7 +257,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     def load_image(self):
         """
         Get file name from user and, if good
-        
+
             Returns:
                 None
         """
@@ -302,7 +302,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
             Args:
                 file_name (string) the file name
-        
+
             Returns:
                 None
         """
@@ -319,7 +319,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
             Args:
                 file_name (string) the file name
-        
+
             Returns:
                 None
         """
@@ -337,7 +337,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
             Args:
                 file_name (string) the file name
-        
+
             Returns:
                 None
         """
@@ -354,7 +354,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     def get_zoom(self):
         """
         getter for the zoom
-        
+
             Returns:
                 the current zoom
         """
@@ -364,7 +364,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     def has_image(self):
         """
         returns true if the object has an raw image set
-        
+
             Returns:
                 True if the _raw_image is set else False
         """
@@ -373,7 +373,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     def display_image(self):
         """
         diseplay the raw image
-        
+
             Returns:
                 None
         """
@@ -392,7 +392,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     def redisplay_image(self):
         """
         display the raw image in the existing label
-        
+
             Returns:
                 None
         """
@@ -434,7 +434,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     def new_subimage(self):
         """
         update the combobox of subimages
-        
+
             Returns:
                 None
         """
@@ -450,7 +450,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     def source_zoom(self):
         """
         callback for change of zoom on source image
-        
+
             Returns:
                 None
         """
@@ -461,7 +461,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     def subimage_zoom(self):
         """
         callback for change of zoom on subimage image
-        
+
             Returns:
                 None
         """
@@ -473,7 +473,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     def save_subimages(self):
         """
         save the selected sub-image
-        
+
             Returns:
                 None
         """
@@ -518,10 +518,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         view and save a new subimage provided by argument 'img': else
         display the subimage currently selected by the user.
-        
+
             Args:
                 img (numpy.array) a new image to be displayed and stored
-        
+
             Returns:
                 None
         """
@@ -581,9 +581,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         This will be called whenever a MyApp object recieves a QCloseEvent.
         All actions required befor closing widget are here.
 
-            Args: 
+            Args:
                 event (QEvent) the Qt event object
-            
+
             Returns:
                 None
         """
@@ -635,7 +635,7 @@ def get_translators(lang):
 def select_translator():
     """
     give the user the option to choose the language other than default English
-    
+
         Returns:
             if English None, else the list of translators
     """
@@ -652,7 +652,7 @@ def select_translator():
 def run_growth_tracker():
     """
     use a local function to make an isolated the QApplication object
-    
+
         Returns:
             None
     """
