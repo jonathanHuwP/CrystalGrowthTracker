@@ -35,15 +35,11 @@ class DrawRect(BaseRect):
         """
         make a new rectangle that is a scaled copy of the existing rectangle 
 
-        Parameters
-        ----------
-        factor : real or integer number
-            the scaling factor for the rectangle.
+            Args:
+                factor (real or integer number) the scaling factor for the rectangle.
 
-        Returns
-        -------
-        DrawRect
-            the scaled rectangle.
+            Returns:
+                the scaled rectangle.
         """
         t = np.uint32(np.round(self.top*factor))
         b = np.uint32(np.round(self.bottom*factor))
@@ -55,18 +51,35 @@ class DrawRect(BaseRect):
     def shift(self, x, y):
         """
         shift the rectangle by the x and y (placeholder)
+        
+            Args:
+                x (number) the shift on X axis
+                y (number) the shift on Y axis
+                
+            Retuns:
+                None
         """
         pass
     
     def reshape(self, del_x, del_y):
         """
         rescale differently in x and y (placeholder)
+        
+            Args:
+                del_x (number) the scale factor for the X axis
+                del_y (number) the scale factor for the Y axis
+                
+            Retuns:
+                None
         """
         pass
     
     def __repr__(self):
         """
         string representation for debugging
+        
+            Returns:
+                string describing object (including memory address)
         """
         
         return "<DrawRect at {}: ({}, {}, {}, {})>".format(
@@ -75,6 +88,9 @@ class DrawRect(BaseRect):
     def __str__(self):
         """
         string representationf for user
+        
+            Returns:
+                string describing object
         """
         return "({}, {}, {}, {})".format(
             self.top, self.bottom, self.left, self.right)
