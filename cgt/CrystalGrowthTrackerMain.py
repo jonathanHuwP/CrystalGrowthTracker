@@ -33,7 +33,7 @@ import PyQt5.QtCore as qc
 
 import lazylogger
 from ImageLabel import ImageLabel
-from PolyLineExtract import PolyLineExtract, IAArgs:
+from PolyLineExtract import PolyLineExtract, IA    Args:
 from ImageEnhancer import ImageEnhancer
 
 # import UI
@@ -56,12 +56,21 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 None
         """
         super(CrystalGrowthTrackerMain, self).__init__()
+        ## the parent object
         self._parent = parent
+        
+        ## the name in the current translation
         self._translated_name = self.tr("CrystalGrowthTracker")
+        
         self.setupUi(self)
+        
+        ## the label for displaying the current main image
         self._source_label1 = None
+        
+        ## @todo is this really needed (check/remove)
         self._source_label2 = None
 
+        ## the QLabel for displaying the current subimage
         self._subimage_label = qw.QLabel(self)
         self._subimage_label.setAlignment(qc.Qt.AlignTop | qc.Qt.AlignLeft)
         self._subimage_label.setSizePolicy(
@@ -79,17 +88,29 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._splitter.setSizes(sizes)
 
         self._subScrollArea.setWidget(self._subimage_label)
-
+        
+        ## the image as numpy.array 
         self._raw_image = None
+        
+        ## the path to the image source
         self._image_source = None
+        
+        ## the current zoom  @todo do we need this as is should always be the same as the spinBox
         self._zoom = 1.0
 
+        ## the current logger
         self._logger = lazylogger.logging.getLogger(self._translated_name)
         self._logger.setLevel(lazylogger.logging.WARNING)
 
     def set_title(self, source):
         """
         assignes the source and sets window title
+        
+            Args:
+                source (string): the path (or file name) of the current main image
+    
+            Returns:
+                None
         """
         self._image_source = source
         title = self._translated_name + " - " + source
@@ -102,9 +123,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         state change required between the two tabs in here. the currentIndex
         function in _tabWidger will act as a state variable.
 
-        Returns:s
-        -------
-        None.
+            Returns:
+                None
         """
 
         self._logger.info(
@@ -115,6 +135,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         @brief find the outlines of any crystals in the currently selected sub-image
         @param method the number of the method to be used
+
+            Returns:
+                None
         """
         index = self._subimageComboBox.currentIndex()
         self._logger.debug("running on subimage (%s)", index)
@@ -125,7 +148,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         rect = self._source_label1.get_rectangle(index)
 
         # line_threshold, line_length, line_gap, verts_min_distance
-        params = IAArgs:(10, 50, 5, 5)
+        params = IA    Args:(10, 50, 5, 5)
         ple = PolyLineExtract(params)
         #ie = ImageEnhancer(
         #    self._raw_image[rect.top:rect.bottom, rect.left:rect.right])
@@ -157,6 +180,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     def save_current_subimage(self):
         """
         callback for saving the current image
+
+            Returns:
+                None
         """
         if self._source_label1 is None or self._source_label1.number_rectangles < 1:
             qw.QMessageBox.information(
@@ -185,18 +211,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         Save image a pickeled np.array
 
-        Args:
-        ----------
-        image : np.array
-            the image to be saved.
+            Args:
+                file_name (string) the file into which the image is to be saved
 
-        file_name : string
-            the file into which the image is to be saved
-
-        Returns:s
-        -------
-        None.
-
+        Returns: 
+            None
         """
         if not file_name.endswith('.pki'):
             file_name = file_name + '.pki'
@@ -215,16 +234,13 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         save image in JPG format
 
-        Args:
-        ----------
-        image : np.array
-            the image to be saved.
-        file_name : string
-            the file to which the image is to be aved.
+            Args:
+                image (numpy.array) the image to be saved.
+                
+            file_name (string) the file to which the image is to be aved.
 
-        Returns:s
-        -------
-        None.
+            Returns:
+                None
         """
         if not file_name.endswith('.jpg'):
             file_name = file_name + '.jpg'
@@ -241,6 +257,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     def load_image(self):
         """
         Get file name from user and, if good
+        
+            Returns:
+                None
         """
 
         # file types
@@ -281,10 +300,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         read a pickeled numpy image array
 
-        Args:
-        ----------
-        file_name: string
-            the file name
+            Args:
+                file_name (string) the file name
+        
+            Returns:
+                None
         """
 
         with open(file_name, 'rb') as in_f:
@@ -296,6 +316,12 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     def read_ga_image(self, file_name):
         """
         read a numpy array
+
+            Args:
+                file_name (string) the file name
+        
+            Returns:
+                None
         """
 
         with open(file_name, 'rb') as in_f:
@@ -308,6 +334,12 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     def read_image(self, file_name):
         """
         Load an image file (jpg or png), convert to numpy grayscal in process
+
+            Args:
+                file_name (string) the file name
+        
+            Returns:
+                None
         """
         # convert 0.0 to 1.0 float to 0 to 255 unsigned int
         def to_gray(value):
@@ -320,19 +352,30 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self.set_title(file_name)
 
     def get_zoom(self):
-        """getter for the zoom"""
+        """
+        getter for the zoom
+        
+            Returns:
+                the current zoom
+        """
         return self._zoom
 
     @property
     def has_image(self):
         """
-        returns true if the label has an image
+        returns true if the object has an raw image set
+        
+            Returns:
+                True if the _raw_image is set else False
         """
         return isinstance(self._raw_image, np.ndarray)
 
     def display_image(self):
         """
-        creeate a new label
+        diseplay the raw image
+        
+            Returns:
+                None
         """
         if not self.has_image:
             return
@@ -349,11 +392,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     def redisplay_image(self):
         """
         display the raw image in the existing label
-
-        Returns:s
-        -------
-        None.
-
+        
+            Returns:
+                None
         """
 
         # cash the zoom
@@ -393,6 +434,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     def new_subimage(self):
         """
         update the combobox of subimages
+        
+            Returns:
+                None
         """
         self._subimageComboBox.addItem(str(self._source_label1.number_rectangles))
 
@@ -406,6 +450,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     def source_zoom(self):
         """
         callback for change of zoom on source image
+        
+            Returns:
+                None
         """
         if self.has_image:
             self.redisplay_image()
@@ -414,6 +461,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     def subimage_zoom(self):
         """
         callback for change of zoom on subimage image
+        
+            Returns:
+                None
         """
 
         if self._source_label1.number_rectangles:
@@ -423,6 +473,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     def save_subimages(self):
         """
         save the selected sub-image
+        
+            Returns:
+                None
         """
 
         if self._source_label1 is None or self._source_label1.number_rectangles < 1:
@@ -463,7 +516,14 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     @qc.pyqtSlot()
     def display_subimage(self, img=None):
         """
-        view the selected subimge
+        view and save a new subimage provided by argument 'img': else
+        display the subimage currently selected by the user.
+        
+            Args:
+                img (numpy.array) a new image to be displayed and stored
+        
+            Returns:
+                None
         """
         if img is None:
             img = self.get_current_subimage()
@@ -500,12 +560,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
     def get_current_subimage(self):
         """
-        get the pixels of the currently displayed subimage
+        get the pixels of the subimage that is selected by the user
 
-        Returns:s
-        -------
-        np.array
-            the pixels in the current subimage
+            Returns:
+                numpy.array the pixels of the selected subimage
         """
         index = self._subimageComboBox.currentIndex()
 
@@ -523,10 +581,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         This will be called whenever a MyApp object recieves a QCloseEvent.
         All actions required befor closing widget are here.
 
-        Args:
-        ----------
-        event (QEvent):
-            the Qt event object
+            Args: 
+                event (QEvent) the Qt event object
+            
+            Returns:
+                None
         """
         mb_reply = qw.QMessageBox.question(self,
                                            self.tr('CrystalGrowthTracker'),
@@ -555,14 +614,11 @@ def get_translators(lang):
     """
     find the available translations files for a languages
 
-    Args:
-    ----------
-    lang: string
-        the name of the language
+        Args:
+        lang (string) the name of the language
 
-    Returns:s
-    -------
-        list [<translator>, <system translator>]
+        Returns:
+            a list consisting of [<translator>, <system translator>]
     """
     qt_translator = qc.QTranslator()
     system_trans = qc.QTranslator()
@@ -578,7 +634,10 @@ def get_translators(lang):
 
 def select_translator():
     """
-    get a lsit of
+    give the user the option to choose the language other than default English
+    
+        Returns:
+            if English None, else the list of translators
     """
     languages = ["English", "German"]
 
@@ -593,6 +652,9 @@ def select_translator():
 def run_growth_tracker():
     """
     use a local function to make an isolated the QApplication object
+    
+        Returns:
+            None
     """
 
     def inner_run():
