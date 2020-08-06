@@ -27,7 +27,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 
-def plot_means(outpath, numbers, means, frame_rate):
+def plot_means(outpath, numbers, means):
     '''
     Function to plot graph of mean image values and save it in a temp directory
     in the source directory.
@@ -47,7 +47,8 @@ def plot_means(outpath, numbers, means, frame_rate):
     fig_mean = plt.figure(facecolor='w', edgecolor='k')
     plt.title('Mean Across All Video Frames', {'fontsize':'22'})
     plt.plot(numbers, means, 'b', label='Frame Mean')
-    plt.xlabel('Frame\n (' + str(frame_rate) + ' frames per second)', {'fontsize':'22'})
+    #plt.xlabel('Frame\n (' + str(frame_rate) + ' frames per second)', {'fontsize':'22'})
+    plt.xlabel('Frame')
     plt.ylabel('Grayscale value', {'fontsize':'22'})
     plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), prop={'size': 14})
     plt.xticks(fontsize=18)
@@ -60,6 +61,8 @@ def plot_means(outpath, numbers, means, frame_rate):
 
     fig_mean.savefig(filename, bbox_inches='tight')
     plt.close(fig_mean)
+
+    return filename
 
 
 def plot_histogram(outpath, img, frame_number, mean, std):
@@ -103,8 +106,10 @@ def plot_histogram(outpath, img, frame_number, mean, std):
     fig_hist.savefig(filename, bbox_inches='tight')
     plt.close(fig_hist)
 
+    return filename
 
-def save_grayscale_frame(outpath, img, frame_number, frame_rate):
+
+def save_grayscale_frame(outpath, img, frame_number):
     '''
     Takes an image and turns it into a gray scale plot with a title
     and scale information and saves it in a temp directory in the source
@@ -122,11 +127,12 @@ def save_grayscale_frame(outpath, img, frame_number, frame_rate):
     '''
     #print("hi from save_grayscale_frame")
     fig_grayscale = plt.figure(facecolor='w', edgecolor='k')
-    if frame_number == 0:
-        time = 0
-    else:
-        time = frame_number/int(frame_rate)
-    plt.title('Grayscale for frame {:d} at time {:0.3f} s'.format(frame_number, time))
+    #if frame_number == 0:
+    #    time = 0
+    #else:
+    #    time = frame_number/int(frame_rate)
+    #plt.title('Grayscale for frame {:d} at time {:0.3f} s'.format(frame_number, time))
+    plt.title('Grayscale for frame {:d}'.format(frame_number))
     plt.imshow(img, cmap='gray', vmin=100, vmax=175)
     number = r"{0:05d}".format(frame_number)
 
@@ -137,3 +143,5 @@ def save_grayscale_frame(outpath, img, frame_number, frame_rate):
 
     fig_grayscale.savefig(filename, bbox_inches='tight')
     plt.close(fig_grayscale)
+    
+    return filename
