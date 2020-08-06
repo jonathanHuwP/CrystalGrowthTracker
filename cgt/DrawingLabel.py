@@ -19,13 +19,16 @@ specific language governing permissions and limitations under the License.
 @copyright 2020
 @author: j.h.pickering@leeds.ac.uk
 """
+# set up linting conditions
+# pylint: disable = too-many-public-methods
+# pylint: disable = c-extension-no-member
+
+from enum import IntEnum
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 import numpy as np
-
-from enum import IntEnum
 
 from image_artifacts import ImagePoint, ImageLineSegment
 
@@ -65,7 +68,6 @@ class AdjustingState(IntEnum):
     ## the end point should be moved
     END = 30
 
-
 class DrawingLabel(qw.QLabel):
     """
     subclass of label providing functions for drawing using a mouse.
@@ -88,38 +90,47 @@ class DrawingLabel(qw.QLabel):
         self._state = WidgetState.DRAWING
 
         ## store the Creating/Copying state
-        self._storageState = StorageState.CREATING_LINES
+        self._storage_state = StorageState.CREATING_LINES
 
         ## start point of the current line
         self._start = None
+
         ## end point of the current line
         self._end = None
+
         ## the initial value of the magnification
-        self._currentZoom = 1.0
+        self._current_zoom = 1.0
+
         ## records if the left mouse button is currently held down
         ## Qt does not allow interrogation of the current state of
         ## the mouse buttons, so a state variable must be
         ## provided to record the state for 'drag' operations
-        self._mouseLeftDown = False
+        self._mouse_left_down = False
+
         ## if true then the label must redraw on the next paint event
         self._redraw = True
 
         ## the following two variables govern the adjustmen of an existing line
         ## if true the whole line is shifted else an end is shifted
-        self._adjustLine = True
-        ## the _linesBase array index of the line being adjusted
-        self._adjustIndex = 0
+        self._adjust_line = True
+
+        ## the _lines_base array index of the line being adjusted
+        self._adjust_index = 0
 
         ## if true display the line labesl on the pixmap
-        self._showLabels = False
+        self._show_labels = False
 
         ## array for the created lines or the base from which the lines are being adjusted
-        self._linesBase = []
+        self._lines_base = []
+
         ## array for the new lines resulting from adjustment
-        self._linesNew = []
+        self.lines_new = []
 
         ## the line being worked on, is created by mouse move or mouse release events
-        self._currentLine = None
+        self._current_line = None
+
+        ## the pixmap on which we are to draw
+        self._background_pixmap = None
 
         self.setAlignment(
             qc.Qt.AlignTop | qc.Qt.AlignLeft)
@@ -128,7 +139,7 @@ class DrawingLabel(qw.QLabel):
         self.setSizePolicy(
             qw.QSizePolicy.Minimum, qw.QSizePolicy.Minimum)
 
-    def setBackgroudPixmap(self, pix):
+    def set_backgroud_pixmap(self, pix):
         """
         set the pixmap to be displayed
 
@@ -138,7 +149,7 @@ class DrawingLabel(qw.QLabel):
             Returns:
                 None
         """
-        self._background = pix
+        self._background_pixmap = pix
 
     @property
     def state(self):
@@ -151,14 +162,14 @@ class DrawingLabel(qw.QLabel):
         return self._state
 
     @property
-    def storageState(self):
+    def storage_state(self):
         """
         getter for the Creating/Copying state
 
             Returns:
                 current storage state
         """
-        return self._storageState
+        return self._storage_state
 
     @property
     def size(self):
@@ -168,29 +179,29 @@ class DrawingLabel(qw.QLabel):
             Returns
                 a tuple consisting of (number line segments in base, number in new list)
         """
-        return (len(self._linesBase), len(self._linesNew))
+        return (len(self._lines_base), len(self.lines_new))
 
     @property
-    def linesBase(self):
+    def lines_base(self):
         """
         getter for the base lines
 
             Returns:
                 the array of lines
         """
-        return self._linesBase
+        return self._lines_base
 
     @property
-    def linesNew(self):
+    def lines_new(self):
         """
         getter for the new lines
 
             Returns:
                 the array of lines
         """
-        return self._linesNew
+        return self.lines_new
 
-    def setDrawing(self):
+    def set_drawing(self):
         """
         set the Drawing/Adjusting state to Drawing
 
@@ -199,7 +210,7 @@ class DrawingLabel(qw.QLabel):
         """
         self._state = WidgetState.DRAWING
 
-    def setAdjusting(self):
+    def set_adjusting(self):
         """
         set the Drawing/Adjusting state to Adjusting
 
@@ -208,25 +219,25 @@ class DrawingLabel(qw.QLabel):
         """
         self._state = WidgetState.ADJUSTING
 
-    def setCreating(self):
+    def set_creating(self):
         """
         set the Creating/Copying state to Creating
 
             Returns:
                 None
         """
-        self._storageState = StorageState.CREATING_LINES
+        self._storage_state = StorageState.CREATING_LINES
 
-    def setCopying(self):
+    def set_copying(self):
         """
         set the Creating/Copying state to Creating
 
             Returns:
                 None
         """
-        self._storageState = StorageState.COPYING_LINES
+        self._storage_state = StorageState.COPYING_LINES
 
-    def setZoom(self, value):
+    def set_zoom(self, value):
         """
         change the magnification and redisplay
 
@@ -236,10 +247,10 @@ class DrawingLabel(qw.QLabel):
             Returns:
                 None
         """
-        self._currentZoom = value
+        self._current_zoom = value
         self.redisplay()
 
-    def showLabels(self, flag):
+    def show_labels(self, flag):
         """
         make the label display, or not, the labels by the lines
 
@@ -249,44 +260,44 @@ class DrawingLabel(qw.QLabel):
             Returns:
                 None
         """
-        self._showLabels = flag
+        self._show_labels = flag
         self.redisplay()
 
     @qc.pyqtSlot()
-    def mousePressEvent(self, e):
+    def mousePressEvent(self, event):
         """
         detect the start of a mouse movement
 
             Args:
-                e (QEvent) the mouse event, which stores details
+                event (QEvent) the mouse event, which stores details
 
             Returns:
                 None
         """
         if self._state == WidgetState.DRAWING:
-            if e.button() == qc.Qt.LeftButton:
-                self._start = e.pos()
-                self._mouseLeftDown = True
+            if event.button() == qc.Qt.LeftButton:
+                self._start = event.pos()
+                self._mouse_left_down = True
             else:
                 pass
             self.redisplay()
         else:
-            if e.button() == qc.Qt.LeftButton:
-                pick = self.pick_artifact(e.pos())
-                print(pick)
+            if event.button() == qc.Qt.LeftButton:
+                pick = self.pick_artifact(event.pos())
+
                 if pick is not None:
-                    self._adjustIndex = pick[0]
-                    self._mouseLeftDown = True
+                    self._adjust_index = pick[0]
+                    self._mouse_left_down = True
 
                     if pick[1] is None:
-                        self._start = e.pos()
-                        self._adjustLine = AdjustingState.LINE
+                        self._start = event.pos()
+                        self._adjust_line = AdjustingState.LINE
                     elif pick[1] == "start":
                         self._start = None
-                        self._adjustLine = AdjustingState.START
+                        self._adjust_line = AdjustingState.START
                     else:
                         self._start = None
-                        self._adjustLine = AdjustingState.END
+                        self._adjust_line = AdjustingState.END
 
             self.redisplay()
 
@@ -316,13 +327,13 @@ class DrawingLabel(qw.QLabel):
                 consisting of the array index of the line and, if a line end was selected,
                 "start" or "end", else the second item is None
         """
-        tp = self.test_points(position, radius)
-        if tp is not None:
-            return tp
+        points = self.test_points(position, radius)
+        if points is not None:
+            return points
 
-        tl = self.test_lines(position, radius)
-        if tl is not None:
-            return tl
+        lines = self.test_lines(position, radius)
+        if lines is not None:
+            return lines
 
         return None
 
@@ -338,42 +349,44 @@ class DrawingLabel(qw.QLabel):
                 if end point found a tuple (<line array index>, <start/end>) else None
         """
 
-        def in_r(im_pt, target, r):
+        def in_r(im_pt, target):
             # find if pixel is within square (2r + 1) about target
             # return True and seperation if in, else (False, 0)
-            dx = abs(im_pt.x - target.x())
-            dy = abs(im_pt.y - target.y())
+            del_x = abs(im_pt.x - target.x())
+            del_y = abs(im_pt.y - target.y())
 
-            if dx > r:
+            if del_x > radius:
                 return (False, 0)
-            elif dy > r:
+
+            if del_y > radius:
                 return (False, 0)
-            else:
-                return (True, np.round(np.sqrt(dx*dx + dy*dy)))
+
+            return (True, np.round(np.sqrt(del_x*del_x + del_y*del_y)))
 
         points = []
         distances = []
-        for i in range(len(self._linesBase)):
-            line = self._linesBase[i]
+        for i in range(len(self._lines_base)):
+            line = self._lines_base[i]
 
             tmp = in_r(
-                line.start.scale(self._currentZoom), position, radius)
+                line.start.scale(self._currentZoom), position)
             if tmp[0]:
                 points.append((i, "start"))
                 distances.append(tmp[1])
             else:
                 tmp = in_r(
-                    line.end.scale(self._currentZoom), position, radius)
+                    line.end.scale(self._currentZoom), position)
                 if tmp[0]:
                     points.append((i, "end"))
                     distances.append(tmp[1])
 
         if len(points) == 1:
             return points[0]
-        elif len(points) > 1:
+
+        if len(points) > 1:
             return points[np.argmin(distances)]
-        else:
-            return None
+
+        return None
 
     def test_lines(self, position, radius):
         """
@@ -390,44 +403,45 @@ class DrawingLabel(qw.QLabel):
         lines = []
         distances = []
 
-        for i in range(len(self._linesBase)):
-            line = self._linesBase[i].scale(self._currentZoom)
-            tmp = line.distancePointToLine(position)
-            if tmp < radius:
-                p = ImagePoint(position.x(), position.y())
-                cp = line.isClosestPointOnSegment(p)
-                if cp[0]:
+        for i in range(len(self._lines_base)):
+            line = self._lines_base[i].scale(self._current_zoom)
+            dist_to_line = line.distancePointToLine(position)
+            if dist_to_line < radius:
+                point = ImagePoint(position.x(), position.y())
+                close_points = line.isClosestPointOnSegment(point)
+                if close_points[0]:
                     lines.append(i)
-                    distances.append(tmp)
+                    distances.append(dist_to_line)
 
         if len(lines) == 1:
             return (lines[0], None)
-        elif len(lines) > 1:
+
+        if len(lines) > 1:
             return (lines[np.argmin(distances)], None)
-        else:
-            return None
+
+        return None
 
     @qc.pyqtSlot()
-    def mouseMoveEvent(self, e):
+    def mouseMoveEvent(self, event):
         """
         responde to the morment of the mouse, if drawing redraw the line else
         to the alter chosen line function
 
             Args:
-                e (QEvent) the event holding the button/location data
+                event (QEvent) the event holding the button/location data
 
             Returns:
                 None
         """
         if self._state == WidgetState.DRAWING and self._mouseLeftDown:
-            self._end = e.pos()
+            self._end = event.pos()
             self.make_line()
             self.redisplay()
 
         elif self._state == WidgetState.ADJUSTING and self._mouseLeftDown:
-            self.alterChosenLine(e)
+            self.alter_chosen_line(event)
 
-    def alterChosenLine(self, event):
+    def alter_chosen_line(self, event):
         """
         the function for altering a line, if adjusting shift the whole line
         else shift the currently selected end.
@@ -438,12 +452,12 @@ class DrawingLabel(qw.QLabel):
             Returns:
                 None
         """
-        if self._adjustLine == AdjustingState.LINE:
-            self.shiftChosenLine(event)
+        if self._adjust_line == AdjustingState.LINE:
+            self.shift_chosen_line(event)
         else:
-            self.moveChosenLineEnd(event)
+            self.move_chosen_line_end(event)
 
-    def moveChosenLineEnd(self, event):
+    def move_chosen_line_end(self, event):
         """
         move the end of the currently chosen line
 
@@ -453,15 +467,15 @@ class DrawingLabel(qw.QLabel):
             Returns:
                 None
         """
-        pt = ImagePoint(event.x(), event.y())
-        if self._adjustLine == AdjustingState.START:
-            self._currentLine = self._linesBase[self._adjustIndex].newStart(pt)
+        point = ImagePoint(event.x(), event.y())
+        if self._adjust_line == AdjustingState.START:
+            self._current_line = self._lines_base[self._adjust_index].newStart(point)
         else:
-            self._currentLine = self._linesBase[self._adjustIndex].newEnd(pt)
+            self._current_line = self._lines_base[self._adjust_index].newEnd(point)
 
         self.redisplay()
 
-    def shiftChosenLine(self, event):
+    def shift_chosen_line(self, event):
         """
         move the the currently chosen line
 
@@ -473,7 +487,7 @@ class DrawingLabel(qw.QLabel):
         """
         shift_qt = event.pos() - self._start
         shift_vec = ImagePoint(shift_qt.x(), shift_qt.y())
-        self._currentLine = self._linesBase[self._adjustIndex].shift(shift_vec)
+        self._current_line = self._lines_base[self._adjust_index].shift(shift_vec)
 
         self.redisplay()
 
@@ -495,7 +509,7 @@ class DrawingLabel(qw.QLabel):
 
         # if mode drawing ask the user if the line is wanted
         if self._state == WidgetState.DRAWING:
-            self._end = e.pos()
+            self._end = event.pos()
             self.make_line()
             self.redisplay()
             reply = qw.QMessageBox.question(
@@ -510,16 +524,16 @@ class DrawingLabel(qw.QLabel):
             self.redisplay()
 
         # else pass the call to the adjusting release function
-        elif self._state == WidgetState.ADJUSTING and self._currentLine is not None:
-            self.adjustingRelease()
+        elif self._state == WidgetState.ADJUSTING and self._current_line is not None:
+            self.adjusting_release()
 
-        self._mouseLeftDown = False
+        self._mouse_left_down = False
 
-    def adjustingRelease(self):
+    def adjusting_release(self):
         """
         the mouse button release function for use in the adjusting mode, if
-        creating lines current is added to the _linesBase, else if copying
-        mode the current line is added to _linesNew
+        creating lines current is added to the _lines_base, else if copying
+        mode the current line is added to lines_new
 
             Returns:
                 None
@@ -530,14 +544,14 @@ class DrawingLabel(qw.QLabel):
             self.tr("Do you wish to save adjusted line?"))
 
         if reply == qw.QMessageBox.Yes:
-            if self._storageState == StorageState.CREATING_LINES:
-                self._linesBase[self._adjustIndex] = self._currentLine
+            if self._storage_state == StorageState.CREATING_LINES:
+                self._lines_base[self._adjust_index] = self._current_line
             else:
-                self._linesNew.append(self._currentLine)
+                self.lines_new.append(self._current_line)
 
         self.clear_current()
-        self._adjustLine = True # if true the whole line is shifted
-        self._adjustIndex = 0
+        self._adjust_line = True # if true the whole line is shifted
+        self._adjust_index = 0
         self.redisplay()
 
     def make_line(self):
@@ -548,20 +562,20 @@ class DrawingLabel(qw.QLabel):
             Returns:
                 None
         """
-        zoom = self._currentZoom
-        sx = np.float64(self._start.x())/zoom
-        sx = np.uint32(np.round(sx))
-        sy = np.float64(self._start.y())/zoom
-        sy = np.uint32(np.round(sy))
+        zoom = self._current_zoom
+        start_x = np.float64(self._start.x())/zoom
+        start_x = np.uint32(np.round(start_x))
+        start_y = np.float64(self._start.y())/zoom
+        start_y = np.uint32(np.round(start_y))
 
-        ex = np.float64(self._end.x())/zoom
-        ex = np.uint32(np.round(ex))
-        ey = np.float64(self._end.y())/zoom
-        ey = np.uint32(np.round(ey))
+        end_x = np.float64(self._end.x())/zoom
+        end_x = np.uint32(np.round(end_x))
+        end_y = np.float64(self._end.y())/zoom
+        end_y = np.uint32(np.round(end_y))
 
-        self._currentLine = ImageLineSegment(
-            ImagePoint(sx, sy),
-            ImagePoint(ex, ey),
+        self._current_line = ImageLineSegment(
+            ImagePoint(start_x, start_y),
+            ImagePoint(end_x, end_y),
             "line")
 
     def clear_current(self):
@@ -573,20 +587,20 @@ class DrawingLabel(qw.QLabel):
         """
         self._start = None
         self._end = None
-        self._currentLine = None
+        self._current_line = None
 
     def add_line(self):
         """
-        copy the current line to the _linesBase with its index as its label
+        copy the current line to the _lines_base with its index as its label
 
             Returns:
                 None
         """
-        if self._currentLine is None:
+        if self._current_line is None:
             return
 
-        self._linesBase.append(
-            self._currentLine.relabel(str(len(self._linesBase))))
+        self._lines_base.append(
+            self._current_line.relabel(str(len(self._lines_base))))
 
     def redisplay(self):
         """
@@ -599,14 +613,17 @@ class DrawingLabel(qw.QLabel):
         self.repaint()
 
     @qc.pyqtSlot()
-    def paintEvent(self, e):
+    def paintEvent(self, event):
         """
         if the redraw flag is set then redraw the lines, else nothing
+
+            Args:
+                event (QEvent) data relating to cause of paint event
 
             Returns:
                 None
         """
-        qw.QLabel.paintEvent(self, e)
+        qw.QLabel.paintEvent(self, event)
 
         if self._redraw:
             self.draw_lines()
@@ -614,7 +631,7 @@ class DrawingLabel(qw.QLabel):
 
     def draw_lines(self):
         """
-        Draw the lines: iterates the _linesBase, then, if COPYING_LINES
+        Draw the lines: iterates the _lines_base, then, if COPYING_LINES
         the _linesNew finally the current line
 
             Returns:
@@ -626,34 +643,34 @@ class DrawingLabel(qw.QLabel):
         new_pen = qg.QPen(qg.QColor(qc.Qt.black), 1, qc.Qt.DashLine)
         painter = qg.QPainter()
 
-        height = self._background.height()*self._currentZoom
-        width = self._background.width()*self._currentZoom
-        pix = self._background.scaled(width, height)
+        height = self._background_pixmap.height()*self._currentZoom
+        width = self._background_pixmap.width()*self._currentZoom
+        pix = self._background_pixmap.scaled(width, height)
 
         painter.begin(pix) # make copy
 
         painter.setPen(pen)
-        for line in self._linesBase:
-            self.drawSingleLine(line, painter)
+        for line in self._lines_base:
+            self.draw_single_line(line, painter)
 
-        if self._storageState == StorageState.COPYING_LINES:
+        if self._storage_state == StorageState.COPYING_LINES:
             painter.setPen(new_pen)
             for line in self._linesNew:
-                self.drawSingleLine(line, painter)
+                self.draw_single_line(line, painter)
 
-        if self._currentLine is not None:
+        if self._current_line is not None:
             painter.setPen(red_pen)
-            zoomed = self._currentLine.scale(self._currentZoom)
-            ql = qc.QLine(
+            zoomed = self._current_line.scale(self._currentZoom)
+            qt_line = qc.QLine(
                 qc.QPoint(int(zoomed.start.x), int(zoomed.start.y)),
                 qc.QPoint(int(zoomed.end.x), int(zoomed.end.y)))
-            painter.drawLine(ql)
+            painter.drawLine(qt_line)
 
         painter.end()
 
         self.setPixmap(pix)
 
-    def drawSingleLine(self, line, painter):
+    def draw_single_line(self, line, painter):
         """
         draw a single line segment
 
@@ -666,10 +683,10 @@ class DrawingLabel(qw.QLabel):
                 None
         """
         zoomed = line.scale(self._currentZoom)
-        ql = qc.QLine(
+        qt_line = qc.QLine(
             qc.QPoint(int(zoomed.start.x), int(zoomed.start.y)),
             qc.QPoint(int(zoomed.end.x), int(zoomed.end.y)))
-        painter.drawLine(ql)
+        painter.drawLine(qt_line)
         if self._showLabels:
             # find the bounding box for the text
             bounding_box = qc.QRect(1, 1, 1, 1)
