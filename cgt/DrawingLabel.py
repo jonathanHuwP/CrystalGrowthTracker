@@ -405,10 +405,10 @@ class DrawingLabel(qw.QLabel):
 
         for i in range(len(self._lines_base)):
             line = self._lines_base[i].scale(self._current_zoom)
-            dist_to_line = line.distancePointToLine(position)
+            dist_to_line = line.distance_point_to_line(position)
             if dist_to_line < radius:
                 point = ImagePoint(position.x(), position.y())
-                close_points = line.isClosestPointOnSegment(point)
+                close_points = line.is_closest_point_on_segment(point)
                 if close_points[0]:
                     lines.append(i)
                     distances.append(dist_to_line)
