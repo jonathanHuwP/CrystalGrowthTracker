@@ -1,6 +1,8 @@
 __pycache__/
 doc/
-temp/
+temp/Grayscale*.png
+temp/Histogram*.png
+temp/Mean1.png
 Ui_*
 cgt/growth_tracker.log*
 .project
