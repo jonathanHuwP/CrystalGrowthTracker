@@ -290,7 +290,7 @@
    <sender>_saveButton</sender>
    <signal>clicked()</signal>
    <receiver>DrawingLabelTestHarness</receiver>
-   <slot>saveImage()</slot>
+   <slot>save_image()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>69</x>
@@ -306,7 +306,7 @@
    <sender>_createButton</sender>
    <signal>toggled(bool)</signal>
    <receiver>DrawingLabelTestHarness</receiver>
-   <slot>createCopyToggled()</slot>
+   <slot>create_copy_toggled()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>

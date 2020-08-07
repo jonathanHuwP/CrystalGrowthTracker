@@ -17,6 +17,10 @@ specific language governing permissions and limitations under the License.
 @copyright 2020
 @author: j.h.pickering@leeds.ac.uk
 """
+# set up linting conditions
+# pylint: disable = too-many-public-methods
+# pylint: disable = c-extension-no-member
+
 import sys
 
 import PyQt5.QtWidgets as qw
@@ -36,107 +40,142 @@ class DrawingLabelTestHarness(qw.QDialog, Ui_DrawingLabelTestHarness):
     """
     a QDialog that demonstrates the DrawingLabel class
     """
-    
+
     def __init__(self, parent=None):
         """
         set up the dialog
+
+            Args:
+                parent (QObject) the parent object
+
+            Returns:
+                None
         """
         super(DrawingLabelTestHarness, self).__init__()
+
+        ## the parent object, if any
         self._parent = parent
-        self.NAME = self.tr("DrawingLabelTestHarness")
+
+        ## the name in translation, if any
+        self._translated_name = self.tr("DrawingLabelTestHarness")
         self.setupUi(self)
+
+        ## the DrawingLabel being tested
         self._drawing = DrawingLabel(self._scrollArea)
-        
-        # 
-        im = Image.fromarray(data.clock())
-        im = im.convert("RGBA")
-        ims = im.convert("RGBA").tobytes("raw", "RGBA")
-        qim = qg.QImage(ims, im.size[0], im.size[1], qg.QImage.Format_ARGB32)
-        
-        self._drawing.set_backgroud_pixmap(qg.QPixmap.fromImage(qim))
+
+        # Get image from scikit.image
+        image = Image.fromarray(data.clock())
+        image_bytes = image.convert("RGBA").tobytes("raw", "RGBA")
+        qt_image = qg.QImage(image_bytes, image.size[0], image.size[1], qg.QImage.Format_ARGB32)
+
+        # if you wan your own image swap the comment on the following
+        # lines and replace whatever.jpg with your image
+        self._drawing.set_backgroud_pixmap(qg.QPixmap.fromImage(qt_image))
         #self._drawing.setPixmap(qg.QPixmap("whatever.jpg"))
-        
+
         self._scrollArea.setWidget(self._drawing)
-        
+
+        ## an ArtifctStore for testing
         self._store = ia.ArtifactStore("test")
-        
+
     @qc.pyqtSlot()
     def state_toggle(self):
         """
         callback for the changing the Drawing/Adjusting state
+
+            Returns:
+                None
         """
         if self._drawButton.isChecked():
             self._drawing.set_drawing()
         else:
             self._drawing.set_adjusting()
-            
+
     @qc.pyqtSlot()
     def labels_toggled(self):
         """
-        callback for the toggeling the display of line labels 
+        callback for the toggeling the display of line labels
+
+            Returns:
+                None
         """
         if self._labelsBox.isChecked():
             self._drawing.show_labels(True)
         else:
             self._drawing.show_labels(False)
-            
+
     @qc.pyqtSlot()
-    def createCopyToggled(self):
+    def create_copy_toggled(self):
         """
         callback for the changing the Crating/Copying state
+
+            Returns
+                None
         """
         if self._createButton.isChecked():
             self._drawing.set_creating()
-            self.setDrawAdjustEnabled(True)
+            self.set_draw_adjust_enabled(True)
         else:
             self._drawing.set_copying()
             self._adjustButton.setChecked(True)
-            self.setDrawAdjustEnabled(False)
-            
-    def setDrawAdjustEnabled(self, state):
+            self.set_draw_adjust_enabled(False)
+
+    def set_draw_adjust_enabled(self, state):
         """
         enable/disable the Draw/Adjust buttons
+
+            Args:
+                state (boolean) the new state
+
+            Returns:
+                None
         """
         self._drawButton.setEnabled(state)
         self._adjustButton.setEnabled(state)
-        
+
     @qc.pyqtSlot()
     def calculate(self):
         """
         calculate the differences and display then in the table.
+
+            Returns:
+                None
         """
         tmp = self._drawing.size
-        if not tmp[0] > 0 and tmp[1] > 0:
-            print("you must have lines and new lines")
+        if tmp[0] <= 0 or tmp[1] <= 0:
+            message = "You only have {} lines and {} new lines. Both must have one or more."
+            print(message.format(tmp[0], tmp[1]))
             return
-            
+
         if self._drawing.lines_base is None:
             print("lines none")
-            
+
         if self._drawing.lines_new is None:
             print("new lines none")
-            
+
         self._store[0] = self._drawing.lines_base
         self._store[1] = self._drawing.lines_new
-        
+
         diffs = self._store.differences(0, 1)
-        
+
         self._tableWidget.setColumnCount(2)
         self._tableWidget.setRowCount(len(diffs))
-        
+
         self._tableWidget.setHorizontalHeaderLabels(["Line", "Displacement (pixels)"])
-        
+
         i = 0
-        for d in diffs:
-            print(d)
-            self._tableWidget.setItem(i,0, qw.QTableWidgetItem(str(d.lines_label)))
-            self._tableWidget.setItem(i,1, qw.QTableWidgetItem(str(d.average)))
-            i+=1
-        
-    @qc.pyqtSlot()      
-    def saveImage(self):
+        for diff in diffs:
+            self._tableWidget.setItem(i, 0, qw.QTableWidgetItem(str(diff.lines_label)))
+            self._tableWidget.setItem(i, 1, qw.QTableWidgetItem(str(diff.average)))
+            i += 1
+
+    @qc.pyqtSlot()
+    def save_image(self):
         """
-        save image callback 
+        save image callback
+
+            Returns:
+                None
         """
         file = qc.QFile("my_image.png")
         self._drawing.save(file)
@@ -145,12 +184,18 @@ class DrawingLabelTestHarness(qw.QDialog, Ui_DrawingLabelTestHarness):
     def zoom_changed(self):
         """
         callback for changes to the zoom slider
+
+            Returns:
+                None
         """
         self._drawing.setZoom(self._zoomSpinBox.value())
-        
+
 def run():
     """
     use a local function to make an isolated the QApplication object
+
+        Returns:
+            None
     """
     def inner_run():
         app = qw.QApplication(sys.argv)
@@ -158,7 +203,7 @@ def run():
         window = DrawingLabelTestHarness(app)
         window.show()
         app.exec_()
-        
+
     inner_run()
 
 if __name__ == "__main__":
