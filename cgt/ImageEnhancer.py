@@ -21,64 +21,51 @@ specific language governing permissions and limitations under the License.
 import numpy as np
 from skimage import exposure
 
-class ImageEnhancer(object):
+class ImageEnhancer():
     """
     Class providing various image enhancment methods.
     """
     def __init__(self, image, parameters=None):
         self._source = image
         self._parameter = parameters
-        
+
     def constrast_stretch(self, limits=(2, 98)):
         """
-        Eliminate the top an bottom of the intensity 
+        Eliminate the top an bottom of the intensity
         and streatch out the rest
-        
-        Parameters
-        ----------
-        limits : tuple of two numbers, optional
-            Use range_values as explicit min/max intensities (%). 
-            The default is (2, 98).
 
-        Returns
-        -------
-        np.array(type = input)
-            the input array streatched so that pixels outside 
-            the range are eliminated.
+            Args:
+                limits (tuple 2 x numbers) explicit min/max intensities (%)
+
+            Returns:
+                (np.array of input type) input streatched to eliminate pixels outside range
         """
-        p2, p98 = np.percentile(self._source, limits)
+        percent2, percent98 = np.percentile(self._source, limits)
         return exposure.rescale_intensity(
-            self._source, 
-            in_range=(p2, p98))
+            self._source,
+            in_range=(percent2, percent98))
 
     def equalization(self):
         """
         histogram equalization of image, returns float64
-        Returns
-        -------
-        np.array(float64)
-            histogram equalised image.
 
+            Returns:
+                histogram equalised image np.array(float64)
         """
         return exposure.equalize_hist(self._source)
 
     def adaptive_equalization(self, c_limit=0.03):
         """
-        adaptabe histogram equalization of image, 
-        uses histograms computed over different tile 
-        regions of the image
+        adaptabe histogram equalization of image, uses histograms
+        computed over different tile regions of the image, the clipping
+        is governed by c_limit, with higher values giving more contrast
 
-        Parameters
-        ----------
-        c_limit : float, optional
-            Clipping limit, normalized between 0 and 1 
-            (higher values give more contrast).. The default is 0.03.
+            Args:
+                c_limit (float) clipping limit, normalized between 0 and 1
 
-        Returns
-        -------
-        np.array(float64)
-            equalized image.
+            Returns:
+                equalized image np.array(float64)
         """
         return exposure.equalize_adapthist(
-            self._source, 
+            self._source,
             clip_limit=c_limit)

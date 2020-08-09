@@ -237,7 +237,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Args:
                 image (numpy.array) the image to be saved.
 
-            file_name (string) the file to which the image is to be aved.
+                file_name (string) the file to which the image is to be aved.
 
             Returns:
                 None

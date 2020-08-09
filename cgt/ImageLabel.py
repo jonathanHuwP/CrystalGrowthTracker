@@ -73,9 +73,9 @@ class ImageLabel(qw.QLabel):
 
     def __iter__(self):
         """
-        make the class iterable, over rectangles, by implementing 
+        make the class iterable, over rectangles, by implementing
         means of producing an iterator of the rectangles
-        
+
             Returns:
                 iterator of the rectangles list
         """
