@@ -25,9 +25,19 @@ class ImageEnhancer():
     """
     Class providing various image enhancment methods.
     """
-    def __init__(self, image, parameters=None):
+    def __init__(self, image):
+        """
+        initalize the object
+
+            Args:
+                image (numpy.array) the image
+
+            Returns:
+                None
+        """
+
+        ## the image on which the object is working
         self._source = image
-        self._parameter = parameters
 
     def constrast_stretch(self, limits=(2, 98)):
         """
