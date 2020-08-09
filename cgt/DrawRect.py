@@ -18,9 +18,8 @@ specific language governing permissions and limitations under the License.
 @author: j.h.pickering@leeds.ac.uk
 """
 
-import numpy as np
-
 from collections import namedtuple
+import numpy as np
 
 ## data struct for a rectangle defined on a pixmap, this will serve
 ## as base for more sophisticated subclasses
@@ -53,25 +52,31 @@ class DrawRect(BaseRect):
             Returns:
                 the scaled rectangle.
         """
-        t = np.uint32(np.round(self.top*factor))
-        b = np.uint32(np.round(self.bottom*factor))
-        l = np.uint32(np.round(self.left*factor))
-        r = np.uint32(np.round(self.right*factor))
+        top = np.uint32(np.round(self.top*factor))
+        bottom = np.uint32(np.round(self.bottom*factor))
+        left = np.uint32(np.round(self.left*factor))
+        right = np.uint32(np.round(self.right*factor))
 
-        return DrawRect(t, b, l, r)
+        return DrawRect(top, bottom, left, right)
 
-    def shift(self, x, y):
+    def shift(self, x_shift, y_shift):
         """
         shift the rectangle by the x and y (placeholder)
 
             Args:
-                x (number) the shift on X axis
-                y (number) the shift on Y axis
+                x_shift (np.uint32) the shift on X axis (horiziontal)
+                y_shift (np.uint32) the shift on Y axis
 
             Retuns:
-                None
+                shifted copy of this rectangle shifted by x_shift, y_shift
         """
-        pass
+
+        top = self.top + y_shift
+        bottom = self.bottom + y_shift
+        left = self.left + x_shift
+        right = self.right + x_shift
+
+        return DrawRect(top, bottom, left, right)
 
     def reshape(self, del_x, del_y):
         """
@@ -84,7 +89,12 @@ class DrawRect(BaseRect):
             Retuns:
                 None
         """
-        pass
+        top = np.uint32(np.round(self.top*del_y))
+        bottom = np.uint32(np.round(self.bottom*del_y))
+        left = np.uint32(np.round(self.left*del_x))
+        right = np.uint32(np.round(self.right*del_x))
+
+        return DrawRect(top, bottom, left, right)
 
     def __repr__(self):
         """
@@ -94,12 +104,11 @@ class DrawRect(BaseRect):
                 string describing object (including memory address)
         """
 
-        return "<DrawRect at {}: ({}, {}, {}, {})>".format(
-            id(self), self.top, self.bottom, self.left, self.right)
+        return "<{} at {}>".format(self.__class__.__name__, id(self))
 
     def __str__(self):
         """
-        string representationf for user
+        string representation for user
 
             Returns:
                 string describing object
