@@ -4,7 +4,7 @@ cgt/temp/Grayscale*.png
 cgt/temp/Histogram*.png
 cgt/temp/Mean1.png
 Ui_*
-cgt/growth_tracker.log*
+*.log
 .project
 .pydevproject
 .spyproject
