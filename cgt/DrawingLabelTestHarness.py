@@ -64,15 +64,21 @@ class DrawingLabelTestHarness(qw.QDialog, Ui_DrawingLabelTestHarness):
         self._drawing = DrawingLabel(self._scrollArea)
 
         # Get image from scikit.image
-        image = Image.fromarray(data.clock())
-        image_bytes = image.convert("RGBA").tobytes("raw", "RGBA")
-        qt_image = qg.QImage(image_bytes, image.size[0], image.size[1], qg.QImage.Format_ARGB32)
+        #image = Image.fromarray(data.clock())
+        #image_bytes = image.convert("RGBA").tobytes("raw", "RGBA")
+        #qt_image = qg.QImage(image_bytes, image.size[0], image.size[1], qg.QImage.Format_ARGB32)
 
         # if you wan your own image swap the comment on the following
         # lines and replace whatever.jpg with your image
-        self._drawing.set_backgroud_pixmap(qg.QPixmap.fromImage(qt_image))
-        #self._drawing.setPixmap(qg.QPixmap("whatever.jpg"))
+        #pixmap = qg.QPixmap.fromImage(qt_image)
+        pixmap = qg.QPixmap("""../doc/images/test_shapes.png""")
+        
+        if pixmap is None:
+            print("pixmap is None")
+            return
 
+        self._drawing.set_backgroud_pixmap(pixmap)
+        
         self._scrollArea.setWidget(self._drawing)
 
         ## an ArtifctStore for testing
@@ -177,7 +183,20 @@ class DrawingLabelTestHarness(qw.QDialog, Ui_DrawingLabelTestHarness):
             Returns:
                 None
         """
-        file = qc.QFile("my_image.png")
+        
+        options = qw.QFileDialog.Options()
+        options |= qw.QFileDialog.DontUseNativeDialog
+        file_name, file_type = qw.QFileDialog().getSaveFileName(
+            self,
+            self.tr("Select File"),
+            "",
+            self.tr("Portable Network graphics (*.png);;JPG Files (*.jpg)"),
+            options=options)
+            
+        if file_name is None:
+            return
+            
+        file = qc.QFile(file_name)
         self._drawing.save(file)
 
     @qc.pyqtSlot()
@@ -188,7 +207,7 @@ class DrawingLabelTestHarness(qw.QDialog, Ui_DrawingLabelTestHarness):
             Returns:
                 None
         """
-        self._drawing.setZoom(self._zoomSpinBox.value())
+        self._drawing.set_zoom(self._zoomSpinBox.value())
 
 def run():
     """

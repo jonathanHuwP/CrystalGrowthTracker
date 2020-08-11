@@ -200,7 +200,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self.tr("CrystalGrowthTracker Files (*.pki);;JPG Files (*.jpg)"),
             options=options)
 
-        print(file_type)
         if file_name:
             if file_type == "CrystalGrowthTracker Files (*.pki)":
                 self.save_image_pickel(file_name)

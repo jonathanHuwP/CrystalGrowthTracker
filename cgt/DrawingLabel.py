@@ -488,6 +488,15 @@ class DrawingLabel(qw.QLabel):
         shift_qt = event.pos() - self._start
         shift_vec = ImagePoint(shift_qt.x(), shift_qt.y())
         self._current_line = self._lines_base[self._adjust_index].shift(shift_vec)
+        
+        m = []
+        m.append("shift: {}".format(shift_vec))
+        m.append("From: {}".format(self._lines_base[self._adjust_index]))
+        m.append("To: {}".format(self._current_line))
+        
+        for i in m:
+            print(i)
+         
 
         self.redisplay()
 
@@ -577,6 +586,8 @@ class DrawingLabel(qw.QLabel):
             ImagePoint(start_x, start_y),
             ImagePoint(end_x, end_y),
             "line")
+            
+        print("line: {}; zoom: {}".format(self._current_line, self._current_zoom))
 
     def clear_current(self):
         """
@@ -637,10 +648,9 @@ class DrawingLabel(qw.QLabel):
             Returns:
                 None
         """
-
-        pen = qg.QPen(qg.QColor(qc.Qt.black), 1, qc.Qt.SolidLine)
-        red_pen = qg.QPen(qg.QColor(qc.Qt.red), 1, qc.Qt.DashLine)
-        new_pen = qg.QPen(qg.QColor(qc.Qt.black), 1, qc.Qt.DashLine)
+        pen = qg.QPen(qg.QColor(qc.Qt.black), 3, qc.Qt.SolidLine)
+        red_pen = qg.QPen(qg.QColor(qc.Qt.red), 3, qc.Qt.DashLine)
+        new_pen = qg.QPen(qg.QColor(qc.Qt.black), 3, qc.Qt.DashLine)
         painter = qg.QPainter()
 
         height = self._background_pixmap.height()*self._current_zoom
@@ -648,7 +658,11 @@ class DrawingLabel(qw.QLabel):
         pix = self._background_pixmap.scaled(width, height)
 
         painter.begin(pix) # make copy
-
+        
+        font = painter.font()
+        font.setPointSize(font.pointSize() * 2)
+        painter.setFont(font)
+        
         painter.setPen(pen)
         for line in self._lines_base:
             self.draw_single_line(line, painter)
