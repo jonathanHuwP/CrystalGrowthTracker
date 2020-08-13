@@ -488,15 +488,6 @@ class DrawingLabel(qw.QLabel):
         shift_qt = event.pos() - self._start
         shift_vec = ImagePoint(shift_qt.x(), shift_qt.y())
         self._current_line = self._lines_base[self._adjust_index].shift(shift_vec)
-        
-        m = []
-        m.append("shift: {}".format(shift_vec))
-        m.append("From: {}".format(self._lines_base[self._adjust_index]))
-        m.append("To: {}".format(self._current_line))
-        
-        for i in m:
-            print(i)
-         
 
         self.redisplay()
 
@@ -586,8 +577,6 @@ class DrawingLabel(qw.QLabel):
             ImagePoint(start_x, start_y),
             ImagePoint(end_x, end_y),
             "line")
-            
-        print("line: {}; zoom: {}".format(self._current_line, self._current_zoom))
 
     def clear_current(self):
         """
