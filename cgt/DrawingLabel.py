@@ -673,14 +673,16 @@ class DrawingLabel(qw.QLabel):
 
         self.setPixmap(pix)
 
-    def draw_single_line(self, line, painter):
+    def draw_single_line(self, line, painter, allow_label=True):
         """
         draw a single line segment
 
             Args:
-            line (int) the array index of the line
+                line (int) the array index of the line
 
-            painter (QPainter) the painter to be used for the drawing, with pen set
+                painter (QPainter) the painter to be used for the drawing, with pen set
+            
+                allow_label (Boolean) if False the user labelling option is ignored and no label added
 
             Returns:
                 None
@@ -690,20 +692,38 @@ class DrawingLabel(qw.QLabel):
             qc.QPoint(int(zoomed.start.x), int(zoomed.start.y)),
             qc.QPoint(int(zoomed.end.x), int(zoomed.end.y)))
         painter.drawLine(qt_line)
+        
+        if allow_label:
+            self.draw_line_label(painter, zoomed)
+            
+    def draw_line_label(self, painter, zoomed):
+        """
+        add the label to a single line segment
+
+            Args:
+
+                painter (QPainter) the painter to be used for the drawing, with pen set
+            
+                zoomed (ImageLineSegment) the line that needs labelling, with current zoom applied
+
+            Returns:
+                None
+        """
         if self._show_labels:
             # find the bounding box for the text
             bounding_box = qc.QRect(1, 1, 1, 1)
             bounding_box = painter.boundingRect(
                 bounding_box,
                 qc.Qt.AlignCenter,
-                line.label)
+                zoomed.label)
+                
             point = zoomed.start
             location = qc.QPoint(point.x, point.y)
             bounding_box = qc.QRect(location, bounding_box.size())
             painter.drawText(
                 bounding_box,
                 qc.Qt.AlignHorizontal_Mask | qc.Qt.AlignVertical_Mask,
-                line.label)
+                zoomed.label)
 
     def save(self, file):
         """
