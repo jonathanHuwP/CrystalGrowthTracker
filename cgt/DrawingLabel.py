@@ -639,7 +639,7 @@ class DrawingLabel(qw.QLabel):
         """
         pen = qg.QPen(qg.QColor(qc.Qt.black), 3, qc.Qt.SolidLine)
         red_pen = qg.QPen(qg.QColor(qc.Qt.red), 3, qc.Qt.DashLine)
-        new_pen = qg.QPen(qg.QColor(qc.Qt.black), 3, qc.Qt.DashLine)
+        new_pen = qg.QPen(qg.QColor(qc.Qt.red), 3, qc.Qt.SolidLine)
         painter = qg.QPainter()
 
         height = self._background_pixmap.height()*self._current_zoom
@@ -651,14 +651,18 @@ class DrawingLabel(qw.QLabel):
         font = painter.font()
         font.setPointSize(font.pointSize() * 2)
         painter.setFont(font)
-        
-        painter.setPen(pen)
-        for line in self._lines_base:
-            self.draw_single_line(line, painter)
 
-        if self._storage_state == StorageState.COPYING_LINES:
+        if self._storage_state == StorageState.COPYING_LINES:      
+            painter.setPen(pen)
+            for line in self._lines_base:
+                self.draw_single_line(line, painter, False)
+
             painter.setPen(new_pen)
             for line in self._lines_new:
+                self.draw_single_line(line, painter)
+        else:
+            painter.setPen(pen)
+            for line in self._lines_base:
                 self.draw_single_line(line, painter)
 
         if self._current_line is not None:
