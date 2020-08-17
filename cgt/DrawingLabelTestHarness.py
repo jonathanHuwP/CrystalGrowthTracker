@@ -71,7 +71,26 @@ class DrawingLabelTestHarness(qw.QDialog, Ui_DrawingLabelTestHarness):
         # if you wan your own image swap the comment on the following
         # lines and replace whatever.jpg with your image
         #pixmap = qg.QPixmap.fromImage(qt_image)
-        pixmap = qg.QPixmap("""../doc/images/test_shapes.png""")
+        
+        image_files = self.tr("Image Files (*.png *.jpg)")
+        all_files = self.tr("All Files (*)")
+
+        files_all = [image_files, all_files]
+        files = ";;".join(files_all)
+
+        options = qw.QFileDialog.Options()
+        options |= qw.QFileDialog.DontUseNativeDialog
+        file_name, file_type = qw.QFileDialog.getOpenFileName(
+            self,
+            self.tr("Select File"),
+            "",
+            files,
+            options=options)
+
+        if not file_name:
+            return
+            
+        pixmap = qg.QPixmap(file_name)
         
         if pixmap is None:
             print("pixmap is None")

@@ -36,6 +36,10 @@ from ImageLabel import ImageLabel
 from PolyLineExtract import PolyLineExtract, IAParameters
 from ImageEnhancer import ImageEnhancer
 
+# set up linting conditions
+# pylint: disable = too-many-public-methods
+# pylint: disable = c-extension-no-member
+
 # import UI
 from Ui_CrystalGrowthTrackerMain import Ui_CrystalGrowthTrackerMain
 
@@ -175,6 +179,60 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         tmp_img = ple.image_all
         self.display_subimage(tmp_img)
+
+    @qc.pyqtSlot()
+    def save_results(self):
+        """
+        Save the curren set of results
+
+            Returns:
+                None
+        """
+        csv_file = "Comma Seperated Value Files (*.csv)"
+        html_file = "HTML Report (*.html)"
+
+        options = qw.QFileDialog.Options()
+        options |= qw.QFileDialog.DontUseNativeDialog
+        file_name, file_type = qw.QFileDialog().getSaveFileName(
+            self,
+            self.tr("Select File"),
+            "",
+            self.tr(";;".join([csv_file, html_file])),
+            options=options)
+
+        if file_type == csv_file:
+            self.save_results_csv(file_name)
+        elif file_type == html_file:
+            self.save_results_html(file_name)
+
+    def save_results_csv(self, file_name):
+        """
+        save the results in a comma seperated file
+
+            Returns:
+                None
+        """
+        if not file_name.lower().endswith(".csv"):
+            file_name += ".csv"
+
+        # call csv writing package with params (self._results, file_name)
+
+        print("{} saving results to comma seperated text file {}".format(
+            self._translated_name, file_name))
+
+    def save_results_html(self, file_name):
+        """
+        save the results as a report in HTML
+
+            Returns:
+                None
+        """
+        if not file_name.lower().endswith(".html"):
+            file_name += ".html"
+
+        # call report writing packagee with params (self._results, file_name)
+
+        print("{}saving results to report file {}".format(self._translated_name, file_name))
 
     @qc.pyqtSlot()
     def save_current_subimage(self):
@@ -645,8 +703,8 @@ def select_translator():
 
     if not lang[1]:
         return None
-    else:
-        return get_translators(lang[0])
+
+    return get_translators(lang[0])
 
 def run_growth_tracker():
     """
