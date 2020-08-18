@@ -26,9 +26,9 @@ import numpy as np
 ##
 ## Args:
 ##
-##     x (int) Y coordinate of the top boundary of the rectangle
+##     x (int) Y coordinate 
 ##
-##     y (int) Y coordinate of the bottom boundary of the rectangle
+##     y (int) Y coordinate 
 ImagePointBase = namedtuple("ImagePointBase", ["x", "y"])
 
 class ImagePoint(ImagePointBase):
@@ -246,13 +246,13 @@ class ImageLineSegment(ImageLineBase):
             Returns:
                 shifted copy of line segment (ImageLineSegment)
         """
-        start_y = self.start.x + shift_vector.x
+        start_x = self.start.x + shift_vector.x
         start_y = self.start.y + shift_vector.y
 
         end_x = self.end.x + shift_vector.x
         end_y = self.end.y + shift_vector.y
 
-        start = ImagePoint(start_y, start_y)
+        start = ImagePoint(start_x, start_y)
         end = ImagePoint(end_x, end_y)
 
         if new_label is None:
