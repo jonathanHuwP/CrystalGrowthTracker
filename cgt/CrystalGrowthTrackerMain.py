@@ -42,6 +42,8 @@ from ImageEnhancer import ImageEnhancer
 
 # import UI
 from Ui_CrystalGrowthTrackerMain import Ui_CrystalGrowthTrackerMain
+from cgt import htmlreport
+#from cgt import reports
 
 class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     """
@@ -203,7 +205,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         if file_type == csv_file:
             self.save_results_csv(file_name)
         elif file_type == html_file:
-            self.save_results_html(file_name)
+            htmlreport.save_html_report(file_name, "video_file_name.avi")
+            #cgt.htmlreports.save_html_report(file_name)
+            #cgt.reports.save_html_report(file_name)
 
     def save_results_csv(self, file_name):
         """
