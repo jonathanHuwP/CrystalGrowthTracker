@@ -23,6 +23,7 @@ CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 
 '''
+
 import sys
 import os
 from datetime import timedelta
@@ -38,6 +39,8 @@ from cgt.Ui_VideoOverviewWindow import Ui_VideoOverviewWindow
 #from Ui_VideoOverviewWindow import Ui_VideoOverviewWindow
 from cgt import overviewplots
 from cgt import readers
+import cv2
+
 
 
 class VideoOverviewWindow(qw.QMainWindow, Ui_VideoOverviewWindow):
@@ -159,7 +162,7 @@ class VideoOverviewWindow(qw.QMainWindow, Ui_VideoOverviewWindow):
 
 
 
-    def read_video(self, file_name):
+    def read_video(self, file_name, read_type):
         ''' opens the avi input file '''
 
         self._in_file_name = file_name
@@ -167,6 +170,9 @@ class VideoOverviewWindow(qw.QMainWindow, Ui_VideoOverviewWindow):
         start = timer()
 
         #print("hi read_video")
+
+        cv2.VideoCapture()
+        
 
         try:
             video = get_reader(file_name, 'ffmpeg')
