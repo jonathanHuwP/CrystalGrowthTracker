@@ -27,6 +27,7 @@ dependencies:
   - numpy=1.18.*
   - scikit-image=0.16.2
   - imageio-ffmpeg
+  - opencv
   - pip
   - doxygen=1.8.*
   - pip:
