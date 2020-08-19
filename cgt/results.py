@@ -27,6 +27,8 @@ from collections import namedtuple
 from os import getlogin
 from datetime import date
 
+import unittest
+
 ## define a date user pair for the history
 ##
 ## Args:
@@ -172,3 +174,54 @@ class VideoAnalysisResultsStore:
                 the list of (date, user name) pairs
         """
         return self._history
+
+################
+class TestStringMethods(unittest.TestCase):
+
+    def test_history(self):
+        """
+        test that the history is correct
+        """
+        self.assertEqual(len(self._test_result.history), 1,
+                         "history length is wrong")
+        self.assertEqual(self._test_result.history[0].date, date.today(),
+                        "date is wrong (careful of midnight)")
+        self.assertEqual(self._test_result.history[0].user_name, getlogin(),
+                        "the user login is wrong")
+
+    def test_video(self):
+        """
+        test the video data struct
+        """
+        self.assertEqual(self._test_result.video.name, self._video_name)
+        self.assertEqual(self._test_result.video.frame_rate, self._frame_rate)
+        self.assertEqual(self._test_result.video.length, self._length)
+        self.assertEqual(self._test_result.video.width, self._width)
+        self.assertEqual(self._test_result.video.height, self._height)
+
+    def setUp(self):
+        self._video_name = "ladkj.mp4"
+        self._frame_rate = 8
+        self._length = 500
+        self._width = 800
+        self._height = 600
+        self._test_result = self.make_test_result()
+
+    def tearDown(self):
+        self._video_name = None
+        self._frame_rate = None
+        self._length = None
+        self._width = None
+        self._height = None
+        self._test_result = None
+
+    def make_test_result(self):
+        source = VideoSource(self._video_name,
+                             self._frame_rate,
+                             self._length,
+                             self._width,
+                             self._height)
+        return VideoAnalysisResultsStore(source)
+
+if __name__ == "__main__":
+    unittest.main()
