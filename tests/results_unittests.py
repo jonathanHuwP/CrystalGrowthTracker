@@ -22,10 +22,14 @@ specific language governing permissions and limitations under the License.
 # pylint: disable = too-many-public-methods
 # pylint: disable = c-extension-no-member
 
-from videoanalysisresultsstore import VideoSource, VideoAnalysisResultsStore
-from crystal import Crystal 
-from region import Region
-import image_artifacts as ia
+import sys
+sys.path.insert(0, 'C:\\Users\\jhp11\\Work\\CrystalGrowthTracker')
+
+import cgt.videoanalysisresultsstore as vas
+from cgt.crystal import Crystal 
+from cgt.region import Region
+import cgt.image_artifacts as ia
+
 import unittest
 import os
 import datetime as dt
@@ -61,12 +65,12 @@ class TestResults1(unittest.TestCase):
         """
         factory function to procduce a Results object
         """
-        source = VideoSource(self._video_name,
+        source = vas.VideoSource(self._video_name,
                              self._frame_rate,
                              self._length,
                              self._width,
                              self._height)
-        return VideoAnalysisResultsStore(source)
+        return vas.VideoAnalysisResultsStore(source)
 
     def test_history(self):
         """
@@ -122,10 +126,10 @@ class TestResults2(unittest.TestCase):
         """
         factory function to procduce a Results object
         """
-        source = VideoSource("ladkj.mp4", 8, 500, 800, 600)
+        source = vas.VideoSource("ladkj.mp4", 8, 500, 800, 600)
         regions = [self.make_region1(), self.make_region2()]
 
-        return VideoAnalysisResultsStore(source, regions)
+        return vas.VideoAnalysisResultsStore(source, regions)
 
     def make_region1(self):
         """
