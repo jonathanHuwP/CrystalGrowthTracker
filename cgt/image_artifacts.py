@@ -19,6 +19,12 @@ specific language governing permissions and limitations under the License.
 @author: j.h.pickering@leeds.ac.uk
 """
 
+# set up linting conditions
+# pylint: disable = too-many-public-methods
+# pylint: disable = c-extension-no-member
+
+import unittest
+
 from collections import namedtuple
 import numpy as np
 
@@ -26,9 +32,9 @@ import numpy as np
 ##
 ## Args:
 ##
-##     x (int) Y coordinate 
+##     x (int) Y coordinate
 ##
-##     y (int) Y coordinate 
+##     y (int) Y coordinate
 ImagePointBase = namedtuple("ImagePointBase", ["x", "y"])
 
 class ImagePoint(ImagePointBase):
@@ -316,7 +322,7 @@ class ImageLineSegment(ImageLineBase):
         upper = abs(np.float64(point.y()) - grad*np.float64(point.x()) - y_intercept)
 
         return upper/lower
-
+        
     @property
     def is_vertical(self):
         """
@@ -398,10 +404,10 @@ class ImageLineSegment(ImageLineBase):
 
         flag = True
         if distance <= 0.0:
-            # point is befor start
+            # point is before start
             flag = False
         elif offset.vector_length2 > vector_direction_raw.vector_length2:
-            # point is beyone end
+            # point is beyond end
             flag = False
 
         return (flag, closest)
@@ -543,75 +549,76 @@ class ArtifactStore(dict):
 
 # TESTING
 #########
-class AltQPoint():
-    """
-    substitute for qpqtcore QPoint, allows tests to be run without Qt
-    """
-    def __init__(self, x, y):
+
+## class for unit tests of the ImagePoints
+class TestImagePoints(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_vertical(self):
         """
-        initalize the object
-
-            Args:
-                x (int) the x coordinate
-                y (int) the y coordinate
-
-            Returns:
-                None
+        test the is_vertical function
         """
-        self._x = x
-        self._y = y
+        start = ImagePoint(100, 200)
+        end0 = ImagePoint(200, 300)
+        end1 = ImagePoint(100, 300)
 
-    def x(self):
+        line = ImageLineSegment(start, end0, "non_vertical")
+        v_line = ImageLineSegment(start, end1, "vertical")
+
+        self.assertFalse(line.is_vertical,
+                        "non-vertical line reports vertical")
+        self.assertTrue(v_line.is_vertical,
+                        "vertical line reports non-vertical")
+
+    def test_dist_to_line(self):
         """
-        getter for x coordinate
-
-            Returns:
-                the x coordinate (int)
+        test the is_vertical function
         """
-        return self._x
+        start = ImagePoint(100, 200)
+        end0 = ImagePoint(200, 300)
+        end1 = ImagePoint(100, 300)
 
-    def y(self):
-        """
-        getter for y coordinate
+        line = ImageLineSegment(start, end0, "non_vertical")
+        v_line = ImageLineSegment(start, end1, "vertical")
 
-            Returns:
-                the y coordinate (int)
-        """
-        return self._y
+        test_point = ImagePoint(100, 100)
 
-    def __repr__(self):
-        """
-        string representation of point
-
-            Returns
-                text representation of point (string)
-        """
-        return "({}, {})".format(self._x, self._y)
-
-def test():
-    """
-    simple test function
-
-        Returns:
-            None
-    """
-    start = ImagePoint(100, 200)
-    end = ImagePoint(200, 300)
-
-    line = ImageLineSegment(start, end, "test00")
-
-    print(line)
-    if line.is_vertical:
-        print("isVatical Fail")
-    else:
-        print("isVerticl Pass")
-
-    tmp = AltQPoint(100, 100)
-
-    if line.distance_point_to_line(tmp) - 100.0 > 0.0001:
-        print("distance_point_to_line Fail")
-    else:
-        print("distance_point_to_line Pass")
+        flag_l, closest_l = line.is_closest_point_on_segment(test_point)
+        flag_vl, closest_vl = v_line.is_closest_point_on_segment(test_point)
+        
+        d_l = closest_l.distance_from(test_point)
+        d_vl = closest_vl.distance_from(test_point)
+        
+        self.assertFalse(flag_l, "claimed test point in line segment")
+        self.assertFalse(flag_vl, "claimed test point in vertical line segment")
+        
+        self.assertAlmostEqual(d_l, 0.0,
+                               msg="distance to line failed",
+                               delta=0.0001)
+                    
+        self.assertAlmostEqual(d_vl, 0.0,
+                               msg="distance to line failed",
+                               delta=0.0001)
 
 if __name__ == "__main__":
-    test()
+    unittest.main()
+    #start = ImagePoint(100, 200)
+    #end0 = ImagePoint(200, 300)
+    #end1 = ImagePoint(100, 300)
+
+    #line = ImageLineSegment(start, end0, "non_vertical")
+    #v_line = ImageLineSegment(start, end1, "vertical")
+
+    #test_point = ImagePoint(100, 100)
+
+    #flag_l, closest_l = line.is_closest_point_on_segment(test_point)
+    #flag_vl, closest_vl = v_line.is_closest_point_on_segment(test_point)
+
+    #msg = "Closest point on {} to {} is {}, seperation = {}"
+
+    #print(msg.format(line, test_point, closest_l, closest_l.distance_from(test_point)))
+    #print(msg.format(v_line, test_point, closest_vl, closest_vl.distance_from(test_point)))
