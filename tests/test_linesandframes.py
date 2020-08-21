@@ -24,7 +24,7 @@ specific language governing permissions and limitations under the License.
 # pylint: disable = c-extension-no-member
 
 import sys
-sys.path.insert(0, 'C:\\Users\\jhp11\\Work\\CrystalGrowthTracker')
+sys.path.insert(0, '..\\CrystalGrowthTracker')
 
 import unittest
 
@@ -70,17 +70,17 @@ class TestImagePoints(unittest.TestCase):
 
         flag_l, closest_l = line.is_closest_point_on_segment(test_point)
         flag_vl, closest_vl = v_line.is_closest_point_on_segment(test_point)
-        
+
         d_l = closest_l.distance_from(test_point)
         d_vl = closest_vl.distance_from(test_point)
-        
+
         self.assertFalse(flag_l, "claimed test point in line segment")
         self.assertFalse(flag_vl, "claimed test point in vertical line segment")
-        
+
         self.assertAlmostEqual(d_l, 0.0,
                                msg="distance to line failed",
                                delta=0.0001)
-                    
+
         self.assertAlmostEqual(d_vl, 0.0,
                                msg="distance to line failed",
                                delta=0.0001)

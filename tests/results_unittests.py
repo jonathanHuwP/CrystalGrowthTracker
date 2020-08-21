@@ -23,10 +23,10 @@ specific language governing permissions and limitations under the License.
 # pylint: disable = c-extension-no-member
 
 import sys
-sys.path.insert(0, 'C:\\Users\\jhp11\\Work\\CrystalGrowthTracker')
+sys.path.insert(0, '..\\CrystalGrowthTracker')
 
 import cgt.videoanalysisresultsstore as vas
-from cgt.crystal import Crystal 
+from cgt.crystal import Crystal
 from cgt.region import Region
 import cgt.image_artifacts as ia
 
