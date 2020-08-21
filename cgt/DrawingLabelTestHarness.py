@@ -101,7 +101,7 @@ class DrawingLabelTestHarness(qw.QDialog, Ui_DrawingLabelTestHarness):
         self._scrollArea.setWidget(self._drawing)
 
         ## an ArtifctStore for testing
-        self._store = LineSetsAndFramesStore("test")
+        self._store = LineSetsAndFramesStore()
 
     @qc.pyqtSlot()
     def state_toggle(self):

@@ -29,28 +29,14 @@ class LineSetsAndFramesStore(dict):
     """
     a store for the sets of lines used in the analysis of one crystal in one video
     """
-    def __init__(self, name):
+    def __init__(self):
         """
         initalize the class
-
-            Args:
-                name (string) a name uniquily identifying the video and crystal
 
             Returns:
                 None
         """
         super().__init__()
-        self._name = name
-
-    @property
-    def name(self):
-        """
-        getter for the name
-
-            Returns:
-                the name (string)
-        """
-        return self._name
 
     def differences(self, key0, key1):
         """
