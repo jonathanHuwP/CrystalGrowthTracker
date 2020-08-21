@@ -42,6 +42,8 @@ from ImageEnhancer import ImageEnhancer
 
 # import UI
 from Ui_CrystalGrowthTrackerMain import Ui_CrystalGrowthTrackerMain
+from cgt import htmlreport
+#from cgt import reports
 
 class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     """
@@ -201,38 +203,16 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             options=options)
 
         if file_type == csv_file:
-            self.save_results_csv(file_name)
+            if not file_name.lower().endswith(".csv"):
+                file_name += ".csv"
+            # call csv writing package with params (self._results, file_name)
+            print("{} saving results to comma seperated text file {}".format(
+                self._translated_name, file_name))
         elif file_type == html_file:
-            self.save_results_html(file_name)
+            htmlreport.save_html_report(file_name, "video_file_name.avi")
+            #cgt.htmlreports.save_html_report(file_name)
+            #cgt.reports.save_html_report(file_name)
 
-    def save_results_csv(self, file_name):
-        """
-        save the results in a comma seperated file
-
-            Returns:
-                None
-        """
-        if not file_name.lower().endswith(".csv"):
-            file_name += ".csv"
-
-        # call csv writing package with params (self._results, file_name)
-
-        print("{} saving results to comma seperated text file {}".format(
-            self._translated_name, file_name))
-
-    def save_results_html(self, file_name):
-        """
-        save the results as a report in HTML
-
-            Returns:
-                None
-        """
-        if not file_name.lower().endswith(".html"):
-            file_name += ".html"
-
-        # call report writing packagee with params (self._results, file_name)
-
-        print("{}saving results to report file {}".format(self._translated_name, file_name))
 
     @qc.pyqtSlot()
     def save_current_subimage(self):

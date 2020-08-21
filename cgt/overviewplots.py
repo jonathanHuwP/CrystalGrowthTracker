@@ -2,7 +2,7 @@
 overviewplots.py
 
 This python module contains functions that create plots
-that provide an overview of an unprocessed (without Euler's Magnifier) 
+that provide an overview of an unprocessed (without Euler's Magnifier)
 video file showing dynamic crystallisation of X-ray synchrotron videos.
 
 Joanna Leng (an EPSRC funded Research Software Engineering Fellow (EP/R025819/1)
