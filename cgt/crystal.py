@@ -23,7 +23,7 @@ specific language governing permissions and limitations under the License.
 # pylint: disable = too-many-public-methods
 # pylint: disable = c-extension-no-member
 
-import cgt.image_artifacts as ia
+from cgt.videoanalysisresultsstore import VideoAnalysisResultsStore
 
 class Crystal:
     """
@@ -42,7 +42,7 @@ class Crystal:
         self._name = name
 
         ## ArtifactStore for the lines forming the faces indexed by frame number
-        self._faces = ia.ArtifactStore(name)
+        self._faces = VideoAnalysisResultsStore()
 
         if faces is not None:
             self._faces = faces

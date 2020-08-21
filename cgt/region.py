@@ -25,7 +25,6 @@ specific language governing permissions and limitations under the License.
 
 from typing import NamedTuple, List
 
-import cgt.image_artifacts as ia
 from cgt.crystal import Crystal
 
 class Region(NamedTuple):
