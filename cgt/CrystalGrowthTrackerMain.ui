@@ -128,7 +128,7 @@
                  <x>0</x>
                  <y>0</y>
                  <width>550</width>
-                 <height>285</height>
+                 <height>290</height>
                 </rect>
                </property>
               </widget>
@@ -140,16 +140,6 @@
                <layout class="QHBoxLayout" name="horizontalLayout">
                 <item>
                  <widget class="QComboBox" name="_subimageComboBox"/>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="_detectButton">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="text">
-                   <string>Detect</string>
-                  </property>
-                 </widget>
                 </item>
                 <item>
                  <spacer name="horizontalSpacer_4">
@@ -367,22 +357,6 @@
     <hint type="sourcelabel">
      <x>953</x>
      <y>278</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>511</x>
-     <y>169</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>_detectButton</sender>
-   <signal>pressed()</signal>
-   <receiver>CrystalGrowthTrackerMain</receiver>
-   <slot>feature_detect()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>718</x>
-     <y>217</y>
     </hint>
     <hint type="destinationlabel">
      <x>511</x>

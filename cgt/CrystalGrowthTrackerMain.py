@@ -20,6 +20,8 @@ specific language governing permissions and limitations under the License.
 """
 
 import sys
+sys.path.insert(0, '..\\CrystalGrowthTracker')
+
 import array as arr
 import pickle as pk
 import numpy as np
@@ -33,8 +35,8 @@ import PyQt5.QtCore as qc
 
 import lazylogger
 from ImageLabel import ImageLabel
-from PolyLineExtract import PolyLineExtract, IAParameters
-from ImageEnhancer import ImageEnhancer
+#from PolyLineExtract import PolyLineExtract, IAParameters
+#from ImageEnhancer import ImageEnhancer
 
 # set up linting conditions
 # pylint: disable = too-many-public-methods
@@ -135,52 +137,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self._logger.info(
             "tab changed to %s", self._tabWidget.currentIndex())
-
-    @qc.pyqtSlot()
-    def feature_detect(self):
-        """
-        @brief find the outlines of any crystals in the currently selected sub-image
-        @param method the number of the method to be used
-
-            Returns:
-                None
-        """
-        index = self._subimageComboBox.currentIndex()
-        self._logger.debug("running on subimage (%s)", index)
-
-        if index < 0:
-            return
-
-        rect = self._source_label1.get_rectangle(index)
-
-        # line_threshold, line_length, line_gap, verts_min_distance
-        params = IAParameters(10, 50, 5, 5)
-        ple = PolyLineExtract(params)
-        #ie = ImageEnhancer(
-        #    self._raw_image[rect.top:rect.bottom, rect.left:rect.right])
-        #ple.image = ie.constrast_stretch((25, 75))
-
-        ple.image = self._raw_image[rect.top:rect.bottom, rect.left:rect.right]
-        ple.find_vertices()
-        ple.find_lines()
-
-        # print("Number of vertices found: {}".format(ple.number_vertices))
-        # for vert in ple.vertices:
-        #     print(vert)
-
-        # print("Number of lines found: {}".format(ple.number_lines))
-        # print("Start, , End")
-        # print("y, x, y, x, theta, r, length")
-        # for l in ple.lines:
-        #     s = "{}, {}, {}, {}, {}, {}, {}".format(
-        #         l.start[0], l.start[1],
-        #         l.end[0], l.end[1],
-        #         l.theta, l.r, l.length)
-        #     print(s)
-        # print("End")
-
-        tmp_img = ple.image_all
-        self.display_subimage(tmp_img)
 
     @qc.pyqtSlot()
     def save_results(self):
@@ -479,9 +435,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self._subimageComboBox.setCurrentIndex(
             self._source_label1.number_rectangles-1)
-
-        if self._source_label1.number_rectangles and not self._detectButton.isEnabled():
-            self._detectButton.setEnabled(True)
 
     @qc.pyqtSlot()
     def source_zoom(self):
