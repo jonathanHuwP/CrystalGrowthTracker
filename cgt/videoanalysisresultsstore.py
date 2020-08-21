@@ -51,7 +51,7 @@ class VideoAnalysisResultsStore:
     """
     a storage class that records the results and history of a video analysis
     """
-    def __init__(self, video, history=None, crystals=None):
+    def __init__(self, video, history=None, regions=None):
         """
         initalize an object
 
@@ -60,7 +60,7 @@ class VideoAnalysisResultsStore:
 
                 history ([date_user]) a list of (date, unser name) recording changes
 
-                crystals ([Crystal]) the crystal objects holding faces, times and region
+                regions ([Region]) the region objects holding crystals
         """
 
         ## a record of the date and user for all saves
@@ -75,10 +75,10 @@ class VideoAnalysisResultsStore:
         self._video = video
 
         ## storage for the crystals identified by the user dict(name, crystal)
-        self._crystals = {}
+        self._regions = {}
 
-        if crystals is not None:
-            self._crystals = crystals
+        if regions is not None:
+            self._regions = regions
 
     @property
     def video(self):
@@ -100,31 +100,48 @@ class VideoAnalysisResultsStore:
         """
         return self._history
 
-    def add_crystal(self, crystal):
+    def add_region(self, region):
         """
         add a crystal to the results
 
             Args:
-                crystal (Crystal) the crystal to be added
+                region (Region) the region to be added
         """
-        self._crystals[crystal.name] = crystal
+        self._regions[region.name] = region
+        
+    @property
+    def number_of_regions(self):
+        """
+        getter for the number of regions in the store
+        
+            Returns:
+                the number of regions
+        """
+        return len(self._regions)
 
     @property
-    def crystal_names(self):
+    def region_and_crystal_ids(self):
         """
-        getter for a list of the names of the crystals
+        getter for a list of lists of crystal names, 
+        each item in top level list is one region
 
             Returns:
-                list of crystal names
+                list of lists of crystal names, each sub-list represents one region
         """
-        return [i.name for i in self._crystals]
+        l = []
+        for r in self._regions:
+            i = i+1
+            l.append(r.crystal_names)
+            
+        return l
 
-    def get_crystal(self, name):
+    def get_crystal(self, region_id, crystal_name):
         """
         getter for an individual crystal
 
             Args:
-                name the name or id of the crystal
+                region_id the array index of the region
+                crystal_name the name or id of the crystal
 
             Returns:
                 the chosen crystel crystal
@@ -132,4 +149,19 @@ class VideoAnalysisResultsStore:
             Throws:
                 KeyError if unknow name
         """
-        return self._crystals[name]
+        return self._regionss[region_id][crystal_name]
+        
+    def get_region(self, region_id):
+        """
+        getter for a region
+        
+            Args:
+                region_id (int) the array index of the region
+        
+            Returns:
+                the region indexed by region_id
+        """
+        return self._regions[region_id]
+        
+        
+        

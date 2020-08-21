@@ -25,9 +25,8 @@ specific language governing permissions and limitations under the License.
 
 from typing import NamedTuple, List
 
-import image_artifacts as ia
-
-from crystal import Crystal
+import cgt.image_artifacts as ia
+from cgt.crystal import Crystal
 
 class Region(NamedTuple):
     """
@@ -71,4 +70,16 @@ class Region(NamedTuple):
         """
         return self.end_frame - self.start_frame
 
+    @property
+    def crystal_names(self):
+        """
+        getter for a list of the names of the crystals
 
+            Returns:
+                list of crystal names
+        """
+        return [i.name for i in self.crystals]
+        
+    @property
+    def get_crystal(self, name):
+        return self.crystals[name]
