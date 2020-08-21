@@ -26,6 +26,8 @@ specific language governing permissions and limitations under the License.
 from collections import namedtuple
 import numpy as np
 
+from imagepoint import ImagePoint
+
 ## data-struct for a directed line segment in pixel coordinates,
 ## basis for classes providing more functionality
 ##
@@ -163,7 +165,7 @@ class ImageLineSegment(ImageLineBase):
         upper = abs(np.float64(point.y()) - grad*np.float64(point.x()) - y_intercept)
 
         return upper/lower
-        
+
     @property
     def is_vertical(self):
         """
@@ -290,7 +292,7 @@ class ImageLineSegment(ImageLineBase):
         """
         return "Line(Start: {}, End {}, {})".format(
             self.start, self.end, self.label)
-            
+
 ## data-structure representing the differences between two line segment's, serves as a base
 ##
 ## Args:

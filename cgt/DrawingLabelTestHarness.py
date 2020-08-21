@@ -30,7 +30,7 @@ import PyQt5.QtCore as qc
 from skimage import data
 from PIL import Image
 
-import image_artifacts as ia
+from linesetsandframesstore import LineSetsAndFramesStore
 
 from DrawingLabel import DrawingLabel
 
@@ -71,7 +71,7 @@ class DrawingLabelTestHarness(qw.QDialog, Ui_DrawingLabelTestHarness):
         # if you wan your own image swap the comment on the following
         # lines and replace whatever.jpg with your image
         #pixmap = qg.QPixmap.fromImage(qt_image)
-        
+
         image_files = self.tr("Image Files (*.png *.jpg)")
         all_files = self.tr("All Files (*)")
 
@@ -89,19 +89,19 @@ class DrawingLabelTestHarness(qw.QDialog, Ui_DrawingLabelTestHarness):
 
         if not file_name:
             return
-            
+
         pixmap = qg.QPixmap(file_name)
-        
+
         if pixmap is None:
             print("pixmap is None")
             return
 
         self._drawing.set_backgroud_pixmap(pixmap)
-        
+
         self._scrollArea.setWidget(self._drawing)
 
         ## an ArtifctStore for testing
-        self._store = ia.ArtifactStore("test")
+        self._store = LineSetsAndFramesStore("test")
 
     @qc.pyqtSlot()
     def state_toggle(self):
@@ -202,7 +202,7 @@ class DrawingLabelTestHarness(qw.QDialog, Ui_DrawingLabelTestHarness):
             Returns:
                 None
         """
-        
+
         options = qw.QFileDialog.Options()
         options |= qw.QFileDialog.DontUseNativeDialog
         file_name, file_type = qw.QFileDialog().getSaveFileName(
@@ -211,10 +211,10 @@ class DrawingLabelTestHarness(qw.QDialog, Ui_DrawingLabelTestHarness):
             "",
             self.tr("Portable Network graphics (*.png);;JPG Files (*.jpg)"),
             options=options)
-            
+
         if file_name is None:
             return
-            
+
         file = qc.QFile(file_name)
         self._drawing.save(file)
 

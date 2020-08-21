@@ -30,7 +30,8 @@ import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 import numpy as np
 
-from image_artifacts import ImagePoint, ImageLineSegment
+from imagepoint import ImagePoint
+from imagelinesegment import ImageLineSegment
 
 class WidgetState(IntEnum):
     """
@@ -647,12 +648,12 @@ class DrawingLabel(qw.QLabel):
         pix = self._background_pixmap.scaled(width, height)
 
         painter.begin(pix) # make copy
-        
+
         font = painter.font()
         font.setPointSize(font.pointSize() * 2)
         painter.setFont(font)
 
-        if self._storage_state == StorageState.COPYING_LINES:      
+        if self._storage_state == StorageState.COPYING_LINES:
             painter.setPen(pen)
             for line in self._lines_base:
                 self.draw_single_line(line, painter, False)
@@ -685,7 +686,7 @@ class DrawingLabel(qw.QLabel):
                 line (int) the array index of the line
 
                 painter (QPainter) the painter to be used for the drawing, with pen set
-            
+
                 allow_label (Boolean) if False the user labelling option is ignored and no label added
 
             Returns:
@@ -696,10 +697,10 @@ class DrawingLabel(qw.QLabel):
             qc.QPoint(int(zoomed.start.x), int(zoomed.start.y)),
             qc.QPoint(int(zoomed.end.x), int(zoomed.end.y)))
         painter.drawLine(qt_line)
-        
+
         if allow_label:
             self.draw_line_label(painter, zoomed)
-            
+
     def draw_line_label(self, painter, zoomed):
         """
         add the label to a single line segment
@@ -707,7 +708,7 @@ class DrawingLabel(qw.QLabel):
             Args:
 
                 painter (QPainter) the painter to be used for the drawing, with pen set
-            
+
                 zoomed (ImageLineSegment) the line that needs labelling, with current zoom applied
 
             Returns:
@@ -720,7 +721,7 @@ class DrawingLabel(qw.QLabel):
                 bounding_box,
                 qc.Qt.AlignCenter,
                 zoomed.label)
-                
+
             point = zoomed.start
             location = qc.QPoint(point.x, point.y)
             bounding_box = qc.QRect(location, bounding_box.size())

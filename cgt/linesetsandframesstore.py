@@ -23,6 +23,8 @@ specific language governing permissions and limitations under the License.
 # pylint: disable = too-many-public-methods
 # pylint: disable = c-extension-no-member
 
+from imagelinesegment import ImageLineDifference
+
 class LineSetsAndFramesStore(dict):
     """
     a store for the sets of lines used in the analysis of one crystal in one video
