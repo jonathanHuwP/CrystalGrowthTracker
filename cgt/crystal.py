@@ -24,7 +24,7 @@ specific language governing permissions and limitations under the License.
 # pylint: disable = c-extension-no-member
 # pylint: disable = E0401 
 
-from cgt.videoanalysisresultsstore import VideoAnalysisResultsStore
+from cgt.linesetsandframesstore import LineSetsAndFramesStore
 
 class Crystal:
     """
@@ -43,7 +43,7 @@ class Crystal:
         self._name = name
 
         ## ArtifactStore for the lines forming the faces indexed by frame number
-        self._faces = VideoAnalysisResultsStore()
+        self._faces = LineSetsAndFramesStore()
 
         if faces is not None:
             self._faces = faces

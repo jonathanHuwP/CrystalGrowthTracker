@@ -28,6 +28,7 @@ sys.path.insert(0, '..\\CrystalGrowthTracker')
 import cgt.videoanalysisresultsstore as vas
 from cgt.crystal import Crystal
 from cgt.region import Region
+import cgt.imagelinesegment as ia
 
 import unittest
 import os
