@@ -82,6 +82,12 @@ class Region(NamedTuple):
         
     @property
     def crystals(self):
+        """
+        getter for the crystals
+        
+            Returns:
+                the list of crystals
+        """
         return self._crystals
 
     def get_crystal(self, index):
