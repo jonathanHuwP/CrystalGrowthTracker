@@ -22,6 +22,7 @@ specific language governing permissions and limitations under the License.
 # set up linting conditions
 # pylint: disable = too-many-public-methods
 # pylint: disable = c-extension-no-member
+# pylint: disable = E0401
 
 from typing import NamedTuple, List
 
@@ -31,13 +32,13 @@ class Region(NamedTuple):
     """
     subclass of video_region providing ustility functions
     """
-    top_left_horizontal : int
-    top_left_vertical : int
-    bottom_right_horizontal : int
-    bottom_right_vertical : int
-    start_frame : int
-    end_frame : int
-    crystals : List[Crystal]
+    top_left_horizontal: int
+    top_left_vertical: int
+    bottom_right_horizontal: int
+    bottom_right_vertical: int
+    start_frame: int
+    end_frame: int
+    crystals: List[Crystal]
 
     @property
     def width(self):
@@ -78,7 +79,15 @@ class Region(NamedTuple):
                 list of crystal names
         """
         return [i.name for i in self.crystals]
-        
-    @property
+
     def get_crystal(self, name):
+        """
+        getter for a named crystal
+
+            Args:
+                name the crystals id
+
+            Returns:
+                the crystal
+        """
         return self.crystals[name]

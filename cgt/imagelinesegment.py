@@ -23,13 +23,15 @@ specific language governing permissions and limitations under the License.
 # pylint: disable = too-many-public-methods
 # pylint: disable = c-extension-no-member
 
-import sys
-sys.path.insert(0, '..\\CrystalGrowthTracker')
-
 from collections import namedtuple
 import numpy as np
 
 from cgt.imagepoint import ImagePoint
+
+import sys
+sys.path.insert(0, '..\\CrystalGrowthTracker')
+
+
 
 ## data-struct for a directed line segment in pixel coordinates,
 ## basis for classes providing more functionality

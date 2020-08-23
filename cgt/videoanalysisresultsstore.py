@@ -18,12 +18,13 @@ specific language governing permissions and limitations under the License.
 
 # set up linting conditions
 # pylint: disable = too-many-public-methods
-# pylint: disable = c-extension-no-member## define a date user pair for the history
+# pylint: disable = c-extension-no-member
 
 from collections import namedtuple
 import os
 import datetime as dt
 
+## define a date user pair for the history
 ##
 ## Args:
 ##
@@ -108,12 +109,12 @@ class VideoAnalysisResultsStore:
                 region (Region) the region to be added
         """
         self._regions[region.name] = region
-        
+
     @property
     def number_of_regions(self):
         """
         getter for the number of regions in the store
-        
+
             Returns:
                 the number of regions
         """
@@ -122,18 +123,17 @@ class VideoAnalysisResultsStore:
     @property
     def region_and_crystal_ids(self):
         """
-        getter for a list of lists of crystal names, 
+        getter for a list of lists of crystal names,
         each item in top level list is one region
 
             Returns:
                 list of lists of crystal names, each sub-list represents one region
         """
-        l = []
-        for r in self._regions:
-            i = i+1
-            l.append(r.crystal_names)
-            
-        return l
+        lst = []
+        for region in self._regions:
+            lst.append(region.crystal_names)
+
+        return lst
 
     def get_crystal(self, region_id, crystal_name):
         """
@@ -149,19 +149,16 @@ class VideoAnalysisResultsStore:
             Throws:
                 KeyError if unknow name
         """
-        return self._regionss[region_id][crystal_name]
-        
+        return self._regions[region_id][crystal_name]
+
     def get_region(self, region_id):
         """
         getter for a region
-        
+
             Args:
                 region_id (int) the array index of the region
-        
+
             Returns:
                 the region indexed by region_id
         """
         return self._regions[region_id]
-        
-        
-        

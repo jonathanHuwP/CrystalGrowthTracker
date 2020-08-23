@@ -22,6 +22,7 @@ specific language governing permissions and limitations under the License.
 # set up linting conditions
 # pylint: disable = too-many-public-methods
 # pylint: disable = c-extension-no-member
+# pylint: disable = E0401 
 
 from cgt.videoanalysisresultsstore import VideoAnalysisResultsStore
 
