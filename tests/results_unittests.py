@@ -158,6 +158,8 @@ class TestResults2(unittest.TestCase):
                         self._stop_frame,
                         [crystal])
 
+        return region
+
     def make_region2(self):
         """
         factory function to produce a test crystal
@@ -191,6 +193,8 @@ class TestResults2(unittest.TestCase):
                         self._start_frame,
                         self._stop_frame,
                         [crystal])
+
+        return region
 
     def test_something(self):
         """

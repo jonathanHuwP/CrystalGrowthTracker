@@ -100,6 +100,10 @@ class VideoAnalysisResultsStore:
                 the list of (date, user name) pairs
         """
         return self._history
+        
+    @property
+    def regions(self):
+        return self._regions
 
     def add_region(self, region):
         """

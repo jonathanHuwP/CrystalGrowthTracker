@@ -68,9 +68,13 @@ class Crystal:
                 number of frames (int)
         """
         return len(self._faces)
+        
+    @property
+    def name(self):
+        return self._name
 
     @property
-    def list_of_frame_number(self):
+    def list_of_frame_numbers(self):
         """
         getter for the frames held
 
