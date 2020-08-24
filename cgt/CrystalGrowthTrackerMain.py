@@ -146,28 +146,19 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 None
         """
-        csv_file = "Comma Seperated Value Files (*.csv)"
-        html_file = "HTML Report (*.html)"
-
-        options = qw.QFileDialog.Options()
-        options |= qw.QFileDialog.DontUseNativeDialog
-        file_name, file_type = qw.QFileDialog().getSaveFileName(
+        dir_name = qw.QFileDialog().getExistingDirectory(
             self,
-            self.tr("Select File"),
-            "",
-            self.tr(";;".join([csv_file, html_file])),
-            options=options)
+            self.tr("Select Directory for the Report"),
+            "")
 
-        if file_type == csv_file:
-            if not file_name.lower().endswith(".csv"):
-                file_name += ".csv"
-            # call csv writing package with params (self._results, file_name)
-            print("{} saving results to comma seperated text file {}".format(
-                self._translated_name, file_name))
-        elif file_type == html_file:
-            htmlreport.save_html_report(file_name, "video_file_name.avi")
-            #cgt.htmlreports.save_html_report(file_name)
-            #cgt.reports.save_html_report(file_name)
+        if dir_name is not None:
+            file_name, _ = qw.QFileDialog().getSaveFileName(
+                self,
+                self.tr("Enter file name of report"),
+                dir_name)
+                
+            if file_name is not None:
+                htmlreport.save_html_report(file_name, "video_file_name.avi")
 
 
     @qc.pyqtSlot()
