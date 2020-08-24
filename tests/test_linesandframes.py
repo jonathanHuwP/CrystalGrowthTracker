@@ -77,12 +77,12 @@ class TestImagePoints(unittest.TestCase):
         self.assertFalse(flag_l, "claimed test point in line segment")
         self.assertFalse(flag_vl, "claimed test point in vertical line segment")
 
-        self.assertAlmostEqual(d_l, 0.0,
-                               msg="distance to line failed",
+        self.assertAlmostEqual(d_l, 70.7107,
+                               msg="distance to line failed on non-vertical line",
                                delta=0.0001)
 
         self.assertAlmostEqual(d_vl, 0.0,
-                               msg="distance to line failed",
+                               msg="distance to line failed on vertical line",
                                delta=0.0001)
 
 if __name__ == "__main__":
