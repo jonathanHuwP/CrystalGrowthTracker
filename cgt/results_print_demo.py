@@ -22,14 +22,14 @@ specific language governing permissions and limitations under the License.
 # pylint: disable = too-many-public-methods
 # pylint: disable = c-extension-no-member
 
-import sys
-sys.path.insert(0, '..\\CrystalGrowthTracker')
-
 import cgt.videoanalysisresultsstore as vas
 from cgt.crystal import Crystal
 from cgt.region import Region
 from imagepoint import ImagePoint
 from imagelinesegment import ImageLineSegment
+
+import sys
+sys.path.insert(0, '..\\CrystalGrowthTracker')
 
 def make_test_result():
     """
@@ -54,14 +54,11 @@ def make_region1():
                              "02")
 
 
-    crystal = Crystal(name="01")
+    tmp_crystal = Crystal(name="01")
 
-    crystal.add_faces([line1, line2], 250)
+    tmp_crystal.add_faces([line1, line2], 250)
 
-    crystals = [crystal]
-    region = Region(450, 200, 675, 500, 250, 500, [crystal])
-    
-    return region
+    return Region(450, 200, 675, 500, 250, 500, [tmp_crystal])
 
 def make_region2():
     """
@@ -84,40 +81,38 @@ def make_region2():
                               ImagePoint(175, 300),
                               "02")
 
-    crystal = Crystal(name="02")
+    tmp_crystal = Crystal(name="02")
 
-    crystal.add_faces([line1, line2], 250)
-    crystal.add_faces([line1a, line2a], 500)
+    tmp_crystal.add_faces([line1, line2], 250)
+    tmp_crystal.add_faces([line1a, line2a], 500)
 
-    region = Region(450, 200, 675, 500, 250, 500, [crystal])
-    
-    return region
-    
+    return Region(450, 200, 675, 500, 250, 500, [tmp_crystal])
+
 if __name__ == "__main__":
     results = make_test_result()
-    
+
     for record in results.history:
         print(record)
-    
+
     video = results.video
     print(video.name, video.frame_rate, video.length, video.width, video.height)
-    
+
     for region in results.regions:
-        print(region.top_left_horizontal, 
-              region.top_left_vertical, 
-              region.bottom_right_horizontal, 
-              region.bottom_right_vertical, 
-              region.start_frame, 
+        print(region.top_left_horizontal,
+              region.top_left_vertical,
+              region.bottom_right_horizontal,
+              region.bottom_right_vertical,
+              region.start_frame,
               region.end_frame)
-        
-        for crystal in region.crystals:            
+
+        for crystal in region.crystals:
             print("Crystal {} has {} frames".format(crystal.name, crystal.number_of_frames_held))
-            
+
             for frame in crystal.list_of_frame_numbers:
                 print("\tframe number {}".format(frame))
-                
+
                 faces = crystal.faces_in_frame(frame)
-                
+
                 for face in faces:
-                    print("\t\t{}".format(face))
-            
+                    print("\t\t{} ({} {}), ({}, {})".format(
+                        face.label, face.start.x, face.start.y, face.end.x, face.end.y))
