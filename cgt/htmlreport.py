@@ -1,5 +1,5 @@
 '''
-reports.py
+htmlreport.py
 
 This python module contains functions that create reports in csv or html
 format for the CrystalGrowthTracker application.
