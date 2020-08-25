@@ -58,8 +58,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>265</width>
-                   <height>290</height>
+                   <width>334</width>
+                   <height>259</height>
                   </rect>
                  </property>
                 </widget>
@@ -110,6 +110,13 @@
               </item>
              </layout>
             </item>
+            <item>
+             <widget class="QSlider" name="_frameSlider">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
            </layout>
           </widget>
           <widget class="QGroupBox" name="groupBox_2">
@@ -127,7 +134,7 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>550</width>
+                 <width>481</width>
                  <height>290</height>
                 </rect>
                </property>
@@ -517,6 +524,22 @@
     <hint type="sourcelabel">
      <x>75</x>
      <y>521</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>470</x>
+     <y>291</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_frameSlider</sender>
+   <signal>sliderReleased()</signal>
+   <receiver>CrystalGrowthTrackerMain</receiver>
+   <slot>frame_changed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>210</x>
+     <y>451</y>
     </hint>
     <hint type="destinationlabel">
      <x>470</x>

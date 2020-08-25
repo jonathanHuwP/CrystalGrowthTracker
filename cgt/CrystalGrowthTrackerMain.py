@@ -43,7 +43,8 @@ from ImageLabel import ImageLabel
 # pylint: disable = c-extension-no-member
 
 # import UI
-from Ui_CrystalGrowthTrackerMain import Ui_CrystalGrowthTrackerMain
+from cgt.Ui_CrystalGrowthTrackerMain import Ui_CrystalGrowthTrackerMain
+
 from cgt import htmlreport
 #from cgt import reports
 
@@ -77,6 +78,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         ## @todo is this really needed (check/remove)
         self._source_label2 = None
+
+        ## the reader for the video file
+        self._video_reader = None
 
         ## the QLabel for displaying the current subimage
         self._subimage_label = qw.QLabel(self)
@@ -156,7 +160,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 self,
                 self.tr("Enter file name of report"),
                 dir_name)
-                
+
             if file_name is not None:
                 htmlreport.save_html_report(file_name, "video_file_name.avi")
 
@@ -247,12 +251,12 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
 
         # file types
-        image_files = self.tr("Image Files (*.png *.jpg)")
+        video_files = self.tr("Video Files (*.avi)")
         tracker_files = self.tr("CrystalGrowthTracker Files (*.ga)")
         subimage_files = self.tr("CrystalGrowthTracker Subimage Files(*.pki)")
         all_files = self.tr("All Files (*)")
 
-        files_all = [image_files, tracker_files, subimage_files, all_files]
+        files_all = [video_files, tracker_files, subimage_files, all_files]
         files = ";;".join(files_all)
 
         options = qw.QFileDialog.Options()
@@ -267,8 +271,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         if not file_name:
             return
 
-        if file_type == image_files:
-            self.read_image(file_name)
+        if file_type == video_files:
+            self.read_video(file_name)
         elif file_type == tracker_files:
             self.read_ga_image(file_name)
         elif file_type == subimage_files:
@@ -279,6 +283,82 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             qw.QMessageBox.warning(self,
                                    self._translated_name,
                                    message)
+
+    def read_video(self, file_name):
+        """
+        read in a video file
+
+            Args:
+                file_name the file name and path
+
+            Returns
+                None
+        """
+        from imageio import get_reader as imio_get_reader
+        print("read_video({})".format(file_name))
+
+        try:
+            self._video_reader = imio_get_reader(file_name, 'ffmpeg')
+        except Exception as ex:
+            message = "Unexpected error: {}, {}".format(type(ex), ex.args)
+            qw.QMessageBox.warning(self,
+                                   self._translated_name,
+                                   message)
+            return
+
+        # analyse the frame
+        count = 0
+        for frame in self._video_reader.iter_data():
+            count += 1
+
+        self._frameSlider.setMaximum(count-1)
+
+        self.display()
+
+    def display(self):
+        """
+        display one frame of the video
+
+            Returns:
+                None
+        """
+        # convert 0.0 to 1.0 float to 0 to 255 unsigned int
+        def to_gray(value):
+            return np.uint8(np.round(value*255))
+            
+        # get the fram as numpy.ndarray
+        frame = self._frameSlider.value()
+        img = color.rgb2gray(self._video_reader.get_data(frame))
+        print(img.shape)
+        img = to_gray(img)
+        
+        self._raw_image = img
+        
+        pixmap = ndarray_to_qpixmap(img)
+
+        if self._source_label1 is None:
+            self._source_label1 = ImageLabel(self)
+            self._source_label1.setAlignment(qc.Qt.AlignTop | qc.Qt.AlignLeft)
+            self._source_label1.setSizePolicy(
+                qw.QSizePolicy.Ignored, qw.QSizePolicy.Fixed)
+            self._source_label1.new_selection.connect(self.new_subimage)
+            self._sourceScrollArea.setWidget(self._source_label1)
+
+        self._source_label1.setPixmap(pixmap)
+        self._source_label1.setScaledContents(True)
+        self._source_label1.setSizePolicy(
+            qw.QSizePolicy.Fixed, qw.QSizePolicy.Fixed)
+        self._source_label1.setMargin(0)
+
+    @qc.pyqtSlot()
+    def frame_changed(self):
+        """
+        callback for the frame slider
+
+            Returns:
+                None
+        """
+        self.display()
 
     def read_numpy_image(self, file_name):
         """
@@ -588,6 +668,21 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         else:
             # dispose of the event in the approved way
             event.ignore()
+
+def ndarray_to_qpixmap(data):
+
+    tmp = arr.array('B', data.reshape(data.size))
+
+    im_format = qg.QImage.Format_Grayscale8
+
+    image = qg.QImage(
+            tmp,
+            data.shape[1],
+            data.shape[0],
+            data.shape[1],
+            im_format)
+
+    return qg.QPixmap.fromImage(image)
 
 ######################################
 
