@@ -74,7 +74,11 @@ def save_html_report(results_dir, filename_in):
 
     fout = write_html_report_start(fout, info)
 
+    info['no_of_cystals'] = 7
+    info['no_of_closed_cystals'] = 5
+    fout = write_html_overview(fout, info)
 
+    fout = write_html_region(fout)
 
     write_html_report_end(fout)
 
@@ -141,7 +145,45 @@ def write_html_report_start(fout, info):
 
     return fout
 
+def write_html_overview(fout, info):
 
+    header2_line = ("<h2 align=\"left\">Overview</h2>\n")
+    fout.write(header2_line)
+
+    line = ("<p>The number of crystals analyzed:  *** </p>\n")
+    line = line.replace("***", str(info['no_of_cystals']))
+    fout.write(line)
+
+    line = ("<p>The number of crystals that formed closed polygons:  *** </p>\n")
+    line = line.replace("***", str(info['no_of_closed_cystals']))
+    fout.write(line)
+
+    fout.write("<p align=\"center\"> An image will go here the caption is below</p>")
+
+    fout.write("<p align=\"center\"><i>The final frame of the video showing the regions"
+               " in which crystals were analyzed as highlighted boxes.</i></p>")
+
+    header3_line = ("<h3 align=\"left\">Image Statistics from the Raw Video</h3>\n")
+    fout.write(header3_line)
+
+    fout.write("<p>This section details some image statistics that show the evolution"
+               " of the individual frames of the raw video.</p>")
+
+    fout.write("<p align=\"center\">A plot of the mean grayscale value for each frame"
+               " over time will go here the caption is below</p>")
+
+    fout.write("<p align=\"center\"><i>The mean grayscale value of each frame plotted"
+               " against the frame number. The gray boxed areas represent the time limits"
+               " of each region containing a crystal.</i></p>")
+
+    return fout
+
+def write_html_region(fout):
+    
+    header3_line = ("<h3 align=\"left\">Region</h3>\n")
+    fout.write(header3_line)
+    
+    return fout
 
 
 def write_html_report_end(fout):
