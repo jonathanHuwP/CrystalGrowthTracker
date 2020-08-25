@@ -49,6 +49,7 @@ from ImageLabel import ImageLabel
 # import UI
 from Ui_CrystalGrowthTrackerMain import Ui_CrystalGrowthTrackerMain
 from cgt import htmlreport
+from cgt import csvreportwrite
 #from cgt import reports
 
 class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
@@ -158,7 +159,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         if dir_name is not None:
             print("Printing html report.")
             prog = 'CGT'
-            description = 'Semi-automatically racks the growth of crystals from X-ray videos.'
+            description = 'Semi-automatically tracks the growth of crystals from X-ray videos.'
 
             info = {'prog':prog,
                     'description':description}
@@ -173,6 +174,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             info['host'], info['ip_address'], info['operating_system'] = utils.find_hostname_and_ip()
             print(find_hostname_and_ip())
             htmlreport.save_html_report(dir_name, info)
+            csvreportwrite.save_csv_reports(dir_name, info)
 
 
     @qc.pyqtSlot()
