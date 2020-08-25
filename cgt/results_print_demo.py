@@ -86,7 +86,7 @@ def make_region2():
     tmp_crystal.add_faces([line1, line2], 250)
     tmp_crystal.add_faces([line1a, line2a], 500)
 
-    return Region(450, 200, 675, 500, 250, 500, [tmp_crystal])
+    return Region(350, 100, 575, 400, 150, 400, [tmp_crystal])
 
 if __name__ == "__main__":
     results = make_test_result()
@@ -98,6 +98,7 @@ if __name__ == "__main__":
     print(video.name, video.frame_rate, video.length, video.width, video.height)
 
     for region in results.regions:
+        print("Region")
         print(region.top_left_horizontal,
               region.top_left_vertical,
               region.bottom_right_horizontal,
