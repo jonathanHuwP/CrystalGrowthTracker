@@ -31,6 +31,14 @@ from cgt.utils import find_hostname_and_ip
 def save_html_report(results_dir, filename_in):
     '''Creates the html report file sop that it can manage the report writing
     and pass the file handle to the functions that write the relevant parts.
+
+    Args:
+        results_dir (str): The directory name the user has selected to save the
+                           results in.
+        filename_in (str): The name of the video file that is being analysed.
+
+    Returns:
+       Nothing is returned.
     '''
     prog = 'CGT'
     description = 'Semi-automatically racks the growth of crystals from X-ray videos.'
@@ -78,14 +86,28 @@ def save_html_report(results_dir, filename_in):
     info['no_of_closed_cystals'] = 5
     fout = write_html_overview(fout, info)
 
-    fout = write_html_region(fout)
+    crystal_total = 3
+    for crystal in range(crystal_total):
+        fout = write_html_crystal(fout, crystal, info)
 
     write_html_report_end(fout)
+
+
+
 
 
 def write_html_report_start(fout, info):
     '''Creates the start of an html report which is generic for the PERPL
     scripts.
+
+    Args:
+        fout (file handler): The file handler allows this function to write out.
+        info (dict): A python dictionary containing a collection of useful parameters
+            such as the filenames and paths.
+
+    Returns:
+       fout (file handler): The file handler is passed back so that other parts of
+                            the report can be written by different functions.
     '''
     prog = info['prog']
     results_dir = info['results_dir']
@@ -145,7 +167,21 @@ def write_html_report_start(fout, info):
 
     return fout
 
+
+
+
 def write_html_overview(fout, info):
+    '''Creates the overview section of the html report.
+
+    Args:
+        fout (file handler): The file handler allows this function to write out.
+        info (dict): A python dictionary containing a collection of useful parameters
+            such as the filenames and paths.
+
+    Returns:
+       fout (file handler): The file handler is passed back so that other parts of
+                            the report can be written by different functions.
+    '''
 
     header2_line = ("<h2 align=\"left\">Overview</h2>\n")
     fout.write(header2_line)
@@ -178,6 +214,30 @@ def write_html_overview(fout, info):
 
     return fout
 
+
+
+def write_html_crystal(fout, crystal_number, info):
+    '''Creates the section for each crystal in the html report.
+
+    Args:
+        fout (file handler): The file handler allows this function to write out.
+        crystal_number (int): The index for the crystal that is being reported.
+        info (dict): A python dictionary containing a collection of useful parameters
+            such as the filenames and paths.
+
+    Returns:
+       fout (file handler): The file handler is passed back so that other parts of
+                            the report can be written by different functions.
+    '''
+
+    header2_line = ("<h2 align=\"left\">Crystal: *** </h2>\n")
+    header2_line = header2_line.replace("***", str(crystal_number))
+    fout.write(header2_line)
+    
+    fout = write_html_region(fout)
+
+    return fout
+
 def write_html_region(fout):
     
     header3_line = ("<h3 align=\"left\">Region</h3>\n")
@@ -187,8 +247,7 @@ def write_html_region(fout):
 
 
 def write_html_report_end(fout):
-    '''Ends and closes an html report which is generic for the PERPL
-    scripts.
+    '''Ends and closes an html report.
     '''
     fout.write("</body>\n")
     fout.write("</html>\n")
