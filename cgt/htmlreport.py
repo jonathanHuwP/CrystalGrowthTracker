@@ -67,7 +67,11 @@ def save_html_report(results_dir, info):
     html_outfile_name = (results_dir_final+r"/"+filename_in
                          +r"_"+prog+r"_report.html")
 
-    fout = open(html_outfile_name, "w")
+    try:
+        fout = open(html_outfile_name, "w")
+    except  OSError:
+        print("Could not open html report file, with error message: ", sys.exc_info()[0])
+        sys.exit("Could not create html report.")
 
     fout = write_html_report_start(fout, info)
 
