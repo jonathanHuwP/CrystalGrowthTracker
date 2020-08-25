@@ -21,6 +21,10 @@ specific language governing permissions and limitations under the License.
 
 import sys
 sys.path.insert(0, '..\\CrystalGrowthTracker')
+import os
+import datetime
+from cgt import utils
+from cgt.utils import find_hostname_and_ip
 
 import array as arr
 import pickle as pk
@@ -153,7 +157,22 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         if dir_name is not None:
             print("Printing html report.")
-            htmlreport.save_html_report(dir_name, "video_file_name.avi")
+            prog = 'CGT'
+            description = 'Semi-automatically racks the growth of crystals from X-ray videos.'
+
+            info = {'prog':prog,
+                    'description':description}
+            info['in_file_no_path'] = "filename_in.avi"
+            info['in_file_no_extension'] = os.path.splitext("filename_in")[0]
+            info['frame_rate'] = 20
+            info['resolution'] = 10
+            info['resolution_units'] = "nm"
+            start = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+            info['start'] = start
+            print(start)
+            info['host'], info['ip_address'], info['operating_system'] = utils.find_hostname_and_ip()
+            print(find_hostname_and_ip())
+            htmlreport.save_html_report(dir_name, info)
 
 
     @qc.pyqtSlot()

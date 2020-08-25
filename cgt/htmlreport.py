@@ -28,7 +28,7 @@ from cgt import utils
 from cgt.utils import find_hostname_and_ip
 
 
-def save_html_report(results_dir, filename_in):
+def save_html_report(results_dir, info):
     '''Creates the html report file sop that it can manage the report writing
     and pass the file handle to the functions that write the relevant parts.
 
@@ -40,30 +40,19 @@ def save_html_report(results_dir, filename_in):
     Returns:
        Nothing is returned.
     '''
-    prog = 'CGT'
-    description = 'Semi-automatically racks the growth of crystals from X-ray videos.'
 
-    info = {'prog':prog,
-            'description':description}
     print(results_dir)
 
-    info['in_file_no_path'] = filename_in
-    info['in_file_no_extension'] = os.path.splitext("filename_in")[0]
-    info['frame_rate'] = 20
-    info['resolution'] = 10
-    info['resolution_units'] = "nm"
+
 
     #path = os.path.dirname(os.path.abspath(results_dir))
     path = os.path.abspath(os.path.realpath(results_dir))
 
     print(path)
 
-    start = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-    info['start'] = start
-    print(start)
-
-    info['host'], info['ip_address'], info['operating_system'] = utils.find_hostname_and_ip()
-    print(find_hostname_and_ip())
+    start = info["start"]
+    filename_in = info['in_file_no_path']
+    prog = info["prog"]
 
     results_dir_final = (path+r"/CGT_"+info['in_file_no_extension']+r"_"+start)
     info['results_dir'] = results_dir_final
