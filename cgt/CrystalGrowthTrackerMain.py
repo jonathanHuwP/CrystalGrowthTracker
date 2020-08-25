@@ -141,7 +141,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     @qc.pyqtSlot()
     def save_results(self):
         """
-        Save the curren set of results
+        Save the current set of results
 
             Returns:
                 None
@@ -152,13 +152,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             "")
 
         if dir_name is not None:
-            file_name, _ = qw.QFileDialog().getSaveFileName(
-                self,
-                self.tr("Enter file name of report"),
-                dir_name)
-                
-            if file_name is not None:
-                htmlreport.save_html_report(file_name, "video_file_name.avi")
+            print("Printing html report.")
+            htmlreport.save_html_report(dir_name, "video_file_name.avi")
 
 
     @qc.pyqtSlot()

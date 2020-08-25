@@ -45,7 +45,8 @@ def save_html_report(results_dir, filename_in):
     info['resolution'] = 10
     info['resolution_units'] = "nm"
 
-    path = os.path.dirname(os.path.abspath(results_dir))
+    #path = os.path.dirname(os.path.abspath(results_dir))
+    path = os.path.abspath(os.path.realpath(results_dir))
 
     print(path)
 
@@ -56,7 +57,7 @@ def save_html_report(results_dir, filename_in):
     info['host'], info['ip_address'], info['operating_system'] = utils.find_hostname_and_ip()
     print(find_hostname_and_ip())
 
-    results_dir_final = (path+r"/CGT_"+filename_in+r"_"+start)
+    results_dir_final = (path+r"/CGT_"+info['in_file_no_extension']+r"_"+start)
     info['results_dir'] = results_dir_final
     print(results_dir_final)
 
