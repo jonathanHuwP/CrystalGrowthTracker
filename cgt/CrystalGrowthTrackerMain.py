@@ -176,7 +176,23 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             htmlreport.save_html_report(dir_name, info)
             writecsvreports.save_csv_reports(dir_name, info)
 
+    @qc.pyqtSlot()
+    def reload_results(self):
+        """
+        reload a set of results
 
+            Returns:
+                None
+        """
+        print("reload results")
+        dir_name = qw.QFileDialog().getExistingDirectory(
+            self,
+            self.tr("Select Directory for Reload"),
+            "")
+
+        if dir_name is not None:
+            pass
+        
     @qc.pyqtSlot()
     def save_current_subimage(self):
         """
