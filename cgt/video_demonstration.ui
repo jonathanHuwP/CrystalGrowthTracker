@@ -188,6 +188,9 @@
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
        <widget class="QPushButton" name="_downButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Down</string>
         </property>
@@ -195,6 +198,9 @@
       </item>
       <item>
        <widget class="QSlider" name="_imageSlider">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="maximum">
          <number>0</number>
         </property>
@@ -205,6 +211,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="_upButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Up</string>
         </property>
@@ -212,6 +221,9 @@
       </item>
       <item>
        <widget class="QDoubleSpinBox" name="_zoomSpinBox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="decimals">
          <number>2</number>
         </property>
@@ -251,6 +263,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="_selectButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Select</string>
         </property>
@@ -293,6 +308,9 @@
    </property>
   </action>
   <action name="_actionSet_Frame_Rate">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Set Frame Rate</string>
    </property>
@@ -421,7 +439,7 @@
    <sender>_actionSet_Frame_Rate</sender>
    <signal>triggered()</signal>
    <receiver>VideoDemo</receiver>
-   <slot>close()</slot>
+   <slot>set_frame_rate()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>

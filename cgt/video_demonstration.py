@@ -64,6 +64,31 @@ from Ui_video_demonstration import Ui_VideoDemo
 ## height the vertical size of the video in pixels
 VideoSource = namedtuple("VideoSource", ["name", "frame_rate", "length", "width", "height"])
 
+def modify_video_source(original,
+                        name = None,
+                        frame_rate = None,
+                        length = None,
+                        width = None,
+                        height = None):
+                        
+    if name is None:
+        name = original.name
+        
+    if frame_rate is None:
+        frame_rate = original.frame_rate
+        
+    if length is None:
+        length = original.length
+        
+    if width is None:
+        width = original.width
+        
+    if height is None:
+        height = original.height
+        
+    return VideoSource(name, frame_rate, length, width, height)
+    
+
 def make_video_source_imageio(file_name, imio_reader):
     """
     construct a VideoSource data-struct from a imageio.reader object's meta data
@@ -324,13 +349,14 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
             Returns:
                 None
         """
-        rate, flag = qw.QInputDialog.getDouble(self,
-                                               "Set Video Frame Rate",
-                                               "Frames per Second",
-                                               0, 0, 100, 1)
+        rate, flag = qw.QInputDialog.getDouble(
+            self,
+            "Set frames per second",
+            "Frames per Second",
+            self._video_data.frame_rate, 0, 100, 1)
 
         if flag:
-            print(rate)
+            self._video_data = modify_video_source(self._video_data, frame_rate = rate)
 
     @qc.pyqtSlot()
     def set_sampeling_rate(self):
@@ -341,13 +367,31 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
             Returns:
                 None
         """
-        rate, flag = qw.QInputDialog.getInt(self,
-                                            "Set Video Sampeling Rate",
-                                            "Sample one in ",
-                                            0, 0, 100)
+        rate, flag = qw.QInputDialog.getInt(
+            self,
+            "Set number of frames per frame sampled",
+            "Sample one in ",
+            self._step_size, 0, 100)
 
         if flag:
-            print(rate)
+            self._step_size = rate
+            
+    def video_controls_enabled(self, flag):
+        """
+        enable disable video controls
+        
+            Args:
+                flag (bool) if true enable, else disable
+                
+            Returns:
+                None
+        """
+        self._actionSet_Frame_Rate.setEnabled(flag)
+        self._downButton.setEnabled(flag)
+        self._upButton.setEnabled(flag)
+        self._imageSlider.setEnabled(flag)
+        self._zoomSpinBox.setEnabled(flag)
+        self._selectButton.setEnabled(flag)
 
     def get_zoom(self):
         """
@@ -382,6 +426,8 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
         self.process_video()
 
         self.display_pixmap()
+        
+        self.video_controls_enabled(True)
 
     def display_pixmap(self):
         """
