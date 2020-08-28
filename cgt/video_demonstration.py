@@ -1,5 +1,22 @@
 # -*- coding: utf-8 -*-
+"""
+Created on Fri Aug 08 2020
 
+Demonstration of how to handel video
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this file except in compliance with the License. You may obtain a copy of the
+License at
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed
+under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+CONDITIONS OF ANY KIND, either express or implied. See the License for the
+specific language governing permissions and limitations under the License.
+
+@copyright 2020
+@author: j.h.pickering@leeds.ac.uk
+"""
 # imageio.reader meta data example
 # plugin => ffmpeg
 # nframes => inf
@@ -11,12 +28,17 @@
 # size => (2560, 2160)
 # duration => 22.0
 
-from imageio import get_reader as imio_get_reader
+# set up linting conditions
+# pylint: disable = too-many-public-methods
+# pylint: disable = c-extension-no-member
+# pylint: disable = too-many-instance-attributes
+
 import sys
-import numpy as np
 from collections import namedtuple
-from skimage import color
 import array as arr
+from imageio import get_reader as imio_get_reader
+import numpy as np
+from skimage import color
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
@@ -55,7 +77,11 @@ def make_video_source_imageio(file_name, imio_reader):
     meta_data = imio_reader.get_meta_data()
     number_frames = int(np.round(meta_data["fps"] * (meta_data["duration"]-1)))
 
-    return VideoSource(file_name, meta_data["fps"], number_frames, meta_data["size"][0], meta_data["size"][1])
+    return VideoSource(file_name,
+                       meta_data["fps"],
+                       number_frames,
+                       meta_data["size"][0],
+                       meta_data["size"][1])
 
 def ndarray_to_qpixmap(data):
     """
@@ -71,12 +97,11 @@ def ndarray_to_qpixmap(data):
 
     im_format = qg.QImage.Format_Grayscale8
 
-    image = qg.QImage(
-            tmp,
-            data.shape[1],
-            data.shape[0],
-            data.shape[1],
-            im_format)
+    image = qg.QImage(tmp,
+                      data.shape[1],
+                      data.shape[0],
+                      data.shape[1],
+                      im_format)
 
     return qg.QPixmap.fromImage(image)
 
@@ -108,10 +133,7 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
         self._source_label.setSizePolicy(
             qw.QSizePolicy.Fixed, qw.QSizePolicy.Fixed)
         self._source_label.setMargin(0)
-        self._source_label.new_selection.connect(self.new_subimage)
-
-        #self._startImageLabel
-        #self._endImageLabel
+        self._source_label.new_selection.connect(self.start_new_region)
 
         ## the reader for the video file
         self._video_reader = None
@@ -134,26 +156,50 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
 
     @property
     def current_image(self):
+        """
+        get the image currently being displayed
+
+            Returns:
+                the image being displayed (numpy.ndarray)
+        """
         return self._current_image
 
-    def video_time(self):
+    def get_current_video_time(self):
+        """
+        getter function for the time associated with the frame
+        of the video currently being displayed, must be getter
+        rather than property to allow use in pyqtSlots
+
+            Returns:
+                the time of the frame in seconds from the start of the video (float)
+        """
         return float(self._current_image * self._step_size) / float(self._video_data.frame_rate)
 
     def set_frame(self, number):
+        """
+        set the frame to be displayed and display it
+
+            Returns:
+                None
+        """
         if self._current_image != number:
             self._current_image = number
             self._imageSlider.setSliderPosition(number)
 
             message = "Frame {:d} of {:d}, approx {:.2f} seconds"
-            message = message.format(number+1, self._max_step+1, self.video_time())
+            message = message.format(number+1, self._max_step+1, self.get_current_video_time())
             self._timeStatusLabel.setText(message)
 
             self.display_pixmap()
-            
-    #@qc.pyqtSlot()
-    def new_subimage(self):
-        print("new_subimage")
 
+    #@qc.pyqtSlot()
+    def start_new_region(self):
+        """
+        get the current rectangle and frame number
+
+            Returns:
+                None
+        """
         img = self.get_current_subimage()
 
         pixmap = ndarray_to_qpixmap(img)
@@ -164,9 +210,9 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
         self._startImageLabel.setSizePolicy(
             qw.QSizePolicy.Fixed, qw.QSizePolicy.Fixed)
         self._startImageLabel.setMargin(0)
-        
-        message = "Start Time {:.2f}".format(self.video_time())
-        
+
+        message = "Start Time {:.2f}".format(self.get_current_video_time())
+
         self._startLabel.setText(message)
 
     #@qc.pyqtSlot()
@@ -181,15 +227,19 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
         img = self._images[self.current_image]
 
         return img[rect.top:rect.bottom, rect.left:rect.right]
-        
+
     @qc.pyqtSlot()
     def select_region(self):
-        print("Select region")
-        
+        """
+        complete the selctions of a region
+
+            Returns:
+                None
+        """
         img = self.get_current_subimage()
-        
+
         pixmap = ndarray_to_qpixmap(img)
-        
+
         self._endImageLabel.setPixmap(pixmap)
 
         self._endImageLabel.setScaledContents(True)
@@ -197,60 +247,117 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
             qw.QSizePolicy.Fixed, qw.QSizePolicy.Fixed)
         self._endImageLabel.setMargin(0)
 
-        message = "End Time {:.2f}".format(self.video_time())
-        
+        message = "End Time {:.2f}".format(self.get_current_video_time())
+
         self._endLabel.setText(message)
-  
+
     @qc.pyqtSlot()
     def zoom_changed(self):
+        """
+        callback for a change of the level of zoom on the main image
+
+            Returns:
+                None
+        """
         self.display_pixmap()
 
     @qc.pyqtSlot()
     def frame_jump(self):
+        """
+        callback for the movement of the slider, display frame changed
+
+            Returns:
+                None
+        """
         frame = self._imageSlider.sliderPosition()
-        print("to frame {}".format(frame))
         self.set_frame(frame)
 
     @qc.pyqtSlot()
     def frame_forward(self):
+        """
+        callback for the click of forward button, if possible the
+        display frame is advanced by one
+
+            Returns:
+                None
+        """
         if self.current_image < self._max_step:
             self.set_frame(self.current_image + 1)
 
     @qc.pyqtSlot()
     def frame_backward(self):
+        """
+        callback for the click of backward button, if possible the
+        display frame is decreased by one
+
+            Returns:
+                None
+        """
         if self.current_image > 0:
             self.set_frame(self.current_image - 1)
 
     @qc.pyqtSlot()
     def open_file(self):
+        """
+        callback for opening a new file
+
+            Returns:
+                None
+        """
         options = qw.QFileDialog.Options()
         options |= qw.QFileDialog.DontUseNativeDialog
-        file_name, file_type = qw.QFileDialog.getOpenFileName(
+        file_name, _ = qw.QFileDialog.getOpenFileName(
             self,
             self.tr("Select File"),
             "",
             " Audio Video Interleave (*.avi)",
             options=options)
-            
+
         if file_name:
             self.load_video(file_name)
-            
+
     @qc.pyqtSlot()
     def set_frame_rate(self):
-        rate, flag = qw.QInputDialog.getDouble(self, "Set Video Frame Rate", "Frames per Second", 0, 0, 100, 1)
-        
+        """
+        callback for setting the video's frame rate will override file meta-data
+
+            Returns:
+                None
+        """
+        rate, flag = qw.QInputDialog.getDouble(self,
+                                               "Set Video Frame Rate",
+                                               "Frames per Second",
+                                               0, 0, 100, 1)
+
         if flag:
             print(rate)
-            
+
+    @qc.pyqtSlot()
     def set_sampeling_rate(self):
-        rate, flag = qw.QInputDialog.getInt(self, "Set Video Sampeling Rate", "Sample one in ", 0, 0, 100)
-        
+        """
+        callback for setting the sampeling rate, which will be one frame
+        in the number of frames entered by this function
+
+            Returns:
+                None
+        """
+        rate, flag = qw.QInputDialog.getInt(self,
+                                            "Set Video Sampeling Rate",
+                                            "Sample one in ",
+                                            0, 0, 100)
+
         if flag:
             print(rate)
-            
+
     def get_zoom(self):
+        """
+        getter for the level of zoom
+
+            Returns:
+                the current zoom (float)
+        """
         return self._zoomSpinBox.value()
-        
+
     def load_video(self, file_name):
         """
         read in a video and have it processed
@@ -263,10 +370,10 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
         """
         try:
             self._video_reader = imio_get_reader(file_name, 'ffmpeg')
-        except Exception as ex:
-            message = "Unexpected error reading {}: {}, {}".format(file_name, type(ex), ex.args)
+        except (FileNotFoundError, IOError) as ex:
+            message = "Unexpected error reading {}: {} => {}".format(file_name, type(ex), ex.args)
             qw.QMessageBox.warning(self,
-                                   "VideoDev",
+                                   "VideoDemo",
                                    message)
             return
 
@@ -289,8 +396,8 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
         size = pixmap.size() * self._zoomSpinBox.value()
 
         pixmap = pixmap.scaled(size,
-                           qc.Qt.KeepAspectRatio,
-                           qc.Qt.SmoothTransformation)
+                               qc.Qt.KeepAspectRatio,
+                               qc.Qt.SmoothTransformation)
 
         self._source_label.setPixmap(pixmap)
 
@@ -312,7 +419,9 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
         # set limiting values on text edit fram number
         self._imageSlider.setMaximum(self._max_step)
 
-        self._images = np.empty((array_size, self._video_data.height, self._video_data.width), dtype=np.uint8)
+        self._images = np.empty(
+            (array_size, self._video_data.height, self._video_data.width),
+            dtype=np.uint8)
 
         image_count = 0
         for frame in range(0, self._video_data.length, self._step_size):
@@ -322,7 +431,7 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
             self._images[image_count] = img
             image_count += 1
 
-            if image_count%2 ==  0:
+            if image_count%2 == 0:
                 tmp = (float(frame) / float(self._video_data.length)) * 100.0
                 self._progressBar.setValue(tmp)
 
@@ -353,4 +462,3 @@ def run():
 
 if __name__ == "__main__":
     run()
-
