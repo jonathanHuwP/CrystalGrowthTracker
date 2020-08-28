@@ -275,6 +275,9 @@
     </property>
     <addaction name="_actionOpen"/>
     <addaction name="_actionQuit"/>
+    <addaction name="separator"/>
+    <addaction name="_actionSet_Frame_Rate"/>
+    <addaction name="_actionSet_Sampeling_Rate"/>
    </widget>
    <addaction name="menuOpen"/>
   </widget>
@@ -287,6 +290,16 @@
   <action name="_actionOpen">
    <property name="text">
     <string>Open</string>
+   </property>
+  </action>
+  <action name="_actionSet_Frame_Rate">
+   <property name="text">
+    <string>Set Frame Rate</string>
+   </property>
+  </action>
+  <action name="_actionSet_Sampeling_Rate">
+   <property name="text">
+    <string>Set Sampeling Rate</string>
    </property>
   </action>
  </widget>
@@ -397,6 +410,38 @@
     <hint type="sourcelabel">
      <x>729</x>
      <y>408</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>234</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_actionSet_Frame_Rate</sender>
+   <signal>triggered()</signal>
+   <receiver>VideoDemo</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>234</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_actionSet_Sampeling_Rate</sender>
+   <signal>triggered()</signal>
+   <receiver>VideoDemo</receiver>
+   <slot>set_sampeling_rate()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
     </hint>
     <hint type="destinationlabel">
      <x>399</x>

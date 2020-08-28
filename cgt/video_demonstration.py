@@ -234,7 +234,20 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
             
         if file_name:
             self.load_video(file_name)
-
+            
+    @qc.pyqtSlot()
+    def set_frame_rate(self):
+        rate, flag = qw.QInputDialog.getDouble(self, "Set Video Frame Rate", "Frames per Second", 0, 0, 100, 1)
+        
+        if flag:
+            print(rate)
+            
+    def set_sampeling_rate(self):
+        rate, flag = qw.QInputDialog.getInt(self, "Set Video Sampeling Rate", "Sample one in ", 0, 0, 100)
+        
+        if flag:
+            print(rate)
+            
     def get_zoom(self):
         return self._zoomSpinBox.value()
         
