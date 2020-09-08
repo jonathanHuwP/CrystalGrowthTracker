@@ -129,7 +129,7 @@ def ndarray_to_qpixmap(data):
                       im_format)
 
     return qg.QPixmap.fromImage(image)
-
+        
 class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
     """
     The implementation of the GUI, all the functions and
@@ -468,6 +468,12 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
         self._images = np.empty(
             (array_size, self._video_data.height, self._video_data.width),
             dtype=np.uint8)
+            
+        progress = qw.QProgressDialog("Video Processing", "cancel", 0, 100)
+        progress.setCancelButton(None)
+        progress.setWindowModality(qc.Qt.WindowModal)
+        progress.setValue(0)
+        progress.show()
 
         image_count = 0
         for frame in range(0, self._video_data.length, self._step_size):
@@ -479,9 +485,8 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
 
             if image_count%2 == 0:
                 tmp = (float(frame) / float(self._video_data.length)) * 100.0
-                self._progressBar.setValue(tmp)
+                progress.setValue(tmp)
 
-        self._progressBar.reset()
 
         self.set_frame(0)
 
@@ -498,8 +503,6 @@ def run():
 
     def inner_run():
         app = qw.QApplication(sys.argv)
-
-
         window = VideoDemo(app)
         window.show()
         app.exec_()
