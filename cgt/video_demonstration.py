@@ -32,6 +32,7 @@ specific language governing permissions and limitations under the License.
 # pylint: disable = too-many-public-methods
 # pylint: disable = c-extension-no-member
 # pylint: disable = too-many-instance-attributes
+# pylint: disable = too-many-arguments
 
 import sys
 from collections import namedtuple
@@ -44,7 +45,7 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
-from ImageLabel import ImageLabel
+from regionselectionlabel import RegionSelectionLabel
 
 # import UI
 from Ui_video_demonstration import Ui_VideoDemo
@@ -65,29 +66,44 @@ from Ui_video_demonstration import Ui_VideoDemo
 VideoSource = namedtuple("VideoSource", ["name", "frame_rate", "length", "width", "height"])
 
 def modify_video_source(original,
-                        name = None,
-                        frame_rate = None,
-                        length = None,
-                        width = None,
-                        height = None):
-                        
+                        name=None,
+                        frame_rate=None,
+                        length=None,
+                        width=None,
+                        height=None):
+    """
+    copy with modification an immutable VideoSource, it will return a
+    copy of the original with any of the named fields in the arguments
+    replacing the equivalent field in the orginal
+
+        Args:
+            original (VideoSource) the object to be modified
+            name (string) new name
+            frame_rate (int) the new video frames per second
+            length (float) the new video duration in seconds
+            width (int) the new horizontal size in pixels
+            height (int) the new verticl size in pixels
+
+        Returns:
+            a modified copy of the original VideoSource
+    """
     if name is None:
         name = original.name
-        
+
     if frame_rate is None:
         frame_rate = original.frame_rate
-        
+
     if length is None:
         length = original.length
-        
+
     if width is None:
         width = original.width
-        
+
     if height is None:
         height = original.height
-        
+
     return VideoSource(name, frame_rate, length, width, height)
-    
+
 
 def make_video_source_imageio(file_name, imio_reader):
     """
@@ -129,7 +145,7 @@ def ndarray_to_qpixmap(data):
                       im_format)
 
     return qg.QPixmap.fromImage(image)
-        
+
 class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
     """
     The implementation of the GUI, all the functions and
@@ -153,12 +169,13 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
         self.setupUi(self)
 
         ## the label for displaying the current main image
-        self._source_label = ImageLabel(self)
+        self._source_label = RegionSelectionLabel(self)
         self._source_label.setAlignment(qc.Qt.AlignTop | qc.Qt.AlignLeft)
         self._source_label.setSizePolicy(
             qw.QSizePolicy.Fixed, qw.QSizePolicy.Fixed)
         self._source_label.setMargin(0)
         self._source_label.new_selection.connect(self.start_new_region)
+        self._source_label.set_adding()
 
         ## the reader for the video file
         self._video_reader = None
@@ -175,7 +192,10 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
         ## the step size of the video
         self._step_size = 5
         self._max_step = 0
-
+        
+        ## storage for the regions 
+        self._regions = []
+        
         # put the label in the scroll
         self._scrollArea.setWidget(self._source_label)
 
@@ -225,8 +245,9 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
             Returns:
                 None
         """
+        message = "Start Time {:.2f}".format(self.get_current_video_time())
         img = self.get_current_subimage()
-
+        
         pixmap = ndarray_to_qpixmap(img)
 
         self._startImageLabel.setPixmap(pixmap)
@@ -236,9 +257,9 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
             qw.QSizePolicy.Fixed, qw.QSizePolicy.Fixed)
         self._startImageLabel.setMargin(0)
 
-        message = "Start Time {:.2f}".format(self.get_current_video_time())
-
         self._startLabel.setText(message)
+        
+        self.enable_select_buttons(True)
 
     #@qc.pyqtSlot()
     def get_current_subimage(self):
@@ -248,7 +269,7 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
             Returns:
                 numpy.array the pixels of the selected subimage
         """
-        rect = self._source_label.get_rectangle(0)
+        rect = self._source_label.rectangle
         img = self._images[self.current_image]
 
         return img[rect.top:rect.bottom, rect.left:rect.right]
@@ -273,6 +294,8 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
         self._endImageLabel.setMargin(0)
 
         message = "End Time {:.2f}".format(self.get_current_video_time())
+        
+        ## add region to list
 
         self._endLabel.setText(message)
 
@@ -356,7 +379,7 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
             self._video_data.frame_rate, 0, 100, 1)
 
         if flag:
-            self._video_data = modify_video_source(self._video_data, frame_rate = rate)
+            self._video_data = modify_video_source(self._video_data, frame_rate=rate)
 
     @qc.pyqtSlot()
     def set_sampeling_rate(self):
@@ -375,14 +398,27 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
 
         if flag:
             self._step_size = rate
-            
-    def video_controls_enabled(self, flag):
+
+    def enable_select_buttons(self, flag):
         """
-        enable disable video controls
+        enable the selection buttons
         
             Args:
                 flag (bool) if true enable, else disable
-                
+
+            Returns:
+                None
+        """
+        self._selectButton.setEnabled(flag)
+        self._cancelButton.setEnabled(flag)
+        
+    def video_controls_enabled(self, flag):
+        """
+        enable disable video controls
+
+            Args:
+                flag (bool) if true enable, else disable
+
             Returns:
                 None
         """
@@ -391,7 +427,6 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
         self._upButton.setEnabled(flag)
         self._imageSlider.setEnabled(flag)
         self._zoomSpinBox.setEnabled(flag)
-        self._selectButton.setEnabled(flag)
 
     def get_zoom(self):
         """
@@ -426,7 +461,7 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
         self.process_video()
 
         self.display_pixmap()
-        
+
         self.video_controls_enabled(True)
 
     def display_pixmap(self):
@@ -468,7 +503,7 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
         self._images = np.empty(
             (array_size, self._video_data.height, self._video_data.width),
             dtype=np.uint8)
-            
+
         progress = qw.QProgressDialog("Video Processing", "cancel", 0, 100)
         progress.setCancelButton(None)
         progress.setWindowModality(qc.Qt.WindowModal)

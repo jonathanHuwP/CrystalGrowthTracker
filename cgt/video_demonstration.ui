@@ -264,6 +264,16 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QPushButton" name="_cancelButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Cancel</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
    </layout>
@@ -453,6 +463,22 @@
     <hint type="sourcelabel">
      <x>-1</x>
      <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>234</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_cancelButton</sender>
+   <signal>clicked()</signal>
+   <receiver>VideoDemo</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>729</x>
+     <y>408</y>
     </hint>
     <hint type="destinationlabel">
      <x>399</x>
