@@ -263,7 +263,6 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
 
             self.display_pixmap()
 
-    #@qc.pyqtSlot()
     def start_new_region(self):
         """
         get the current rectangle and frame number
@@ -309,7 +308,7 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
         message = "End Time {:.2f}".format(time)
         self._endLabel.setText(message) 
 
-    #@qc.pyqtSlot()
+
     def get_current_subimage(self):
         """
         get the pixels of the subimage that is selected by the user
@@ -322,6 +321,18 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
 
         return img[rect.top:rect.bottom, rect.left:rect.right], rect
 
+    @qc.pyqtSlot()
+    def region_combobox_changed(self):
+        """
+        callback for changes to the region combobox
+        
+            Returns:
+                None
+        """
+        if self._selectedButton.isChecked():
+            self._source_label.repaint()
+            
+        
     @qc.pyqtSlot()
     def select_region(self):
         """
