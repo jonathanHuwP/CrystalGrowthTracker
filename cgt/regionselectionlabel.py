@@ -285,17 +285,12 @@ class RegionSelectionLabel(qw.QLabel):
             self.draw_adding_mode(painter)
         elif self._state == SelectionState.DISPLAY_SELECTED:
             self.draw_selected_mode(painter)
+        elif self._state == SelectionState.DISPLAY_ALL:
+            self.draw_showing_all_regions(painter, time=True)
+        elif self._state == SelectionState.DISPLAY_ALL_NO_TIME:
+            self.draw_showing_all_regions(painter, time=False)
         else:
             print("other state")
-
-# TODO draw parent's rectagles as required
-#        for rect in self._rectangles:
-#            zoomed = rect.scale(self._parent.get_zoom())
-#            q_rect = qc.QRect(
-#                qc.QPoint(int(zoomed.left), int(zoomed.top)),
-#                qc.QPoint(int(zoomed.right), int(zoomed.bottom)))
-#
-#            painter.drawRect(q_rect)
 
     def draw_adding_mode(self, painter):
         """
@@ -328,8 +323,38 @@ class RegionSelectionLabel(qw.QLabel):
 
         if region is None:
             return
-        
+
         if region.time_in_region(self._parent.get_current_original_video_frame()):
-            rectangle = DrawRect(region.top, region.bottom, region.left, region.right)
-            zoomed = rectangle.scale(self._parent.get_zoom())
-            painter.drawRect(qc.QRect(zoomed.left, zoomed.top, zoomed.width, zoomed.height))
+            self.draw_region(painter, region)
+
+    def draw_region(self, painter, region):
+        """
+        draw a region
+
+            Args:
+                painter (QPainter) the painter to be used
+                region (Region) the region to be drawn
+        """
+        rectangle = DrawRect(region.top, region.bottom, region.left, region.right)
+        zoomed = rectangle.scale(self._parent.get_zoom())
+        painter.drawRect(qc.QRect(zoomed.left, zoomed.top, zoomed.width, zoomed.height))
+
+    def draw_showing_all_regions(self, painter, time):
+        """
+        draw all the regions
+
+            Args:
+                painter (QPainter) the painter to be used
+                time (bool) if True the time intervals of the regions are used
+
+            Returns:
+                None
+        """
+        regions = self._parent.get_regions_iter()
+
+        for region in regions:
+            if time:
+                if region.time_in_region(self._parent.get_current_original_video_frame()):
+                    self.draw_region(painter, region)
+            else:
+                self.draw_region(painter, region)

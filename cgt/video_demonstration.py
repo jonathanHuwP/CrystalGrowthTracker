@@ -224,6 +224,15 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
         """
         return self._current_image
         
+    def get_regions_iter(self):
+        """
+        get an iterator for the list of regions
+        
+            Returns:
+                iterator of regions
+        """
+        return iter(self._regions)
+        
     def get_current_original_video_frame(self):
         """
         getter for the frame number in the orginal unprocessed video
@@ -307,7 +316,6 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
         time, frame = self.get_current_video_time()
         message = "End Time {:.2f}".format(time)
         self._endLabel.setText(message) 
-
 
     def get_current_subimage(self):
         """
