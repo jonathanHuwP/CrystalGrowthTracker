@@ -474,7 +474,7 @@
    <sender>_cancelButton</sender>
    <signal>clicked()</signal>
    <receiver>VideoDemo</receiver>
-   <slot>close()</slot>
+   <slot>reset_enter_region()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>729</x>

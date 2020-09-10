@@ -46,9 +46,19 @@ import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
 from regionselectionlabel import RegionSelectionLabel
+from region import Region
 
 # import UI
 from Ui_video_demonstration import Ui_VideoDemo
+
+## a tuple representing one end of a region
+##
+## Args:
+##
+## rectangle the subimage in screen pixel coordinates
+##
+## frame the number of the frame 
+RegionEnd = namedtuple("RegionEnd", ["rectangle", "frame"])
 
 ## a tuple for the video on which the analysis is based
 ##
@@ -193,6 +203,9 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
         self._step_size = 5
         self._max_step = 0
         
+        ## storage for one end of a region in the process of being created
+        self._region_end = None
+        
         ## storage for the regions 
         self._regions = []
         
@@ -216,9 +229,10 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
         rather than property to allow use in pyqtSlots
 
             Returns:
-                the time of the frame in seconds from the start of the video (float)
+                the time of the frame in seconds from the start of the video (float) and the original frame number (int)
         """
-        return float(self._current_image * self._step_size) / float(self._video_data.frame_rate)
+        original_frame = self._current_image * self._step_size
+        return float(original_frame) / float(self._video_data.frame_rate), original_frame
 
     def set_frame(self, number):
         """
@@ -232,7 +246,8 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
             self._imageSlider.setSliderPosition(number)
 
             message = "Frame {:d} of {:d}, approx {:.2f} seconds"
-            message = message.format(number+1, self._max_step+1, self.get_current_video_time())
+            time, _ = self.get_current_video_time()
+            message = message.format(number+1, self._max_step+1, time)
             self._timeStatusLabel.setText(message)
 
             self.display_pixmap()
@@ -245,18 +260,18 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
             Returns:
                 None
         """
-        message = "Start Time {:.2f}".format(self.get_current_video_time())
-        img = self.get_current_subimage()
+        time, frame = self.get_current_video_time()
+        img, rect = self.get_current_subimage()
+        self._region_end = RegionEnd(rect, frame)
         
         pixmap = ndarray_to_qpixmap(img)
-
         self._startImageLabel.setPixmap(pixmap)
-
         self._startImageLabel.setScaledContents(True)
         self._startImageLabel.setSizePolicy(
             qw.QSizePolicy.Fixed, qw.QSizePolicy.Fixed)
         self._startImageLabel.setMargin(0)
 
+        message = "Start Time {:.2f}".format(time)
         self._startLabel.setText(message)
         
         self.enable_select_buttons(True)
@@ -272,7 +287,7 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
         rect = self._source_label.rectangle
         img = self._images[self.current_image]
 
-        return img[rect.top:rect.bottom, rect.left:rect.right]
+        return img[rect.top:rect.bottom, rect.left:rect.right], rect
 
     @qc.pyqtSlot()
     def select_region(self):
@@ -282,7 +297,7 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
             Returns:
                 None
         """
-        img = self.get_current_subimage()
+        img, _ = self.get_current_subimage()
 
         pixmap = ndarray_to_qpixmap(img)
 
@@ -292,12 +307,48 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
         self._endImageLabel.setSizePolicy(
             qw.QSizePolicy.Fixed, qw.QSizePolicy.Fixed)
         self._endImageLabel.setMargin(0)
-
-        message = "End Time {:.2f}".format(self.get_current_video_time())
         
-        ## add region to list
-
-        self._endLabel.setText(message)
+        time, frame = self.get_current_video_time()
+        message = "End Time {:.2f}".format(time)
+        self._endLabel.setText(message)   
+        
+        self.add_new_region(frame)
+  
+    def add_new_region(self, last_frame):
+        """
+        construct a new Region and add it to the list, reset the region end and selection label
+        
+            Args:
+                
+        """
+        tlh = self._region_end.rectangle.top
+        tlv = self._region_end.rectangle.left
+        brh = self._region_end.rectangle.bottom
+        brv = self._region_end.rectangle.right
+        first_frame = min(self._region_end.frame, last_frame)
+        final_frame = max(self._region_end.frame, last_frame)
+        
+        self._regions.append(Region(tlh, tlv, brh, brv, first_frame, final_frame))
+        self.reset_enter_region()
+    
+    @qc.pyqtSlot()
+    def reset_enter_region(self):
+        """
+        reset the process of entering a new region
+        
+            Returns:
+                None
+        """
+        self._region_end = None
+        self._endLabel.setText("End")
+        self._startLabel.setText("Start")
+        self._endImageLabel.clear()
+        self._startImageLabel.clear()
+        self._source_label.reset_selection()  
+        
+        # TODO remove when tested
+        for item in self._regions:
+            print(item)
 
     @qc.pyqtSlot()
     def zoom_changed(self):
