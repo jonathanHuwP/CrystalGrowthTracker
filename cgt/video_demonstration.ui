@@ -7,14 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>470</height>
+    <height>552</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Video Deomostration</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <layout class="QVBoxLayout" name="verticalLayout_3">
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
@@ -175,6 +175,78 @@
         </item>
        </layout>
       </widget>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="_regionsGroupBox">
+      <property name="title">
+       <string>View Regions</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QRadioButton" name="_newButton">
+           <property name="text">
+            <string>New</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">_regionsButtonGroup</string>
+           </attribute>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="_allButton">
+           <property name="text">
+            <string>All</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">_regionsButtonGroup</string>
+           </attribute>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="_allNoTimeButton">
+           <property name="text">
+            <string>All (no time)</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">_regionsButtonGroup</string>
+           </attribute>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="_selectedButton">
+           <property name="text">
+            <string>Selected</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">_regionsButtonGroup</string>
+           </attribute>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="_regionComboBox"/>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+      </layout>
      </widget>
     </item>
     <item>
@@ -486,5 +558,24 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>_regionsButtonGroup</sender>
+   <signal>buttonToggled(int,bool)</signal>
+   <receiver>VideoDemo</receiver>
+   <slot>test_something()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>275</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
+ <buttongroups>
+  <buttongroup name="_regionsButtonGroup"/>
+ </buttongroups>
 </ui>

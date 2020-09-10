@@ -201,6 +201,8 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
 
         ## the step size of the video
         self._step_size = 5
+        
+        ## upper limit for the display frame
         self._max_step = 0
         
         ## storage for one end of a region in the process of being created
@@ -275,6 +277,28 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
         self._startLabel.setText(message)
         
         self.enable_select_buttons(True)
+        
+    def display_final_region(self):
+        """
+        display the user's current selection of the final frame of region
+        
+            Returns:
+                None
+        """
+        img, _ = self.get_current_subimage()
+
+        pixmap = ndarray_to_qpixmap(img)
+
+        self._endImageLabel.setPixmap(pixmap)
+
+        self._endImageLabel.setScaledContents(True)
+        self._endImageLabel.setSizePolicy(
+            qw.QSizePolicy.Fixed, qw.QSizePolicy.Fixed)
+        self._endImageLabel.setMargin(0)
+        
+        time, frame = self.get_current_video_time()
+        message = "End Time {:.2f}".format(time)
+        self._endLabel.setText(message) 
 
     #@qc.pyqtSlot()
     def get_current_subimage(self):
@@ -296,21 +320,8 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
 
             Returns:
                 None
-        """
-        img, _ = self.get_current_subimage()
-
-        pixmap = ndarray_to_qpixmap(img)
-
-        self._endImageLabel.setPixmap(pixmap)
-
-        self._endImageLabel.setScaledContents(True)
-        self._endImageLabel.setSizePolicy(
-            qw.QSizePolicy.Fixed, qw.QSizePolicy.Fixed)
-        self._endImageLabel.setMargin(0)
-        
-        time, frame = self.get_current_video_time()
-        message = "End Time {:.2f}".format(time)
-        self._endLabel.setText(message)   
+        """        
+        _, frame = self.get_current_video_time()
         
         self.add_new_region(frame)
   
@@ -345,6 +356,7 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
         self._endImageLabel.clear()
         self._startImageLabel.clear()
         self._source_label.reset_selection()  
+        self.enable_select_buttons(False)
         
         # TODO remove when tested
         for item in self._regions:
@@ -532,6 +544,9 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
                                qc.Qt.SmoothTransformation)
 
         self._source_label.setPixmap(pixmap)
+        
+        if self._region_end is not None:
+            self.display_final_region()
 
     def process_video(self):
         """
@@ -575,6 +590,23 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
 
 
         self.set_frame(0)
+        
+    #@qc.pyqtSlot()
+    def test_something(self):
+        # get the name of the checked button, same as give in designer
+        button = self._regionsButtonGroup.checkedButton().objectName()
+        
+        if button == "_newButton":
+            print("new")
+            
+        elif button == "_allButton":
+            print("All")
+            
+        elif button == "_allNoTimeButton":
+            print("All No Time")
+            
+        elif button == "_selectedButton":
+            print("selected {}".format(self._regionComboBox.currentIndex()  ))
 
 # the main
 ######################
