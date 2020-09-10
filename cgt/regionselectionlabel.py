@@ -94,12 +94,12 @@ class RegionSelectionLabel(qw.QLabel):
 
     ## signal to indicate the user has selected a new rectangle
     new_selection = qc.pyqtSignal()
-    
+
     @property
     def rectangle(self):
         """
         getter for the rectangle
-        
+
             Returns:
                 the user's current rectangle or None
         """
@@ -113,6 +113,7 @@ class RegionSelectionLabel(qw.QLabel):
                 None
         """
         self._state = SelectionState.NO_ACTION
+        self.repaint()
 
     def set_adding(self):
         """
@@ -122,18 +123,17 @@ class RegionSelectionLabel(qw.QLabel):
                 None
         """
         self._state = SelectionState.ADD_NEW_REGION
+        self.repaint()
 
-    def set_display_selected(self, index):
+    def set_display_selected(self):
         """
-        set the state to
-
-            Args:
-                index (int) the list index of the region to be displayed
+        set the state to display the Range selected by the user
 
             Returns:
                 None
         """
         self._state = SelectionState.DISPLAY_SELECTED
+        self.repaint()
 
     def set_display_all(self):
         """
@@ -143,6 +143,7 @@ class RegionSelectionLabel(qw.QLabel):
                 None
         """
         self._state = SelectionState.DISPLAY_ALL
+        self.repaint()
 
     def set_display_all_no_time(self):
         """
@@ -152,6 +153,7 @@ class RegionSelectionLabel(qw.QLabel):
                 None
         """
         self._state = SelectionState.DISPLAY_ALL_NO_TIME
+        self.repaint()
 
     def mousePressEvent(self, event):
         """
@@ -204,7 +206,7 @@ class RegionSelectionLabel(qw.QLabel):
                 self.make_rectangle()
             else:
                 self.reset_selection()
-                
+
             self.repaint()
 
     def reset_selection(self):
@@ -232,7 +234,7 @@ class RegionSelectionLabel(qw.QLabel):
         # get horizontal range
         horiz = (self._start.x(), self._end.x())
         zoom = self._parent.get_zoom()
-        
+
         # get horizontal range
         start_h = np.uint32(np.round(min(horiz)/zoom))
         end_h = np.uint32(np.round(max(horiz)/zoom))
@@ -241,7 +243,7 @@ class RegionSelectionLabel(qw.QLabel):
         vert = (self._start.y(), self._end.y())
         start_v = np.uint32(np.round(min(vert)/zoom))
         end_v = np.uint32(np.round(max(vert)/zoom))
-        
+
         self._rectangle = DrawRect(start_v, end_v, start_h, end_h)
         self._start = None
         self._end = None
@@ -258,6 +260,8 @@ class RegionSelectionLabel(qw.QLabel):
             Returns:
                 None
         """
+
+        # pass on to get pixmap displayed
         qw.QLabel.paintEvent(self, event)
 
         self.draw_rectangles()
@@ -277,6 +281,13 @@ class RegionSelectionLabel(qw.QLabel):
         painter.setPen(pen)
         painter.setBrush(brush)
 
+        if self._state == SelectionState.ADD_NEW_REGION:
+            self.draw_adding_mode(painter)
+        elif self._state == SelectionState.DISPLAY_SELECTED:
+            self.draw_selected_mode(painter)
+        else:
+            print("other state")
+
 # TODO draw parent's rectagles as required
 #        for rect in self._rectangles:
 #            zoomed = rect.scale(self._parent.get_zoom())
@@ -286,9 +297,39 @@ class RegionSelectionLabel(qw.QLabel):
 #
 #            painter.drawRect(q_rect)
 
+    def draw_adding_mode(self, painter):
+        """
+        draw the user's current input rectangle
+
+            Args:
+                painter (QPainter) the painter to be used
+
+            Returns:
+                None
+        """
         if self._start is not None and self._end is not None:
             painter.drawRect(qc.QRect(self._start, self._end))
         elif self._rectangle is not None:
             zoomed = self._rectangle.scale(self._parent.get_zoom())
             rect = qc.QRect(zoomed.left, zoomed.top, zoomed.width, zoomed.height)
             painter.drawRect(rect)
+
+    def draw_selected_mode(self, painter):
+        """
+        draw the user's selected rectangle
+
+            Args:
+                painter (QPainter) the painter to be used
+
+            Returns:
+                None
+        """
+        region = self._parent.get_selected_region()
+
+        if region is None:
+            return
+        
+        if region.time_in_region(self._parent.get_current_original_video_frame()):
+            rectangle = DrawRect(region.top, region.bottom, region.left, region.right)
+            zoomed = rectangle.scale(self._parent.get_zoom())
+            painter.drawRect(qc.QRect(zoomed.left, zoomed.top, zoomed.width, zoomed.height))

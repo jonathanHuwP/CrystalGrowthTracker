@@ -179,6 +179,12 @@
     </item>
     <item>
      <widget class="QGroupBox" name="_regionsGroupBox">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="title">
        <string>View Regions</string>
       </property>
@@ -562,7 +568,7 @@
    <sender>_regionsButtonGroup</sender>
    <signal>buttonToggled(int,bool)</signal>
    <receiver>VideoDemo</receiver>
-   <slot>test_something()</slot>
+   <slot>region_display_mode()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>

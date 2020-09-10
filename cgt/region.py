@@ -32,13 +32,53 @@ class Region(NamedTuple):
     """
     subclass of video_region providing ustility functions
     """
-    top_left_horizontal: int
-    top_left_vertical: int
-    bottom_right_horizontal: int
-    bottom_right_vertical: int
+    top: int
+    left: int
+    bottom: int
+    right: int
     start_frame: int
     end_frame: int
     crystals: List[Crystal]
+
+    @property
+    def top_left_horizontal(self):
+        """
+        getter for the top (backward compatability)
+
+            Returns:
+                pixel coordinate of the top edge of the region
+        """
+        return self.top
+
+    @property
+    def top_left_vertical(self):
+        """
+        getter for the left  (backward compatability)
+
+            Returns:
+                pixel coordinate of the left edge of the region
+        """
+        return self.left
+
+    @property
+    def bottom_right_horizontal(self):
+        """
+        getter for the bottom (backward compatability)
+
+            Returns:
+                pixel coordinate of the bottom edge of the region
+        """
+        return bottom
+
+    @property
+    def bottom_right_vertical(self):
+        """
+        getter for the right (backward compatability)
+
+            Returns:
+                pixel coordinate of the right edge of the region
+        """
+        return right
 
     @property
     def width(self):
@@ -48,7 +88,7 @@ class Region(NamedTuple):
             Returns:
                 the width in pixels
         """
-        return self.bottom_right_horizontal - self.top_left_horizontal
+        return self.bottom - self.top
 
     @property
     def height(self):
@@ -58,7 +98,7 @@ class Region(NamedTuple):
             Returns:
                 the height in pixels
         """
-        return self.top_left_vertical - self.bottom_right_vertical
+        return self.left - self.right
 
     @property
     def time_interval(self):
@@ -79,16 +119,28 @@ class Region(NamedTuple):
                 list of crystal names
         """
         return [i.name for i in self.crystals]
-        
+
     @property
     def crystals(self):
         """
         getter for the crystals
-        
+
             Returns:
                 the list of crystals
         """
         return self._crystals
+        
+    def time_in_region(self, frame):
+        """
+        return true if the time parameter is in the time interval of the region
+        
+            Args:
+                time (int) frame number
+                
+            Returns:
+                True if time in time range of region, else False
+        """
+        return (frame >= self.start_frame and frame <= self.end_frame)
 
     def get_crystal(self, index):
         """

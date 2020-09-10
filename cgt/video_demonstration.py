@@ -223,6 +223,15 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
                 the image being displayed (numpy.ndarray)
         """
         return self._current_image
+        
+    def get_current_original_video_frame(self):
+        """
+        getter for the frame number in the orginal unprocessed video
+        
+            Returns:
+                the frame number in the unprocessed video
+        """
+        return self._current_image * self._step_size
 
     def get_current_video_time(self):
         """
@@ -233,7 +242,7 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
             Returns:
                 the time of the frame in seconds from the start of the video (float) and the original frame number (int)
         """
-        original_frame = self._current_image * self._step_size
+        original_frame = self.get_current_original_video_frame()
         return float(original_frame) / float(self._video_data.frame_rate), original_frame
 
     def set_frame(self, number):
@@ -324,22 +333,40 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
         _, frame = self.get_current_video_time()
         
         self.add_new_region(frame)
+        
+    def get_selected_region(self):
+        """
+        getter for the region selected via the combo box, 
+        
+            Returns:
+                region or None if no regions entered
+        """
+        
+        index = self._regionComboBox.currentIndex()
+        
+        if len(self._regions) < 1 or index < 0:
+            return None
+        
+        return self._regions[index]
   
     def add_new_region(self, last_frame):
         """
         construct a new Region and add it to the list, reset the region end and selection label
         
             Args:
-                
+                last_frame (int) the frame number of the user's end point selection
         """
         tlh = self._region_end.rectangle.top
         tlv = self._region_end.rectangle.left
         brh = self._region_end.rectangle.bottom
         brv = self._region_end.rectangle.right
+        
+        # ensure that the first is the earliest frame
         first_frame = min(self._region_end.frame, last_frame)
         final_frame = max(self._region_end.frame, last_frame)
         
         self._regions.append(Region(tlh, tlv, brh, brv, first_frame, final_frame))
+        self._regionComboBox.addItem(str(len(self._regions)))
         self.reset_enter_region()
     
     @qc.pyqtSlot()
@@ -357,10 +384,6 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
         self._startImageLabel.clear()
         self._source_label.reset_selection()  
         self.enable_select_buttons(False)
-        
-        # TODO remove when tested
-        for item in self._regions:
-            print(item)
 
     @qc.pyqtSlot()
     def zoom_changed(self):
@@ -474,6 +497,7 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
         """
         self._selectButton.setEnabled(flag)
         self._cancelButton.setEnabled(flag)
+        self._regionsGroupBox.setEnabled(not flag)
         
     def video_controls_enabled(self, flag):
         """
@@ -592,21 +616,35 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
         self.set_frame(0)
         
     #@qc.pyqtSlot()
-    def test_something(self):
+    def region_display_mode(self):
+        """
+        set the mode of operation, with respect to showing the regions
+        
+            Returns:
+                None
+        """
         # get the name of the checked button, same as give in designer
         button = self._regionsButtonGroup.checkedButton().objectName()
         
         if button == "_newButton":
+            # set state for entering new regions
             print("new")
+            self._source_label.set_adding()
             
         elif button == "_allButton":
+            # set display all regions
             print("All")
+            self._source_label.set_display_all()
             
         elif button == "_allNoTimeButton":
+            # set display all regions independant of time
             print("All No Time")
+            self._source_label.set_display_all_no_time()
             
         elif button == "_selectedButton":
-            print("selected {}".format(self._regionComboBox.currentIndex()  ))
+            # only disply the selected region
+            print("selected {}".format(self._regionComboBox.currentText()))
+            self._source_label.set_display_selected()
 
 # the main
 ######################
