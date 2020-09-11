@@ -267,6 +267,7 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
         if self._current_image != number:
             self._current_image = number
             self._imageSlider.setSliderPosition(number)
+            self._frameSpinBox.setValue(number)
 
             message = "Frame {:d} of {:d}, approx {:.2f} seconds"
             time, _ = self.get_current_video_time()
@@ -416,6 +417,18 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
                 None
         """
         self.display_pixmap()
+        
+    @qc.pyqtSlot()
+    def frame_spin_box_change(self):
+        """
+        callback for change of the frame spin box, 
+        
+            Returns:
+                None
+        """
+        frame = self._frameSpinBox.value()
+        self.set_frame(frame)
+
 
     @qc.pyqtSlot()
     def frame_jump(self):
@@ -536,6 +549,7 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
         self._upButton.setEnabled(flag)
         self._imageSlider.setEnabled(flag)
         self._zoomSpinBox.setEnabled(flag)
+        self._frameSpinBox.setEnabled(flag)
 
     def get_zoom(self):
         """
@@ -616,6 +630,7 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
 
         # set limiting values on text edit fram number
         self._imageSlider.setMaximum(self._max_step)
+        self._frameSpinBox.setMaximum(self._max_step)
 
         self._images = np.empty(
             (array_size, self._video_data.height, self._video_data.width),
