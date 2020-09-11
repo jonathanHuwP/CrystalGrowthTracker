@@ -211,6 +211,9 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
         ## storage for the regions 
         self._regions = []
         
+        ## a user set frame rate to override video header
+        self._user_frame_rate = None
+        
         # put the label in the scroll
         self._scrollArea.setWidget(self._source_label)
 
@@ -481,10 +484,10 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
             self,
             "Set frames per second",
             "Frames per Second",
-            self._video_data.frame_rate, 0, 100, 1)
+            25, 0, 100, 1)
 
         if flag:
-            self._video_data = modify_video_source(self._video_data, frame_rate=rate)
+            self._user_frame_rate = rate
 
     @qc.pyqtSlot()
     def set_sampeling_rate(self):
@@ -563,6 +566,11 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
             return
 
         self._video_data = make_video_source_imageio(file_name, self._video_reader)
+        
+        if self._user_frame_rate is not None:
+            self._video_data = modify_video_source(
+                self._video_data, 
+                frame_rate=self._user_frame_rate)
 
         self.process_video()
 
@@ -630,7 +638,9 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
             if image_count%2 == 0:
                 tmp = (float(frame) / float(self._video_data.length)) * 100.0
                 progress.setValue(tmp)
-
+                
+            if image_count > self._max_step:
+                break
 
         self.set_frame(0)
         
