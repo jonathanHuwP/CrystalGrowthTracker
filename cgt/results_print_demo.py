@@ -98,6 +98,9 @@ def make_crystal2():
 
 
 def main():
+    """
+    runner for the demonstration
+    """
     results = make_test_result()
 
     for record in results.history:
@@ -121,10 +124,10 @@ def main():
     for crystal in results.crystals:
         # find the region (and region's array index) containing crystal
         region, r_index = results.get_region(i)
-        
+
         print("Crystal {} is in region {}".format(i, r_index))
         print("The number of times measured is {}".format(crystal.number_of_frames_held))
-        
+
         if crystal.notes is not None:
             print("Note: {}".format(crystal.notes))
 
@@ -132,10 +135,10 @@ def main():
             print("\tFrame number {}".format(frame))
             faces = crystal.faces_in_frame(frame)
 
-            for face in faces:  
+            for face in faces:
                 print("\t\t{} ({} {}), ({}, {})".format(
                     face.label, face.start.x, face.start.y, face.end.x, face.end.y))
-               
+
         i += 1
 
 if __name__ == "__main__":

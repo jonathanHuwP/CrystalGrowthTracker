@@ -22,13 +22,15 @@ specific language governing permissions and limitations under the License.
 # set up linting conditions
 # pylint: disable = too-many-public-methods
 # pylint: disable = c-extension-no-member
-# pylint: disable = E0401 
+# pylint: disable = E0401
 
 from cgt.linesetsandframesstore import LineSetsAndFramesStore
 
 class Crystal:
     """
-    storage for the crystals identifed in the video, the class is a container for sets of lines, each set is indexed by the number of the video frame from which it was derived.
+    storage for the crystals identifed in the video, the class is a container
+    for sets of lines, each set is indexed by the number of the video frame
+    from which it was derived.
     """
     def __init__(self, notes=None, faces=None):
         """
@@ -68,12 +70,12 @@ class Crystal:
                 number of frames (int)
         """
         return len(self._faces)
-        
+
     @property
     def notes(self):
         """
         getter for any notes
-        
+
             Returns:
                 the notes or None
         """
@@ -115,4 +117,4 @@ class Crystal:
 
         TODO implement this
         """
-        pass
+        return 0

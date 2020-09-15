@@ -32,19 +32,19 @@ class Region(NamedTuple):
     """
     ## the of the region in pixel coordinates, user's view
     top: int
-    
+
     ## the left of the region in pixel coordinates, user's view
     left: int
-    
+
     ## the bottom of the region in pixel coordinates, user's view
     bottom: int
-    
+
     ## the right of the region in pixel coordinates, user's view
     right: int
-    
+
     ## the number of the first frame in the region
     start_frame: int
-    
+
     ## the number of the last frame in the region
     end_frame: int
 
@@ -117,31 +117,31 @@ class Region(NamedTuple):
                 the number of frames in the time interval
         """
         return self.end_frame - self.start_frame
-        
+
     def time_in_region(self, frame):
         """
         return true if the time parameter is in the time interval of the region
-        
+
             Args:
                 time (int) frame number
-                
+
             Returns:
                 True if time in time range of region, else False
         """
-        return (frame >= self.start_frame and frame <= self.end_frame)
-        
+        return self.end_frame >= frame >= self.start_frame #and frame <= self.end_frame
+
     def point_in_region(self, horizontal, vertical):
         """
             test if a point in pixel coordinates is inside the region
-            
+
                 Args:
                     horizontal (int) the horizontal (x) screen coordinate
                     vertical (int) the vertical (y) screen coordinate
-                    
+
                 Returns:
                     True if point in region< else False
         """
-        h_flag = horizontal >= self.left and horizontal <= self.right
-        v_flag = vertical >= self.top and vertical <= self.bottom
-        
+        h_flag = self.right >= horizontal >= self.left
+        v_flag = self.bottom >= vertical >= self.top
+
         return h_flag and v_flag
