@@ -24,21 +24,29 @@ specific language governing permissions and limitations under the License.
 # pylint: disable = c-extension-no-member
 # pylint: disable = E0401
 
-from typing import NamedTuple, List
-
-from cgt.crystal import Crystal
+from typing import NamedTuple
 
 class Region(NamedTuple):
     """
-    subclass of video_region providing ustility functions
+    class defining a region of the video in frame number and pixel space
     """
+    ## the of the region in pixel coordinates, user's view
     top: int
+    
+    ## the left of the region in pixel coordinates, user's view
     left: int
+    
+    ## the bottom of the region in pixel coordinates, user's view
     bottom: int
+    
+    ## the right of the region in pixel coordinates, user's view
     right: int
+    
+    ## the number of the first frame in the region
     start_frame: int
+    
+    ## the number of the last frame in the region
     end_frame: int
-    crystals: List[Crystal]
 
     @property
     def top_left_horizontal(self):
@@ -68,7 +76,7 @@ class Region(NamedTuple):
             Returns:
                 pixel coordinate of the bottom edge of the region
         """
-        return bottom
+        return self.bottom
 
     @property
     def bottom_right_vertical(self):
@@ -78,7 +86,7 @@ class Region(NamedTuple):
             Returns:
                 pixel coordinate of the right edge of the region
         """
-        return right
+        return self.right
 
     @property
     def width(self):
@@ -109,26 +117,6 @@ class Region(NamedTuple):
                 the number of frames in the time interval
         """
         return self.end_frame - self.start_frame
-
-    @property
-    def crystal_names(self):
-        """
-        getter for a list of the names of the crystals
-
-            Returns:
-                list of crystal names
-        """
-        return [i.name for i in self.crystals]
-
-    @property
-    def crystals(self):
-        """
-        getter for the crystals
-
-            Returns:
-                the list of crystals
-        """
-        return self._crystals
         
     def time_in_region(self, frame):
         """
@@ -141,15 +129,19 @@ class Region(NamedTuple):
                 True if time in time range of region, else False
         """
         return (frame >= self.start_frame and frame <= self.end_frame)
-
-    def get_crystal(self, index):
+        
+    def point_in_region(self, horizontal, vertical):
         """
-        getter for a named crystal
-
-            Args:
-                name the crystals id
-
-            Returns:
-                the crystal
+            test if a point in pixel coordinates is inside the region
+            
+                Args:
+                    horizontal (int) the horizontal (x) screen coordinate
+                    vertical (int) the vertical (y) screen coordinate
+                    
+                Returns:
+                    True if point in region< else False
         """
-        return self.crystals[index]
+        h_flag = horizontal >= self.left and horizontal <= self.right
+        v_flag = vertical >= self.top and vertical <= self.bottom
+        
+        return h_flag and v_flag

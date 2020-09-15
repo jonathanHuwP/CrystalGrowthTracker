@@ -28,9 +28,9 @@ from cgt.linesetsandframesstore import LineSetsAndFramesStore
 
 class Crystal:
     """
-    storage for the crystals identifed in the video
+    storage for the crystals identifed in the video, the class is a container for sets of lines, each set is indexed by the number of the video frame from which it was derived.
     """
-    def __init__(self, name, faces=None):
+    def __init__(self, notes=None, faces=None):
         """
         initalization function
 
@@ -39,8 +39,8 @@ class Crystal:
 
                 faces (image_artifacts.ArtifactStore) the lines defining the faces
         """
-        ## the name or id of the crystal
-        self._name = name
+        ## any notes associated with the crystal
+        self._notes = notes
 
         ## ArtifactStore for the lines forming the faces indexed by frame number
         self._faces = LineSetsAndFramesStore()
@@ -70,8 +70,14 @@ class Crystal:
         return len(self._faces)
         
     @property
-    def name(self):
-        return self._name
+    def notes(self):
+        """
+        getter for any notes
+        
+            Returns:
+                the notes or None
+        """
+        return self._notes
 
     @property
     def list_of_frame_numbers(self):
