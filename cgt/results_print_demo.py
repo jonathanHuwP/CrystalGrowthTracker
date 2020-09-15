@@ -35,14 +35,22 @@ def make_test_result():
     """
     factory function to procduce a Results object
     """
-    source = vas.VideoSource("ladkj.mp4", 8, 500, 800, 600)
-    regions = [make_region1(), make_region2()]
+    source = vas.VideoSource("ladkj.mp4", 8, 700, 800, 600)
+    store = vas.VideoAnalysisResultsStore(source)
+    store.append_history()
 
-    return vas.VideoAnalysisResultsStore(source, regions=regions)
+    index = store.add_region(Region(450, 200, 675, 400, 250, 500))
+    store.add_crystal(make_crystal1(), index)
 
-def make_region1():
+    index = store.add_region(Region(250, 323, 450, 500, 123, 345))
+    store.add_crystal(make_crystal2(), index)
+
+    return store
+
+
+def make_crystal1():
     """
-    factory function to produce a test crystal
+    factory function to produce a test crystals
     """
 
     line1 = ImageLineSegment(ImagePoint(50, 150),
@@ -54,13 +62,13 @@ def make_region1():
                              "02")
 
 
-    tmp_crystal = Crystal(name="01")
+    tmp_crystal = Crystal()
 
     tmp_crystal.add_faces([line1, line2], 250)
 
-    return Region(450, 200, 675, 500, 250, 500, [tmp_crystal])
+    return tmp_crystal
 
-def make_region2():
+def make_crystal2():
     """
     factory function to produce a test crystal
     """
@@ -81,14 +89,15 @@ def make_region2():
                               ImagePoint(175, 300),
                               "02")
 
-    tmp_crystal = Crystal(name="02")
+    tmp_crystal = Crystal(notes="very blured")
 
     tmp_crystal.add_faces([line1, line2], 250)
     tmp_crystal.add_faces([line1a, line2a], 500)
 
-    return Region(350, 100, 575, 400, 150, 400, [tmp_crystal])
+    return tmp_crystal
 
-if __name__ == "__main__":
+
+def main():
     results = make_test_result()
 
     for record in results.history:
@@ -97,6 +106,7 @@ if __name__ == "__main__":
     video = results.video
     print(video.name, video.frame_rate, video.length, video.width, video.height)
 
+    print("Number of regions {}".format(len(results.regions)))
     for region in results.regions:
         print("Region")
         print(region.top_left_horizontal,
@@ -106,14 +116,27 @@ if __name__ == "__main__":
               region.start_frame,
               region.end_frame)
 
-        for crystal in region.crystals:
-            print("Crystal {} has {} frames".format(crystal.name, crystal.number_of_frames_held))
+    print("Number of crystals {}".format(len(results.crystals)))
+    i = 0
+    for crystal in results.crystals:
+        # find the region (and region's array index) containing crystal
+        region, r_index = results.get_region(i)
+        
+        print("Crystal {} is in region {}".format(i, r_index))
+        print("The number of times measured is {}".format(crystal.number_of_frames_held))
+        
+        if crystal.notes is not None:
+            print("Note: {}".format(crystal.notes))
 
-            for frame in crystal.list_of_frame_numbers:
-                print("\tframe number {}".format(frame))
+        for frame in crystal.list_of_frame_numbers:
+            print("\tFrame number {}".format(frame))
+            faces = crystal.faces_in_frame(frame)
 
-                faces = crystal.faces_in_frame(frame)
+            for face in faces:  
+                print("\t\t{} ({} {}), ({}, {})".format(
+                    face.label, face.start.x, face.start.y, face.end.x, face.end.y))
+               
+        i += 1
 
-                for face in faces:
-                    print("\t\t{} ({} {}), ({}, {})".format(
-                        face.label, face.start.x, face.start.y, face.end.x, face.end.y))
+if __name__ == "__main__":
+    main()
