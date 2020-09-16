@@ -120,8 +120,8 @@ def main():
               region.end_frame)
 
     print("Number of crystals {}".format(len(results.crystals)))
-    i = 0
-    for crystal in results.crystals:
+
+    for crystal, i in enumerate(results.crystals):
         # find the region (and region's array index) containing crystal
         region, r_index = results.get_region(i)
 
@@ -138,8 +138,6 @@ def main():
             for face in faces:
                 print("\t\t{} ({} {}), ({}, {})".format(
                     face.label, face.start.x, face.start.y, face.end.x, face.end.y))
-
-        i += 1
 
 if __name__ == "__main__":
     main()
