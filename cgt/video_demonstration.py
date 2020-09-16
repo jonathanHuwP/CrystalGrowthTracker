@@ -17,16 +17,6 @@ specific language governing permissions and limitations under the License.
 @copyright 2020
 @author: j.h.pickering@leeds.ac.uk
 """
-# imageio.reader meta data example
-# plugin => ffmpeg
-# nframes => inf
-# ffmpeg_version => 4.2.2 built with gcc 9.2.1 (GCC) 20200122
-# codec => mjpeg
-# pix_fmt => yuvj420p(pc
-# fps => 20.0
-# source_size => (2560, 2160)
-# size => (2560, 2160)
-# duration => 22.0
 
 # set up linting conditions
 # pylint: disable = too-many-public-methods
