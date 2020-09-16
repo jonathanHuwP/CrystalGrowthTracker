@@ -41,12 +41,12 @@ DateUser = namedtuple("DateUser", ["date", "user_name"])
 ##
 ## frame_rate number of frames per second
 ##
-## length the numer of frames in the video
+## frame_count the numer of frames in the video
 ##
 ## width the horizontal size of the video in pixels
 ##
 ## height the vertical size of the video in pixels
-VideoSource = namedtuple("VideoSource", ["name", "frame_rate", "length", "width", "height"])
+VideoSource = namedtuple("VideoSource", ["name", "frame_rate", "frame_count", "width", "height"])
 
 class VideoAnalysisResultsStore:
     """

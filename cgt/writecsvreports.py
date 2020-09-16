@@ -91,10 +91,10 @@ def save_csv_crystals(results_dir, info):
     index = 0
     for region in results.regions:
         regions_array.append([index,
-                              region.top_left_horizontal,
-                              region.top_left_vertical,
-                              region.bottom_right_horizontal,
-                              region.bottom_right_vertical,
+                              region.top,
+                              region.left,
+                              region.bottom,
+                              region.right,
                               region.start_frame,
                               region.end_frame])
         index = index + 1
@@ -159,10 +159,10 @@ def save_csv_regions(results_dir, info):
     index = 0
     for region in results.regions:
         regions_array.append([index, index,
-                              region.top_left_horizontal,
-                              region.top_left_vertical,
-                              region.bottom_right_horizontal,
-                              region.bottom_right_vertical,
+                              region.top,
+                              region.left,
+                              region.bottom,
+                              region.right,
                               region.start_frame,
                               region.end_frame])
         index = index + 1

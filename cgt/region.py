@@ -49,46 +49,6 @@ class Region(NamedTuple):
     end_frame: int
 
     @property
-    def top_left_horizontal(self):
-        """
-        getter for the top (backward compatability)
-
-            Returns:
-                pixel coordinate of the top edge of the region
-        """
-        return self.top
-
-    @property
-    def top_left_vertical(self):
-        """
-        getter for the left  (backward compatability)
-
-            Returns:
-                pixel coordinate of the left edge of the region
-        """
-        return self.left
-
-    @property
-    def bottom_right_horizontal(self):
-        """
-        getter for the bottom (backward compatability)
-
-            Returns:
-                pixel coordinate of the bottom edge of the region
-        """
-        return self.bottom
-
-    @property
-    def bottom_right_vertical(self):
-        """
-        getter for the right (backward compatability)
-
-            Returns:
-                pixel coordinate of the right edge of the region
-        """
-        return self.right
-
-    @property
     def width(self):
         """
         getter for the width in pixels

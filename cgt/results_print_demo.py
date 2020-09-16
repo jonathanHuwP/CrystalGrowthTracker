@@ -107,15 +107,15 @@ def main():
         print(record)
 
     video = results.video
-    print(video.name, video.frame_rate, video.length, video.width, video.height)
+    print(video.name, video.frame_rate, video.frame_count, video.width, video.height)
 
     print("Number of regions {}".format(len(results.regions)))
     for region in results.regions:
         print("Region")
-        print(region.top_left_horizontal,
-              region.top_left_vertical,
-              region.bottom_right_horizontal,
-              region.bottom_right_vertical,
+        print(region.top,
+              region.left,
+              region.bottom,
+              region.right,
               region.start_frame,
               region.end_frame)
 

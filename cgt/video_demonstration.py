@@ -68,17 +68,17 @@ RegionEnd = namedtuple("RegionEnd", ["rectangle", "frame"])
 ##
 ## frame_rate number of frames per second
 ##
-## length the numer of frames in the video
+## frame_count the numer of frames in the video
 ##
 ## width the horizontal size of the video in pixels
 ##
 ## height the vertical size of the video in pixels
-VideoSource = namedtuple("VideoSource", ["name", "frame_rate", "length", "width", "height"])
+VideoSource = namedtuple("VideoSource", ["name", "frame_rate", "frame_count", "width", "height"])
 
 def modify_video_source(original,
                         name=None,
                         frame_rate=None,
-                        length=None,
+                        frame_count=None,
                         width=None,
                         height=None):
     """
@@ -90,7 +90,7 @@ def modify_video_source(original,
             original (VideoSource) the object to be modified
             name (string) new name
             frame_rate (int) the new video frames per second
-            length (float) the new video duration in seconds
+            frame_count (float) the new video's number of frames
             width (int) the new horizontal size in pixels
             height (int) the new verticl size in pixels
 
@@ -103,8 +103,8 @@ def modify_video_source(original,
     if frame_rate is None:
         frame_rate = original.frame_rate
 
-    if length is None:
-        length = original.length
+    if frame_count is None:
+        frame_count = original.frame_count
 
     if width is None:
         width = original.width
@@ -112,7 +112,7 @@ def modify_video_source(original,
     if height is None:
         height = original.height
 
-    return VideoSource(name, frame_rate, length, width, height)
+    return VideoSource(name, frame_rate, frame_count, width, height)
 
 
 def make_video_source_imageio(file_name, imio_reader):
@@ -625,7 +625,7 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
             return np.uint8(np.round(value*255))
 
         self._timeStatusLabel.setText("Loading and processing video")
-        array_size = int(np.round(self._video_data.length/self._step_size))
+        array_size = int(np.round(self._video_data.frame_count/self._step_size))
         self._max_step = array_size-1
 
         # set limiting values on text edit fram number
@@ -643,7 +643,7 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
         progress.show()
 
         image_count = 0
-        for frame in range(0, self._video_data.length, self._step_size):
+        for frame in range(0, self._video_data.frame_count, self._step_size):
             img = color.rgb2gray(self._video_reader.get_data(frame))
             img = to_gray(img)
 
@@ -651,7 +651,7 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
             image_count += 1
 
             if image_count%2 == 0:
-                tmp = (float(frame) / float(self._video_data.length)) * 100.0
+                tmp = (float(frame) / float(self._video_data.frame_count)) * 100.0
                 progress.setValue(tmp)
                 
             if image_count > self._max_step:
