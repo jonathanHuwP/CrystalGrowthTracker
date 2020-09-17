@@ -393,7 +393,6 @@
     <addaction name="_actionQuit"/>
     <addaction name="separator"/>
     <addaction name="_actionSet_Frame_Rate"/>
-    <addaction name="_actionSet_Sampeling_Rate"/>
    </widget>
    <addaction name="menuOpen"/>
   </widget>
@@ -508,7 +507,7 @@
    <sender>_imageSlider</sender>
    <signal>sliderMoved(int)</signal>
    <receiver>VideoDemo</receiver>
-   <slot>frame_jump()</slot>
+   <slot>frame_slider_changed()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>188</x>
@@ -541,22 +540,6 @@
    <signal>triggered()</signal>
    <receiver>VideoDemo</receiver>
    <slot>set_frame_rate()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>234</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>_actionSet_Sampeling_Rate</sender>
-   <signal>triggered()</signal>
-   <receiver>VideoDemo</receiver>
-   <slot>set_sampeling_rate()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
