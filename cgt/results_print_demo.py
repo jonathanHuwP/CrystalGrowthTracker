@@ -108,7 +108,7 @@ def main():
         print(record)
 
     video = results.video
-    print(video.name, video.frame_rate, video.length, video.width, video.height)
+    print(video.name, video.frame_rate, video.frame_count, video.width, video.height)
 
     print("Number of regions {}".format(len(results.regions)))
     for region in results.regions:
@@ -121,7 +121,11 @@ def main():
               region.end_frame)
 
     print("Number of crystals {}".format(len(results.crystals)))
+
     for i, crystal in enumerate(results.crystals):
+
+#    for crystal, i in enumerate(results.crystals):
+
         # find the region (and region's array index) containing crystal
         region, r_index = results.get_region(i)
 
@@ -139,7 +143,6 @@ def main():
                 print("\t\t{} ({} {}), ({}, {})".format(
                     face.label, face.start.x, face.start.y, face.end.x, face.end.y))
 
- 
 
 if __name__ == "__main__":
     main()

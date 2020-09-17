@@ -231,8 +231,31 @@ def save_csv_crystals(results_dir, info, crystals_array):
         print("Could not open csv crystals report file, with error message: ", sys.exc_info()[0])
         sys.exit("Could not create csv crystals report.")
 
+
     header = ("Crystal index", "Region index", "Note",
               "Number of frames","Frame number")
+
+#    header = ("Region number,",
+#              "Top left horizontal","Top left vertical",
+#              "Bottom right horizontal","Bottom right vertical",
+#              "Start frame","End frame")
+
+    #regions = [[1, 2, 3, 4, 5, 6], 
+    #           [700, 800, 9, 10, 65, 29], 
+    #           [10, 11, 12, 20 ,20 ,20]]
+#    results = make_test_result()
+    
+#    regions_array = []
+#    index = 0
+#    for region in results.regions:
+#        regions_array.append([index,
+#                              region.top,
+#                              region.left,
+#                              region.bottom,
+#                              region.right,
+#                              region.start_frame,
+#                              region.end_frame])
+#        index = index + 1
 
     with fout:
         writer = csv.writer(fout, delimiter=',', lineterminator = '\n')
@@ -283,10 +306,26 @@ def save_csv_lines(results_dir, info, lines_array):
         print("Could not open csv lines report file, with error message: ", sys.exc_info()[0])
         sys.exit("Could not create csv lines report.")
 
+
     header = ("Crystal index", "Region index",
               "Frame number", "Line number",
               "x0","y0",
               "x1","y1",)
+
+#    results = make_test_result()
+#    
+#    regions_array = []
+#    index = 0
+#    for region in results.regions:
+#        regions_array.append([index, index,
+#                              region.top,
+#                              region.left,
+#                              region.bottom,
+#                              region.right,
+#                              region.start_frame,
+#                              region.end_frame])
+#        index = index + 1
+
 
     with fout:
         writer = csv.writer(fout, delimiter=',', lineterminator = '\n')
