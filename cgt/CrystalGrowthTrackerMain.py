@@ -20,9 +20,10 @@ specific language governing permissions and limitations under the License.
 """
 
 import sys
-sys.path.insert(0, '..\\CrystalGrowthTracker')
 import os
 import datetime
+sys.path.insert(0, '..\\CrystalGrowthTracker')
+
 from cgt import utils
 from cgt.utils import find_hostname_and_ip
 
