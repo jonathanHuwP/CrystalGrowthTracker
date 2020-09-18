@@ -63,7 +63,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         ## an ArtifctStore for testing
         self._store = LineSetsAndFramesStore()
         
-    def set_pixmap(pixmap):
+    def set_pixmap(self, pixmap):
         self._drawing = DrawingLabel(self._scrollArea)
         self._drawing.set_backgroud_pixmap(pixmap)
         self._scrollArea.setWidget(self._drawing)

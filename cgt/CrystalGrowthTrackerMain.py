@@ -121,6 +121,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         
     def append_region(self, region):
         self._regions.append(region)
+        self._regionsComboBox.addItem(str(len(self.get_regions())))
         
     def get_video_data(self):
         return self._video_data
@@ -145,6 +146,29 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         title = self._translated_name + " - " + name
         self.setWindowTitle(title)
+        
+    def make_pixmap(self, index):
+        region = self._regions[index]
+        
+        img = self._video_reader.get_data(region.start_frame)
+
+        im_format = qg.QImage.Format_RGB888
+        image = qg.QImage(
+            img.data,
+            img.shape[1],
+            img.shape[0],
+            3*img.shape[1],
+            im_format)
+
+        return qg.QPixmap.fromImage(image)
+
+        
+    @qc.pyqtSlot()
+    def select_region(self):
+        index = self._regionsComboBox.currentIndex()
+        print("region {}".format(index))
+        pixmap = self.make_pixmap(index)
+        self._drawingWidget.set_pixmap(pixmap)
 
     @qc.pyqtSlot()
     def tab_changed(self):
