@@ -37,6 +37,7 @@ import PyQt5.QtCore as qc
 # pylint: disable = c-extension-no-member
 
 from cgt.regionselectionwidget import RegionSelectionWidget
+from cgt.crystaldrawingwidget import CrystalDrawingWidget
 
 # import UI
 from cgt.Ui_CrystalGrowthTrackerMain import Ui_CrystalGrowthTrackerMain
@@ -83,6 +84,13 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         layout.addWidget(self._selectWidget)
         self._selectTab.setLayout(layout)
         self._tabWidget.addTab(self._selectTab, "Select Regions")
+        
+        self._drawingTab = qw.QWidget(self)
+        self._drawingWidget = CrystalDrawingWidget(self._drawingTab)
+        layout = qw.QVBoxLayout()
+        layout.addWidget(self._drawingWidget)
+        self._drawingTab.setLayout(layout)
+        self._tabWidget.addTab(self._drawingTab, "Trace Crystals")
         
     def get_regions(self):
         return self._regions
