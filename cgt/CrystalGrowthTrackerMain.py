@@ -23,8 +23,10 @@ import sys
 sys.path.insert(0, '..\\CrystalGrowthTracker')
 import os
 import datetime
+from imageio import get_reader as imio_get_reader
 from cgt import utils
 from cgt.utils import find_hostname_and_ip
+from cgt.cgtutility import RegionEnd, VideoSource
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
@@ -33,6 +35,8 @@ import PyQt5.QtCore as qc
 # set up linting conditions
 # pylint: disable = too-many-public-methods
 # pylint: disable = c-extension-no-member
+
+from cgt.regionselectionwidget import RegionSelectionWidget
 
 # import UI
 from cgt.Ui_CrystalGrowthTrackerMain import Ui_CrystalGrowthTrackerMain
@@ -61,12 +65,58 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._translated_name = self.tr("CrystalGrowthTracker")
 
         self.setupUi(self)
-        
+
         ## the name of the project
         self._project_name = None
         
-        self.set_title()
+        ## the videos data
+        self._video_data = None
         
+        ## storage for the regions
+        self._regions = []
+
+        self.set_title()
+
+        self._selectTab = qw.QWidget(self)
+        self._selectWidget = RegionSelectionWidget(self._selectTab, self)
+        self._tabWidget.addTab(self._selectTab, "Select Regions")
+        
+    def get_regions(self):
+        return self._regions
+        
+    def get_regions_iter(self):
+        """
+        get an iterator for the list of regions
+
+            Returns:
+                iterator of regions
+        """
+        return iter(self._regions)
+        
+    def get_selected_region(self, index):
+        """
+        getter for the region selected via the combo box,
+        
+            Args:
+                index (int) the list index of the region
+
+            Returns:
+                region or None if no regions entered
+        """
+        if len(self._regions) < 1 or index < 0:
+            return None
+
+        return self._regions[index]
+        
+    def append_region(self, region):
+        self._regions.append(region)
+        
+    def get_video_data(self):
+        return self._video_data
+        
+    def get_video_reader(self):
+        return self._video_reader
+
     def set_title(self):
         """
         assignes the source and sets window title
@@ -78,10 +128,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 None
         """
         name = "No project"
-        
+
         if self._project_name is not None:
             name = self._project_name
-            
+
         title = self._translated_name + " - " + name
         self.setWindowTitle(title)
 
@@ -97,6 +147,59 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
 
         print("tab changed to {}".format(self._tabWidget.currentIndex()))
+        
+        
+    @qc.pyqtSlot()
+    def load_video(self):
+        """
+        seperate video loding callback for use in development
+        
+        TODO remove as function provided in new project
+        """
+
+        options = qw.QFileDialog.Options()
+        options |= qw.QFileDialog.DontUseNativeDialog
+        file_name, _ = qw.QFileDialog.getOpenFileName(
+            self,
+            self.tr("Select File"),
+            "",
+            " Audio Video Interleave (*.avi)",
+            options=options)
+
+        if file_name:
+            self.read_video(file_name)
+            
+    def read_video(self, file_name):
+        """
+        read in a video and display
+
+            Args:
+                file_name (string) the file name of the video
+
+            Returns:
+                None
+        """
+        try:
+            self._video_reader = imio_get_reader(file_name, 'ffmpeg')
+        except (FileNotFoundError, IOError) as ex:
+            message = "Unexpected error reading {}: {} => {}".format(file_name, type(ex), ex.args)
+            qw.QMessageBox.warning(self,
+                                   "VideoDemo",
+                                   message)
+            return
+
+        # TODO allow for user override of frame rate
+
+        # set up the video data struct
+        meta_data = self._video_reader.get_meta_data()
+        self._video_data = VideoSource(
+            file_name,
+            meta_data["fps"],
+            self._video_reader.count_frames(),
+            meta_data["size"][0],
+            meta_data["size"][1])
+
+        self._selectWidget.show_video()
 
     @qc.pyqtSlot()
     def save_project(self):
@@ -240,10 +343,10 @@ def run_growth_tracker():
 
         window = CrystalGrowthTrackerMain()
         window.show()
-        
+
         app.exec_()
-    
+
     inner_run()
-    
+
 if __name__ == "__main__":
     run_growth_tracker()

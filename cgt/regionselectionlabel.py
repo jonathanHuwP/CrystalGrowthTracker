@@ -56,7 +56,7 @@ class RegionSelectionLabel(qw.QLabel):
     subclass of label allowing selection of region by drawing rectangle and
     displaying a list of already selected rectangles.
     """
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, regions_store=None):
         """
         Set up the label
 
@@ -70,6 +70,9 @@ class RegionSelectionLabel(qw.QLabel):
 
         ## (QObject) the parent object
         self._parent = parent
+        
+        ## storage for the regions
+        self._regions_store = regions_store
 
         ## the widget's state
         self._state = SelectionState.NO_ACTION
@@ -344,7 +347,7 @@ class RegionSelectionLabel(qw.QLabel):
             Returns:
                 None
         """
-        regions = self._parent.get_regions_iter()
+        regions = self._regions_store.get_regions_iter()
 
         for region in regions:
             if time:
