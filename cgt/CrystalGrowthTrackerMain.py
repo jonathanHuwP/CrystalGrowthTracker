@@ -79,6 +79,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self._selectTab = qw.QWidget(self)
         self._selectWidget = RegionSelectionWidget(self._selectTab, self)
+        layout = qw.QVBoxLayout()
+        layout.addWidget(self._selectWidget)
+        self._selectTab.setLayout(layout)
         self._tabWidget.addTab(self._selectTab, "Select Regions")
         
     def get_regions(self):
