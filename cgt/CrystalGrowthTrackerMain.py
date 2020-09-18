@@ -26,21 +26,9 @@ import datetime
 from cgt import utils
 from cgt.utils import find_hostname_and_ip
 
-import array as arr
-import pickle as pk
-import numpy as np
-from PIL import Image
-import matplotlib.image as mpimg
-from skimage import color
-
 import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
-
-import lazylogger
-from ImageLabel import ImageLabel
-#from PolyLineExtract import PolyLineExtract, IAParameters
-#from ImageEnhancer import ImageEnhancer
 
 # set up linting conditions
 # pylint: disable = too-many-public-methods
@@ -48,10 +36,6 @@ from ImageLabel import ImageLabel
 
 # import UI
 from cgt.Ui_CrystalGrowthTrackerMain import Ui_CrystalGrowthTrackerMain
-
-from cgt import htmlreport
-from cgt import writecsvreports
-#from cgt import reports
 
 class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     """
@@ -69,7 +53,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 None
         """
-        super(CrystalGrowthTrackerMain, self).__init__()
+        super(CrystalGrowthTrackerMain, self).__init__(parent)
         ## the parent object
         self._parent = parent
 
@@ -77,49 +61,13 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._translated_name = self.tr("CrystalGrowthTracker")
 
         self.setupUi(self)
-
-        ## the label for displaying the current main image
-        self._source_label1 = None
-
-        ## @todo is this really needed (check/remove)
-        self._source_label2 = None
-
-        ## the reader for the video file
-        self._video_reader = None
-
-        ## the QLabel for displaying the current subimage
-        self._subimage_label = qw.QLabel(self)
-        self._subimage_label.setAlignment(qc.Qt.AlignTop | qc.Qt.AlignLeft)
-        self._subimage_label.setSizePolicy(
-            qw.QSizePolicy.Ignored, qw.QSizePolicy.Fixed)
-
-        source_width = int(round(self.size().width()*0.6))
-        sub_width = int(round(source_width))
-
-        sizes = list()
-        sizes.append(source_width)
-        sizes.append(200)
-        sizes.append(sub_width)
-        sizes.append(200)
-
-        self._splitter.setSizes(sizes)
-
-        self._subScrollArea.setWidget(self._subimage_label)
-
-        ## the image as numpy.array
-        self._raw_image = None
-
-        ## the path to the image source
-        self._image_source = None
-
-        ## the current zoom  @todo do we need this as is should always be the same as the spinBox
-        self._zoom = 1.0
-
-        ## the current logger
-        self._logger = lazylogger.logging.getLogger(self._translated_name)
-        self._logger.setLevel(lazylogger.logging.WARNING)
-
-    def set_title(self, source):
+        
+        ## the name of the project
+        self._project_name = None
+        
+        self.set_title()
+        
+    def set_title(self):
         """
         assignes the source and sets window title
 
@@ -129,8 +77,12 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 None
         """
-        self._image_source = source
-        title = self._translated_name + " - " + source
+        name = "No project"
+        
+        if self._project_name is not None:
+            name = self._project_name
+            
+        title = self._translated_name + " - " + name
         self.setWindowTitle(title)
 
     @qc.pyqtSlot()
@@ -144,529 +96,57 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 None
         """
 
-        self._logger.info(
-            "tab changed to %s", self._tabWidget.currentIndex())
+        print("tab changed to {}".format(self._tabWidget.currentIndex()))
 
     @qc.pyqtSlot()
-    def save_results(self):
+    def save_project(self):
         """
-        Save the current set of results
+        Save the current project
 
             Returns:
                 None
         """
-        dir_name = qw.QFileDialog().getExistingDirectory(
-            self,
-            self.tr("Select Directory for the Report"),
-            "")
-
-        if dir_name is not None:
-
-            print("Printing html report.")
-            prog = 'CGT'
-            description = 'Semi-automatically tracks the growth of crystals from X-ray videos.'
-
-            info = {'prog':prog,
-                    'description':description}
-            info['in_file_no_path'] = "filename_in.avi"
-            info['in_file_no_extension'] = os.path.splitext("filename_in")[0]
-            info['frame_rate'] = 20
-            info['resolution'] = 10
-            info['resolution_units'] = "nm"
-            start = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-            info['start'] = start
-            print(start)
-            info['host'], info['ip_address'], info['operating_system'] = utils.find_hostname_and_ip()
-            print(find_hostname_and_ip())
-            htmlreport.save_html_report(dir_name, info)
-            writecsvreports.save_csv_reports(dir_name, info)
+        print("Save Project")
 
     @qc.pyqtSlot()
-    def reload_results(self):
+    def load_project(self):
         """
-        reload a set of results
+        load an existing project
 
             Returns:
                 None
         """
-        print("reload results")
-        dir_name = qw.QFileDialog().getExistingDirectory(
-            self,
-            self.tr("Select Directory for Reload"),
-            "")
+        print("load project")
 
-        if dir_name is not None:
-            pass
-        
     @qc.pyqtSlot()
-    def save_current_subimage(self):
+    def save_subimage(self):
         """
         callback for saving the current image
 
             Returns:
                 None
         """
-        if self._source_label1 is None or self._source_label1.number_rectangles < 1:
-            qw.QMessageBox.information(
-                self,
-                self.tr('Save'),
-                self.tr("You have not made any subimages yet!"))
-            return
-
-        options = qw.QFileDialog.Options()
-        options |= qw.QFileDialog.DontUseNativeDialog
-        file_name, file_type = qw.QFileDialog().getSaveFileName(
-            self,
-            self.tr("Select File"),
-            "",
-            self.tr("CrystalGrowthTracker Files (*.pki);;JPG Files (*.jpg)"),
-            options=options)
-
-        if file_name:
-            if file_type == "CrystalGrowthTracker Files (*.pki)":
-                self.save_image_pickel(file_name)
-            elif file_type == "JPG Files (*.jpg)":
-                self.save_image_jpg(file_name)
-
-    def save_image_pickel(self, file_name):
-        """
-        Save image a pickeled np.array
-
-            Args:
-                file_name (string) the file into which the image is to be saved
-
-        Returns:
-            None
-        """
-        if not file_name.endswith('.pki'):
-            file_name = file_name + '.pki'
-
-        img = self.get_current_subimage()
-
-        with open(file_name, 'wb') as out_f:
-            pk.dump(img, out_f)
-
-        qw.QMessageBox.information(
-            self,
-            self.tr('Save Pickle'),
-            self.tr("Subimage written to: {}").format(file_name))
-
-    def save_image_jpg(self, file_name):
-        """
-        save image in JPG format
-
-            Args:
-                image (numpy.array) the image to be saved.
-
-                file_name (string) the file to which the image is to be aved.
-
-            Returns:
-                None
-        """
-        if not file_name.endswith('.jpg'):
-            file_name = file_name + '.jpg'
-
-        image = Image.fromarray(self.get_current_subimage())
-        image.save(file_name)
-
-        qw.QMessageBox.information(
-            self,
-            self.tr('Save JPG'),
-            self.tr("Subimage written to: {}").format(file_name))
+        print("Save image")
 
     @qc.pyqtSlot()
-    def load_image(self):
+    def new_project(self):
         """
-        Get file name from user and, if good
+        Start a new project
 
             Returns:
                 None
         """
-
-        # file types
-        video_files = self.tr("Video Files (*.avi)")
-        tracker_files = self.tr("CrystalGrowthTracker Files (*.ga)")
-        subimage_files = self.tr("CrystalGrowthTracker Subimage Files(*.pki)")
-        all_files = self.tr("All Files (*)")
-
-        files_all = [video_files, tracker_files, subimage_files, all_files]
-        files = ";;".join(files_all)
-
-        options = qw.QFileDialog.Options()
-        options |= qw.QFileDialog.DontUseNativeDialog
-        file_name, file_type = qw.QFileDialog.getOpenFileName(
-            self,
-            self.tr("Select File"),
-            "",
-            files,
-            options=options)
-
-        if not file_name:
-            return
-
-        if file_type == video_files:
-            self.read_video(file_name)
-        elif file_type == tracker_files:
-            self.read_ga_image(file_name)
-        elif file_type == subimage_files:
-            self.read_numpy_image(file_name)
-        else:
-            message = self.tr("Unknown file type: {}").format(file_type)
-            self._logger.error("bad file type: %s, should be %s", file_type, image_files)
-            qw.QMessageBox.warning(self,
-                                   self._translated_name,
-                                   message)
-
-    def read_video(self, file_name):
-        """
-        read in a video file
-
-            Args:
-                file_name the file name and path
-
-            Returns
-                None
-        """
-        from imageio import get_reader as imio_get_reader
-        print("read_video({})".format(file_name))
-
-        try:
-            self._video_reader = imio_get_reader(file_name, 'ffmpeg')
-        except Exception as ex:
-            message = "Unexpected error: {}, {}".format(type(ex), ex.args)
-            qw.QMessageBox.warning(self,
-                                   self._translated_name,
-                                   message)
-            return
-
-        # analyse the frame
-        count = 0
-        for frame in self._video_reader.iter_data():
-            count += 1
-
-        self._frameSlider.setMaximum(count-1)
-
-        self.display()
-
-    def display(self):
-        """
-        display one frame of the video
-
-            Returns:
-                None
-        """
-        # convert 0.0 to 1.0 float to 0 to 255 unsigned int
-        def to_gray(value):
-            return np.uint8(np.round(value*255))
-            
-        # get the fram as numpy.ndarray
-        frame = self._frameSlider.value()
-        img = color.rgb2gray(self._video_reader.get_data(frame))
-        print(img.shape)
-        img = to_gray(img)
-        
-        self._raw_image = img
-        
-        pixmap = ndarray_to_qpixmap(img)
-
-        if self._source_label1 is None:
-            self._source_label1 = ImageLabel(self)
-            self._source_label1.setAlignment(qc.Qt.AlignTop | qc.Qt.AlignLeft)
-            self._source_label1.setSizePolicy(
-                qw.QSizePolicy.Ignored, qw.QSizePolicy.Fixed)
-            self._source_label1.new_selection.connect(self.new_subimage)
-            self._sourceScrollArea.setWidget(self._source_label1)
-
-        self._source_label1.setPixmap(pixmap)
-        self._source_label1.setScaledContents(True)
-        self._source_label1.setSizePolicy(
-            qw.QSizePolicy.Fixed, qw.QSizePolicy.Fixed)
-        self._source_label1.setMargin(0)
+        print("New Project")
 
     @qc.pyqtSlot()
-    def frame_changed(self):
+    def project_parameters(self):
         """
-        callback for the frame slider
+        display the paramertes of the current project
 
             Returns:
                 None
         """
-        self.display()
-
-    def read_numpy_image(self, file_name):
-        """
-        read a pickeled numpy image array
-
-            Args:
-                file_name (string) the file name
-
-            Returns:
-                None
-        """
-
-        with open(file_name, 'rb') as in_f:
-            self._raw_image = pk.load(in_f)
-
-        self.display_image()
-        self.set_title(file_name)
-
-    def read_ga_image(self, file_name):
-        """
-        read a numpy array
-
-            Args:
-                file_name (string) the file name
-
-            Returns:
-                None
-        """
-
-        with open(file_name, 'rb') as in_f:
-            tmp = pk.load(in_f)
-
-        self._raw_image = tmp["image"]
-        self.display_image()
-        self.set_title(file_name)
-
-    def read_image(self, file_name):
-        """
-        Load an image file (jpg or png), convert to numpy grayscal in process
-
-            Args:
-                file_name (string) the file name
-
-            Returns:
-                None
-        """
-        # convert 0.0 to 1.0 float to 0 to 255 unsigned int
-        def to_gray(value):
-            return np.uint8(np.round(value*255))
-
-        img = color.rgb2gray(mpimg.imread(file_name))
-        self._raw_image = to_gray(img)
-
-        self.display_image()
-        self.set_title(file_name)
-
-    def get_zoom(self):
-        """
-        getter for the zoom
-
-            Returns:
-                the current zoom
-        """
-        return self._zoom
-
-    @property
-    def has_image(self):
-        """
-        returns true if the object has an raw image set
-
-            Returns:
-                True if the _raw_image is set else False
-        """
-        return isinstance(self._raw_image, np.ndarray)
-
-    def display_image(self):
-        """
-        diseplay the raw image
-
-            Returns:
-                None
-        """
-        if not self.has_image:
-            return
-
-        self._source_label1 = ImageLabel(self)
-        self._source_label1.setAlignment(qc.Qt.AlignTop | qc.Qt.AlignLeft)
-        self._source_label1.setSizePolicy(
-            qw.QSizePolicy.Ignored, qw.QSizePolicy.Fixed)
-        self._source_label1.new_selection.connect(self.new_subimage)
-        self._sourceScrollArea.setWidget(self._source_label1)
-
-        self.redisplay_image()
-
-    def redisplay_image(self):
-        """
-        display the raw image in the existing label
-
-            Returns:
-                None
-        """
-
-        # cash the zoom
-        self._zoom = self._sourceZoomSpinBox.value()
-
-        height, width = self._raw_image.shape
-
-        display_image = arr.array(
-            'B',
-            self._raw_image.reshape(self._raw_image.size))
-
-        # use constructor with bytes per line
-        image = qg.QImage(
-            display_image,
-            width,
-            height,
-            width,
-            qg.QImage.Format_Grayscale8)
-
-        pixmap = qg.QPixmap.fromImage(image)
-        size = pixmap.size()
-        size *= self._zoom
-
-        pixmap = pixmap.scaled(
-            size,
-            qc.Qt.KeepAspectRatio,
-            qc.Qt.SmoothTransformation)
-
-        self._source_label1.setPixmap(pixmap)
-
-        self._source_label1.setScaledContents(True)
-        self._source_label1.setSizePolicy(
-            qw.QSizePolicy.Fixed, qw.QSizePolicy.Fixed)
-        self._source_label1.setMargin(0)
-
-    @qc.pyqtSlot()
-    def new_subimage(self):
-        """
-        update the combobox of subimages
-
-            Returns:
-                None
-        """
-        self._subimageComboBox.addItem(str(self._source_label1.number_rectangles))
-
-        self._subimageComboBox.setCurrentIndex(
-            self._source_label1.number_rectangles-1)
-
-    @qc.pyqtSlot()
-    def source_zoom(self):
-        """
-        callback for change of zoom on source image
-
-            Returns:
-                None
-        """
-        if self.has_image:
-            self.redisplay_image()
-
-    @qc.pyqtSlot()
-    def subimage_zoom(self):
-        """
-        callback for change of zoom on subimage image
-
-            Returns:
-                None
-        """
-
-        if self._source_label1.number_rectangles:
-            self.display_subimage()
-
-    @qc.pyqtSlot()
-    def save_subimages(self):
-        """
-        save the selected sub-image
-
-            Returns:
-                None
-        """
-
-        if self._source_label1 is None or self._source_label1.number_rectangles < 1:
-            qw.QMessageBox.information(
-                self,
-                'Save',
-                "You have not made any subimages yet!")
-            return
-
-        options = qw.QFileDialog.Options()
-        options |= qw.QFileDialog.DontUseNativeDialog
-        file_name, _ = qw.QFileDialog().getSaveFileName(
-            self,
-            self.tr("Select File"),
-            "",
-            self.tr("CrystalGrowthTracker Files (*.ga);;All Files (*)"),
-            options=options)
-
-        if file_name:
-            if not file_name.endswith('.ga'):
-                file_name = file_name + '.ga'
-
-            with open(file_name, 'wb') as out_f:
-                for index in range(self._source_label1.number_rectangles):
-                    rect = self._source_label1.get_rectangle(index)
-                    # store as raw data because pickel will not export Qt objects
-                    tmp = {}
-                    tmp["top left (v,h)"] = (rect.left, rect.bottom)
-                    tmp["source"] = self._image_source
-                    tmp["image"] = self._raw_image[rect.left:rect.right, rect.top:rect.bottom]
-                    pk.dump(tmp, out_f)
-
-                qw.QMessageBox.information(
-                    self,
-                    self.tr('Save'),
-                    self.tr("Subimages written to: {}").format(file_name))
-
-    @qc.pyqtSlot()
-    def display_subimage(self, img=None):
-        """
-        view and save a new subimage provided by argument 'img': else
-        display the subimage currently selected by the user.
-
-            Args:
-                img (numpy.array) a new image to be displayed and stored
-
-            Returns:
-                None
-        """
-        if img is None:
-            img = self.get_current_subimage()
-
-        height, width = img.shape
-        tmp = arr.array(
-            'B',
-            img.reshape(img.size))
-
-        # use constructor with bytes per line
-        image = qg.QImage(
-            tmp,
-            width,
-            height,
-            width,
-            qg.QImage.Format_Grayscale8)
-
-        pixmap = qg.QPixmap.fromImage(image)
-        size = pixmap.size()
-        size *= self._subimageZoomSpinBox.value()
-
-        pixmap = pixmap.scaled(
-            size,
-            qc.Qt.KeepAspectRatio,
-            qc.Qt.SmoothTransformation)
-
-        self._subimage_label.setPixmap(pixmap)
-
-        self._subimage_label.setScaledContents(True)
-        self._subimage_label.setSizePolicy(
-            qw.QSizePolicy.Fixed, qw.QSizePolicy.Fixed)
-        self._subimage_label.setMargin(0)
-        self._subScrollArea.setWidget(self._subimage_label)
-
-    def get_current_subimage(self):
-        """
-        get the pixels of the subimage that is selected by the user
-
-            Returns:
-                numpy.array the pixels of the selected subimage
-        """
-        index = self._subimageComboBox.currentIndex()
-
-        if index < 0:
-            return None
-
-        rect = self._source_label1.get_rectangle(index)
-
-        return self._raw_image[rect.top:rect.bottom, rect.left:rect.right]
+        print("Project Parameters")
 
     @qc.pyqtSlot()
     def closeEvent(self, event):
@@ -701,21 +181,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         else:
             # dispose of the event in the approved way
             event.ignore()
-
-def ndarray_to_qpixmap(data):
-
-    tmp = arr.array('B', data.reshape(data.size))
-
-    im_format = qg.QImage.Format_Grayscale8
-
-    image = qg.QImage(
-            tmp,
-            data.shape[1],
-            data.shape[0],
-            data.shape[1],
-            im_format)
-
-    return qg.QPixmap.fromImage(image)
 
 ######################################
 
@@ -773,14 +238,12 @@ def run_growth_tracker():
         for translator in translators:
             qc.QCoreApplication.installTranslator(translator)
 
-        window = CrystalGrowthTrackerMain(app)
+        window = CrystalGrowthTrackerMain()
         window.show()
+        
         app.exec_()
-
-    file_name = "growth_tracker.log"
-    lazylogger.set_up_logging(file_name, append=True)
+    
     inner_run()
-    lazylogger.end_logging(file_name)
-
+    
 if __name__ == "__main__":
     run_growth_tracker()
