@@ -24,6 +24,7 @@ sys.path.insert(0, '..\\CrystalGrowthTracker')
 import os
 import datetime
 from imageio import get_reader as imio_get_reader
+import array as arr
 from cgt import utils
 from cgt.utils import find_hostname_and_ip
 from cgt.cgtutility import RegionEnd, VideoSource
@@ -69,10 +70,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         ## the name of the project
         self._project_name = None
-        
+
         ## the videos data
         self._video_data = None
-        
+
         ## storage for the regions
         self._regions = []
 
@@ -84,7 +85,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         layout.addWidget(self._selectWidget)
         self._selectTab.setLayout(layout)
         self._tabWidget.addTab(self._selectTab, "Select Regions")
-        
+
         self._drawingTab = qw.QWidget(self)
         self._drawingWidget = CrystalDrawingWidget(self._drawingTab)
         layout = qw.QVBoxLayout()
@@ -92,9 +93,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._drawingTab.setLayout(layout)
         self._tabWidget.addTab(self._drawingTab, "Trace Crystals")
         
+        self.read_video("C:\\Users\\jhp11\\Work\\CrystalGrowthTracker\\file_example_AVI_640_800kB.avi")
+
     def get_regions(self):
         return self._regions
-        
+
     def get_regions_iter(self):
         """
         get an iterator for the list of regions
@@ -103,11 +106,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 iterator of regions
         """
         return iter(self._regions)
-        
+
     def get_selected_region(self, index):
         """
         getter for the region selected via the combo box,
-        
+
             Args:
                 index (int) the list index of the region
 
@@ -118,14 +121,14 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             return None
 
         return self._regions[index]
-        
+
     def append_region(self, region):
         self._regions.append(region)
         self._regionsComboBox.addItem(str(len(self.get_regions())))
-        
+
     def get_video_data(self):
         return self._video_data
-        
+
     def get_video_reader(self):
         return self._video_reader
 
@@ -146,27 +149,28 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         title = self._translated_name + " - " + name
         self.setWindowTitle(title)
-        
+
     def make_pixmap(self, index):
         region = self._regions[index]
         
-        img = self._video_reader.get_data(region.start_frame)
-
+        raw = self._video_reader.get_data(region.start_frame)
+        tmp = raw[region.top:region.bottom, region.left:region.right]
+        img = arr.array('B', tmp.reshape(tmp.size))
+        
         im_format = qg.QImage.Format_RGB888
         image = qg.QImage(
-            img.data,
-            img.shape[1],
-            img.shape[0],
-            3*img.shape[1],
+            img,
+            region.width,
+            region.height,
+            3*region.width,
             im_format)
 
         return qg.QPixmap.fromImage(image)
 
-        
+
     @qc.pyqtSlot()
     def select_region(self):
         index = self._regionsComboBox.currentIndex()
-        print("region {}".format(index))
         pixmap = self.make_pixmap(index)
         self._drawingWidget.set_pixmap(pixmap)
 
@@ -181,14 +185,13 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 None
         """
 
-        print("tab changed to {}".format(self._tabWidget.currentIndex()))
-        
-        
+        pass 
+
     @qc.pyqtSlot()
     def load_video(self):
         """
         seperate video loding callback for use in development
-        
+
         TODO remove as function provided in new project
         """
 
@@ -203,7 +206,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         if file_name:
             self.read_video(file_name)
-            
+
     def read_video(self, file_name):
         """
         read in a video and display

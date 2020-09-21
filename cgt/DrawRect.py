@@ -121,5 +121,5 @@ class DrawRect(BaseRect):
             Returns:
                 string describing object
         """
-        return "({}, {}, {}, {})".format(
-            self.top, self.bottom, self.left, self.right)
+        return "(top: {}, bottom:{}, left:{}, right:{}, height:{}, width:{})".format(
+            self.top, self.bottom, self.left, self.right, self.height, self.width)

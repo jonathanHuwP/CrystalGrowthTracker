@@ -160,10 +160,14 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
                 None
         """
         time, frame = self.get_current_video_time()
+        
         img, rect = self.get_current_subimage()
+        print(">>> New Region {}".format(rect))
+
         self._region_end = RegionEnd(rect, frame)
 
         pixmap = memview_3b_to_qpixmap(img, rect.width, rect.height)
+        #print("RSW.start_new_region({}, {}) len {}".format(rect.width, rect.height, len(img)))
 
         self._startImageLabel.setPixmap(pixmap)
         self._startImageLabel.setScaledContents(True)
@@ -208,6 +212,7 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         """
         rect = self._source_label.rectangle
         raw = self._owner.get_video_reader().get_data(self._current_image)
+        
         return raw[rect.top:rect.bottom, rect.left:rect.right], rect
 
     @qc.pyqtSlot()
@@ -233,7 +238,7 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         _, frame = self.get_current_video_time()
 
         self.add_new_region(frame)
-        
+
     def add_new_region(self, last_frame):
         """
         construct a new Region and add it to the list, reset the region end and selection label
@@ -253,10 +258,10 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         self._owner.append_region(Region(tlh, tlv, brh, brv, first_frame, final_frame))
         self._regionComboBox.addItem(str(len(self._owner.get_regions())))
         self.reset_enter_region()
-        
+
     def get_selected_region(self):
         index = self._regionComboBox.currentIndex()
-        
+
         return self._owner.get_selected_region(index)
 
     @qc.pyqtSlot()
@@ -342,7 +347,6 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             Returns:
                 None
         """
-        print("Enabled {}".format(flag))
         self._selectButton.setEnabled(flag)
         self._cancelButton.setEnabled(flag)
         self._regionsGroupBox.setEnabled(not flag)
@@ -396,7 +400,6 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             Returns:
                 None
         """
-        print("Frame {}".format(self._current_image))
         img = self._owner.get_video_reader().get_data(self._current_image)
 
         im_format = qg.QImage.Format_RGB888
