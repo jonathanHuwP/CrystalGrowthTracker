@@ -103,14 +103,25 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         ## storage for one end of a region in the process of being created
         self._region_end = None
 
-        ## storage for the regions
-        #self._regions = []
-
         ## a user set frame rate to override video header
         self._user_frame_rate = None
 
         # put the label in the scroll
         self._scrollArea.setWidget(self._source_label)
+
+        # connect up the change frame signals
+        self._videoControls.frame_changed.connect(self.frame_changed)
+
+    @qc.pyqtSlot()
+    def frame_changed(self):
+        """
+        callback for a change of frame
+
+            Returns:
+                None
+        """
+        frame = self._videoControls.get_current_frame()
+        self.set_frame(frame)
 
     @property
     def current_image(self):
@@ -142,8 +153,6 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         """
         if self._current_image != number:
             self._current_image = number
-            self._imageSlider.setSliderPosition(number)
-            self._frameSpinBox.setValue(number)
 
             message = "Frame {:d} of {:d}, approx {:.2f} seconds"
             time, _ = self.get_current_video_time()
@@ -160,14 +169,12 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
                 None
         """
         time, frame = self.get_current_video_time()
-        
+
         img, rect = self.get_current_subimage()
-        print(">>> New Region {}".format(rect))
 
         self._region_end = RegionEnd(rect, frame)
 
         pixmap = memview_3b_to_qpixmap(img, rect.width, rect.height)
-        #print("RSW.start_new_region({}, {}) len {}".format(rect.width, rect.height, len(img)))
 
         self._startImageLabel.setPixmap(pixmap)
         self._startImageLabel.setScaledContents(True)
@@ -190,7 +197,7 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         img, rect = self.get_current_subimage()
 
         pixmap = memview_3b_to_qpixmap(img, rect.width, rect.height)
-        # zoom of source goes here
+        # TODO zoom of source goes here ?
 
         self._endImageLabel.setPixmap(pixmap)
 
@@ -212,7 +219,7 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         """
         rect = self._source_label.rectangle
         raw = self._owner.get_video_reader().get_data(self._current_image)
-        
+
         return raw[rect.top:rect.bottom, rect.left:rect.right], rect
 
     @qc.pyqtSlot()
@@ -290,53 +297,6 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         """
         self.display_pixmap()
 
-    @qc.pyqtSlot()
-    def frame_spin_box_change(self):
-        """
-        callback for change of the frame spin box,
-
-            Returns:
-                None
-        """
-        frame = self._frameSpinBox.value()
-        self.set_frame(frame)
-
-
-    @qc.pyqtSlot()
-    def frame_slider_changed(self):
-        """
-        callback for the movement of the slider, display frame changed
-
-            Returns:
-                None
-        """
-        frame = self._imageSlider.sliderPosition()
-        self.set_frame(frame)
-
-    @qc.pyqtSlot()
-    def frame_forward(self):
-        """
-        callback for the click of forward button, if possible the
-        display frame is advanced by one
-
-            Returns:
-                None
-        """
-        if self.current_image < self._owner.get_video_data().frame_count:
-            self.set_frame(self.current_image + 1)
-
-    @qc.pyqtSlot()
-    def frame_backward(self):
-        """
-        callback for the click of backward button, if possible the
-        display frame is decreased by one
-
-            Returns:
-                None
-        """
-        if self.current_image > 0:
-            self.set_frame(self.current_image - 1)
-
     def enable_select_buttons(self, flag):
         """
         enable the selection buttons
@@ -351,21 +311,6 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         self._cancelButton.setEnabled(flag)
         self._regionsGroupBox.setEnabled(not flag)
 
-    def video_controls_enabled(self, flag):
-        """
-        enable disable video controls
-
-            Args:
-                flag (bool) if true enable, else disable
-
-            Returns:
-                None
-        """
-        self._downButton.setEnabled(flag)
-        self._upButton.setEnabled(flag)
-        self._imageSlider.setEnabled(flag)
-        self._zoomSpinBox.setEnabled(flag)
-        self._frameSpinBox.setEnabled(flag)
 
     def get_zoom(self):
         """
@@ -388,10 +333,10 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         """
 
         self._current_image = 0
-
+        print("show vid")
         self.display_pixmap()
-        self._imageSlider.setRange(0, self._owner.get_video_data().frame_count)
-        self.video_controls_enabled(True)
+        self._videoControls.set_range(0, self._owner.get_video_data().frame_count)
+        self._videoControls.enable(True)
 
     def display_pixmap(self):
         """

@@ -88,7 +88,7 @@
    <sender>_frameSpinBox</sender>
    <signal>valueChanged(int)</signal>
    <receiver>VideoControlWidget</receiver>
-   <slot>close()</slot>
+   <slot>spin_box_changed()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>97</x>
@@ -104,7 +104,7 @@
    <sender>_downButton</sender>
    <signal>clicked()</signal>
    <receiver>VideoControlWidget</receiver>
-   <slot>close()</slot>
+   <slot>down_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>193</x>
@@ -120,7 +120,7 @@
    <sender>_frameSlider</sender>
    <signal>sliderMoved(int)</signal>
    <receiver>VideoControlWidget</receiver>
-   <slot>close()</slot>
+   <slot>slider_moved()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>394</x>
@@ -136,7 +136,7 @@
    <sender>_upButton</sender>
    <signal>clicked()</signal>
    <receiver>VideoControlWidget</receiver>
-   <slot>close()</slot>
+   <slot>up_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>595</x>

@@ -123,6 +123,7 @@ class VideoControlWidget(qw.QWidget, Ui_VideoControlWidget):
             Returns:
                 None
         """
+        print("VCW.enable")
         self._downButton.setEnabled(flag)
         self._upButton.setEnabled(flag)
         self._frameSlider.setEnabled(flag)
