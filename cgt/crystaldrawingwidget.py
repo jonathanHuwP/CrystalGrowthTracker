@@ -76,10 +76,12 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
-        if self._drawButton.isChecked():
-            self._drawing.set_drawing()
-        else:
-            self._drawing.set_adjusting()
+        if self._createButton.isChecked():
+            #self._drawing.set_drawing()
+            print("create")
+        elif self._adjustButton.isChecked():
+            #self._drawing.set_adjusting()
+            print("adjust")
 
     @qc.pyqtSlot()
     def labels_toggled(self):
@@ -89,99 +91,23 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
-        if self._labelsBox.isChecked():
-            self._drawing.show_labels(True)
-        else:
-            self._drawing.show_labels(False)
+        print("labels_toggled")
+        #if self._labelsBox.isChecked():
+        #    self._drawing.show_labels(True)
+        #else:
+        #    self._drawing.show_labels(False)
 
     @qc.pyqtSlot()
-    def create_copy_toggled(self):
-        """
-        callback for the changing the Crating/Copying state
-
-            Returns
-                None
-        """
-        if self._createButton.isChecked():
-            self._drawing.set_creating()
-            self.set_draw_adjust_enabled(True)
-        else:
-            self._drawing.set_copying()
-            self._adjustButton.setChecked(True)
-            self.set_draw_adjust_enabled(False)
-
-    def set_draw_adjust_enabled(self, state):
-        """
-        enable/disable the Draw/Adjust buttons
-
-            Args:
-                state (boolean) the new state
-
-            Returns:
-                None
-        """
-        self._drawButton.setEnabled(state)
-        self._adjustButton.setEnabled(state)
+    def clear_crystal(self):
+        print("clear_crystal")
 
     @qc.pyqtSlot()
-    def calculate(self):
-        """
-        calculate the differences and display then in the table.
-
-            Returns:
-                None
-        """
-        tmp = self._drawing.size
-        if tmp[0] <= 0 or tmp[1] <= 0:
-            message = "You only have {} lines and {} new lines. Both must have one or more."
-            print(message.format(tmp[0], tmp[1]))
-            return
-
-        if self._drawing.lines_base is None:
-            print("lines none")
-
-        if self._drawing.lines_new is None:
-            print("new lines none")
-
-        self._store[0] = self._drawing.lines_base
-        self._store[1] = self._drawing.lines_new
-
-        diffs = self._store.differences(0, 1)
-
-        self._tableWidget.setColumnCount(2)
-        self._tableWidget.setRowCount(len(diffs))
-
-        self._tableWidget.setHorizontalHeaderLabels(["Line", "Displacement (pixels)"])
-
-        i = 0
-        for diff in diffs:
-            self._tableWidget.setItem(i, 0, qw.QTableWidgetItem(str(diff.lines_label)))
-            self._tableWidget.setItem(i, 1, qw.QTableWidgetItem(str(diff.average)))
-            i += 1
-
+    def add_crystal(self):
+        print("add_crystal")
+        
     @qc.pyqtSlot()
-    def save_image(self):
-        """
-        save image callback
-
-            Returns:
-                None
-        """
-
-        options = qw.QFileDialog.Options()
-        options |= qw.QFileDialog.DontUseNativeDialog
-        file_name, file_type = qw.QFileDialog().getSaveFileName(
-            self,
-            self.tr("Select File"),
-            "",
-            self.tr("Portable Network graphics (*.png);;JPG Files (*.jpg)"),
-            options=options)
-
-        if file_name is None:
-            return
-
-        file = qc.QFile(file_name)
-        self._drawing.save(file)
+    def start_new_crystal(self):
+        print("start_new_crystal")
 
     @qc.pyqtSlot()
     def zoom_changed(self):
@@ -191,7 +117,8 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
-        self._drawing.set_zoom(self._zoomSpinBox.value())
+        print("zoom_changed")
+        #self._drawing.set_zoom(self._zoomSpinBox.value())
 
 def run():
     """

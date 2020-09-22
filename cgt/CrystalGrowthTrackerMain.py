@@ -93,7 +93,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._drawingTab.setLayout(layout)
         self._tabWidget.addTab(self._drawingTab, "Trace Crystals")
         
-        self.read_video("C:\\Users\\jhp11\\Work\\CrystalGrowthTracker\\file_example_AVI_640_800kB.avi")
+        self.read_video("C:\\Users\\jhp11\\Work\\CrystalGrowthTracker\\doc\\video\\file_example_AVI_640_800kB.avi")
 
     def get_regions(self):
         return self._regions
