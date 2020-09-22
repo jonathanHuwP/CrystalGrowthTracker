@@ -2,8 +2,6 @@
 """
 Created on Fri Jul 10 21:36:13 2020
 
-This class provides a test harness for DrawingLabel allowing all user operations.
-
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 this file except in compliance with the License. You may obtain a copy of the
 License at
@@ -35,7 +33,7 @@ from Ui_crystaldrawingwidget import Ui_CrystalDrawingWidget
 
 class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
     """
-    a QDialog that demonstrates the DrawingLabel class
+    the widget in which the user will draw the crystals
     """
 
     def __init__(self, parent=None):

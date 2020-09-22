@@ -32,7 +32,7 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="_labelsZoomLayout">
      <item>
       <widget class="QCheckBox" name="_labelsBox">
        <property name="text">
