@@ -91,11 +91,10 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
-        print("labels_toggled")
-        #if self._labelsBox.isChecked():
-        #    self._drawing.show_labels(True)
-        #else:
-        #    self._drawing.show_labels(False)
+        if self._labelsBox.isChecked():
+            self._drawing.show_labels(True)
+        else:
+            self._drawing.show_labels(False)
 
     @qc.pyqtSlot()
     def clear_crystal(self):
@@ -118,7 +117,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
                 None
         """
         print("zoom_changed")
-        #self._drawing.set_zoom(self._zoomSpinBox.value())
+        self._drawing.set_zoom(self._zoomSpinBox.value())
 
 def run():
     """

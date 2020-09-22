@@ -638,7 +638,7 @@ class DrawingLabel(qw.QLabel):
             Returns:
                 None
         """
-        pen = qg.QPen(qg.QColor(qc.Qt.black), 3, qc.Qt.SolidLine)
+        pen = qg.QPen(qg.QColor(qc.Qt.yellow), 3, qc.Qt.SolidLine)
         red_pen = qg.QPen(qg.QColor(qc.Qt.red), 3, qc.Qt.DashLine)
         new_pen = qg.QPen(qg.QColor(qc.Qt.red), 3, qc.Qt.SolidLine)
         painter = qg.QPainter()
