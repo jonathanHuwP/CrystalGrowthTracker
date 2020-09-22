@@ -77,11 +77,9 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
                 None
         """
         if self._createButton.isChecked():
-            #self._drawing.set_drawing()
-            print("create")
+            self._drawing.set_drawing()
         elif self._adjustButton.isChecked():
-            #self._drawing.set_adjusting()
-            print("adjust")
+            self._drawing.set_adjusting()
 
     @qc.pyqtSlot()
     def labels_toggled(self):
@@ -116,7 +114,6 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
-        print("zoom_changed")
         self._drawing.set_zoom(self._zoomSpinBox.value())
 
 def run():
