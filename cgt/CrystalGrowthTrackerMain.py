@@ -79,15 +79,25 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self.set_title()
 
+        ## base widget for region selection tab
         self._selectTab = qw.QWidget(self)
+        
+        ## the region selection widget
         self._selectWidget = RegionSelectionWidget(self._selectTab, self)
+        
+        # set up tab
         layout = qw.QVBoxLayout()
         layout.addWidget(self._selectWidget)
         self._selectTab.setLayout(layout)
         self._tabWidget.addTab(self._selectTab, "Select Regions")
 
+        ## base widget of crystal drawing tab
         self._drawingTab = qw.QWidget(self)
-        self._drawingWidget = CrystalDrawingWidget(self._drawingTab)
+        
+        ## the crystal drawing widget
+        self._drawingWidget = CrystalDrawingWidget(self._drawingTab, self)
+        
+        # set up tab
         layout = qw.QVBoxLayout()
         layout.addWidget(self._drawingWidget)
         self._drawingTab.setLayout(layout)
@@ -124,7 +134,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
     def append_region(self, region):
         self._regions.append(region)
-        self._regionsComboBox.addItem(str(len(self.get_regions())))
+        self._drawingWidget.new_region()
+        #self._regionsComboBox.addItem(str(len(self.get_regions())))
 
     def get_video_data(self):
         return self._video_data
@@ -150,10 +161,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         title = self._translated_name + " - " + name
         self.setWindowTitle(title)
 
-    def make_pixmap(self, index):
+    def make_pixmap(self, index, frame):
         region = self._regions[index]
         
-        raw = self._video_reader.get_data(region.start_frame)
+        raw = self._video_reader.get_data(frame)
         tmp = raw[region.top:region.bottom, region.left:region.right]
         img = arr.array('B', tmp.reshape(tmp.size))
         

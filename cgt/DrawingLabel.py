@@ -626,7 +626,7 @@ class DrawingLabel(qw.QLabel):
         """
         qw.QLabel.paintEvent(self, event)
 
-        if self._redraw:
+        if self._background_pixmap is not None and self._redraw:
             self.draw_lines()
             self._redraw = False
 

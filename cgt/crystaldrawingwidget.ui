@@ -15,6 +15,33 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Region</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="_regionBox"/>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_4">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
     <widget class="QScrollArea" name="_scrollArea">
      <property name="widgetResizable">
       <bool>true</bool>
@@ -25,7 +52,7 @@
         <x>0</x>
         <y>0</y>
         <width>797</width>
-        <height>363</height>
+        <height>327</height>
        </rect>
       </property>
      </widget>
@@ -34,11 +61,7 @@
    <item>
     <layout class="QHBoxLayout" name="_labelsZoomLayout">
      <item>
-      <widget class="QCheckBox" name="_labelsBox">
-       <property name="text">
-        <string>Show Labels</string>
-       </property>
-      </widget>
+      <widget class="VideoControlWidget" name="_videoControl" native="true"/>
      </item>
      <item>
       <spacer name="horizontalSpacer_2">
@@ -107,6 +130,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QCheckBox" name="_labelsBox">
+       <property name="text">
+        <string>Show Labels</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer_3">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -161,6 +191,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>VideoControlWidget</class>
+   <extends>QWidget</extends>
+   <header>videocontrolwidget</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>
@@ -252,6 +290,22 @@
     <hint type="sourcelabel">
      <x>74</x>
      <y>400</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>412</x>
+     <y>252</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_regionBox</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>CrystalDrawingWidget</receiver>
+   <slot>display_region()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>117</x>
+     <y>26</y>
     </hint>
     <hint type="destinationlabel">
      <x>412</x>

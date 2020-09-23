@@ -27,33 +27,6 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Regions</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="_regionsComboBox"/>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-     </layout>
-    </item>
-    <item>
      <widget class="QTabWidget" name="_tabWidget">
       <property name="currentIndex">
        <number>-1</number>
@@ -252,22 +225,6 @@
     <hint type="sourcelabel">
      <x>-1</x>
      <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>470</x>
-     <y>291</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>_regionsComboBox</sender>
-   <signal>currentIndexChanged(int)</signal>
-   <receiver>CrystalGrowthTrackerMain</receiver>
-   <slot>select_region()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>145</x>
-     <y>59</y>
     </hint>
     <hint type="destinationlabel">
      <x>470</x>

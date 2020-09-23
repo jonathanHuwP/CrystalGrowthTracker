@@ -36,36 +36,50 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
     the widget in which the user will draw the crystals
     """
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, owner=None):
         """
         set up the dialog
 
             Args:
                 parent (QObject) the parent object
+                owner (CrystalGrowthTrackerMain) the object holding the project data
 
             Returns:
                 None
         """
         super(CrystalDrawingWidget, self).__init__(parent)
 
-        ## the parent object, if any
-        self._parent = parent
+        ## the widget holding the project data
+        self._owner = owner
 
         ## the name in translation, if any
         self._translated_name = self.tr("CrystalDrawingWidget")
         self.setupUi(self)
 
-        ## the DrawingLabel being tested
-        self._drawing = None
-
         ## an ArtifctStore for testing
         self._store = LineSetsAndFramesStore()
-        
-    def set_pixmap(self, pixmap):
+
+        ## the drawing label
         self._drawing = DrawingLabel(self._scrollArea)
-        self._drawing.set_backgroud_pixmap(pixmap)
         self._scrollArea.setWidget(self._drawing)
+
+        # connect up the change frame signals
+        self._videoControl.frame_changed.connect(self.frame_changed)
+
+    def display_region(self):
+        index = self._regionBox.currentIndex()
+        frame = self._videoControl.get_current_frame()
         
+        pixmap = self._owner.make_pixmap(index, frame)
+        self._drawing.set_backgroud_pixmap(pixmap)
+        self._drawing.redisplay()
+
+    def new_region(self):
+        self._regionBox.clear()
+
+        for i, _ in enumerate(self._owner.get_regions_iter()):
+            self._regionBox.addItem(str(i))
+
     @qc.pyqtSlot()
     def state_toggle(self):
         """
@@ -99,10 +113,22 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
     @qc.pyqtSlot()
     def add_crystal(self):
         print("add_crystal")
-        
+
     @qc.pyqtSlot()
     def start_new_crystal(self):
         print("start_new_crystal")
+
+    @qc.pyqtSlot()
+    def frame_changed(self):
+        """
+        callback for a change of frame
+
+            Returns:
+                None
+        """
+        frame = self._videoControls.get_current_frame()
+
+        self.set_frame(frame)
 
     @qc.pyqtSlot()
     def zoom_changed(self):
@@ -113,6 +139,20 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
                 None
         """
         self._drawing.set_zoom(self._zoomSpinBox.value())
+        
+    @qc.pyqtSlot()
+    def showEvent(self, event):
+        qw.QWidget.showEvent(self, event)
+        
+        if self._owner is not None:
+            if self._owner.get_video_reader() is not None:
+                if len(self._owner.get_regions()) > 0: 
+                    self.display_region()
+
+    @qc.pyqtSlot()
+    def hideEvent(self, event):
+        qw.QWidget.hideEvent(self, event)
+        print("Hide")       
 
 def run():
     """
