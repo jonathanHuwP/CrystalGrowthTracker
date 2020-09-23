@@ -66,19 +66,36 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         # connect up the change frame signals
         self._videoControl.frame_changed.connect(self.frame_changed)
 
+    def region_chosen(self):
+        if not self.isHidden():
+            index = self._regionBox.currentIndex()
+            region = self._owner.get_selected_region(index)
+        
+            print("CDW.region_chosen: index: {} region: {}".format(index, region))
+        
+            self._videoControl.set_range(region.start_frame, region.end_frame)
+            self.display_region()
+
     def display_region(self):
         index = self._regionBox.currentIndex()
         frame = self._videoControl.get_current_frame()
-        
+        print("display region (index: {}, frame {})".format(index, frame))
+
         pixmap = self._owner.make_pixmap(index, frame)
+
         self._drawing.set_backgroud_pixmap(pixmap)
         self._drawing.redisplay()
 
     def new_region(self):
+        self._regionBox.blockSignals(True)
+        
         self._regionBox.clear()
-
         for i, _ in enumerate(self._owner.get_regions_iter()):
             self._regionBox.addItem(str(i))
+            
+        self._regionBox.blockSignals(False)
+        
+        print("added region")
 
     @qc.pyqtSlot()
     def state_toggle(self):
@@ -126,9 +143,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
-        frame = self._videoControls.get_current_frame()
-
-        self.set_frame(frame)
+        self.display_region()
 
     @qc.pyqtSlot()
     def zoom_changed(self):
@@ -139,20 +154,33 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
                 None
         """
         self._drawing.set_zoom(self._zoomSpinBox.value())
-        
+
     @qc.pyqtSlot()
     def showEvent(self, event):
+        """
+        override qwidget and ensure a safe display
+
+            Returns:
+                None
+        """
         qw.QWidget.showEvent(self, event)
-        
+
         if self._owner is not None:
             if self._owner.get_video_reader() is not None:
-                if len(self._owner.get_regions()) > 0: 
+                if len(self._owner.get_regions()) > 0:
+                    self._videoControl.enable(True)
                     self.display_region()
 
     @qc.pyqtSlot()
     def hideEvent(self, event):
+        """
+        override qwidget and ensure a safe hide
+
+            Returns:
+                None
+        """
         qw.QWidget.hideEvent(self, event)
-        print("Hide")       
+        self._videoControl.enable(False)
 
 def run():
     """

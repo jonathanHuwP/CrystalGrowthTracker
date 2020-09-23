@@ -301,7 +301,7 @@
    <sender>_regionBox</sender>
    <signal>currentIndexChanged(int)</signal>
    <receiver>CrystalDrawingWidget</receiver>
-   <slot>display_region()</slot>
+   <slot>region_chosen()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>117</x>

@@ -40,6 +40,13 @@ class VideoControlWidget(qw.QWidget, Ui_VideoControlWidget):
         """
         super(VideoControlWidget, self).__init__(parent)
         self.setupUi(self)
+        
+        ## storage for enabled/disabled state
+        self._enabled = False
+        
+        # set disabled
+        self.enable(self._enabled)
+        
 
     @qc.pyqtSlot()        
     def up_clicked(self):
@@ -92,6 +99,9 @@ class VideoControlWidget(qw.QWidget, Ui_VideoControlWidget):
                 
             Returns:
                 None
+                
+            Emits:
+                frame_changed if a change has occured
         """
         change = False
         if self._frameSpinBox.value() != frame:
@@ -102,7 +112,8 @@ class VideoControlWidget(qw.QWidget, Ui_VideoControlWidget):
             self._frameSlider.setSliderPosition(frame)
             change = True
             
-        return self.frame_changed.emit()
+        if self.is_enabled() and change:
+            self.frame_changed.emit()
         
     def get_current_frame(self):
         """
@@ -123,11 +134,20 @@ class VideoControlWidget(qw.QWidget, Ui_VideoControlWidget):
             Returns:
                 None
         """
-        print("VCW.enable")
         self._downButton.setEnabled(flag)
         self._upButton.setEnabled(flag)
         self._frameSlider.setEnabled(flag)
         self._frameSpinBox.setEnabled(flag)
+        self._enabled = flag
+        
+    def is_enabled(self):
+        """
+        getter for the enabled/disabled state
+        
+            Returns:
+                (bool) enabled/disabled state
+        """
+        return self._enabled
         
     def set_range(self, minimum, maximum):
         """
@@ -139,8 +159,14 @@ class VideoControlWidget(qw.QWidget, Ui_VideoControlWidget):
             Returns:
                 None
         """
+        tmp = self.is_enabled()
+        self.enable(False)
+        
         self._frameSlider.setRange(minimum, maximum)
         self._frameSpinBox.setRange(minimum, maximum)
+        
+        self.enable(tmp)
+       
     
 def run():
     """
