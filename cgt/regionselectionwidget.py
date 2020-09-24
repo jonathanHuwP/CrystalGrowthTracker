@@ -253,16 +253,19 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             Args:
                 last_frame (int) the frame number of the user's end point selection
         """
-        tlh = self._region_end.rectangle.top
-        tlv = self._region_end.rectangle.left
-        brh = self._region_end.rectangle.bottom
-        brv = self._region_end.rectangle.right
-
         # ensure that the first is the earliest frame
         first_frame = min(self._region_end.frame, last_frame)
         final_frame = max(self._region_end.frame, last_frame)
-
-        self._owner.append_region(Region(tlh, tlv, brh, brv, first_frame, final_frame))
+        
+        region = Region(
+            top=self._region_end.rectangle.top, 
+            left=self._region_end.rectangle.left, 
+            bottom=self._region_end.rectangle.bottom, 
+            right=self._region_end.rectangle.right, 
+            start_frame=first_frame, 
+            end_frame=final_frame)
+        
+        self._owner.append_region(region)
         self._regionComboBox.addItem(str(len(self._owner.get_regions())))
         self.reset_enter_region()
 
