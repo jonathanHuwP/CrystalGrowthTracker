@@ -133,7 +133,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         return self._regions[index]
 
     def append_region(self, region):
-        print("CGT.append_region: {}".format(region))
         self._regions.append(region)
         self._drawingWidget.new_region()
 

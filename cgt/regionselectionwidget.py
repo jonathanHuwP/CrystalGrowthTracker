@@ -336,7 +336,6 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         """
 
         self._current_image = 0
-        print("show vid")
         self.display_pixmap()
         self._videoControls.set_range(0, self._owner.get_video_data().frame_count)
         self._videoControls.enable(True)
