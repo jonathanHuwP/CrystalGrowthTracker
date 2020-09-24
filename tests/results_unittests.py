@@ -48,6 +48,8 @@ class TestResults1(unittest.TestCase):
         self._frame_count = 500
         self._width = 800
         self._height = 600
+        self._user = "who@dodgy_mail.com"
+        self._date =  dt.datetime.now().strftime("%d %b, %Y, %H:%M:%S")
         self._test_result = self.make_test_result()
 
     def tearDown(self):
@@ -59,6 +61,8 @@ class TestResults1(unittest.TestCase):
         self._frame_count = None
         self._width = None
         self._height = None
+        self._user = None
+        self._date = None
         self._test_result = None
 
     def make_test_result(self):
@@ -70,18 +74,21 @@ class TestResults1(unittest.TestCase):
                              self._frame_count,
                              self._width,
                              self._height)
-        return vas.VideoAnalysisResultsStore(source)
+                             
+        user_record = vas.DateUser(self._date, self._user)
+        
+        return vas.VideoAnalysisResultsStore(source, history=[user_record])
 
     def test_history(self):
         """
         test that the history is correct
         """
-        self.assertEqual(len(self._test_result.history), 0,
+        self.assertEqual(len(self._test_result.history), 1,
                          "history length is wrong")
-        #self.assertEqual(self._test_result.history[0].date, str(dt.date.today()),
-        #                 "date is wrong (careful of midnight)")
-        #self.assertEqual(self._test_result.history[0].user_name, os.getlogin(),
-        #                 "the user login is wrong")
+        self.assertEqual(self._test_result.history[0].date, self._date,
+                         "date is wrong")
+        self.assertEqual(self._test_result.history[0].user_name, self._user,
+                         "the user login is wrong")
 
     def test_video(self):
         """
