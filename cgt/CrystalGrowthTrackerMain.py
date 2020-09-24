@@ -86,10 +86,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._selectWidget = RegionSelectionWidget(self._selectTab, self)
         
         # set up tab
-        layout = qw.QVBoxLayout()
-        layout.addWidget(self._selectWidget)
-        self._selectTab.setLayout(layout)
-        self._tabWidget.addTab(self._selectTab, "Select Regions")
+        self.add_tab(self._selectTab, self._selectWidget, "Select Regions")
 
         ## base widget of crystal drawing tab
         self._drawingTab = qw.QWidget(self)
@@ -98,12 +95,27 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._drawingWidget = CrystalDrawingWidget(self._drawingTab, self)
         
         # set up tab
-        layout = qw.QVBoxLayout()
-        layout.addWidget(self._drawingWidget)
-        self._drawingTab.setLayout(layout)
-        self._tabWidget.addTab(self._drawingTab, "Trace Crystals")
+        self.add_tab(self._drawingTab, self._drawingWidget, "Trace Crystals")
         
         self.read_video("C:\\Users\\jhp11\\Work\\CrystalGrowthTracker\\doc\\video\\file_example_AVI_640_800kB.avi")
+        
+    def add_tab(self, tab_widget, target_widget, title):
+        """
+        add a new tab
+        
+            Args:
+                tab_widget (QWidget) the widget forming the tab
+                target_widget (QWidget subclass) the widget to be used
+                title (string) the tabbox title
+                
+            Returns:
+                None
+        """
+        layout = qw.QVBoxLayout()
+        layout.addWidget(target_widget)
+        tab_widget.setLayout(layout)
+        
+        self._tabWidget.addTab(tab_widget, title)
 
     def get_regions(self):
         return self._regions
