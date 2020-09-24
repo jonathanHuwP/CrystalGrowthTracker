@@ -52,7 +52,7 @@ class Region(NamedTuple):
     def width(self):
         """
         getter for the width in pixels
-    
+
             Returns:
                 the width in pixels
         """
@@ -62,7 +62,7 @@ class Region(NamedTuple):
     def height(self):
         """
         getter for the height in pixels
-    
+
             Returns:
                 the height in pixels
         """
@@ -81,10 +81,10 @@ class Region(NamedTuple):
     def time_in_region(self, frame):
         """
         return true if the time parameter is in the time interval of the region
-    
+
             Args:
                 time (int) frame number
-    
+
             Returns:
                 True if time in time range of region, else False
         """
@@ -105,31 +105,13 @@ class Region(NamedTuple):
         v_flag = self.bottom >= vertical >= self.top
 
         return h_flag and v_flag
-        
+
     def __str__(self):
         """
         a to string methods
-        
+
             Returns:
                 String describing object (user view)
         """
         return "(top:{}, bottom:{}, left:{}, right:{}, start frame:{}, end frame:{})".format(
             self.top, self.bottom, self.left, self.right, self.start_frame, self.end_frame)
-            
-######################################
-#TODO move to unit tests
-
-def tests():
-    print("Region Tests")
-    top = 100
-    left = 200
-    bottom = 500
-    right = 400
-    start = 250
-    stop = 450
-    
-    region = Region(top, left, bottom, right, start, stop)
-    print(region)
-
-if __name__ == "__main__":
-    tests()

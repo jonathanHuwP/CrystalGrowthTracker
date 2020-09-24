@@ -21,18 +21,18 @@ specific language governing permissions and limitations under the License.
 # set up linting conditions
 # pylint: disable = too-many-public-methods
 # pylint: disable = c-extension-no-member
-
+import unittest
+import datetime as dt
 import sys
-sys.path.insert(0, '..\\CrystalGrowthTracker')
 
 import cgt.videoanalysisresultsstore as vas
 from cgt.crystal import Crystal
 from cgt.region import Region
 import cgt.imagelinesegment as ia
 
-import unittest
-import os
-import datetime as dt
+sys.path.insert(0, '..\\CrystalGrowthTracker')
+
+# pylint: disable = too-many-instance-attributes
 
 class TestResults1(unittest.TestCase):
     """
@@ -49,7 +49,7 @@ class TestResults1(unittest.TestCase):
         self._width = 800
         self._height = 600
         self._user = "who@dodgy_mail.com"
-        self._date =  dt.datetime.now().strftime("%d %b, %Y, %H:%M:%S")
+        self._date = dt.datetime.now().strftime("%d %b, %Y, %H:%M:%S")
         self._test_result = self.make_test_result()
 
     def tearDown(self):
@@ -70,13 +70,13 @@ class TestResults1(unittest.TestCase):
         factory function to procduce a Results object
         """
         source = vas.VideoSource(self._video_name,
-                             self._frame_rate,
-                             self._frame_count,
-                             self._width,
-                             self._height)
-                             
+                                 self._frame_rate,
+                                 self._frame_count,
+                                 self._width,
+                                 self._height)
+
         user_record = vas.DateUser(self._date, self._user)
-        
+
         return vas.VideoAnalysisResultsStore(source, history=[user_record])
 
     def test_history(self):
@@ -134,7 +134,10 @@ class TestResults2(unittest.TestCase):
         factory function to procduce a Results object
         """
         source = vas.VideoSource("ladkj.mp4", 8, 500, 800, 600)
-        regions = [self.make_region1(), self.make_region2()]
+
+        region1, _ = self.make_region1()
+        region2, _ = self.make_region2()
+        regions = [region1, region2]
 
         return vas.VideoAnalysisResultsStore(source, regions)
 
@@ -164,7 +167,7 @@ class TestResults2(unittest.TestCase):
                         self._start_frame,
                         self._stop_frame)
 
-        return region
+        return region, crystals
 
     def make_region2(self):
         """
@@ -199,7 +202,7 @@ class TestResults2(unittest.TestCase):
                         self._start_frame,
                         self._stop_frame)
 
-        return region
+        return region, [crystal]
 
     def test_something(self):
         """

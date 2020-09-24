@@ -18,11 +18,11 @@ specific language governing permissions and limitations under the License.
 # set up linting conditions
 # pylint: disable = too-many-public-methods
 # pylint: disable = c-extension-no-member
+# pylint: disable = import-error
 
 import sys
 
 import PyQt5.QtWidgets as qw
-import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
 from linesetsandframesstore import LineSetsAndFramesStore
@@ -67,14 +67,26 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         self._videoControl.frame_changed.connect(self.frame_changed)
 
     def region_chosen(self):
+        """
+        function called to use a new region
+
+            Returns:
+                None
+        """
         if not self.isHidden():
             index = self._regionBox.currentIndex()
             region = self._owner.get_selected_region(index)
-        
+
             self._videoControl.set_range(region.start_frame, region.end_frame)
             self.display_region()
 
     def display_region(self):
+        """
+        the display function
+
+            Returns:
+                None
+        """
         index = self._regionBox.currentIndex()
         frame = self._videoControl.get_current_frame()
 
@@ -84,12 +96,18 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         self._drawing.redisplay()
 
     def new_region(self):
+        """
+        called by owner to indicate a new region has been added, index added to spin box
+
+            Returns:
+                None
+        """
         self._regionBox.blockSignals(True)
-        
+
         self._regionBox.clear()
         for i, _ in enumerate(self._owner.get_regions_iter()):
             self._regionBox.addItem(str(i))
-            
+
         self._regionBox.blockSignals(False)
 
     @qc.pyqtSlot()
@@ -120,15 +138,33 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
 
     @qc.pyqtSlot()
     def clear_crystal(self):
-        print("clear_crystal")
+        """
+        clear the curren crystal
+
+            Returns:
+                None
+        """
+        print("clear_crystal {}".format(id(self)))
 
     @qc.pyqtSlot()
     def add_crystal(self):
-        print("add_crystal")
+        """
+        add the curren crystal to the results
+
+            Returns:
+                None
+        """
+        print("add_crystal {}".format(id(self)))
 
     @qc.pyqtSlot()
     def start_new_crystal(self):
-        print("start_new_crystal")
+        """
+        start a new crystal
+
+            Returns:
+                None
+        """
+        print("start_new_crystal {}".format(id(self)))
 
     @qc.pyqtSlot()
     def frame_changed(self):
