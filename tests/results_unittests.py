@@ -109,10 +109,10 @@ class TestResults2(unittest.TestCase):
         """
         build a full test class
         """
-        self._top_left_horizontal = 450
-        self._top_left_vertical = 200
-        self._bottom_right_horizontal = 675
-        self._bottom_right_vertical = 500
+        self._top = 450
+        self._left = 200
+        self._bottom = 675
+        self._right = 500
         self._start_frame = 250
         self._stop_frame = 500
         self._test_result = self.make_test_result()
@@ -121,10 +121,10 @@ class TestResults2(unittest.TestCase):
         """
         delete the test class
         """
-        self._top_left_horizontal = None
-        self._top_left_vertical = None
-        self._bottom_right_horizontal = None
-        self._bottom_right_vertical = None
+        self._top = None
+        self._left = None
+        self._bottom = None
+        self._right = None
         self._start_frame = None
         self._stop_frame = None
         self._test_result = None
@@ -160,10 +160,10 @@ class TestResults2(unittest.TestCase):
         crystal.add_faces([line1, line2], self._start_frame)
 
         crystals = [crystal]
-        region = Region(self._top_left_horizontal,
-                        self._top_left_vertical,
-                        self._bottom_right_horizontal,
-                        self._bottom_right_vertical,
+        region = Region(self._top,
+                        self._left,
+                        self._bottom,
+                        self._right,
                         self._start_frame,
                         self._stop_frame)
 
@@ -195,10 +195,10 @@ class TestResults2(unittest.TestCase):
         crystal.add_faces([line1, line2], self._start_frame)
         crystal.add_faces([line1a, line2a], self._stop_frame)
 
-        region = Region(self._top_left_horizontal,
-                        self._top_left_vertical,
-                        self._bottom_right_horizontal,
-                        self._bottom_right_vertical,
+        region = Region(self._top,
+                        self._left,
+                        self._bottom,
+                        self._right,
                         self._start_frame,
                         self._stop_frame)
 
