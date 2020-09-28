@@ -55,9 +55,13 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         ## the name in translation, if any
         self._translated_name = self.tr("CrystalDrawingWidget")
         self.setupUi(self)
+        
 
         ## an ArtifctStore for testing
         self._store = LineSetsAndFramesStore()
+        
+        ## store the the region being viewed
+        self._current_region = None
 
         ## the drawing label
         self._drawing = DrawingLabel(self._scrollArea)
@@ -81,20 +85,6 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         """
         self._owner = owner
 
-    def region_chosen(self):
-        """
-        function called to use a new region
-
-            Returns:
-                None
-        """
-        if not self.isHidden():
-            index = self._regionBox.currentIndex()
-            region = self._owner.get_selected_region(index)
-
-            self._videoControl.set_range(region.start_frame, region.end_frame)
-            self.display_region()
-
     def display_region(self):
         """
         the display function
@@ -102,10 +92,12 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
-        index = self._regionBox.currentIndex()
+        if self._current_region is None:
+            return
+            
         frame = self._videoControl.get_current_frame()
 
-        pixmap = self._owner.make_pixmap(index, frame)
+        pixmap = self._owner.make_pixmap(self._current_region, frame)
 
         self._drawing.set_backgroud_pixmap(pixmap)
         self._drawing.redisplay()
@@ -117,14 +109,6 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
-        self._regionBox.blockSignals(True)
-
-        self._regionBox.clear()
-        for i, _ in enumerate(self._owner.get_regions_iter()):
-            self._regionBox.addItem(str(i))
-
-        self._regionBox.blockSignals(False)
-        
         self._treeWidget.blockSignals(True)
         self._treeWidget.fill_tree()
         self._treeWidget.blockSignals(False)
@@ -219,7 +203,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             if self._owner.get_video_reader() is not None:
                 if len(self._owner.get_regions()) > 0:
                     self._videoControl.enable(True)
-                    self.region_chosen()
+                    self.display_region()
 
     @qc.pyqtSlot()
     def hideEvent(self, event):
@@ -243,11 +227,8 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
                 None
         """
         print("CrystalDrawingWidget Region {}".format(r_index))
+        self._current_region = r_index
         region = self._owner.get_selected_region(r_index)
-        
-        self._regionBox.blockSignals(True)
-        self._regionBox.setCurrentIndex(r_index)
-        self._regionBox.blockSignals(False)
 
         self._videoControl.set_range(region.start_frame, region.end_frame)
         self.display_region()
