@@ -27,7 +27,8 @@ from imageio import get_reader as imio_get_reader
 import array as arr
 from cgt import utils
 from cgt.utils import find_hostname_and_ip
-from cgt.cgtutility import RegionEnd, VideoSource
+from cgt.cgtutility import RegionEnd
+from videoanalysisresultsstore import VideoAnalysisResultsStore, DateUser, VideoSource
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
@@ -75,7 +76,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._video_data = None
 
         ## storage for the regions
-        self._regions = []
+        #self._regions = []
+        
+        ## storage for the result
+        self._result = None
 
         self.set_title()
 
@@ -116,9 +120,12 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         tab_widget.setLayout(layout)
         
         self._tabWidget.addTab(tab_widget, title)
+        
+    def get_result(self):
+        return self._result
 
     def get_regions(self):
-        return self._regions
+        return self._result.regions
 
     def get_regions_iter(self):
         """
@@ -127,7 +134,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 iterator of regions
         """
-        return iter(self._regions)
+        return iter(self._result.regions)
 
     def get_selected_region(self, index):
         """
@@ -139,17 +146,17 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 region or None if no regions entered
         """
-        if len(self._regions) < 1 or index < 0:
+        if len(self._result.regions) < 1 or index < 0:
             return None
 
-        return self._regions[index]
+        return self._result.regions[index]
 
     def append_region(self, region):
-        self._regions.append(region)
+        self._result.add_region(region)
         self._drawingWidget.new_region()
 
     def get_video_data(self):
-        return self._video_data
+        return self._result.video
 
     def get_video_reader(self):
         return self._video_reader
@@ -173,7 +180,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self.setWindowTitle(title)
 
     def make_pixmap(self, index, frame):
-        region = self._regions[index]
+        region = self._result.regions[index]
         
         raw = self._video_reader.get_data(frame)
         tmp = raw[region.top:region.bottom, region.left:region.right]
@@ -190,11 +197,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         return qg.QPixmap.fromImage(image)
 
 
-    @qc.pyqtSlot()
-    def select_region(self):
-        index = self._regionsComboBox.currentIndex()
-        pixmap = self.make_pixmap(index)
-        self._drawingWidget.set_pixmap(pixmap)
+    #@qc.pyqtSlot()
+    #def select_region(self):
+    #    index = self._regionsComboBox.currentIndex()
+    #    pixmap = self.make_pixmap(index)
+    #    self._drawingWidget.set_pixmap(pixmap)
 
     @qc.pyqtSlot()
     def tab_changed(self):
@@ -252,12 +259,15 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         # set up the video data struct
         meta_data = self._video_reader.get_meta_data()
-        self._video_data = VideoSource(
+        video_data = VideoSource(
             file_name,
             meta_data["fps"],
             self._video_reader.count_frames(),
             meta_data["size"][0],
             meta_data["size"][1])
+            
+        self._result = VideoAnalysisResultsStore(video_data)
+        self._result.append_history()
 
         self._selectWidget.show_video()
 

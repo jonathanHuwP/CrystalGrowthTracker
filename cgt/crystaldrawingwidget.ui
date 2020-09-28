@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>825</width>
-    <height>506</height>
+    <height>284</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -42,19 +42,25 @@
     </layout>
    </item>
    <item>
-    <widget class="QScrollArea" name="_scrollArea">
-     <property name="widgetResizable">
-      <bool>true</bool>
+    <widget class="QSplitter" name="splitter">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
-     <widget class="QWidget" name="scrollAreaWidgetContents">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>797</width>
-        <height>327</height>
-       </rect>
+     <widget class="ResultsTreeWidget" name="_treeWidget" native="true"/>
+     <widget class="QScrollArea" name="_scrollArea">
+      <property name="widgetResizable">
+       <bool>true</bool>
       </property>
+      <widget class="QWidget" name="scrollAreaWidgetContents">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>105</width>
+         <height>105</height>
+        </rect>
+       </property>
+      </widget>
      </widget>
     </widget>
    </item>
@@ -196,6 +202,12 @@
    <class>VideoControlWidget</class>
    <extends>QWidget</extends>
    <header>videocontrolwidget</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ResultsTreeWidget</class>
+   <extends>QWidget</extends>
+   <header>resultstreewidget</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

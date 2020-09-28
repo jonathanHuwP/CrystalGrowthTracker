@@ -65,6 +65,21 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
 
         # connect up the change frame signals
         self._videoControl.frame_changed.connect(self.frame_changed)
+        
+        # set data source for tree widget
+        self._treeWidget.set_owner(owner)
+        
+    def set_owner(self, owner):
+        """
+        setter for the object holding the data to be displayed
+        
+            Args:
+                owner (CrystalGrowthTrackerMain) object holding data
+                
+            Returns:
+                None
+        """
+        self._owner = owner
 
     def region_chosen(self):
         """
@@ -109,6 +124,10 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             self._regionBox.addItem(str(i))
 
         self._regionBox.blockSignals(False)
+        
+        self._treeWidget.blockSignals(True)
+        self._treeWidget.fill_tree()
+        self._treeWidget.blockSignals(False)
 
     @qc.pyqtSlot()
     def state_toggle(self):
@@ -212,6 +231,70 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         """
         qw.QWidget.hideEvent(self, event)
         self._videoControl.enable(False)
+        
+    def select_region(self, r_index):
+        """
+        a region has been selected 
+            
+            Args:
+                r_index (int) the array index of the region
+                
+            Returns:
+                None
+        """
+        print("CrystalDrawingWidget Region {}".format(r_index))
+        region = self._owner.get_selected_region(r_index)
+        
+        self._regionBox.blockSignals(True)
+        self._regionBox.setCurrentIndex(r_index)
+        self._regionBox.blockSignals(False)
+
+        self._videoControl.set_range(region.start_frame, region.end_frame)
+        self.display_region()
+        
+    def select_crystal(self, r_index, c_index):
+        """
+        a crystal has been selected 
+            
+            Args:
+                r_index (int) the array index of the region
+                c_indes (int) the array index of the crystal
+                
+            Returns:
+                None
+        """
+        print("CrystalDrawingWidget Region {}, Crystal {}".format(r_index, c_index))
+        
+    def select_frame(self, r_index, c_index, f_index):
+        """
+        a frame number has been selected 
+            
+            Args:
+                r_index (int) the array index of the region
+                c_indes (int) the array index of the crystal
+                f_indes (int) the array index of the frame number
+                
+                
+            Returns:
+                None
+        """
+        print("CrystalDrawingWidget Region {}, Crystal {}, Frame {}".format(r_index, c_index, f_index))
+        
+    def select_line(self, r_index, c_index, f_index, l_index):
+        """
+        a line has been selected 
+            
+            Args:
+                r_index (int) the array index of the region
+                c_indes (int) the array index of the crystal
+                f_indes (int) the array index of the frame number
+                l_index (int) the array index of the line
+                
+            Returns:
+                None
+        """
+        print("CrystalDrawingWidget Region {}, Crystal {}, Frame {}, Line {}".format(r_index, c_index, f_index, l_index))
+
 
 def run():
     """

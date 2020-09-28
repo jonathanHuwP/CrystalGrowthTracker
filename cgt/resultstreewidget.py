@@ -67,6 +67,21 @@ class ResultsTreeWidget(qw.QWidget, Ui_ResultsTreeWidget):
         h_list = ["Region", "Crystal", "Time", "Line"]
         self._tree.setColumnCount(len(h_list))
         self._tree.setHeaderLabels(h_list)
+        
+        if owner is not None:
+            self.fill_tree()
+            
+    def set_owner(self, owner):
+        """
+        setter for the object holding the data to be displayed
+        
+            Args:
+                owner (CrystalGrowthTrackerMain) object holding data
+                
+            Returns:
+                None
+        """
+        self._owner = owner
         self.fill_tree()
 
     @qc.pyqtSlot()
@@ -96,7 +111,7 @@ class ResultsTreeWidget(qw.QWidget, Ui_ResultsTreeWidget):
         r_index = item.data(0, qc.Qt.UserRole)
         print("region {}".format(r_index))
         if self.parent() is not None:
-            self.parent().region_selected(r_index)
+            self.parent().parent().select_region(r_index)
 
     def crystal_selected(self, item):
         """
@@ -148,10 +163,13 @@ class ResultsTreeWidget(qw.QWidget, Ui_ResultsTreeWidget):
             Returns:
                 None
         """
-        items = []
-        result = self._owner.get_result()
         self._tree.clear()
-        
+        result = self._owner.get_result()
+        if result is None:
+            return
+
+        items = []
+
         for r_index, region in enumerate(result.regions):
             r_item = qw.QTreeWidgetItem(self._tree, [str(r_index)], ResultType.REGION)
             r_var = qc.QVariant(r_index)
