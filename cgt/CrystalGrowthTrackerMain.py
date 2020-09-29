@@ -133,7 +133,28 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._image_source = source
         title = self._translated_name + " - " + source
         self.setWindowTitle(title)
+        
+    @qc.pyqtSlot()
+    def new_project(self):
+        """
+        callback for starting a new project
+        
+            Returns:
+                None
+        """
+        print("CrystalGrowthTrackerMain.new_project()")
 
+    @qc.pyqtSlot()
+    def load_project(self):
+        """
+        callback for loading an existing project
+        
+            Returns:
+                None
+        """
+        #TODO implement function
+        print("CrystalGrowthTrackerMain.load_project()")
+        
     @qc.pyqtSlot()
     def tab_changed(self):
         """
