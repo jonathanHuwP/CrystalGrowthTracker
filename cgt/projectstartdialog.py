@@ -9,14 +9,14 @@ Created on Monday 28 Sept 2020
 # set up linting conditions
 # pylint: disable = too-many-public-methods
 # pylint: disable = c-extension-no-member
+# pylint: disable = too-many-return-statements
 
 import sys
 import os
-
+from pathlib import Path
+from pathvalidate import sanitize_filename, validate_filename, ValidationError
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
-
-from pathvalidate import sanitize_filename, validate_filename, ValidationError
 
 from cgt.Ui_projectstartdialog import Ui_ProjectStartDialog
 
@@ -57,10 +57,10 @@ class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
                 None
         """
         dir_name = qw.QFileDialog.getExistingDirectory(
-                    self,
-                    self.tr("Select directory"),
-                    os.getcwd(),
-                    options=qw.QFileDialog.ShowDirsOnly)
+            self,
+            self.tr("Select directory"),
+            os.getcwd(),
+            options=qw.QFileDialog.ShowDirsOnly)
 
         if dir_name is not None:
             self._projDir.setText(dir_name)
@@ -74,18 +74,17 @@ class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
                 None
         """
         file_name, _ = qw.QFileDialog.getOpenFileName(
-                    self,
-                    self.tr("Project Source File"),
-                    os.getcwd(),
-                    self.tr("AVI (*.avi)"))
+            self,
+            self.tr("Project Source File"),
+            os.getcwd(),
+            self.tr("AVI (*.avi)"))
 
         if file_name is not None:
             self._sourceVideo.setText(file_name)
             file = os.path.basename(self._sourceVideo.text())
-            file = file.rsplit('.',1)[0]
+            file = file.rsplit('.', 1)[0]
             file = sanitize_filename(file)
             self._projName.setText(file)
-
 
     @qc.pyqtSlot()
     def find_processed_file(self):
@@ -96,10 +95,10 @@ class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
                 None
         """
         file_name, _ = qw.QFileDialog.getOpenFileName(
-                    self,
-                    self.tr("Processed Copy of Source"),
-                    os.getcwd(),
-                    self.tr("AVI (*.avi)"))
+            self,
+            self.tr("Processed Copy of Source"),
+            os.getcwd(),
+            self.tr("AVI (*.avi)"))
 
         if file_name is not None:
             self._processedVideo.setText(file_name)
@@ -113,38 +112,55 @@ class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
             Returns:
                 None
         """
-        source = qc.QFile(self._sourceVideo.text())
-
-        if not source.exists():
-            message = self.tr("Source file {} dosn't exist")
-            message = message.format(source.fileName())
+        text = self._sourceVideo.text().strip()
+        if not text:
+            message = self.tr("You must provide a source file")
             qw.QMessageBox.warning(self, "Error", message)
             return
 
-        if self._processedVideo.text().strip() != "":
-            processed = qc.QFile(self._processedVideo.text())
+        source = Path(text)
+        if not source.exists():
+            message = self.tr("Source file \"{}\" does not exist!")
+            message = message.format(source)
+            qw.QMessageBox.critical(self, "Error", message)
+            return
+
+        text = self._processedVideo.text().strip()
+        if text:
+            processed = Path(text)
             if not processed.exists():
-                message = self.tr("Processed file {} dosn't exist")
-                message = message.format(processed.fileName())
-                qw.QMessageBox.warning(self, "Error", message)
+                message = self.tr("Processed file {} does not exist!")
+                message = message.format(processed)
+                qw.QMessageBox.critical(self, "Error", message)
+                return
+
+            if processed.resolve() == source.resolve():
+                message = self.tr("The source and processed files are the same!")
+                qw.QMessageBox.critical(self, "Error", message)
                 return
         else:
             processed = None
 
         proj_name = self._projName.text().strip()
 
-        if  proj_name == "":
+        if not proj_name:
             message = self.tr("You must provide a project name!")
             qw.QMessageBox.warning(self, "Error", message)
             return
 
-        proj_dir = qc.QDir(self._projDir.text().strip())
-
-        if  proj_name == "":
+        text = self._projDir.text().strip()
+        if not text:
             message = self.tr("You must provide a project directory path!")
             qw.QMessageBox.warning(self, "Error", message)
             return
-            
+
+        proj_dir = Path(text)
+        if not proj_dir.exists():
+            message = self.tr("Project directory location {} does not exist!")
+            message = message.format(proj_dir)
+            qw.QMessageBox.warning(self, "Error", message)
+            return
+
         try:
             validate_filename(proj_name)
         except ValidationError   as err:
@@ -152,7 +168,7 @@ class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
             message = message.format(proj_name, err)
             qw.QMessageBox.warning(self, "Error", message)
             return
-            
+
         notes = self._notesEdit.toPlainText().strip()
 
         if self.parent() is not None:
@@ -166,7 +182,7 @@ class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
         else:
             message = "Source: {}\nProcessed: {}\nPath: {}\nName: {}\nCopy video: {}"
             message = message.format(
-                source.fileName(),
+                source,
                 processed,
                 proj_dir,
                 proj_name,

@@ -59,7 +59,7 @@ from cgt.Ui_CrystalGrowthTrackerMain import Ui_CrystalGrowthTrackerMain
 from cgt import htmlreport
 from cgt import writecsvreports
 #from cgt import reports
-        
+
 class CGTProject(dict):
     """
     a store for a the project meta data
@@ -72,14 +72,14 @@ class CGTProject(dict):
                 None
         """
         super().__init__()
-        
+
         self["source"] = None
         self["processed"] = None
         self["proj_dir"] = None
         self["proj_name"] = None
         self["notes"] = None
-        
-        
+
+
 class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     """
     The implementation of the GUI, all the functions and
@@ -188,20 +188,20 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
     @qc.pyqtSlot()
     def start_project(
-        self,
-        source,
-        processed,
-        proj_dir,
-        proj_name,
-        notes,
-        copy_files):
+            self,
+            source,
+            processed,
+            proj_dir,
+            proj_name,
+            notes,
+            copy_files):
         """
         function for starting a new project
 
             Args
-                source (QFile) the main source video
-                processed (QFile) secondary processed video
-                proj_dir  (QDir) parent directory of project directory
+                source (pathlib.Path) the main source video
+                processed (pathlib.Path) secondary processed video
+                proj_dir  (pathlib.Path) parent directory of project directory
                 proj_name (string) the name of project, will be directory name
                 notes (string) project notes
                 copy_files (bool) if true the source and processed files are copied to project dir
@@ -209,48 +209,64 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 None
         """
-        if proj_dir.exists(proj_name):
+        # make the full project path
+        path = proj_dir.joinpath(proj_name)
+
+        if path.exists():
             message = "Project {} already exists you are not allowd to overwrite.".format(proj_name)
             qw.QMessageBox.critical(self, "Project Exists!", message)
             return
 
-        if not proj_dir.mkdir(proj_name):
-            message = "Can't make directory {} in {}".format(proj_name, proj_dir.absolutePath())
-            qw.QMessageBox.critical(self, "Error making directory!", message)
+        try:
+            path.mkdir()
+        except (FileNotFoundError, OSError) as err:
+            message = "Error making project directory \"{}\"".format(err)
+            qw.QMessageBox.critical(self, "Cannot Create Project!", message)
             return
 
-        # path of newly created dir
-        path =  Path(proj_dir.absoluteFilePath(proj_name))
-        
         self._project["proj_name"] = proj_name
-        self._project["proj_dir"] = proj_dir.absolutePath()
+        self._project["proj_dir"] = proj_dir
 
         if copy_files:
             try:
-                copy2(source.fileName(), path)
+                copy2(source, path)
+                print("Copied {} to {}".format(source, path))
             except (IOError, os.error) as why:
-                qw.QMessageBox.warning(self, "Problem copying File", "Error message: {}".format(why))
+                qw.QMessageBox.warning(
+                    self,
+                    "Problem copying File",
+                    "Error message: {}".format(why))
             except Error as err:
-                qw.QMessageBox.warning(self, "Problem copying File", "Error message: {}".format(err.args[0]))
+                qw.QMessageBox.warning(
+                    self,
+                    "Problem copying File",
+                    "Error message: {}".format(err.args[0]))
 
             if processed is not None:
                 try:
-                    copy2(processed.fileName(), path)
+                    copy2(processed, path)
                 except (IOError, os.error) as why:
-                    qw.QMessageBox.warning(self, "Problem copying File", "Error message: {}".format(why))
+                    qw.QMessageBox.warning(
+                        self,
+                        "Problem copying File",
+                        "Error message: {}".format(why))
                 except Error as err:
-                    qw.QMessageBox.warning(self, "Problem copying File", "Error message: {}".format(err.args[0]))
+                    qw.QMessageBox.warning(
+                        self,
+                        "Problem copying File",
+                        "Error message: {}".format(err.args[0]))
 
-        if notes is not None and not notes.isspace() and len(notes) > 0:
-            notes_dir = qc.QDir(path)
-            notes_file = proj_name + "_notes.txt"
+        if notes is not None and not notes.isspace() and notes:
+            notes_file_name = proj_name + "_notes.txt"
+            notes_file = path.joinpath(notes_file_name)
+
             try:
-                with open(notes_dir.absoluteFilePath(notes_file), 'w') as n_file:
+                with open(notes_file, 'w') as n_file:
                     n_file.write(notes)
             except IOError as error:
                 message = "Can't open file for the notes"
                 qw.QMessageBox.critical(self, "Error making directory!", message)
-                
+
         print(self._project)
 
     @qc.pyqtSlot()
@@ -824,7 +840,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
 # TODO move to qt utility
 def ndarray_to_qpixmap(data):
-    
+
     tmp = arr.array('B', data.reshape(data.size))
 
     im_format = qg.QImage.Format_Grayscale8
