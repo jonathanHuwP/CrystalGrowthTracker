@@ -179,6 +179,8 @@ class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
                 proj_name,
                 notes,
                 self._copyCheckBox.isChecked())
+                
+            self.close()
         else:
             message = "Source: {}\nProcessed: {}\nPath: {}\nName: {}\nCopy video: {}"
             message = message.format(
