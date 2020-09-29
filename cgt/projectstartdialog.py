@@ -12,7 +12,7 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
-#from pathvalidate import sanitize_filename, validate_filename
+from pathvalidate import sanitize_filename, validate_filename, ValidationError
 
 from Ui_projectstartdialog import Ui_ProjectStartDialog
 
@@ -51,7 +51,6 @@ class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
                     self.tr("Select directory"),
                     os.getcwd(),
                     options=qw.QFileDialog.ShowDirsOnly)
-                    #tr("Images (*.png *.xpm *.jpg)"));
 
         if dir_name is not None:
             self._projDir.setText(dir_name)
@@ -68,7 +67,7 @@ class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
             self._sourceVideo.setText(file_name)
             file = os.path.basename(self._sourceVideo.text())
             file = file.rsplit('.',1)[0]
-            #file = sanitize_filename(file)
+            file = sanitize_filename(file)
             self._projName.setText(file)
             
         
@@ -85,7 +84,6 @@ class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
 
     @qc.pyqtSlot()
     def make_project(self):
-        # TODO check there is a valid source, name/project, and if present processed video is valid
         source = qc.QFile(self._sourceVideo.text())
         
         if not source.exists():
@@ -119,14 +117,14 @@ class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
             return
             
         notes = self._notesEdit.toPlainText().strip()
-            
-        #try:
-        #    validate_filename(proj_name)
-        #except OSError as err:
-        #    message = self.tr("Project name, {}, not valid: {}")
-        #    message = message.format(proj_name, err)
-        #    qw.QMessageBox.warning(self, "Error", message)
-        #    return
+           
+        try:
+            validate_filename(proj_name)
+        except ValidationError   as err:
+            message = self.tr("Project name, {}, not valid: {}")
+            message = message.format(proj_name, err)
+            qw.QMessageBox.warning(self, "Error", message)
+            return
         
         if self.parent() is not None:
             self.parent().new_project(source, processed, proj_name, notes)
