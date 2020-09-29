@@ -58,7 +58,7 @@ from cgt.Ui_CrystalGrowthTrackerMain import Ui_CrystalGrowthTrackerMain
 from cgt import htmlreport
 from cgt import writecsvreports
 #from cgt import reports
-
+        
 class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     """
     The implementation of the GUI, all the functions and
@@ -188,16 +188,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 None
         """
-        message = "Source: {}\nProcessed: {}\nPath: {}\nName: {}\nCopy video: {}"
-        message = message.format(
-                source.fileName(),
-                processed,
-                proj_dir,
-                proj_name,
-                copy_files)
-        print(message)
-        print("NOTES {}".format(notes))
-
         if proj_dir.exists(proj_name):
             message = "Project {} already exists you are not allowd to overwrite.".format(proj_name)
             qw.QMessageBox.critical(self, "Project Exists!", message)
