@@ -40,6 +40,7 @@ import PyQt5.QtCore as qc
 
 from pathvalidate import validate_filename, ValidationError
 from shutil import copy2
+from pathlib import Path
 
 import lazylogger
 from ImageLabel import ImageLabel
@@ -58,6 +59,26 @@ from cgt.Ui_CrystalGrowthTrackerMain import Ui_CrystalGrowthTrackerMain
 from cgt import htmlreport
 from cgt import writecsvreports
 #from cgt import reports
+        
+class CGTProject(dict):
+    """
+    a store for a the project meta data
+    """
+    def __init__(self):
+        """
+        initalize the class
+
+            Returns:
+                None
+        """
+        super().__init__()
+        
+        self["source"] = None
+        self["processed"] = None
+        self["proj_dir"] = None
+        self["proj_name"] = None
+        self["notes"] = None
+        
         
 class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     """
@@ -122,7 +143,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._zoom = 1.0
 
         ## the project data structure
-        self._project = {}
+        self._project = CGTProject()
 
         ## the current logger
         self._logger = lazylogger.logging.getLogger(self._translated_name)
@@ -199,7 +220,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             return
 
         # path of newly created dir
-        path =  proj_dir.absoluteFilePath(proj_name)
+        path =  Path(proj_dir.absoluteFilePath(proj_name))
+        
+        self._project["proj_name"] = proj_name
+        self._project["proj_dir"] = proj_dir.absolutePath()
 
         if copy_files:
             try:
@@ -226,6 +250,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             except IOError as error:
                 message = "Can't open file for the notes"
                 qw.QMessageBox.critical(self, "Error making directory!", message)
+                
+        print(self._project)
 
     @qc.pyqtSlot()
     def tab_changed(self):
@@ -796,8 +822,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             # dispose of the event in the approved way
             event.ignore()
 
+# TODO move to qt utility
 def ndarray_to_qpixmap(data):
-
+    
     tmp = arr.array('B', data.reshape(data.size))
 
     im_format = qg.QImage.Format_Grayscale8
