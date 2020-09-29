@@ -38,6 +38,9 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
+from pathvalidate import validate_filename, ValidationError
+from shutil import copy2
+
 import lazylogger
 from ImageLabel import ImageLabel
 from cgt.projectstartdialog import ProjectStartDialog
@@ -117,7 +120,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         ## the current zoom  @todo do we need this as is should always be the same as the spinBox
         self._zoom = 1.0
-        
+
         ## the project data structure
         self._project = {}
 
@@ -138,33 +141,33 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._image_source = source
         title = self._translated_name + " - " + source
         self.setWindowTitle(title)
-        
+
     @qc.pyqtSlot()
     def new_project(self):
         """
         callback for starting a new project
-        
+
             Returns:
                 None
         """
         print("CrystalGrowthTrackerMain.new_project()")
         dia = ProjectStartDialog(self)
         dia.show()
-        
+
     @qc.pyqtSlot()
     def load_project(self):
         """
         callback for loading an existing project
-        
+
             Returns:
                 None
         """
         #TODO implement function
         print("CrystalGrowthTrackerMain.load_project()")
-        
+
     @qc.pyqtSlot()
     def start_project(
-        self, 
+        self,
         source,
         processed,
         proj_dir,
@@ -173,7 +176,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         copy_files):
         """
         function for starting a new project
-        
+
             Args
                 source (QFile) the main source video
                 processed (QFile) secondary processed video
@@ -181,7 +184,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 proj_name (string) the name of project, will be directory name
                 notes (string) project notes
                 copy_files (bool) if true the source and processed files are copied to project dir
-                
+
             Returns:
                 None
         """
@@ -193,10 +196,47 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 proj_name,
                 copy_files)
         print(message)
-        print(notes)
-        
-        proj_dir.mkdir(proj_name)
-        
+        print("NOTES {}".format(notes))
+
+        if proj_dir.exists(proj_name):
+            message = "Project {} already exists you are not allowd to overwrite.".format(proj_name)
+            qw.QMessageBox.critical(self, "Project Exists!", message)
+            return
+
+        if not proj_dir.mkdir(proj_name):
+            message = "Can't make directory {} in {}".format(proj_name, proj_dir.absolutePath())
+            qw.QMessageBox.critical(self, "Error making directory!", message)
+            return
+
+        # path of newly created dir
+        path =  proj_dir.absoluteFilePath(proj_name)
+
+        if copy_files:
+            try:
+                copy2(source.fileName(), path)
+            except (IOError, os.error) as why:
+                qw.QMessageBox.warning(self, "Problem copying File", "Error message: {}".format(why))
+            except Error as err:
+                qw.QMessageBox.warning(self, "Problem copying File", "Error message: {}".format(err.args[0]))
+
+            if processed is not None:
+                try:
+                    copy2(processed.fileName(), path)
+                except (IOError, os.error) as why:
+                    qw.QMessageBox.warning(self, "Problem copying File", "Error message: {}".format(why))
+                except Error as err:
+                    qw.QMessageBox.warning(self, "Problem copying File", "Error message: {}".format(err.args[0]))
+
+        if notes is not None and not notes.isspace() and len(notes) > 0:
+            notes_dir = qc.QDir(path)
+            notes_file = proj_name + "_notes.txt"
+            try:
+                with open(notes_dir.absoluteFilePath(notes_file), 'w') as n_file:
+                    n_file.write(notes)
+            except IOError as error:
+                message = "Can't open file for the notes"
+                qw.QMessageBox.critical(self, "Error making directory!", message)
+
     @qc.pyqtSlot()
     def tab_changed(self):
         """
@@ -261,7 +301,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         if dir_name is not None:
             pass
-        
+
     @qc.pyqtSlot()
     def save_current_subimage(self):
         """
@@ -422,15 +462,15 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         # convert 0.0 to 1.0 float to 0 to 255 unsigned int
         def to_gray(value):
             return np.uint8(np.round(value*255))
-            
+
         # get the fram as numpy.ndarray
         frame = self._frameSlider.value()
         img = color.rgb2gray(self._video_reader.get_data(frame))
         print(img.shape)
         img = to_gray(img)
-        
+
         self._raw_image = img
-        
+
         pixmap = ndarray_to_qpixmap(img)
 
         if self._source_label1 is None:
