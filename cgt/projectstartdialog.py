@@ -138,15 +138,13 @@ class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
             qw.QMessageBox.warning(self, "Error", message)
             return
 
-        proj_dir = self._projDir.text().strip()
+        proj_dir = qc.QDir(self._projDir.text().strip())
 
         if  proj_name == "":
             message = self.tr("You must provide a project directory path!")
             qw.QMessageBox.warning(self, "Error", message)
             return
-
-        notes = self._notesEdit.toPlainText().strip()
-
+            
         try:
             validate_filename(proj_name)
         except ValidationError   as err:
@@ -154,6 +152,8 @@ class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
             message = message.format(proj_name, err)
             qw.QMessageBox.warning(self, "Error", message)
             return
+            
+        notes = self._notesEdit.toPlainText().strip()
 
         if self.parent() is not None:
             self.parent().start_project(

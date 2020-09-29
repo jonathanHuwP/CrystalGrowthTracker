@@ -117,6 +117,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         ## the current zoom  @todo do we need this as is should always be the same as the spinBox
         self._zoom = 1.0
+        
+        ## the project data structure
+        self._project = {}
 
         ## the current logger
         self._logger = lazylogger.logging.getLogger(self._translated_name)
@@ -191,6 +194,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 copy_files)
         print(message)
         print(notes)
+        
+        proj_dir.mkdir(proj_name)
         
     @qc.pyqtSlot()
     def tab_changed(self):
