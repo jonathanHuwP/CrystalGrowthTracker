@@ -40,6 +40,8 @@ import PyQt5.QtCore as qc
 
 import lazylogger
 from ImageLabel import ImageLabel
+from cgt.projectstartdialog import ProjectStartDialog
+
 #from PolyLineExtract import PolyLineExtract, IAParameters
 #from ImageEnhancer import ImageEnhancer
 
@@ -143,7 +145,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 None
         """
         print("CrystalGrowthTrackerMain.new_project()")
-
+        dia = ProjectStartDialog(self)
+        dia.show()
+        
     @qc.pyqtSlot()
     def load_project(self):
         """
@@ -154,6 +158,39 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         #TODO implement function
         print("CrystalGrowthTrackerMain.load_project()")
+        
+    @qc.pyqtSlot()
+    def start_project(
+        self, 
+        source,
+        processed,
+        proj_dir,
+        proj_name,
+        notes,
+        copy_files):
+        """
+        function for starting a new project
+        
+            Args
+                source (QFile) the main source video
+                processed (QFile) secondary processed video
+                proj_dir  (QDir) parent directory of project directory
+                proj_name (string) the name of project, will be directory name
+                notes (string) project notes
+                copy_files (bool) if true the source and processed files are copied to project dir
+                
+            Returns:
+                None
+        """
+        message = "Source: {}\nProcessed: {}\nPath: {}\nName: {}\nCopy video: {}"
+        message = message.format(
+                source.fileName(),
+                processed,
+                proj_dir,
+                proj_name,
+                copy_files)
+        print(message)
+        print(notes)
         
     @qc.pyqtSlot()
     def tab_changed(self):

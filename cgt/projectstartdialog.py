@@ -18,7 +18,7 @@ import PyQt5.QtCore as qc
 
 from pathvalidate import sanitize_filename, validate_filename, ValidationError
 
-from Ui_projectstartdialog import Ui_ProjectStartDialog
+from cgt.Ui_projectstartdialog import Ui_ProjectStartDialog
 
 class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
     """
@@ -156,7 +156,7 @@ class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
             return
 
         if self.parent() is not None:
-            self.parent().new_project(
+            self.parent().start_project(
                 source,
                 processed,
                 proj_dir,
