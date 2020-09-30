@@ -960,8 +960,8 @@ def run_growth_tracker():
         window = CrystalGrowthTrackerMain(app)
         window.show()
         app.exec_()
-    
+
     inner_run()
-    
+
 if __name__ == "__main__":
     run_growth_tracker()

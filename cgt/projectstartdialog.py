@@ -14,11 +14,27 @@ Created on Monday 28 Sept 2020
 import sys
 import os
 from pathlib import Path
+import random
+import string
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
 
 from cgt.Ui_projectstartdialog import Ui_ProjectStartDialog
+
+def get_random_string(length):
+    """
+    generator for random strings
+
+        Args:
+            length (int) the number of characters needed
+
+        Returns:
+            random string of characters
+    """
+    letters = string.ascii_lowercase
+    result_str = ''.join(random.choice(letters) for i in range(length))
+    return result_str
 
 class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
     """
@@ -83,6 +99,7 @@ class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
             self._sourceVideo.setText(file_name)
             file = os.path.basename(self._sourceVideo.text())
             file = file.rsplit('.', 1)[0]
+            file += "_" + get_random_string(8)
             self._projName.setText(file)
 
     @qc.pyqtSlot()
