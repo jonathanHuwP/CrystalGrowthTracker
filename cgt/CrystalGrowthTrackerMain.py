@@ -64,7 +64,6 @@ from cgt import readcsvreports
 #from cgt import reports
 
 
-
 class CGTProject(dict):
     """
     a store for a the project meta data
@@ -381,11 +380,13 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             "")
 
         if dir_name is not None:
-
             readcsvreports.read_csv_reports(dir_name)
             pass
 
 
+            readcsvreports.read_csv_reports(dir_name)
+
+>>>>>>> 340f895dff25a79ee9fd1aaf7f7d858365c8466e
     @qc.pyqtSlot()
     def save_current_subimage(self):
         """
