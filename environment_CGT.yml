@@ -28,6 +28,7 @@ dependencies:
   - scikit-image=0.16.2
   - imageio-ffmpeg
   - opencv
+  - pathvalidate
   - pip
   - doxygen=1.8.*
   - pip:

@@ -38,8 +38,15 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
+from pathvalidate import validate_filename, ValidationError
+from shutil import copy2
+from pathlib import Path
+
 import lazylogger
 from ImageLabel import ImageLabel
+from cgt.projectstartdialog import ProjectStartDialog
+from cgt.projectpropertieswidget import ProjectPropertiesWidget
+
 #from PolyLineExtract import PolyLineExtract, IAParameters
 #from ImageEnhancer import ImageEnhancer
 
@@ -55,6 +62,28 @@ from cgt import writecsvreports
 from cgt import readcsvreports
 #from cgt import reports
 
+<<<<<<< HEAD
+=======
+class CGTProject(dict):
+    """
+    a store for a the project meta data
+    """
+    def __init__(self):
+        """
+        initalize the class
+
+            Returns:
+                None
+        """
+        super().__init__()
+
+        self["source"] = None
+        self["processed"] = None
+        self["proj_dir"] = None
+        self["proj_name"] = None
+        self["notes"] = None
+
+>>>>>>> dde0238a0b2eb14cbdf7da325512e4a67093c707
 
 class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     """
@@ -115,12 +144,57 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         ## the path to the image source
         self._image_source = None
 
+        ## base widget for region selection tab
+        self._propertiesTab = qw.QWidget(self)
+
+        ## the region selection widget
+        self._propertiesWidget = ProjectPropertiesWidget(self._propertiesTab, self)
+
+        # set up tab
+        self.add_tab(self._propertiesTab, self._propertiesWidget, "Project Properties")
+
         ## the current zoom  @todo do we need this as is should always be the same as the spinBox
         self._zoom = 1.0
+
+        ## the project data structure
+        self._project = CGTProject()
 
         ## the current logger
         self._logger = lazylogger.logging.getLogger(self._translated_name)
         self._logger.setLevel(lazylogger.logging.WARNING)
+
+    def add_tab(self, tab_widget, target_widget, title):
+        """
+        add a new tab
+
+            Args:
+                tab_widget (QWidget) the widget forming the tab
+                target_widget (QWidget subclass) the widget to be used
+                title (string) the tabbox title
+
+            Returns:
+                None
+        """
+        layout = qw.QVBoxLayout()
+        layout.addWidget(target_widget)
+        tab_widget.setLayout(layout)
+
+        self._tabWidget.addTab(tab_widget, title)
+
+    def display_properties(self):
+        """
+        display the properties tab with the current properties
+
+            Returns:
+                None
+        """
+        self._propertiesWidget.clear_and_display_text("<h1>Properties</h1>")
+        for key in self._project:
+            text = "<p><b>{}:</b> {}"
+            text = text.format(key, self._project[key])
+            self._propertiesWidget.append_text(text)
+
+        self._tabWidget.setCurrentWidget(self._propertiesTab)
 
     def set_title(self, source):
         """
@@ -135,6 +209,113 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._image_source = source
         title = self._translated_name + " - " + source
         self.setWindowTitle(title)
+
+    @qc.pyqtSlot()
+    def new_project(self):
+        """
+        callback for starting a new project
+
+            Returns:
+                None
+        """
+        print("CrystalGrowthTrackerMain.new_project()")
+        dia = ProjectStartDialog(self)
+        dia.show()
+
+    @qc.pyqtSlot()
+    def load_project(self):
+        """
+        callback for loading an existing project
+
+            Returns:
+                None
+        """
+        #TODO implement function
+        print("CrystalGrowthTrackerMain.load_project()")
+
+    @qc.pyqtSlot()
+    def start_project(
+            self,
+            source,
+            processed,
+            proj_dir,
+            proj_name,
+            notes,
+            copy_files):
+        """
+        function for starting a new project
+
+            Args
+                source (pathlib.Path) the main source video
+                processed (pathlib.Path) secondary processed video
+                proj_dir  (pathlib.Path) parent directory of project directory
+                proj_name (string) the name of project, will be directory name
+                notes (string) project notes
+                copy_files (bool) if true the source and processed files are copied to project dir
+
+            Returns:
+                None
+        """
+        # make the full project path
+        path = proj_dir.joinpath(proj_name)
+
+        if path.exists():
+            message = "Project {} already exists you are not allowd to overwrite.".format(proj_name)
+            qw.QMessageBox.critical(self, "Project Exists!", message)
+            return
+
+        try:
+            path.mkdir()
+        except (FileNotFoundError, OSError) as err:
+            message = "Error making project directory \"{}\"".format(err)
+            qw.QMessageBox.critical(self, "Cannot Create Project!", message)
+            return
+
+        self._project["proj_name"] = proj_name
+        self._project["proj_dir"] = proj_dir
+
+        if copy_files:
+            try:
+                copy2(source, path)
+                print("Copied {} to {}".format(source, path))
+            except (IOError, os.error) as why:
+                qw.QMessageBox.warning(
+                    self,
+                    "Problem copying File",
+                    "Error message: {}".format(why))
+            except Error as err:
+                qw.QMessageBox.warning(
+                    self,
+                    "Problem copying File",
+                    "Error message: {}".format(err.args[0]))
+
+            if processed is not None:
+                try:
+                    copy2(processed, path)
+                except (IOError, os.error) as why:
+                    qw.QMessageBox.warning(
+                        self,
+                        "Problem copying File",
+                        "Error message: {}".format(why))
+                except Error as err:
+                    qw.QMessageBox.warning(
+                        self,
+                        "Problem copying File",
+                        "Error message: {}".format(err.args[0]))
+
+        if notes is not None and not notes.isspace() and notes:
+            notes_file_name = proj_name + "_notes.txt"
+            notes_file = path.joinpath(notes_file_name)
+
+            try:
+                with open(notes_file, 'w') as n_file:
+                    n_file.write(notes)
+            except IOError as error:
+                message = "Can't open file for the notes"
+                qw.QMessageBox.critical(self, "Error making directory!", message)
+
+        print(self._project)
+        self.display_properties()
 
     @qc.pyqtSlot()
     def tab_changed(self):
@@ -199,9 +380,13 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             "")
 
         if dir_name is not None:
+<<<<<<< HEAD
             readcsvreports.read_csv_reports(dir_name)
 
 
+=======
+            pass
+>>>>>>> dde0238a0b2eb14cbdf7da325512e4a67093c707
 
     @qc.pyqtSlot()
     def save_current_subimage(self):
@@ -363,15 +548,15 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         # convert 0.0 to 1.0 float to 0 to 255 unsigned int
         def to_gray(value):
             return np.uint8(np.round(value*255))
-            
+
         # get the fram as numpy.ndarray
         frame = self._frameSlider.value()
         img = color.rgb2gray(self._video_reader.get_data(frame))
         print(img.shape)
         img = to_gray(img)
-        
+
         self._raw_image = img
-        
+
         pixmap = ndarray_to_qpixmap(img)
 
         if self._source_label1 is None:
@@ -707,6 +892,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             # dispose of the event in the approved way
             event.ignore()
 
+# TODO move to qt utility
 def ndarray_to_qpixmap(data):
 
     tmp = arr.array('B', data.reshape(data.size))
