@@ -52,7 +52,9 @@ from cgt.Ui_CrystalGrowthTrackerMain import Ui_CrystalGrowthTrackerMain
 
 from cgt import htmlreport
 from cgt import writecsvreports
+from cgt import readcsvreports
 #from cgt import reports
+
 
 class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     """
@@ -197,8 +199,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             "")
 
         if dir_name is not None:
-            pass
-        
+            readcsvreports.read_csv_reports(dir_name)
+
+
+
     @qc.pyqtSlot()
     def save_current_subimage(self):
         """
