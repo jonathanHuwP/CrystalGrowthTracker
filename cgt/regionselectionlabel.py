@@ -26,8 +26,6 @@ import numpy as np
 
 from DrawRect import DrawRect
 
-import lazylogger
-
 # set up linting conditions
 # pylint: disable = too-many-public-methods
 # pylint: disable = c-extension-no-member
@@ -87,10 +85,6 @@ class RegionSelectionLabel(qw.QLabel):
 
         ## holder for the rectangle which a user has defined, but not yet formed a region
         self._rectangle = None
-
-        ## the logger
-        self._logger = lazylogger.logging.getLogger(self._translation_name)
-        self._logger.setLevel(lazylogger.logging.WARNING)
 
     ## signal to indicate the user has selected a new rectangle
     new_selection = qc.pyqtSignal()

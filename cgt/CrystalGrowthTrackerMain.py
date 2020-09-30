@@ -42,7 +42,6 @@ from pathvalidate import validate_filename, ValidationError
 from shutil import copy2
 from pathlib import Path
 
-import lazylogger
 from ImageLabel import ImageLabel
 from cgt.projectstartdialog import ProjectStartDialog
 #from cgt.projectstartdialog import ProjectStartDialog
@@ -158,10 +157,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         ## the project data structure
         self._project = CGTProject()
-
-        ## the current logger
-        self._logger = lazylogger.logging.getLogger(self._translated_name)
-        self._logger.setLevel(lazylogger.logging.WARNING)
 
     def add_tab(self, tab_widget, target_widget, title):
         """
@@ -331,9 +326,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 None
         """
-
-        self._logger.info(
-            "tab changed to %s", self._tabWidget.currentIndex())
+        print("tab changed")
 
     @qc.pyqtSlot()
     def save_results(self):
@@ -962,19 +955,14 @@ def run_growth_tracker():
 
     def inner_run():
         app = qw.QApplication(sys.argv)
-
         translators = select_translator()
         for translator in translators:
             qc.QCoreApplication.installTranslator(translator)
-
         window = CrystalGrowthTrackerMain(app)
         window.show()
         app.exec_()
-
-    file_name = "growth_tracker.log"
-    lazylogger.set_up_logging(file_name, append=True)
+    
     inner_run()
-    lazylogger.end_logging(file_name)
-
+    
 if __name__ == "__main__":
     run_growth_tracker()
