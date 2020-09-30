@@ -214,8 +214,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>98</width>
-               <height>28</height>
+               <width>880</width>
+               <height>342</height>
               </rect>
              </property>
             </widget>
@@ -326,6 +326,7 @@
     <addaction name="_actionOpen"/>
     <addaction name="_actionNewProject"/>
     <addaction name="_actionLoadProject"/>
+    <addaction name="_actionSaveProject"/>
     <addaction name="_actionReload_Results"/>
     <addaction name="separator"/>
     <addaction name="_actionSaveSubimages"/>
@@ -375,6 +376,11 @@
   <action name="_actionLoadProject">
    <property name="text">
     <string>Load Project</string>
+   </property>
+  </action>
+  <action name="_actionSaveProject">
+   <property name="text">
+    <string>Save Project</string>
    </property>
   </action>
  </widget>
@@ -609,6 +615,22 @@
    <signal>triggered()</signal>
    <receiver>CrystalGrowthTrackerMain</receiver>
    <slot>new_project()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>470</x>
+     <y>291</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_actionSaveProject</sender>
+   <signal>triggered()</signal>
+   <receiver>CrystalGrowthTrackerMain</receiver>
+   <slot>save_project()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>

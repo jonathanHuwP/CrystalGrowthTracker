@@ -196,6 +196,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self._tabWidget.setCurrentWidget(self._propertiesTab)
 
+    @qc.pyqtSlot()
+    def save_project(self):
+        print("save project")
+
     def set_title(self, source):
         """
         assignes the source and sets window title
