@@ -59,7 +59,7 @@ class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
         dir_name = qw.QFileDialog.getExistingDirectory(
             self,
             self.tr("Select directory"),
-            os.getcwd(),
+            os.path.expanduser('~'),
             options=qw.QFileDialog.ShowDirsOnly)
 
         if dir_name is not None:
@@ -76,7 +76,7 @@ class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
         file_name, _ = qw.QFileDialog.getOpenFileName(
             self,
             self.tr("Project Source File"),
-            os.getcwd(),
+            os.path.expanduser('~'),
             self.tr("AVI (*.avi)"))
 
         if file_name is not None:
@@ -97,7 +97,7 @@ class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
         file_name, _ = qw.QFileDialog.getOpenFileName(
             self,
             self.tr("Processed Copy of Source"),
-            os.getcwd(),
+            os.path.expanduser('~'),
             self.tr("AVI (*.avi)"))
 
         if file_name is not None:
@@ -179,7 +179,7 @@ class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
                 proj_name,
                 notes,
                 self._copyCheckBox.isChecked())
-                
+
             self.close()
         else:
             message = "Source: {}\nProcessed: {}\nPath: {}\nName: {}\nCopy video: {}"

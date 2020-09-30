@@ -45,6 +45,7 @@ from pathlib import Path
 import lazylogger
 from ImageLabel import ImageLabel
 from cgt.projectstartdialog import ProjectStartDialog
+from cgt.projectpropertieswidget import ProjectPropertiesWidget
 
 #from PolyLineExtract import PolyLineExtract, IAParameters
 #from ImageEnhancer import ImageEnhancer
@@ -139,6 +140,15 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         ## the path to the image source
         self._image_source = None
 
+        ## base widget for region selection tab
+        self._propertiesTab = qw.QWidget(self)
+
+        ## the region selection widget
+        self._propertiesWidget = ProjectPropertiesWidget(self._propertiesTab, self)
+
+        # set up tab
+        self.add_tab(self._propertiesTab, self._propertiesWidget, "Project Properties")
+
         ## the current zoom  @todo do we need this as is should always be the same as the spinBox
         self._zoom = 1.0
 
@@ -148,6 +158,39 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         ## the current logger
         self._logger = lazylogger.logging.getLogger(self._translated_name)
         self._logger.setLevel(lazylogger.logging.WARNING)
+
+    def add_tab(self, tab_widget, target_widget, title):
+        """
+        add a new tab
+
+            Args:
+                tab_widget (QWidget) the widget forming the tab
+                target_widget (QWidget subclass) the widget to be used
+                title (string) the tabbox title
+
+            Returns:
+                None
+        """
+        layout = qw.QVBoxLayout()
+        layout.addWidget(target_widget)
+        tab_widget.setLayout(layout)
+
+        self._tabWidget.addTab(tab_widget, title)
+
+    def display_properties(self):
+        """
+        display the properties tab with the current properties
+
+            Returns:
+                None
+        """
+        self._propertiesWidget.clear_and_display_text("<h1>Properties</h1>")
+        for key in self._project:
+            text = "<p><b>{}:</b> {}"
+            text = text.format(key, self._project[key])
+            self._propertiesWidget.append_text(text)
+
+        self._tabWidget.setCurrentWidget(self._propertiesTab)
 
     def set_title(self, source):
         """
@@ -268,6 +311,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 qw.QMessageBox.critical(self, "Error making directory!", message)
 
         print(self._project)
+        self.display_properties()
 
     @qc.pyqtSlot()
     def tab_changed(self):
