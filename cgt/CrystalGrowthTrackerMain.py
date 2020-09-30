@@ -38,7 +38,6 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
-from pathvalidate import validate_filename, ValidationError
 from shutil import copy2
 from pathlib import Path
 

@@ -14,7 +14,7 @@ Created on Monday 28 Sept 2020
 import sys
 import os
 from pathlib import Path
-from pathvalidate import sanitize_filename, validate_filename, ValidationError
+
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
 
@@ -83,7 +83,6 @@ class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
             self._sourceVideo.setText(file_name)
             file = os.path.basename(self._sourceVideo.text())
             file = file.rsplit('.', 1)[0]
-            file = sanitize_filename(file)
             self._projName.setText(file)
 
     @qc.pyqtSlot()
@@ -158,14 +157,6 @@ class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
         if not proj_dir.exists():
             message = self.tr("Project directory location {} does not exist!")
             message = message.format(proj_dir)
-            qw.QMessageBox.warning(self, "Error", message)
-            return
-
-        try:
-            validate_filename(proj_name)
-        except ValidationError   as err:
-            message = self.tr("Project name, {}, not valid: {}")
-            message = message.format(proj_name, err)
             qw.QMessageBox.warning(self, "Error", message)
             return
 
