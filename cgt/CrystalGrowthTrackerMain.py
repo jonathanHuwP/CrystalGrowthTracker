@@ -386,7 +386,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
             readcsvreports.read_csv_reports(dir_name)
 
->>>>>>> 340f895dff25a79ee9fd1aaf7f7d858365c8466e
+
     @qc.pyqtSlot()
     def save_current_subimage(self):
         """
