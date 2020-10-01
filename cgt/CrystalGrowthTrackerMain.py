@@ -74,6 +74,21 @@ class CGTProject(dict):
                 None
         """
         super().__init__()
+        
+        prog = 'CGT'
+        description = 'Semi-automatically tracks the growth of crystals from X-ray videos.'
+
+        self["prog"] = prog
+        self["description"] = description
+        start = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+        self["start"] = start
+        self['host'], self['ip_address'], self['operating_system'] = utils.find_hostname_and_ip()
+
+        #info['in_file_no_path'] = "filename_in.avi"
+        #info['in_file_no_extension'] = os.path.splitext("filename_in")[0]
+        #info['frame_rate'] = 20
+        #info['resolution'] = 10
+        #info['resolution_units'] = "nm"
 
         self["source"] = None
         self["processed"] = None
@@ -190,9 +205,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self._tabWidget.setCurrentWidget(self._propertiesTab)
 
-    @qc.pyqtSlot()
-    def save_project(self):
-        print("save project")
 
     def set_title(self, source):
         """
@@ -230,6 +242,48 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         #TODO implement function
         print("CrystalGrowthTrackerMain.load_project()")
+        
+        dir_name = qw.QFileDialog().getExistingDirectory(
+            self,
+            self.tr("Select Directory for the Report"),
+            "")
+        
+        if dir_name is not None:
+            print("Loading Project.")
+            prog = 'CGT'
+            description = 'Semi-automatically tracks the growth of crystals from X-ray videos.'
+
+            info = {'prog':prog,
+                    'description':description}
+            info['in_file_no_path'] = "filename_in.avi"
+            info['in_file_no_extension'] = os.path.splitext("filename_in")[0]
+            info['frame_rate'] = 20
+            info['resolution'] = 10
+            info['resolution_units'] = "nm"
+            start = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+            info['start'] = start
+            print(start)
+            info['host'], info['ip_address'], info['operating_system'] = utils.find_hostname_and_ip()
+            print(find_hostname_and_ip())
+            #htmlreport.save_html_report(dir_name, info)
+            #writecsvreports.save_csv_reports(dir_name, info)
+
+    @qc.pyqtSlot()
+    def save_project(self):
+        print("save project")
+
+        for key in self._project:
+            print("key: ", key)
+            print("value: ", self._project[key])
+
+        #dir_name = (self._project["proj_dir"]+r"/"+self._project["proj_name"])
+
+        #print("type(self._project): ", type(self._project))
+
+        #writecsvreports.save_csv_reports(dir_name, info)
+        writecsvreports.save_csv_project(self._project)
+
+
 
     @qc.pyqtSlot()
     def start_project(
@@ -311,6 +365,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             except IOError as error:
                 message = "Can't open file for the notes"
                 qw.QMessageBox.critical(self, "Error making directory!", message)
+
+        self._project["source"] = source
+        self._project["processed"] = processed
 
         print(self._project)
         self.display_properties()
