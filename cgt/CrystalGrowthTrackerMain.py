@@ -106,20 +106,14 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         ## the videos data
         self._video_data = None
 
-        ## storage for the regions
-        #self._regions = []
-        
+        ## storage for the open video source
+        self._video_reader = None
+
         ## storage for the result
         self._result = None
 
-        ## base widget for region selection tab
-        self._selectTab = qw.QWidget(self)
-        
-        ## the region selection widget
-        self._selectWidget = RegionSelectionWidget(self._selectTab, self)
-        
-        # set up tab
-        self.add_tab(self._selectTab, self._selectWidget, "Select Regions")
+        ## the project data structure
+        self._project = CGTProject()
 
         ## base widget for region selection tab
         self._propertiesTab = qw.QWidget(self)
@@ -130,21 +124,27 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         # set up tab
         self.add_tab(self._propertiesTab, self._propertiesWidget, "Project Properties")
 
-        ## the project data structure
-        self._project = CGTProject()
-        
+        ## base widget for region selection tab
+        self._selectTab = qw.QWidget(self)
+
+        ## the region selection widget
+        self._selectWidget = RegionSelectionWidget(self._selectTab, self)
+
+        # set up tab
+        self.add_tab(self._selectTab, self._selectWidget, "Select Regions")
+
         ## base widget of crystal drawing tab
         self._drawingTab = qw.QWidget(self)
-        
+
         ## the crystal drawing widget
         self._drawingWidget = CrystalDrawingWidget(self._drawingTab, self)
-        
+
         # set up tab
         self.add_tab(self._drawingTab, self._drawingWidget, "Trace Crystals")
-        
+
         # set up the title
         self.set_title()
-        
+
         #self.read_video("C:\\Users\\jhp11\\Work\\CrystalGrowthTracker\\doc\\video\\file_example_AVI_640_800kB.avi")
 
     def add_tab(self, tab_widget, target_widget, title):
@@ -179,7 +179,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self._propertiesWidget.append_text(text)
 
         self._tabWidget.setCurrentWidget(self._propertiesTab)
-        
+
     def get_result(self):
         return self._result
 
@@ -335,7 +335,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         if len(self._result.regions) < 1 or index < 0:
             return None
-        
+
         return self._result.regions[index]
 
     def append_region(self, region):
@@ -368,11 +368,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
     def make_pixmap(self, index, frame):
         region = self._result.regions[index]
-        
+
         raw = self._video_reader.get_data(frame)
         tmp = raw[region.top:region.bottom, region.left:region.right]
         img = arr.array('B', tmp.reshape(tmp.size))
-        
+
         im_format = qg.QImage.Format_RGB888
         image = qg.QImage(
             img,
@@ -381,8 +381,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             3*region.width,
             im_format)
 
-        return qg.QPixmap.fromImage(image) 
-        
+        return qg.QPixmap.fromImage(image)
+
     @qc.pyqtSlot()
     def save_results(self):
         """
@@ -486,10 +486,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self._video_reader.count_frames(),
             meta_data["size"][0],
             meta_data["size"][1])
-            
+
         self._result = VideoAnalysisResultsStore(video_data)
         self._result.append_history()
-        
+
         self._selectWidget.show_video()
 
     @qc.pyqtSlot()
