@@ -31,6 +31,82 @@ from cgt.results_print_demo import make_test_result
 
 
 
+def save_csv_project(info):
+    '''Coordinates the creation of a selection of csv reports.
+
+    Args:
+        results_dir (str): The directory name the user has selected to save the
+                           results in.
+        info (dict): A python dictionary containing a collection of useful parameters
+            such as the filenames and paths.
+
+    Returns:
+       Nothing is returned.
+    '''
+
+    print("save_csv_project")
+    
+    print("info: ", info)
+
+    #results = make_test_result()
+
+    #print("results: ", results)
+
+#     regions_array = []
+# 
+#     for index, region in enumerate(results.regions):
+#         print("Region: ", index)
+#         regions_array.append([index,
+#             region.top,
+#             region.left,
+#             region.bottom,
+#             region.right,
+#             region.start_frame,
+#             region.end_frame])
+# 
+#     crystals_array = []
+#     lines_array = []
+#     for index, crystal in enumerate(results.crystals):
+# 
+#         region, region_index = results.get_region(index)
+# 
+#         print("Crystal {} is in region {}".format(index, region_index))
+#         print("The number of times measured is {}".format(crystal.number_of_frames_held))
+# 
+# 
+#         note = ""
+#         if crystal.notes is not None:
+#             note = crystal.notes
+# 
+#         for frame in crystal.list_of_frame_numbers:
+#             print("\tframe number {}".format(frame))
+# 
+#             faces = crystal.faces_in_frame(frame)
+# 
+# 
+#             crystals_array.append([index,
+#                 region_index,
+#                 note,
+#                 crystal.number_of_frames_held,
+#                 frame])
+#  
+#             for face in faces:
+#                 lines_array.append([index,
+#                                     region_index,
+#                                     frame,
+#                                     face.label,
+#                                     face.start.x,
+#                                     face.start.y,
+#                                     face.end.x,
+#                                     face.end.y])
+
+
+    #save_csv_regions(results_dir, info, regions_array)
+    #save_csv_crystals(results_dir, info, crystals_array)
+    #save_csv_lines(results_dir, info, lines_array)
+    save_csv_info1(results_dir, info)
+
+
 
 def save_csv_reports(results_dir, info):
     '''Coordinates the creation of a selection of csv reports.
@@ -336,9 +412,6 @@ def save_csv_lines(results_dir, info, lines_array):
     fout.close()
 
 
-
-
-
 def save_csv_info(results_dir, info):
     '''Creates the csv report file for info.
 
@@ -380,5 +453,51 @@ def save_csv_info(results_dir, info):
         writer.writerow([key, value])
 
     fout.close()
+
+
+def save_csv_info1(info):
+    '''Creates the csv report file for info.
+
+    Args:
+        results_dir (str): The directory name the user has selected to save the
+                           results in.
+        info (dict): A python dictionary containing a collection of useful parameters
+            such as the filenames and paths.
+
+    Returns:
+       Nothing is returned.
+    '''
+
+    print("Hello from save_csv_info1")
+    
+    #print("results_dir: ", results_dir)
+    #print("info: ", info)
+
+#     path = os.path.abspath(os.path.realpath(results_dir))
+# 
+# 
+#     start = info["start"]
+#     prog = info["prog"]
+#     in_file_no_extension = info["in_file_no_extension"]
+# 
+#     results_dir_final = (path+r"/CGT_"+info['in_file_no_extension']+r"_"+start)
+#     info['results_dir'] = results_dir_final
+# 
+#     csv_outfile_name = (results_dir_final+r"/"+in_file_no_extension
+#                          +r"_"+prog+r"_info.csv")
+# 
+#     try:
+#         fout = open(csv_outfile_name, "w")
+#     except OSError:
+#         print("Could not open csv info report file, with error message: ", sys.exc_info()[0])
+#         sys.exit("Could not create csv info report.")
+# 
+#     writer = csv.writer(fout, delimiter=',', lineterminator = '\n')
+#     for key, value in info.items():
+#         #print("key: ", key)
+#         #print("value: ", value)
+#         writer.writerow([key, value])
+# 
+#     fout.close()
 
 
