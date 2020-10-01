@@ -104,7 +104,7 @@ def save_csv_project(info):
     #save_csv_regions(results_dir, info, regions_array)
     #save_csv_crystals(results_dir, info, crystals_array)
     #save_csv_lines(results_dir, info, lines_array)
-    save_csv_info1(results_dir, info)
+    save_csv_info1(info)
 
 
 
