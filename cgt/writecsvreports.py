@@ -45,65 +45,65 @@ def save_csv_project(info):
     '''
 
     print("save_csv_project")
-    
+
     print("info: ", info)
 
-    #results = make_test_result()
+    results = make_test_result()
 
-    #print("results: ", results)
+    print("results: ", results)
 
-#     regions_array = []
-# 
-#     for index, region in enumerate(results.regions):
-#         print("Region: ", index)
-#         regions_array.append([index,
-#             region.top,
-#             region.left,
-#             region.bottom,
-#             region.right,
-#             region.start_frame,
-#             region.end_frame])
-# 
-#     crystals_array = []
-#     lines_array = []
-#     for index, crystal in enumerate(results.crystals):
-# 
-#         region, region_index = results.get_region(index)
-# 
-#         print("Crystal {} is in region {}".format(index, region_index))
-#         print("The number of times measured is {}".format(crystal.number_of_frames_held))
-# 
-# 
-#         note = ""
-#         if crystal.notes is not None:
-#             note = crystal.notes
-# 
-#         for frame in crystal.list_of_frame_numbers:
-#             print("\tframe number {}".format(frame))
-# 
-#             faces = crystal.faces_in_frame(frame)
-# 
-# 
-#             crystals_array.append([index,
-#                 region_index,
-#                 note,
-#                 crystal.number_of_frames_held,
-#                 frame])
-#  
-#             for face in faces:
-#                 lines_array.append([index,
-#                                     region_index,
-#                                     frame,
-#                                     face.label,
-#                                     face.start.x,
-#                                     face.start.y,
-#                                     face.end.x,
-#                                     face.end.y])
+    regions_array = []
+
+    for index, region in enumerate(results.regions):
+        print("Region: ", index)
+        regions_array.append([index,
+            region.top,
+            region.left,
+            region.bottom,
+            region.right,
+            region.start_frame,
+            region.end_frame])
+
+    crystals_array = []
+    lines_array = []
+    for index, crystal in enumerate(results.crystals):
+ 
+        region, region_index = results.get_region(index)
+ 
+        print("Crystal {} is in region {}".format(index, region_index))
+        print("The number of times measured is {}".format(crystal.number_of_frames_held))
+ 
+ 
+        note = ""
+        if crystal.notes is not None:
+            note = crystal.notes
+ 
+        for frame in crystal.list_of_frame_numbers:
+            print("\tframe number {}".format(frame))
+ 
+            faces = crystal.faces_in_frame(frame)
+ 
+ 
+            crystals_array.append([index,
+                region_index,
+                note,
+                crystal.number_of_frames_held,
+                frame])
+  
+            for face in faces:
+                lines_array.append([index,
+                                    region_index,
+                                    frame,
+                                    face.label,
+                                    face.start.x,
+                                    face.start.y,
+                                    face.end.x,
+                                    face.end.y])
 
 
-    #save_csv_regions(results_dir, info, regions_array)
-    #save_csv_crystals(results_dir, info, crystals_array)
-    #save_csv_lines(results_dir, info, lines_array)
+    save_csv_regions1(info, regions_array)
+    save_csv_crystals1(info, crystals_array)
+    save_csv_lines1(info, lines_array)
     save_csv_info1(info)
 
 
@@ -271,6 +271,46 @@ def save_csv_regions(results_dir, info, regions_array):
     fout.close()
 
 
+def save_csv_regions1(info, regions_array):
+    '''Creates the csv report file for regions.
+
+    Args:
+        info (dict): A python dictionary containing a collection of useful parameters
+            such as the filenames and paths.
+        regions_array (array): Regions data in a format that is easy to write into a csv file.
+
+    Returns:
+       Nothing is returned.
+    '''
+
+    print("Hello from save_csv_regions1")
+
+    results_dir = info["proj_full_path"]
+    path = os.path.abspath(os.path.realpath(results_dir))
+
+
+    csv_outfile_name = (path+r"/"+info["prog"]
+                          +r"_"+info["proj_name"]+r"_project_regions.csv")
+
+    try:
+        fout = open(csv_outfile_name, "w")
+    except OSError:
+        print("Could not open csv regions report file, with error message: ", sys.exc_info()[0])
+        sys.exit("Could not create csv regions report.")
+
+    header = ("Region index",
+              "Top","Left",
+              "Bottom","Right",
+              "Start frame","End frame")
+
+    with fout:
+        writer = csv.writer(fout, delimiter=',', lineterminator = '\n')
+        writer.writerow(header)
+        for row in regions_array:
+            writer.writerow(row)
+
+    fout.close()
+
 
 
 
@@ -342,7 +382,66 @@ def save_csv_crystals(results_dir, info, crystals_array):
     fout.close()
 
 
+def save_csv_crystals1(info, crystals_array):
+    '''Creates the csv report file for crystals.
 
+    Args:
+        info (dict): A python dictionary containing a collection of useful parameters
+            such as the filenames and paths.
+
+    Returns:
+       Nothing is returned.
+    '''
+    print("Hello from save_csv_cystals1")
+
+
+    results_dir = info["proj_full_path"]
+
+    path = os.path.abspath(os.path.realpath(results_dir))
+
+
+    csv_outfile_name = (path+r"/"+info["prog"]
+                        +r"_"+info["proj_name"]+r"_project_crystals.csv")
+
+    try:
+        fout = open(csv_outfile_name, "w")
+    except OSError:
+        print("Could not open csv crystals report file, with error message: ", sys.exc_info()[0])
+        sys.exit("Could not create csv crystals report.")
+
+
+    header = ("Crystal index", "Region index", "Note",
+              "Number of frames","Frame number")
+
+#    header = ("Region number,",
+#              "Top left horizontal","Top left vertical",
+#              "Bottom right horizontal","Bottom right vertical",
+#              "Start frame","End frame")
+
+    #regions = [[1, 2, 3, 4, 5, 6], 
+    #           [700, 800, 9, 10, 65, 29], 
+    #           [10, 11, 12, 20 ,20 ,20]]
+#    results = make_test_result()
+    
+#    regions_array = []
+#    index = 0
+#    for region in results.regions:
+#        regions_array.append([index,
+#                              region.top,
+#                              region.left,
+#                              region.bottom,
+#                              region.right,
+#                              region.start_frame,
+#                              region.end_frame])
+#        index = index + 1
+
+    with fout:
+        writer = csv.writer(fout, delimiter=',', lineterminator = '\n')
+        writer.writerow(header)
+        for row in crystals_array:
+            writer.writerow(row)
+
+    fout.close()
 
 
 
@@ -390,6 +489,64 @@ def save_csv_lines(results_dir, info, lines_array):
 
 #    results = make_test_result()
 #    
+#    regions_array = []
+#    index = 0
+#    for region in results.regions:
+#        regions_array.append([index, index,
+#                              region.top,
+#                              region.left,
+#                              region.bottom,
+#                              region.right,
+#                              region.start_frame,
+#                              region.end_frame])
+#        index = index + 1
+
+
+    with fout:
+        writer = csv.writer(fout, delimiter=',', lineterminator = '\n')
+        writer.writerow(header)
+        for row in lines_array:
+            writer.writerow(row)
+
+    fout.close()
+
+
+def save_csv_lines1(info, lines_array):
+    '''Creates the csv report file for lines.
+
+    Args:
+        info (dict): A python dictionary containing a collection of useful parameters
+            such as the filenames and paths.
+        regions_array (array): Regions data in a format that is easy to write into a csv file.
+
+    Returns:
+       Nothing is returned.
+    '''
+
+    print("Hello from save_csv_lines1")
+
+    results_dir = info["proj_full_path"]
+
+    path = os.path.abspath(os.path.realpath(results_dir))
+
+
+    csv_outfile_name = (path+r"/"+info["prog"]
+                        +r"_"+info["proj_name"]+r"_project_lines.csv")
+
+    try:
+        fout = open(csv_outfile_name, "w")
+    except OSError:
+        print("Could not open csv lines report file, with error message: ", sys.exc_info()[0])
+        sys.exit("Could not create csv lines report.")
+
+
+    header = ("Crystal index", "Region index",
+              "Frame number", "Line number",
+              "x0","y0",
+              "x1","y1",)
+
+#    results = make_test_result()
+#
 #    regions_array = []
 #    index = 0
 #    for region in results.regions:
@@ -469,35 +626,26 @@ def save_csv_info1(info):
     '''
 
     print("Hello from save_csv_info1")
-    
-    #print("results_dir: ", results_dir)
-    #print("info: ", info)
 
-#     path = os.path.abspath(os.path.realpath(results_dir))
-# 
-# 
-#     start = info["start"]
-#     prog = info["prog"]
-#     in_file_no_extension = info["in_file_no_extension"]
-# 
-#     results_dir_final = (path+r"/CGT_"+info['in_file_no_extension']+r"_"+start)
-#     info['results_dir'] = results_dir_final
-# 
-#     csv_outfile_name = (results_dir_final+r"/"+in_file_no_extension
-#                          +r"_"+prog+r"_info.csv")
-# 
-#     try:
-#         fout = open(csv_outfile_name, "w")
-#     except OSError:
-#         print("Could not open csv info report file, with error message: ", sys.exc_info()[0])
-#         sys.exit("Could not create csv info report.")
-# 
-#     writer = csv.writer(fout, delimiter=',', lineterminator = '\n')
-#     for key, value in info.items():
-#         #print("key: ", key)
-#         #print("value: ", value)
-#         writer.writerow([key, value])
-# 
-#     fout.close()
+    results_dir = info["proj_full_path"]
 
+    path = os.path.abspath(os.path.realpath(results_dir))
+
+
+    csv_outfile_name = (path+r"/"+info["prog"]
+                          +r"_"+info["proj_name"]+r"_project_info.csv")
+
+    try:
+        fout = open(csv_outfile_name, "w")
+    except OSError:
+        print("Could not open csv info report file, with error message: ", sys.exc_info()[0])
+        sys.exit("Could not create csv info report.")
+
+    writer = csv.writer(fout, delimiter=',', lineterminator = '\n')
+    for key, value in info.items():
+        #print("key: ", key)
+        #print("value: ", value)
+        writer.writerow([key, value])
+
+    fout.close()
 

@@ -23,6 +23,7 @@ import sys
 import os
 import datetime
 sys.path.insert(0, '..\\CrystalGrowthTracker')
+from pathlib import Path
 
 from cgt import utils
 from cgt.utils import find_hostname_and_ip
@@ -242,12 +243,12 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         #TODO implement function
         print("CrystalGrowthTrackerMain.load_project()")
-        
+
         dir_name = qw.QFileDialog().getExistingDirectory(
             self,
             self.tr("Select Directory for the Report"),
             "")
-        
+
         if dir_name is not None:
             print("Loading Project.")
             prog = 'CGT'
@@ -263,24 +264,25 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             start = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
             info['start'] = start
             print(start)
-            info['host'], info['ip_address'], info['operating_system'] = utils.find_hostname_and_ip()
+            info['host'],
+            info['ip_address'],
+            info['operating_system'] = utils.find_hostname_and_ip()
             print(find_hostname_and_ip())
             #htmlreport.save_html_report(dir_name, info)
             #writecsvreports.save_csv_reports(dir_name, info)
 
+
+
     @qc.pyqtSlot()
     def save_project(self):
+        '''
+        Function to write all the csv files needed to define a project.
+        Args:
+            self    Needs to access the project dictionary.
+        Returns:
+            None
+        '''
         print("save project")
-
-        for key in self._project:
-            print("key: ", key)
-            print("value: ", self._project[key])
-
-        #dir_name = (self._project["proj_dir"]+r"/"+self._project["proj_name"])
-
-        #print("type(self._project): ", type(self._project))
-
-        #writecsvreports.save_csv_reports(dir_name, info)
         writecsvreports.save_csv_project(self._project)
 
 
@@ -325,6 +327,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self._project["proj_name"] = proj_name
         self._project["proj_dir"] = proj_dir
+        self._project["proj_full_path"] = path
 
         if copy_files:
             try:
@@ -368,6 +371,26 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self._project["source"] = source
         self._project["processed"] = processed
+ 
+        source_path, source_no_path = os.path.split(source)
+        self._project['source_path'] = source_path
+        self._project['source_no_path'] = source_no_path
+        self._project['source_no_extension'] = os.path.splitext(source_no_path)[0]
+
+        if processed is not None:
+            processed_path, processed_no_path = os.path.split(processed)
+            self._project['processed_path'] = processed_path
+            self._project['processed_no_path'] = processed_no_path
+            self._project['processed_no_extension'] = os.path.splitext(processed_no_path)[0]
+        else:
+            print("Processed in None.")
+            self._project['processed_path'] = None
+            self._project['processed_no_path'] = None
+            self._project['processed_no_extension'] = None
+
+        self._project['frame_rate'] = 8
+        self._project['resolution'] = 10
+        self._project['resolution_units'] = "nm"
 
         print(self._project)
         self.display_properties()
