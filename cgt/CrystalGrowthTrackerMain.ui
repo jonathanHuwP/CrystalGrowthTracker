@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>942</width>
-    <height>583</height>
+    <height>584</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -51,10 +51,12 @@
     <addaction name="_actionNewProject"/>
     <addaction name="_actionLoadVideo"/>
     <addaction name="_actionLoadProject"/>
+    <addaction name="_actionReloadResults"/>
     <addaction name="_actionProjectParameters"/>
     <addaction name="separator"/>
-    <addaction name="_actionSavetSubimage"/>
     <addaction name="_actionSaveProject"/>
+    <addaction name="_actionSaveCurrentSubimage"/>
+    <addaction name="_actionSaveResults"/>
     <addaction name="separator"/>
     <addaction name="_actionExit"/>
    </widget>
@@ -71,12 +73,7 @@
     <string>Exit</string>
    </property>
   </action>
-  <action name="_actionSaveSubimages">
-   <property name="text">
-    <string>Save Subimages</string>
-   </property>
-  </action>
-  <action name="_actionSavetSubimage">
+  <action name="_actionSaveCurrentSubimage">
    <property name="text">
     <string>Save Subimage</string>
    </property>
@@ -99,6 +96,21 @@
   <action name="_actionLoadVideo">
    <property name="text">
     <string>Load Video</string>
+   </property>
+  </action>
+  <action name="actionSave_Project">
+   <property name="text">
+    <string>Save Project</string>
+   </property>
+  </action>
+  <action name="_actionSaveResults">
+   <property name="text">
+    <string>Save Results</string>
+   </property>
+  </action>
+  <action name="_actionReloadResults">
+   <property name="text">
+    <string>Reload Results</string>
    </property>
   </action>
  </widget>
@@ -137,7 +149,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>_actionSavetSubimage</sender>
+   <sender>_actionSaveCurrentSubimage</sender>
    <signal>triggered()</signal>
    <receiver>CrystalGrowthTrackerMain</receiver>
    <slot>save_subimage()</slot>
@@ -221,6 +233,38 @@
    <signal>triggered()</signal>
    <receiver>CrystalGrowthTrackerMain</receiver>
    <slot>load_video()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>470</x>
+     <y>291</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_actionReloadResults</sender>
+   <signal>triggered()</signal>
+   <receiver>CrystalGrowthTrackerMain</receiver>
+   <slot>reload_results()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>470</x>
+     <y>291</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_actionSaveResults</sender>
+   <signal>triggered()</signal>
+   <receiver>CrystalGrowthTrackerMain</receiver>
+   <slot>save_results()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>

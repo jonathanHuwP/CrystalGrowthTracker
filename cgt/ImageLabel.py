@@ -26,8 +26,6 @@ import numpy as np
 
 from DrawRect import DrawRect
 
-import lazylogger
-
 # set up linting conditions
 # pylint: disable = too-many-public-methods
 # pylint: disable = c-extension-no-member
@@ -66,10 +64,6 @@ class ImageLabel(qw.QLabel):
 
         ## list for storing rectangles
         self._rectangles = []
-
-        ## the logger
-        self._logger = lazylogger.logging.getLogger(self._translation_name)
-        self._logger.setLevel(lazylogger.logging.WARNING)
 
     def __iter__(self):
         """

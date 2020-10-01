@@ -22,13 +22,14 @@ specific language governing permissions and limitations under the License.
 # pylint: disable = too-many-public-methods
 # pylint: disable = c-extension-no-member
 
+import sys
 import cgt.videoanalysisresultsstore as vas
 from cgt.crystal import Crystal
 from cgt.region import Region
-from imagepoint import ImagePoint
-from imagelinesegment import ImageLineSegment
+from cgt.imagepoint import ImagePoint
+from cgt.imagelinesegment import ImageLineSegment
 
-import sys
+
 sys.path.insert(0, '..\\CrystalGrowthTracker')
 
 def make_test_result():
@@ -121,7 +122,10 @@ def main():
 
     print("Number of crystals {}".format(len(results.crystals)))
 
-    for crystal, i in enumerate(results.crystals):
+    for i, crystal in enumerate(results.crystals):
+
+#    for crystal, i in enumerate(results.crystals):
+
         # find the region (and region's array index) containing crystal
         region, r_index = results.get_region(i)
 
@@ -138,6 +142,7 @@ def main():
             for face in faces:
                 print("\t\t{} ({} {}), ({}, {})".format(
                     face.label, face.start.x, face.start.y, face.end.x, face.end.y))
+
 
 if __name__ == "__main__":
     main()

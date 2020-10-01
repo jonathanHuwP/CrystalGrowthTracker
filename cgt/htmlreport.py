@@ -23,9 +23,10 @@ specific language governing permissions and limitations under the License.
 '''
 import os
 import sys
-import datetime
-from cgt import utils
-from cgt.utils import find_hostname_and_ip
+#import datetime
+#from cgt import utils
+#from cgt.utils import find_hostname_and_ip
+from cgt.results_print_demo import make_test_result
 
 
 def save_html_report(results_dir, info):
@@ -40,48 +41,47 @@ def save_html_report(results_dir, info):
     Returns:
        Nothing is returned.
     '''
-
+    print("hi from save_html_report")
     print(results_dir)
-
-
 
     #path = os.path.dirname(os.path.abspath(results_dir))
     path = os.path.abspath(os.path.realpath(results_dir))
 
-    print(path)
 
     start = info["start"]
     filename_in = info['in_file_no_path']
     prog = info["prog"]
-
+ 
     results_dir_final = (path+r"/CGT_"+info['in_file_no_extension']+r"_"+start)
     info['results_dir'] = results_dir_final
-    print(results_dir_final)
-
+ 
     try:
         os.makedirs(results_dir_final)
     except OSError:
         print("Unexpected error:", sys.exc_info()[0])
         sys.exit("Could not create directory for the results.")
-
+ 
     html_outfile_name = (results_dir_final+r"/"+filename_in
                          +r"_"+prog+r"_report.html")
-
+ 
     try:
         fout = open(html_outfile_name, "w")
     except  OSError:
         print("Could not open html report file, with error message: ", sys.exc_info()[0])
         sys.exit("Could not create html report.")
 
-    fout = write_html_report_start(fout, info)
+    results = make_test_result()
 
-    info['no_of_cystals'] = 7
-    info['no_of_closed_cystals'] = 5
-    fout = write_html_overview(fout, info)
+    info['no_of_cystals'] = len(results.crystals)
+    info['no_of_regions'] = len(results.regions)
+# 
+#     print("crystals_array: ", crystals_array)
+# 
+    fout = write_html_report_start(fout, info,)
 
-    crystal_total = 3
-    for crystal in range(crystal_total):
-        fout = write_html_crystal(fout, crystal, info)
+    fout = write_html_overview(fout, info, results)
+
+    fout = write_html_crystals(fout, info, results)
 
     write_html_report_end(fout)
 
@@ -103,9 +103,9 @@ def write_html_report_start(fout, info):
                             the report can be written by different functions.
     '''
     prog = info['prog']
-    results_dir = info['results_dir']
-    in_file_no_extension = info['in_file_no_extension']
-    in_file_no_path = info['in_file_no_path']
+    #results_dir = info['results_dir']
+    #in_file_no_extension = info['in_file_no_extension']
+    #in_file_no_path = info['in_file_no_path']
     #html_outfile_name = (results_dir+r"/"+in_file_no_extension+r"_"+prog+r"_report.html")
 
     #print("Hi from write_html_report_start")
@@ -163,7 +163,7 @@ def write_html_report_start(fout, info):
 
 
 
-def write_html_overview(fout, info):
+def write_html_overview(fout, info, results):
     '''Creates the overview section of the html report.
 
     Args:
@@ -180,11 +180,11 @@ def write_html_overview(fout, info):
     fout.write(header2_line)
 
     line = ("<p>The number of crystals analyzed:  *** </p>\n")
-    line = line.replace("***", str(info['no_of_cystals']))
+    line = line.replace("***", str(len(results.crystals)))
     fout.write(line)
 
     line = ("<p>The number of crystals that formed closed polygons:  *** </p>\n")
-    line = line.replace("***", str(info['no_of_closed_cystals']))
+    line = line.replace("***", str("TO BE ADDED!"))
     fout.write(line)
 
     fout.write("<p align=\"center\"> An image will go here the caption is below</p>")
@@ -209,7 +209,7 @@ def write_html_overview(fout, info):
 
 
 
-def write_html_crystal(fout, crystal_number, info):
+def write_html_crystals(fout, info, results):
     '''Creates the section for each crystal in the html report.
 
     Args:
@@ -222,21 +222,114 @@ def write_html_crystal(fout, crystal_number, info):
        fout (file handler): The file handler is passed back so that other parts of
                             the report can be written by different functions.
     '''
+    print("Hello from write_html_crystal")
 
-    header2_line = ("<h2 align=\"left\">Crystal: *** </h2>\n")
-    header2_line = header2_line.replace("***", str(crystal_number))
-    fout.write(header2_line)
-    
-    fout = write_html_region(fout)
+
+    for i, crystal in enumerate(results.crystals):
+        print("i: ", i)
+        print("crystal: ", crystal)
+        header2_line = ("<h2 align=\"left\">Crystal: *** </h2>\n")
+        header2_line = header2_line.replace("***", str(i))
+        fout.write(header2_line)
+
+        fout = write_html_region(fout, results, i)
+
+        line = ("<p><b>Number of recorded faces</b>:  *** </p>\n")
+        line = line.replace("***", str("Should be in table"))
+        fout.write(line)
+
+        line = ("<p><b>Closed Polygon formed</b>:  *** </p>\n")
+        line = line.replace("***", str("TO BE ADDED!"))
+        fout.write(line)
+
+        line = ("<p><b>Number of times measured</b>:  *** </p>\n")
+        line = line.replace("***", str(crystal.number_of_frames_held))
+        fout.write(line)
+
+        line = ("<p><b>Frame Rate</b>:  *** </p>\n")
+        line = line.replace("***", str(results.video.frame_rate))
+        fout.write(line)
+
+        write_frame_table(fout, results, i, crystal)
+
+        
 
     return fout
 
-def write_html_region(fout):
-    
-    header3_line = ("<h3 align=\"left\">Region</h3>\n")
+
+
+
+def write_html_region(fout, results, i):
+
+    region, r_index = results.get_region(i)
+    #print(results.get_region(i))
+    header3_line = ("<h3 align=\"left\">Region ***:</h3>\n")
+    header3_line = header3_line.replace("***", str(r_index))
     fout.write(header3_line)
-    
+
+    line = ("<p>Top:  *** </p>\n")
+    line = line.replace("***", str(region.top))
+    fout.write(line)
+
+    line = ("<p>Left:  *** </p>\n")
+    line = line.replace("***", str(region.left))
+    fout.write(line)
+
+    line = ("<p>Bottom:  *** </p>\n")
+    line = line.replace("***", str(region.bottom))
+    fout.write(line)
+
+    line = ("<p>Right:  *** </p>\n")
+    line = line.replace("***", str(region.right))
+    fout.write(line)
+
+    line = ("<p>Start Frame:  *** </p>\n")
+    line = line.replace("***", str(region.start_frame))
+    fout.write(line)
+
+    line = ("<p>End Frame:  *** </p>\n")
+    line = line.replace("***", str(region.end_frame))
+    fout.write(line)
+
     return fout
+
+
+def write_frame_table(fout, results, i, crystal):
+
+
+    fout.write("<table>\n")
+    fout.write("<caption style=\"caption-side:bottom\"><em>The frame numbers, "
+               "number of faces recorded and elapsed times of the frames in "
+               "which measurements were made</em></caption>\n")
+    fout.write("   <tr>\n")
+    fout.write("     <th>Frame Number</th>\n")
+    fout.write("     <th>Number of Recorded Faces</th>\n")
+    fout.write("     <th>Elapsed Time (s)</th>\n")
+    fout.write("     <th>Time Difference Previous (s)</th>\n")
+    fout.write("   </tr>\n")
+
+    last_frame_number = 0
+    for frame in crystal.list_of_frame_numbers:
+        print("last_frame_number: ",last_frame_number)
+        faces = crystal.faces_in_frame(frame)
+        print("faces:", len(faces))
+#         video = results.video
+#         print("video: ", video)
+        elapsed_time = frame / results.video.frame_rate
+        print("elapsed_time: ", elapsed_time)
+        time_difference = (frame - last_frame_number) / results.video.frame_rate
+        print("time_difference: ", time_difference)
+        last_frame_number = frame
+        fout.write('   <tr> <td> %d </td> <td> %d </td> <td> %.2f </td> <td> %.2f </td> </tr>\n'
+                   %(frame, len(faces), elapsed_time, time_difference))
+#                   '</td> </tr> \n' %(frame, faces, elapsed_time, time_difference))
+
+    fout.write("</table>\n")
+    fout.write("<p></p>\n")
+
+    return fout
+
+
 
 
 def write_html_report_end(fout):
