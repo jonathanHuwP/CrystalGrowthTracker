@@ -18,6 +18,10 @@ specific language governing permissions and limitations under the License.
 @copyright 2020
 @author: j.h.pickering@leeds.ac.uk
 """
+# set up linting conditions
+# pylint: disable = too-many-public-methods
+# pylint: disable = c-extension-no-member
+# pylint: disable = too-many-instance-attributes
 
 import sys
 import os
@@ -41,10 +45,6 @@ from pathlib import Path
 from ImageLabel import ImageLabel
 from cgt.projectstartdialog import ProjectStartDialog
 from cgt.projectpropertieswidget import ProjectPropertiesWidget
-
-# set up linting conditions
-# pylint: disable = too-many-public-methods
-# pylint: disable = c-extension-no-member
 
 from cgt.regionselectionwidget import RegionSelectionWidget
 from cgt.crystaldrawingwidget import CrystalDrawingWidget
@@ -145,7 +145,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         # set up the title
         self.set_title()
 
-        #self.read_video("C:\\Users\\jhp11\\Work\\CrystalGrowthTracker\\doc\\video\\file_example_AVI_640_800kB.avi")
+        #self.read_video("..\\doc\\video\\file_example_AVI_640_800kB.avi")
 
     def add_tab(self, tab_widget, target_widget, title):
         """
@@ -181,14 +181,22 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._tabWidget.setCurrentWidget(self._propertiesTab)
 
     def get_result(self):
+        """
+        getter for the current results object
+        
+            Return:
+                the current results object
+        """
         return self._result
 
     def get_regions(self):
+        """
+        getter for the list of regions
+        
+            Returns:
+                regions list
+        """
         return self._result.regions
-
-        self._image_source = source
-        title = self._translated_name + " - " + source
-        self.setWindowTitle(title)
 
     @qc.pyqtSlot()
     def new_project(self):
@@ -574,11 +582,11 @@ def ndarray_to_qpixmap(data):
     im_format = qg.QImage.Format_Grayscale8
 
     image = qg.QImage(
-            tmp,
-            data.shape[1],
-            data.shape[0],
-            data.shape[1],
-            im_format)
+        tmp,
+        data.shape[1],
+        data.shape[0],
+        data.shape[1],
+        im_format)
 
     return qg.QPixmap.fromImage(image)
 
