@@ -603,6 +603,16 @@ class DrawingLabel(qw.QLabel):
         self._lines_base.append(
             self._current_line.relabel(str(len(self._lines_base))))
 
+    def set_lines_base(self, lines):
+        """
+        set the set of base lines, existing are deleted
+
+            Return:
+                None
+        """
+        self._lines_base = lines
+        self.redisplay()
+
     def redisplay(self):
         """
         force the label to redisplay the current contents

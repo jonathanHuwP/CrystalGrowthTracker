@@ -233,6 +233,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         if r_index == self._current_region:
             return
 
+        # TODO put test and save in seperate function
         # has label got unsaved lines?
         if len(self._drawing.lines_base) > 0:
             message = "You have unsaved data do you wish to save?"
@@ -298,7 +299,22 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
-        print("CrystalDrawingWidget Region {}, Crystal {}, Frame {}".format(r_index, c_index, f_index))
+        print("CrystalDrawingWidget.select_frame Region {}, Crystal {}, Frame {}".format(r_index, c_index, f_index))
+        if self._current_region != r_index:
+            self.select_region(r_index)
+            print("changed region")
+        else:
+            # TODO add test and save function
+            self._drawing.clear_all()
+            print("clear all")
+
+        results = self._owner.get_result()
+        print("Results {}".format(results))
+        crystals = results.get_crystals(r_index)
+        print("Crystals {}".format(crystals))
+        crystal = crystals[c_index]
+        lines = crystal.faces_in_frame(f_index)
+        self._drawing.set_lines_base(lines)
 
     def select_line(self, r_index, c_index, f_index, l_index):
         """
