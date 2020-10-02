@@ -27,7 +27,74 @@ import csv
 import cgt.videoanalysisresultsstore as vas
 from cgt.crystal import Crystal
 from cgt.region import Region
+from cgt.imagepoint import ImagePoint
+from cgt.imagelinesegment import ImageLineSegment
 from cgt.results_print_demo import make_test_result
+
+
+def read_csv_project(dir, info):
+    '''Coordinates the reading of a selection of csv reports.
+
+    Args:
+        results_dir (str): The directory name the user has selected to save the
+                           results in.
+
+    Returns:
+        error_code (int):  An error code is returned a 0 (zero) values means all file were read while 
+                           a 1 (one) value means 1 or more files were not read.
+    '''
+    print("hello from read_csv_reports")
+    error_code = 0
+
+
+    files = []
+    dirpath = ""
+    for (dirpath, dirnames, filenames) in os.walk(dir):
+        files.extend(filenames)
+        break
+
+
+    error_crystal = 0
+    error_line = 0
+    error_region = 0
+    print(files)
+    crystal_data = []
+    line_data = []
+    region_data = []
+    for file in files:
+        if file[-4:] == '.csv':
+            print(file)
+            if "project_crystals" in file:
+                print("Crystals!")
+                crystal_data, error_crystal = readcsv2listofdicts(file, dirpath)
+            if "project_info" in file:
+                print("Info!")
+                info_data, error_info = readcsvinfo2dict(file, dirpath)
+            if "project_lines" in file:
+                print("Lines!")
+                line_data, error_line = readcsv2listofdicts(file, dirpath)
+            if "project_regions" in file:
+                print("Regions!")
+                region_data, error_region = readcsv2listofdicts(file, dirpath)
+
+    print("crystal_data: ", crystal_data)
+    print("line_data: ", line_data)
+    print("region_data: ", region_data)
+    print("info_data: ", info_data)
+
+    if error_crystal or error_line or error_region or error_info == 1:
+        error_code = 1
+
+    if error_code == 0:
+        source = vas.VideoSource(info_data["source"], 8, 700, 800, 600)
+        store = vas.VideoAnalysisResultsStore(source)
+        store.append_history()
+        storeregions(store, region_data)
+        storecrystals(store, crystal_data, line_data)
+
+
+    return info_data, error_code
+
 
 
 def read_csv_reports(results_dir):
@@ -142,6 +209,59 @@ def readcsv2listofdicts(file, dirpath):
     return (data, error_code)
 
 
+def readcsvinfo2dict(file, dirpath):
+    '''Reads csv reports created by the Crystal Growth Tracker as a list of dictionaries.
+       This allows means varaibles are read with the header as a pair so can be searched 
+       by its semantic meaning.
+
+    Args:
+        results_dir (str): The directory name the user has selected to save the
+                           results in.
+
+    Returns:
+        data (list of doctionaries): A list of dictionaries where each item in the list is a row
+                                     from the file read.
+        error_code (int):  An error code is returned a 0 (zero) values means all file were read
+                           while a 1 (one) value means 1 or more files were not read.
+    '''
+    error_code = 0
+    dir_in = Path(dirpath)
+    file_to_open = dir_in / file
+    print(file_to_open)
+
+    data = {}
+
+    if not os.path.exists(file_to_open):
+        print("ERROR; The input file does not exist.")
+        return
+    print("file exists")
+
+    try:
+        with open(file_to_open, 'r') as file_in:
+            reader = csv.reader(file_in)
+            #column_names = reader.fieldnames
+            #print(column_names)
+            for row in reader:
+                #print(row)
+                #print(row['Crystal index'])
+                if len(row) == 2:
+                    key = row[0]
+                    value = row[1]
+                    data[key] = value
+    except (IOError, OSError, EOFError) as exception:
+        print(exception)
+        error_code = 1
+    except:
+        print("Reading failed for file ", file)
+        error_code = 1
+    finally:
+        print("Read file: ", file)
+
+    print("data: ", data)
+
+    return (data, error_code)
+
+
 
 def storeregions(store, regions_data):
     ''' Writes the regions_data list/array which is read in from a csv file created by the
@@ -185,20 +305,26 @@ def storecrystals(store, crystal_data, line_data):
         Nothing
     '''
 
-    temp_crystal = Crystal()
+    #temp_crystal = Crystal()
     crystal_count = 0
     for crystal in crystal_data:
         #print("crystal: ", crystal)
         #if crystal_count == 0:
-            
+
 
         crystal_index = int(crystal["Crystal index"])
         print("crystal_index: ", crystal_index)
         region_index = int(crystal["Region index"])
-        note = int(crystal["Note"])
+        note = str(crystal["Note"])
         number_of_frames = int(crystal["Number of frames"])
         frame_number = int(crystal["Frame number"])
 
+        if note:
+            temp_crystal = Crystal(notes=note)
+        else:
+            temp_crystal = Crystal()
+
+        line_list = []
         for line in line_data:
             crystal_index_from_line = int(line["Crystal index"])
             print("crystal_index_from_line: ", crystal_index_from_line)
@@ -209,29 +335,11 @@ def storecrystals(store, crystal_data, line_data):
                 x1 = int(line["x1"])
                 y1 = int(line["y1"])
                 line_number = line["Line number"]
-                line1 = ImageLineSegment(ImagePoint(x0, y0),
+                line = ImageLineSegment(ImagePoint(x0, y0),
                                          ImagePoint(x1, y1),
                                          line_number)
-                tmp_crystal.add_faces([line1, line2], frame_number)
-                
+                line_list.append(line)
+        temp_crystal.add_faces(line_list, frame_number)
 
 
-def make_crystal():
-    """
-    factory function to produce a crystals
-    """
 
-    line1 = ImageLineSegment(ImagePoint(50, 150),
-                             ImagePoint(150, 50),
-                             "01")
-
-    line2 = ImageLineSegment(ImagePoint(50, 50),
-                             ImagePoint(150, 150),
-                             "02")
-
-
-    tmp_crystal = Crystal()
-
-    tmp_crystal.add_faces([line1, line2], 250)
-
-    return tmp_crystal

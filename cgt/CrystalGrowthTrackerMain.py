@@ -22,6 +22,7 @@ specific language governing permissions and limitations under the License.
 import sys
 import os
 import datetime
+from astropy.table import info
 sys.path.insert(0, '..\\CrystalGrowthTracker')
 from pathlib import Path
 
@@ -75,7 +76,7 @@ class CGTProject(dict):
                 None
         """
         super().__init__()
-        
+
         prog = 'CGT'
         description = 'Semi-automatically tracks the growth of crystals from X-ray videos.'
 
@@ -173,6 +174,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         ## the project data structure
         self._project = CGTProject()
 
+
+
     def add_tab(self, tab_widget, target_widget, title):
         """
         add a new tab
@@ -191,6 +194,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self._tabWidget.addTab(tab_widget, title)
 
+
+
     def display_properties(self):
         """
         display the properties tab with the current properties
@@ -207,6 +212,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._tabWidget.setCurrentWidget(self._propertiesTab)
 
 
+
     def set_title(self, source):
         """
         assignes the source and sets window title
@@ -221,6 +227,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         title = self._translated_name + " - " + source
         self.setWindowTitle(title)
 
+
+
     @qc.pyqtSlot()
     def new_project(self):
         """
@@ -233,6 +241,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         dia = ProjectStartDialog(self)
         dia.show()
 
+
+
     @qc.pyqtSlot()
     def load_project(self):
         """
@@ -241,35 +251,24 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 None
         """
-        #TODO implement function
         print("CrystalGrowthTrackerMain.load_project()")
 
         dir_name = qw.QFileDialog().getExistingDirectory(
             self,
-            self.tr("Select Directory for the Report"),
+            self.tr("Select the Project Directory."),
             "")
 
         if dir_name is not None:
             print("Loading Project.")
-            prog = 'CGT'
-            description = 'Semi-automatically tracks the growth of crystals from X-ray videos.'
+            data, error_code = readcsvreports.read_csv_project(dir_name, self._project)
+            if error_code == 0:
+                print("The project was loaded.")
+                self._project = data
+            else:
+                print("The project was not loaded.")
 
-            info = {'prog':prog,
-                    'description':description}
-            info['in_file_no_path'] = "filename_in.avi"
-            info['in_file_no_extension'] = os.path.splitext("filename_in")[0]
-            info['frame_rate'] = 20
-            info['resolution'] = 10
-            info['resolution_units'] = "nm"
-            start = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-            info['start'] = start
-            print(start)
-            info['host'],
-            info['ip_address'],
-            info['operating_system'] = utils.find_hostname_and_ip()
-            print(find_hostname_and_ip())
-            #htmlreport.save_html_report(dir_name, info)
-            #writecsvreports.save_csv_reports(dir_name, info)
+            self.display_properties()
+
 
 
 
@@ -371,7 +370,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self._project["source"] = source
         self._project["processed"] = processed
- 
+
         source_path, source_no_path = os.path.split(source)
         self._project['source_path'] = source_path
         self._project['source_no_path'] = source_no_path
@@ -394,6 +393,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         print(self._project)
         self.display_properties()
+
+
 
     @qc.pyqtSlot()
     def tab_changed(self):
