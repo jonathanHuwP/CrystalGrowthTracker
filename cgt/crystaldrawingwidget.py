@@ -258,7 +258,8 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         """
         print("CrystalDrawingWidget.save_crystal")
         # TODO popup request for note
-        crystal = Crystal(notes="very blured")
+        note = qw.QInputDialog.getText(self, "Crystal Note", "What")
+        crystal = Crystal(notes=note)
         lines = []
         for line in self._drawing.lines_base:
             print("\tadding: {}".format(line))
