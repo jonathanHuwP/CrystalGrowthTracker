@@ -730,6 +730,27 @@ class DrawingLabel(qw.QLabel):
                 qc.Qt.AlignHorizontal_Mask | qc.Qt.AlignVertical_Mask,
                 zoomed.label)
 
+    def clear_all(self):
+        """
+        clear all lines
+
+            Returns:
+                None
+        """
+        self._lines_base.clear()
+        self._lines_new.clear()
+        self.redisplay()
+
+    def get_pixmap(self):
+        """
+        get the current pixmap
+
+            Returns:
+                the current QPixmap
+        """
+
+        print("DrawingLabel.get_pixmap: not implemented")
+
     def save(self, file):
         """
         save the current image as a PNG file

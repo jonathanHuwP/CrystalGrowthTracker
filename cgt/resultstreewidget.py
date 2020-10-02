@@ -124,7 +124,7 @@ class ResultsTreeWidget(qw.QWidget, Ui_ResultsTreeWidget):
         c_index = item.data(1, qc.Qt.UserRole)
         print("region {}, crystal {}".format(r_index, c_index))
         if self.parent() is not None:
-            self.parent().crystal_selected(r_index, c_index)
+            self.parent().parent().select_crystal(r_index, c_index)
         
     def frame_selected(self, item):
         """
@@ -138,7 +138,7 @@ class ResultsTreeWidget(qw.QWidget, Ui_ResultsTreeWidget):
         f_index = item.data(2, qc.Qt.UserRole)
         print("region {}, crystal {}, frame {}".format(r_index, c_index, f_index))
         if self.parent() is not None:
-            self.parent().frame_selected(r_index, c_index, f_index)
+            self.parent().parent().select_frame(r_index, c_index, f_index)
 
     def line_selected(self, item):
         """
@@ -154,7 +154,7 @@ class ResultsTreeWidget(qw.QWidget, Ui_ResultsTreeWidget):
         print("region {}, crystal {}, frame, {}, line {}".format(
             r_index, c_index, f_index, l_index))
         if self.parent() is not None:
-            self.parent().line_selected(r_index, c_index, f_index, l_index)
+            self.parent().parent().select_line(r_index, c_index, f_index, l_index)
 
     def fill_tree(self):
         """
