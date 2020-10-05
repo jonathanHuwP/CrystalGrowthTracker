@@ -21,7 +21,6 @@ specific language governing permissions and limitations under the License.
 
 import sys
 import os
-import datetime
 from astropy.table import info
 sys.path.insert(0, '..\\CrystalGrowthTracker')
 from pathlib import Path
@@ -82,7 +81,7 @@ class CGTProject(dict):
 
         self["prog"] = prog
         self["description"] = description
-        start = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+        start = utils.timestamp()
         self["start"] = start
         self['host'], self['ip_address'], self['operating_system'] = utils.find_hostname_and_ip()
 
@@ -422,10 +421,14 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 None
         """
-        dir_name = qw.QFileDialog().getExistingDirectory(
-            self,
-            self.tr("Select Directory for the Report"),
-            "")
+        #dir_name = qw.QFileDialog().getExistingDirectory(
+        #    self,
+        #    self.tr("Select Directory for the Report"),
+        #    "")
+
+        dir_name = self._project["proj_full_path"]
+
+        print("dir_name: ", dir_name)
 
         if dir_name is not None:
 
@@ -440,7 +443,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             info['frame_rate'] = 20
             info['resolution'] = 10
             info['resolution_units'] = "nm"
-            start = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+            start = utils.timestamp()
             info['start'] = start
             print(start)
             info['host'], info['ip_address'], info['operating_system'] = utils.find_hostname_and_ip()

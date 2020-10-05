@@ -24,7 +24,6 @@ specific language governing permissions and limitations under the License.
 
 import sys
 import os
-from datetime import timedelta
 from timeit import default_timer as timer
 from imageio import get_reader
 from cgt import overviewplots

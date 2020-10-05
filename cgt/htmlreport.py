@@ -23,7 +23,6 @@ specific language governing permissions and limitations under the License.
 '''
 import os
 import sys
-#import datetime
 #from cgt import utils
 #from cgt.utils import find_hostname_and_ip
 from cgt.results_print_demo import make_test_result
