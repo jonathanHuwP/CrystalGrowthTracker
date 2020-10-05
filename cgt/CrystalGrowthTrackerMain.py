@@ -331,6 +331,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         if copy_files:
             try:
                 copy2(source, path)
+                self._project["source"] = path.joinpath(source.name)
                 print("Copied {} to {}".format(source, path))
             except (IOError, os.error) as why:
                 qw.QMessageBox.warning(
@@ -346,6 +347,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             if processed is not None:
                 try:
                     copy2(processed, path)
+                    self._project["processed"] = path.joinpath(processed.name)
                 except (IOError, os.error) as why:
                     qw.QMessageBox.warning(
                         self,
@@ -356,10 +358,14 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                         self,
                         "Problem copying File",
                         "Error message: {}".format(err.args[0]))
+        else:
+            self._project["source"] = path
+            self._project["processed"] = path  
 
         if notes is not None and not notes.isspace() and notes:
             notes_file_name = proj_name + "_notes.txt"
             notes_file = path.joinpath(notes_file_name)
+            self._project["notes"] = notes
 
             try:
                 with open(notes_file, 'w') as n_file:
