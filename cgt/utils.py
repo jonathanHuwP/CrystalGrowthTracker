@@ -21,12 +21,11 @@ under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 '''
-import os
-import sys
+
 import socket
 from sys import platform as _platform
 import datetime
-from _pylief import NONE
+
 
 
 def find_hostname_and_ip():
@@ -83,7 +82,8 @@ def timestamp():
         Args:
             NONE
         Returns:
-            timestamp (str):  In the format of year_month_day_hour_minute_second.  
+            timestamp (str):  In the format of year_month_day_hour_minute_second.
     '''
     return datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+
 

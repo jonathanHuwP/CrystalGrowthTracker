@@ -23,8 +23,6 @@ specific language governing permissions and limitations under the License.
 '''
 import os
 import sys
-from cgt import utils
-#from cgt.utils import find_hostname_and_ip
 from cgt.results_print_demo import make_test_result
 
 
@@ -50,19 +48,19 @@ def save_html_report(results_dir, info):
     start = info["start"]
     filename_in = info['in_file_no_path']
     prog = info["prog"]
- 
+
     results_dir_final = (path+r"/CGT_"+info['in_file_no_extension']+r"_"+start)
     info['results_dir'] = results_dir_final
- 
+
     try:
         os.makedirs(results_dir_final)
     except OSError:
         print("Unexpected error:", sys.exc_info()[0])
         sys.exit("Could not create directory for the results.")
- 
+
     html_outfile_name = (results_dir_final+r"/"+filename_in
                          +r"_"+prog+r"_report.html")
- 
+
     try:
         fout = open(html_outfile_name, "w")
     except  OSError:
@@ -108,9 +106,8 @@ def save_html_report1(info, time_stamp):
 
     prog = info["prog"]
 
-#  
     try:
-        os.makedirs(results_dir)
+        os.makedirs(path)
     except OSError:
         print("Unexpected error:", sys.exc_info()[0])
         sys.exit("Could not create directory for the results.")

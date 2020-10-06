@@ -23,10 +23,6 @@ import sys
 import os
 from astropy.table import info
 sys.path.insert(0, '..\\CrystalGrowthTracker')
-from pathlib import Path
-
-from cgt import utils
-from cgt.utils import find_hostname_and_ip
 
 import array as arr
 import pickle as pk
@@ -47,9 +43,6 @@ from cgt.projectstartdialog import ProjectStartDialog
 #from cgt.projectstartdialog import ProjectStartDialog
 from cgt.projectpropertieswidget import ProjectPropertiesWidget
 
-#from PolyLineExtract import PolyLineExtract, IAParameters
-#from ImageEnhancer import ImageEnhancer
-
 # set up linting conditions
 # pylint: disable = too-many-public-methods
 # pylint: disable = c-extension-no-member
@@ -60,7 +53,7 @@ from cgt.Ui_CrystalGrowthTrackerMain import Ui_CrystalGrowthTrackerMain
 from cgt import htmlreport
 from cgt import writecsvreports
 from cgt import readcsvreports
-#from cgt import reports
+from cgt import utils
 
 
 class CGTProject(dict):
@@ -90,7 +83,7 @@ class CGTProject(dict):
         self["proj_dir"] = None
         self["proj_name"] = None
         self["notes"] = None
-        
+
         self["latest_report"] = None
 
 
