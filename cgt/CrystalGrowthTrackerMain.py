@@ -25,10 +25,18 @@ specific language governing permissions and limitations under the License.
 
 import sys
 import os
-import datetime
+
+# TODO check if needed
+#import datetime
+
 from imageio import get_reader as imio_get_reader
 import array as arr
+
+# TODO check if needed
+#from astropy.table import info
+
 sys.path.insert(0, '..\\CrystalGrowthTracker')
+from pathlib import Path
 
 from cgt import utils
 from cgt.utils import find_hostname_and_ip
@@ -68,6 +76,21 @@ class CGTProject(dict):
                 None
         """
         super().__init__()
+
+        prog = 'CGT'
+        description = 'Semi-automatically tracks the growth of crystals from X-ray videos.'
+
+        self["prog"] = prog
+        self["description"] = description
+        start = utils.timestamp()
+        self["start"] = start
+        self['host'], self['ip_address'], self['operating_system'] = utils.find_hostname_and_ip()
+
+        #info['in_file_no_path'] = "filename_in.avi"
+        #info['in_file_no_extension'] = os.path.splitext("filename_in")[0]
+        #info['frame_rate'] = 20
+        #info['resolution'] = 10
+        #info['resolution_units'] = "nm"
 
         self["source"] = None
         self["processed"] = None
@@ -147,6 +170,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         #self.read_video("..\\doc\\video\\file_example_AVI_640_800kB.avi")
 
+
+
     def add_tab(self, tab_widget, target_widget, title):
         """
         add a new tab
@@ -165,6 +190,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self._tabWidget.addTab(tab_widget, title)
 
+
+
     def display_properties(self):
         """
         display the properties tab with the current properties
@@ -179,6 +206,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self._propertiesWidget.append_text(text)
 
         self._tabWidget.setCurrentWidget(self._propertiesTab)
+
 
     def get_result(self):
         """
@@ -218,8 +246,35 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 None
         """
-        #TODO implement function
         print("CrystalGrowthTrackerMain.load_project()")
+
+        dir_name = qw.QFileDialog().getExistingDirectory(
+            self,
+            self.tr("Select the Project Directory."),
+            "")
+
+        if dir_name is not None:
+            print("Loading Project.")
+            data, error_code = readcsvreports.read_csv_project(dir_name, self._project)
+            if error_code == 0:
+                print("The project was loaded.")
+                self._project = data
+            else:
+                print("The project was not loaded.")
+
+            self.display_properties()
+
+    @qc.pyqtSlot()
+    def save_project(self):
+        '''
+        Function to write all the csv files needed to define a project.
+        Args:
+            self    Needs to access the project dictionary.
+        Returns:
+            None
+        '''
+        print("save project")
+        writecsvreports.save_csv_project(self._project)
 
     @qc.pyqtSlot()
     def start_project(
@@ -261,11 +316,14 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self._project["proj_name"] = proj_name
         self._project["proj_dir"] = proj_dir
+        self._project["proj_full_path"] = path
 
         if copy_files:
             try:
                 copy2(source, path)
+                # if copied source is project path + file name
                 self._project["source"] = path.joinpath(source.name)
+
             except (IOError, os.error) as why:
                 qw.QMessageBox.warning(
                     self,
@@ -280,6 +338,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             if processed is not None:
                 try:
                     copy2(processed, path)
+                    # if used and copied processed is project path + file name
                     self._project["processed"] = path.joinpath(processed.name)
                 except (IOError, os.error) as why:
                     qw.QMessageBox.warning(
@@ -292,9 +351,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                         "Problem copying File",
                         "Error message: {}".format(err.args[0]))
         else:
-            self._project["source"] = path
-            self._project["processed"] = path
-
+            # set sourec and project to their user input values
+            self._project["source"] = source
+            if processed is not None:
+                self._project["processed"] = processed
+                
         if notes is not None and not notes.isspace() and notes:
             notes_file_name = proj_name + "_notes.txt"
             notes_file = path.joinpath(notes_file_name)
@@ -306,6 +367,29 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             except IOError as error:
                 message = "Can't open file for the notes"
                 qw.QMessageBox.critical(self, "Error making directory!", message)
+                
+        # TODO simplify using pathlib
+        source_path, source_no_path = os.path.split(source)
+        self._project['source_path'] = source_path
+        self._project['source_no_path'] = source_no_path
+        self._project['source_no_extension'] = os.path.splitext(source_no_path)[0]
+
+        if processed is not None:
+            # TODO simplify using pathlib
+            processed_path, processed_no_path = os.path.split(processed)
+            self._project['processed_path'] = processed_path
+            self._project['processed_no_path'] = processed_no_path
+            self._project['processed_no_extension'] = os.path.splitext(processed_no_path)[0]
+        else:
+            print("Processed in None.")
+            self._project['processed_path'] = None
+            self._project['processed_no_path'] = None
+            self._project['processed_no_extension'] = None
+
+        # TODO these must be user input
+        self._project['frame_rate'] = 8
+        self._project['resolution'] = 10
+        self._project['resolution_units'] = "nm"
 
         print(self._project)
         self.display_properties()
@@ -399,10 +483,14 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 None
         """
-        dir_name = qw.QFileDialog().getExistingDirectory(
-            self,
-            self.tr("Select Directory for the Report"),
-            "")
+        #dir_name = qw.QFileDialog().getExistingDirectory(
+        #    self,
+        #    self.tr("Select Directory for the Report"),
+        #    "")
+
+        dir_name = self._project["proj_full_path"]
+
+        print("dir_name: ", dir_name)
 
         if dir_name is not None:
 
@@ -417,7 +505,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             info['frame_rate'] = 20
             info['resolution'] = 10
             info['resolution_units'] = "nm"
-            start = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+            start = utils.timestamp()
             info['start'] = start
             print(start)
             info['host'], info['ip_address'], info['operating_system'] = utils.find_hostname_and_ip()

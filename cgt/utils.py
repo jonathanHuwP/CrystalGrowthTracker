@@ -25,6 +25,8 @@ import os
 import sys
 import socket
 from sys import platform as _platform
+import datetime
+#from _pylief import NONE
 
 
 def find_hostname_and_ip():
@@ -73,3 +75,15 @@ def find_hostname_and_ip():
         operating_system = 'Windows'
 
     return host, ip_address, operating_system
+
+def timestamp():
+    ''' Gets the date and time from the operating system and turns it into
+        a string used as a time stamp. This function allows consistency in the
+        format of the time stamp string.
+        Args:
+            NONE
+        Returns:
+            timestamp (str):  In the format of year_month_day_hour_minute_second.  
+    '''
+    return datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+
