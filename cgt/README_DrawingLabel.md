@@ -9,7 +9,7 @@ The objective is to provide a graphical user interface allowing the user to draw
 The software has to provide a means of:
 1. displaying an image
 2. allowing the user to draw straight lines on the image
-3. allowing the user to modify the lines by shifting the whole line or the endpoints.
+3. allowing the user to modify the lines by shifting the whole line or the end-points.
 4. allowing the user to produce an ordered list of sets of lines in which each new set is produced by altering all (or some) of the lines in the previous set.
 5. for any two sets in a list the relative motion between the pairs of lines must be calculated
 6. the original lines must be uniquely labelled to allow identification
@@ -17,7 +17,7 @@ The software has to provide a means of:
 8. if required multiple sets of lines must be displayed in the same image
 9. the user must be able to produce a picture (PNG, JPEG) of the image with the lines included
 
-The software is to form part of a package written in PyQt5 so subclassing a QWidgets, which allows for user interaction by Qt signalling was the preferred option.
+The software is to form part of a package written in PyQt5 so sub-classing a QWidgets, which allows for user interaction by Qt signalling was the preferred option.
 
 Finally, in calculating in pixel coordinates we have assumed that the pixels are square, so that ten pixels horizontally is the same as ten pixels vertically. In general this will not be true so we have to allow for a future upgrade in which the pixel calculations will use a two by two matrix to correct the stigmatism.
 
@@ -34,11 +34,11 @@ The lowest level of the software is the module `image_artifacts`, which provides
 
 An important consideration is the conversion from integer coordinates of raw image points to floating point number required in the calculations.
 
-In general, the classes are derived from Python `namedtuple` objects, available in the `collections` module. The named tuples hold the data and are subclassed to provide the required functions.
+In general, the classes are derived from Python `namedtuple` objects, available in the `collections` module. The named tuples hold the data and are sub-classed to provide the required functions.
 
-`ImagePoint` stores a pair of numbers as the (x, y) coordinates of a point on the image. It also provides overloaded mathematic operators (*+-/), vector length (origin to point), and a `distanceFrom` function that determines the distance from the point to another point.
+`ImagePoint` stores a pair of numbers as the (x, y) coordinates of a point on the image. It also provides overloaded mathematical operators (*+-/), vector length (origin to point), and a `distanceFrom` function that determines the distance from the point to another point.
 
-`ImageLineSegment` stores a line segment as a pair of `ImagePoints` (start, end) and a label. It provides functions for the it provides functions that allow the generation of a new modified line (shift, shift start, shift end). It also provides a function that determines if an image point is withing a given distance of the line segment. The function implements the following algorithm, which returns (True, the closest point on the line) if satisfied and (False None) otherwise.
+`ImageLineSegment` stores a line segment as a pair of `ImagePoints` (start, end) and a label. It provides functions for the it provides functions that allow the generation of a new modified line (shift, shift start, shift end). It also provides a function that determines if an image point is within a given distance of the line segment. The function implements the following algorithm, which returns (True, the closest point on the line) if satisfied and (False None) otherwise.
 
     test(point, epsilon)
         if self.start.distanceFrom(point) <= epsilon
@@ -58,13 +58,13 @@ In general, the classes are derived from Python `namedtuple` objects, available 
             return (False, None)
             
             
-`ArtifactStore` provides storage for sets of lines and a function to compare any two sets, the result is a list of type `ImageLineDifference` a simple data type that stores the distance the start and end points have moved, and an average function. `ArtifactStore` itself is implemented as a subclass of the Python dictionary class (dict is subclassable since 2.2, you don't need to use `collections.UserDict` anymore). This allows each set of lines to be given an identifier, which can be related to the frame number of the video, also `ArtifactStore` has a name which allows the user to name features on the image and separate results for each feature. 
+`ArtifactStore` provides storage for sets of lines and a function to compare any two sets, the result is a list of type `ImageLineDifference` a simple data type that stores the distance the start and end points have moved, and an average function. `ArtifactStore` itself is implemented as a subclass of the Python dictionary class (dict is sub-classable since 2.2, you don't need to use `collections.UserDict` anymore). This allows each set of lines to be given an identifier, which can be related to the frame number of the video, also `ArtifactStore` has a name which allows the user to name features on the image and separate results for each feature. 
 
 If the image pixels are not square and a correction is required, the matrix can be added t `ArtifactStore` and passed into the `distanceFrom` function of `ImagePoint` which is used to calculate the displacements. 
 
 ### `DrawingLabel`
 
-`DrawingLabel` is a subclass of QLabel its basic function is to store the orignal image as a constant pixmap, which is redisplayed with or without lines as the user requires. The mouse down, up and moved callback functions have been overridden, which allows for handling user input. Internally newly created lines are stored in a list called `_linedBase`, when they are moved the modified copies are stored in a list `_linesNew`. 
+`DrawingLabel` is a subclass of QLabel its basic function is to store the original image as a constant pixmap, which is redisplayed with or without lines as the user requires. The mouse down, up and moved callback functions have been overridden, which allows for handling user input. Internally newly created lines are stored in a list called `_linedBase`, when they are moved the modified copies are stored in a list `_linesNew`. 
 
 `DrawingLabel's` behaviour is governed by state variables, defined using Python `enum.IntEnum`. These relate to how the user's inputs are handled and how the lines are stored. In creating mode, the user is allowed to draw lines; in adjusting the user can select existing lines and move them (whole line or just end points); in copying mode existing lines can be adjusted and are then copied to new set.
 
