@@ -24,7 +24,8 @@ specific language governing permissions and limitations under the License.
 import os
 from pathlib import Path
 import csv
-import cgt.videoanalysisresultsstore as vas
+from cgt import videoanalysisresultsstore as vas
+#import cgt.videoanalysisresultsstore as vas
 from cgt.crystal import Crystal
 from cgt.region import Region
 from cgt.imagepoint import ImagePoint

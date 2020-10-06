@@ -21,8 +21,8 @@ specific language governing permissions and limitations under the License.
 
 import sys
 import os
-from astropy.table import info
-sys.path.insert(0, '..\\CrystalGrowthTracker')
+#from astropy.table import info
+
 
 import array as arr
 import pickle as pk
@@ -36,9 +36,9 @@ import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
 from shutil import copy2
-from pathlib import Path
+#from pathlib import Path
 
-from ImageLabel import ImageLabel
+from cgt import ImageLabel
 from cgt.projectstartdialog import ProjectStartDialog
 #from cgt.projectstartdialog import ProjectStartDialog
 from cgt.projectpropertieswidget import ProjectPropertiesWidget
@@ -50,10 +50,16 @@ from cgt.projectpropertieswidget import ProjectPropertiesWidget
 # import UI
 from cgt.Ui_CrystalGrowthTrackerMain import Ui_CrystalGrowthTrackerMain
 
-from cgt import htmlreport
-from cgt import writecsvreports
-from cgt import readcsvreports
+#from cgt import htmlreport
+from cgt.readwrite import htmlreport
+#from cgt import writecsvreports
+from cgt.readwrite import writecsvreports
+from cgt.readwrite import readcsvreports
+#from cgt import readcsvreports
 from cgt import utils
+
+
+sys.path.insert(0, '..\\CrystalGrowthTracker')
 
 
 class CGTProject(dict):
@@ -577,7 +583,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self.read_numpy_image(file_name)
         else:
             message = self.tr("Unknown file type: {}").format(file_type)
-            self._logger.error("bad file type: %s, should be %s", file_type, image_files)
+            #self._logger.error("bad file type: %s, should be %s", file_type, image_files)
             qw.QMessageBox.warning(self,
                                    self._translated_name,
                                    message)
