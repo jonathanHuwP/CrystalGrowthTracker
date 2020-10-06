@@ -85,17 +85,13 @@ class CGTProject(dict):
         self["start"] = start
         self['host'], self['ip_address'], self['operating_system'] = utils.find_hostname_and_ip()
 
-        #info['in_file_no_path'] = "filename_in.avi"
-        #info['in_file_no_extension'] = os.path.splitext("filename_in")[0]
-        #info['frame_rate'] = 20
-        #info['resolution'] = 10
-        #info['resolution_units'] = "nm"
-
         self["source"] = None
         self["processed"] = None
         self["proj_dir"] = None
         self["proj_name"] = None
         self["notes"] = None
+        
+        self["latest_report"] = None
 
 
 
@@ -359,7 +355,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                         "Error message: {}".format(err.args[0]))
         else:
             self._project["source"] = path
-            self._project["processed"] = path  
+            self._project["processed"] = path
 
         if notes is not None and not notes.isspace() and notes:
             notes_file_name = proj_name + "_notes.txt"
@@ -433,23 +429,24 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         if dir_name is not None:
 
             print("Printing html report.")
-            prog = 'CGT'
-            description = 'Semi-automatically tracks the growth of crystals from X-ray videos.'
+            #prog = 'CGT'
+            #description = 'Semi-automatically tracks the growth of crystals from X-ray videos.'
 
-            info = {'prog':prog,
-                    'description':description}
-            info['in_file_no_path'] = "filename_in.avi"
-            info['in_file_no_extension'] = os.path.splitext("filename_in")[0]
-            info['frame_rate'] = 20
-            info['resolution'] = 10
-            info['resolution_units'] = "nm"
-            start = utils.timestamp()
-            info['start'] = start
-            print(start)
-            info['host'], info['ip_address'], info['operating_system'] = utils.find_hostname_and_ip()
-            print(find_hostname_and_ip())
-            htmlreport.save_html_report(dir_name, info)
-            writecsvreports.save_csv_reports(dir_name, info)
+            #info = {'prog':prog,
+            #        'description':description}
+            #info['in_file_no_path'] = "filename_in.avi"
+            #info['in_file_no_extension'] = os.path.splitext("filename_in")[0]
+            #info['frame_rate'] = 20
+            #info['resolution'] = 10
+            #info['resolution_units'] = "nm"
+            time_stamp = utils.timestamp()
+            #info['start'] = start
+            print(time_stamp)
+            #info['host'], info['ip_address'], info['operating_system'] = utils.find_hostname_and_ip()
+            #print(find_hostname_and_ip())
+            self._project["latest_report"] = htmlreport.save_html_report1(self._project, time_stamp)
+            #htmlreport.save_html_report1(self._project, time_stamp)
+            #writecsvreports.save_csv_reports(dir_name, info)
 
     @qc.pyqtSlot()
     def reload_results(self):

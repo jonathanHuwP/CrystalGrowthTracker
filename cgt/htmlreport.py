@@ -23,7 +23,7 @@ specific language governing permissions and limitations under the License.
 '''
 import os
 import sys
-#from cgt import utils
+from cgt import utils
 #from cgt.utils import find_hostname_and_ip
 from cgt.results_print_demo import make_test_result
 
@@ -86,6 +86,119 @@ def save_html_report(results_dir, info):
 
 
 
+def save_html_report1(info, time_stamp):
+    '''Creates the html report file sop that it can manage the report writing
+    and pass the file handle to the functions that write the relevant parts.
+
+    Args:
+        results_dir (str): The directory name the user has selected to save the
+                           results in.
+        filename_in (str): The name of the video file that is being analysed.
+
+    Returns:
+       Nothing is returned.
+    '''
+    print("hi from save_html_report1")
+
+    results_dir = (info["proj_full_path"]+r"/"+time_stamp)
+
+    print(results_dir)
+
+    path = os.path.abspath(os.path.realpath(results_dir))
+
+    prog = info["prog"]
+
+#  
+    try:
+        os.makedirs(results_dir)
+    except OSError:
+        print("Unexpected error:", sys.exc_info()[0])
+        sys.exit("Could not create directory for the results.")
+
+    html_outfile_name = (results_dir+r"/"+prog+r"_report.html")
+
+    try:
+        fout = open(html_outfile_name, "w")
+    except  OSError:
+        print("Could not open html report file, with error message: ", sys.exc_info()[0])
+        sys.exit("Could not create html report.")
+
+
+    fout = write_html_report_start1(fout, info,)
+# 
+#     write_html_report_end(fout)
+
+    return results_dir
+
+
+
+
+def write_html_report_start1(fout, info):
+    '''Creates the start of an html report which is generic for the PERPL
+    scripts.
+
+    Args:
+        fout (file handler): The file handler allows this function to write out.
+        info (dict): A python dictionary containing a collection of useful parameters
+            such as the filenames and paths.
+
+    Returns:
+       fout (file handler): The file handler is passed back so that other parts of
+                            the report can be written by different functions.
+    '''
+    prog = info['prog']
+
+    print("Hi from write_html_report_start1")
+
+    fout.write("<!DOCTYPE html>\n")
+
+    fout.write("<html>\n")
+    fout.write("<head>\n")
+    fout.write("<meta charset=\"UTF-8\">\n")
+    fout.write("<style>\n")
+    fout.write("table, th, td {\n")
+    fout.write("    border: 1px solid black;\n")
+    fout.write("    border-collapse: collapse;\n")
+    fout.write("}\n")
+    fout.write("th, td {\n")
+    fout.write("    padding: 15px;\n")
+    fout.write("}\n")
+    fout.write("</style>\n")
+
+    title_line1 = ("<title>Report on *** Produced by the Crystal Growth Tracker (+++) "
+                   "Software</title>\n")
+    title = title_line1.replace("***", info['source_no_path'])
+    title = title.replace("+++", info['prog'])
+    fout.write(title)
+
+    fout.write("</head>\n")
+    fout.write("\n<body>\n")
+    title_line2 = ("<h1 align=\"center\">Report on *** Produced by the "
+                   "Crystal Growth Tracker (+++) Software</h1>\n")
+    title2 = title_line2.replace("***", info['source_no_path'])
+    title2 = title2.replace("+++", prog)
+    fout.write(title2)
+
+    program_info = '<p><i>%s</i>: %s</p>\n' % (info['prog'], info['description'])
+    fout.write(program_info)
+
+
+    report_info = (r"<p>This project was started at "+info['start']+r" on the "
+                    +info['host']+r" host system with the "+info['operating_system']
+                    +" operating system. The video file, "+info['source_no_path']
+                    +r" was analysed and has a frame rate of "+str(info['frame_rate'])
+                    +" and resolution of " +str(info['resolution'])
+                    +" "+str(info['resolution_units'])+" per pixel. A note of caution "
+                    +"is needed here because sometimes the frame rate and resolution "
+                    +"are changed in the video header when the video is being "
+                    +"pre-processed so in this report we always give results in pixels "
+                    +"and frames as well as SI units where possible. This report provides "
+                    +"images and information on experimental X-ray videos created at "
+                    +"Diamond Light Source.</p>\n")
+
+    fout.write(report_info)
+
+    return fout
 
 
 def write_html_report_start(fout, info):
@@ -158,8 +271,6 @@ def write_html_report_start(fout, info):
     fout.write(report_info)
 
     return fout
-
-
 
 
 def write_html_overview(fout, info, results):
