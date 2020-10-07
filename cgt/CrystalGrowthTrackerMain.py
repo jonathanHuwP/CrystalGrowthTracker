@@ -86,7 +86,8 @@ class CGTProject(dict):
 class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     """
     The implementation of the GUI, all the functions and
-    data-structures required to implement the intended behaviour
+    data-structures required to implement the desired functionality
+    acts as main data store for package
     """
 
     def __init__(self, parent=None):
