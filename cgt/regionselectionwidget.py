@@ -39,7 +39,8 @@ from region import Region
 # import UI
 from cgt.Ui_regionselectionwidget import Ui_RegionSelectionWidget
 
-from cgt.cgtutility import RegionEnd, VideoSource
+#from cgt.cgtutility import RegionEnd, VideoSource
+from cgt.utils import RegionEnd, VideoSource
 
 def memview_3b_to_qpixmap(pixels, width, height):
     """
@@ -140,7 +141,8 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         rather than property to allow use in pyqtSlots
 
             Returns:
-                the video time in seconds (float) and the frame number (int)
+                the video time in seconds (float)
+                the frame number (int)
         """
         return float(self._current_image) / float(self._owner.get_video_data().frame_rate), self._current_image
 

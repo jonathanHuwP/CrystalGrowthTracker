@@ -18,13 +18,14 @@ specific language governing permissions and limitations under the License.
 @copyright 2020
 @author: j.h.pickering@leeds.ac.uk
 """
-# set up linting conditions
-# pylint: disable = too-many-public-methods
-# pylint: disable = c-extension-no-member
-# pylint: disable = too-many-instance-attributes
 
 import sys
 import os
+import datetime
+sys.path.insert(0, '..\\CrystalGrowthTracker')
+
+from cgt import utils
+from cgt.utils import find_hostname_and_ip
 
 import array as arr
 import pickle as pk
@@ -47,7 +48,7 @@ from pathlib import Path
 
 from cgt import utils
 from cgt.utils import find_hostname_and_ip
-from cgt.cgtutility import RegionEnd
+#from cgt.cgtutility import RegionEnd
 from videoanalysisresultsstore import VideoAnalysisResultsStore, DateUser, VideoSource
 
 import PyQt5.QtWidgets as qw
@@ -291,14 +292,13 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         writecsvreports.save_csv_project(self._project)
 
     @qc.pyqtSlot()
-    def start_project(
-            self,
-            source,
-            processed,
-            proj_dir,
-            proj_name,
-            notes,
-            copy_files):
+    def start_project(self,
+                      source,
+                      processed,
+                      proj_dir,
+                      proj_name,
+                      notes,
+                      copy_files):
         """
         function for starting a new project
 
@@ -381,7 +381,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             except IOError as error:
                 message = "Can't open file for the notes"
                 qw.QMessageBox.critical(self, "Error making directory!", message)
-                
+
         # TODO simplify using pathlib
         source_path, source_no_path = os.path.split(source)
         self._project['source_path'] = source_path
