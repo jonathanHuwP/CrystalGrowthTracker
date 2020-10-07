@@ -26,8 +26,6 @@ import sys
 import socket
 from sys import platform as _platform
 import datetime
-#from _pylief import NONE
-
 
 def find_hostname_and_ip():
     """Finds the hostname and IP address to go in the log file.

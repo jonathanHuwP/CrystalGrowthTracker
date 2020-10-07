@@ -66,7 +66,24 @@ from cgt import readcsvreports
 
 class CGTProject(dict):
     """
-    a store for a the project meta data
+    a store for a the project data and results
+    
+    Contents:
+        prog: (string) name of program
+        description: (string) description of the program
+        start: (string) timestamp of start of project
+        host: (string) name of computer
+        ip_address: (string) ip address of computer
+        operating_system: (string) operating system of computer
+        source: (pathlib.Path)
+        processed: (pathlib.Path)
+        proj_dir: (path.lib.Path)
+        proj_name: (string)
+        notes: (string)
+        frame_rate: (int)
+        resolution: (float)
+        resolution_units: (string)
+        results: (VideoAnalysisResultsStore)
     """
     def __init__(self):
         """
@@ -112,66 +129,6 @@ class CGTProject(dict):
         
         # the results
         self["results"] = None
-        
-    def set_source(self, source):
-        """
-        set the source file
-        
-            Args:
-                source (pathlib.Path) the source file for the project
-                
-            Returns:
-        """
-        self["source"] = Path(source)
-
-    def get_source_no_path(self):
-        """
-        the plain file name of the source
-        
-            Return:
-                file name of source without path
-        """
-        return self["source"].name
-        
-    @property
-    def source_path(self):
-        """
-        the directory path of the source without the file name
-        
-            Reuturn:
-                the directory path to the source
-        """
-        return self["source"].parent
-        
-    def set_processed(self, processed):
-        """
-        set the processed file
-        
-            Args:
-                processed (pathlib.Path) the processed file for the project
-                
-            Returns:
-        """
-        self["processed"] = Path(processed)
-
-    def get_processed_no_path(self):
-        """
-        the plain file name of the processed
-        
-            Return:
-                file name of processed without path
-        """
-        return self["processed"].name
-        
-    @property
-    def processed_path(self):
-        """
-        the directory path of the processed without the file name
-        
-            Reuturn:
-                the directory path to the processed
-        """
-        return self["processed"].parent
         
     def set_results(self, results):
         """
@@ -367,14 +324,13 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         writecsvreports.save_csv_project(self._project)
 
     @qc.pyqtSlot()
-    def start_project(
-            self,
-            source,
-            processed,
-            proj_dir,
-            proj_name,
-            notes,
-            copy_files):
+    def start_project(self,
+                      source,
+                      processed,
+                      proj_dir,
+                      proj_name,
+                      notes,
+                      copy_files):
         """
         function for starting a new project
 
