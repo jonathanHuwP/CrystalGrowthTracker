@@ -30,6 +30,12 @@ Compile the pyqt5 Code.
 
 `pyuic5 .\CrystalGrowthTrackerMain.ui -o .\Ui_CrystalGrowthTrackerMain.py`
 
+Several seperate widgets are required by CrystalGrowthTrackerMain, each with their own .ui file. To automate the building of the Ui_ files the script build_ui has been provided. The script scans a directory, passed by command line option '-d', lists the .ui files, and then compiles them all. The command line option '-c' will delete all Ui_ files before compiling. The full command is 
+
+`python .\build_ui.py -d .\cgt -c`
+
+Help can be provided by running with option '-h'. 
+
 Finally run the Crystal Growth Tracker:
 
 `python .\CrystalGrowthTrackerMain.py`

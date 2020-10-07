@@ -56,7 +56,7 @@ class Region(NamedTuple):
             Returns:
                 the width in pixels
         """
-        return self.bottom - self.top
+        return self.right - self.left
 
     @property
     def height(self):
@@ -66,7 +66,7 @@ class Region(NamedTuple):
             Returns:
                 the height in pixels
         """
-        return self.left - self.right
+        return self.bottom - self.top
 
     @property
     def time_interval(self):
@@ -105,3 +105,13 @@ class Region(NamedTuple):
         v_flag = self.bottom >= vertical >= self.top
 
         return h_flag and v_flag
+
+    def __str__(self):
+        """
+        a to string methods
+
+            Returns:
+                String describing object (user view)
+        """
+        return "(top:{}, bottom:{}, left:{}, right:{}, start frame:{}, end frame:{})".format(
+            self.top, self.bottom, self.left, self.right, self.start_frame, self.end_frame)

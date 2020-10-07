@@ -603,6 +603,16 @@ class DrawingLabel(qw.QLabel):
         self._lines_base.append(
             self._current_line.relabel(str(len(self._lines_base))))
 
+    def set_lines_base(self, lines):
+        """
+        set the set of base lines, existing are deleted
+
+            Return:
+                None
+        """
+        self._lines_base = lines
+        self.redisplay()
+
     def redisplay(self):
         """
         force the label to redisplay the current contents
@@ -626,7 +636,7 @@ class DrawingLabel(qw.QLabel):
         """
         qw.QLabel.paintEvent(self, event)
 
-        if self._redraw:
+        if self._background_pixmap is not None and self._redraw:
             self.draw_lines()
             self._redraw = False
 
@@ -638,7 +648,7 @@ class DrawingLabel(qw.QLabel):
             Returns:
                 None
         """
-        pen = qg.QPen(qg.QColor(qc.Qt.black), 3, qc.Qt.SolidLine)
+        pen = qg.QPen(qg.QColor(qc.Qt.yellow), 3, qc.Qt.SolidLine)
         red_pen = qg.QPen(qg.QColor(qc.Qt.red), 3, qc.Qt.DashLine)
         new_pen = qg.QPen(qg.QColor(qc.Qt.red), 3, qc.Qt.SolidLine)
         painter = qg.QPainter()
@@ -729,6 +739,27 @@ class DrawingLabel(qw.QLabel):
                 bounding_box,
                 qc.Qt.AlignHorizontal_Mask | qc.Qt.AlignVertical_Mask,
                 zoomed.label)
+
+    def clear_all(self):
+        """
+        clear all lines
+
+            Returns:
+                None
+        """
+        self._lines_base.clear()
+        self._lines_new.clear()
+        self.redisplay()
+
+    def get_pixmap(self):
+        """
+        get the current pixmap
+
+            Returns:
+                the current QPixmap
+        """
+
+        print("DrawingLabel.get_pixmap: not implemented")
 
     def save(self, file):
         """

@@ -56,7 +56,7 @@ class RegionSelectionLabel(qw.QLabel):
     subclass of label allowing selection of region by drawing rectangle and
     displaying a list of already selected rectangles.
     """
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, regions_store=None):
         """
         Set up the label
 
@@ -70,6 +70,9 @@ class RegionSelectionLabel(qw.QLabel):
 
         ## (QObject) the parent object
         self._parent = parent
+        
+        ## storage for the regions
+        self._regions_store = regions_store
 
         ## the widget's state
         self._state = SelectionState.NO_ACTION
@@ -284,7 +287,7 @@ class RegionSelectionLabel(qw.QLabel):
         elif self._state == SelectionState.DISPLAY_ALL_NO_TIME:
             self.draw_showing_all_regions(painter, time=False)
         else:
-            print("other state")
+            print(self._state)
 
     def draw_adding_mode(self, painter):
         """
@@ -318,7 +321,7 @@ class RegionSelectionLabel(qw.QLabel):
         if region is None:
             return
 
-        if region.time_in_region(self._parent.get_current_original_video_frame()):
+        if region.time_in_region(self._parent.current_image):
             self.draw_region(painter, region)
 
     def draw_region(self, painter, region):
@@ -344,11 +347,11 @@ class RegionSelectionLabel(qw.QLabel):
             Returns:
                 None
         """
-        regions = self._parent.get_regions_iter()
+        regions = self._regions_store.get_regions_iter()
 
         for region in regions:
             if time:
-                if region.time_in_region(self._parent.get_current_original_video_frame()):
+                if region.time_in_region(self._parent.current_image):
                     self.draw_region(painter, region)
             else:
                 self.draw_region(painter, region)

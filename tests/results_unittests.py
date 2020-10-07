@@ -21,18 +21,18 @@ specific language governing permissions and limitations under the License.
 # set up linting conditions
 # pylint: disable = too-many-public-methods
 # pylint: disable = c-extension-no-member
-
+import unittest
+import datetime as dt
 import sys
-sys.path.insert(0, '..\\CrystalGrowthTracker')
 
 import cgt.videoanalysisresultsstore as vas
 from cgt.crystal import Crystal
 from cgt.region import Region
 import cgt.imagelinesegment as ia
 
-import unittest
-import os
-import datetime as dt
+sys.path.insert(0, '..\\CrystalGrowthTracker')
+
+# pylint: disable = too-many-instance-attributes
 
 class TestResults1(unittest.TestCase):
     """
@@ -45,9 +45,11 @@ class TestResults1(unittest.TestCase):
         """
         self._video_name = "ladkj.mp4"
         self._frame_rate = 8
-        self._length = 500
+        self._frame_count = 500
         self._width = 800
         self._height = 600
+        self._user = "who@dodgy_mail.com"
+        self._date = dt.datetime.now().strftime("%d %b, %Y, %H:%M:%S")
         self._test_result = self.make_test_result()
 
     def tearDown(self):
@@ -56,9 +58,11 @@ class TestResults1(unittest.TestCase):
         """
         self._video_name = None
         self._frame_rate = None
-        self._length = None
+        self._frame_count = None
         self._width = None
         self._height = None
+        self._user = None
+        self._date = None
         self._test_result = None
 
     def make_test_result(self):
@@ -66,11 +70,14 @@ class TestResults1(unittest.TestCase):
         factory function to procduce a Results object
         """
         source = vas.VideoSource(self._video_name,
-                             self._frame_rate,
-                             self._length,
-                             self._width,
-                             self._height)
-        return vas.VideoAnalysisResultsStore(source)
+                                 self._frame_rate,
+                                 self._frame_count,
+                                 self._width,
+                                 self._height)
+
+        user_record = vas.DateUser(self._date, self._user)
+
+        return vas.VideoAnalysisResultsStore(source, history=[user_record])
 
     def test_history(self):
         """
@@ -78,9 +85,9 @@ class TestResults1(unittest.TestCase):
         """
         self.assertEqual(len(self._test_result.history), 1,
                          "history length is wrong")
-        self.assertEqual(self._test_result.history[0].date, str(dt.date.today()),
-                         "date is wrong (careful of midnight)")
-        self.assertEqual(self._test_result.history[0].user_name, os.getlogin(),
+        self.assertEqual(self._test_result.history[0].date, self._date,
+                         "date is wrong")
+        self.assertEqual(self._test_result.history[0].user_name, self._user,
                          "the user login is wrong")
 
     def test_video(self):
@@ -89,7 +96,7 @@ class TestResults1(unittest.TestCase):
         """
         self.assertEqual(self._test_result.video.name, self._video_name)
         self.assertEqual(self._test_result.video.frame_rate, self._frame_rate)
-        self.assertEqual(self._test_result.video.length, self._length)
+        self.assertEqual(self._test_result.video.frame_count, self._frame_count)
         self.assertEqual(self._test_result.video.width, self._width)
         self.assertEqual(self._test_result.video.height, self._height)
 
@@ -102,10 +109,10 @@ class TestResults2(unittest.TestCase):
         """
         build a full test class
         """
-        self._top_left_horizontal = 450
-        self._top_left_vertical = 200
-        self._bottom_right_horizontal = 675
-        self._bottom_right_vertical = 500
+        self._top = 450
+        self._left = 200
+        self._bottom = 675
+        self._right = 500
         self._start_frame = 250
         self._stop_frame = 500
         self._test_result = self.make_test_result()
@@ -114,10 +121,10 @@ class TestResults2(unittest.TestCase):
         """
         delete the test class
         """
-        self._top_left_horizontal = None
-        self._top_left_vertical = None
-        self._bottom_right_horizontal = None
-        self._bottom_right_vertical = None
+        self._top = None
+        self._left = None
+        self._bottom = None
+        self._right = None
         self._start_frame = None
         self._stop_frame = None
         self._test_result = None
@@ -127,7 +134,10 @@ class TestResults2(unittest.TestCase):
         factory function to procduce a Results object
         """
         source = vas.VideoSource("ladkj.mp4", 8, 500, 800, 600)
-        regions = [self.make_region1(), self.make_region2()]
+
+        region1, _ = self.make_region1()
+        region2, _ = self.make_region2()
+        regions = [region1, region2]
 
         return vas.VideoAnalysisResultsStore(source, regions)
 
@@ -145,20 +155,19 @@ class TestResults2(unittest.TestCase):
                                     "02")
 
 
-        crystal = Crystal(name="01")
+        crystal = Crystal(notes="01")
 
         crystal.add_faces([line1, line2], self._start_frame)
 
         crystals = [crystal]
-        region = Region(self._top_left_horizontal,
-                        self._top_left_vertical,
-                        self._bottom_right_horizontal,
-                        self._bottom_right_vertical,
+        region = Region(self._top,
+                        self._left,
+                        self._bottom,
+                        self._right,
                         self._start_frame,
-                        self._stop_frame,
-                        [crystal])
+                        self._stop_frame)
 
-        return region
+        return region, crystals
 
     def make_region2(self):
         """
@@ -181,20 +190,19 @@ class TestResults2(unittest.TestCase):
                                      ia.ImagePoint(175, 300),
                                      "02")
 
-        crystal = Crystal(name="02")
+        crystal = Crystal(notes="02")
 
         crystal.add_faces([line1, line2], self._start_frame)
         crystal.add_faces([line1a, line2a], self._stop_frame)
 
-        region = Region(self._top_left_horizontal,
-                        self._top_left_vertical,
-                        self._bottom_right_horizontal,
-                        self._bottom_right_vertical,
+        region = Region(self._top,
+                        self._left,
+                        self._bottom,
+                        self._right,
                         self._start_frame,
-                        self._stop_frame,
-                        [crystal])
+                        self._stop_frame)
 
-        return region
+        return region, [crystal]
 
     def test_something(self):
         """

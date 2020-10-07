@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>942</width>
-    <height>583</height>
+    <height>584</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -25,288 +25,13 @@
    <string>CrystalGrowthTracker</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_8">
+   <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QTabWidget" name="_tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>-1</number>
       </property>
-      <widget class="QWidget" name="tab">
-       <attribute name="title">
-        <string>Face Tracking</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_5">
-        <item>
-         <widget class="QSplitter" name="_splitter">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <widget class="QGroupBox" name="groupBox">
-           <property name="title">
-            <string>Source</string>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout">
-            <item>
-             <layout class="QVBoxLayout" name="verticalLayout_3">
-              <item>
-               <widget class="QScrollArea" name="_sourceScrollArea">
-                <property name="widgetResizable">
-                 <bool>true</bool>
-                </property>
-                <widget class="QWidget" name="scrollAreaWidgetContents">
-                 <property name="geometry">
-                  <rect>
-                   <x>0</x>
-                   <y>0</y>
-                   <width>334</width>
-                   <height>259</height>
-                  </rect>
-                 </property>
-                </widget>
-               </widget>
-              </item>
-              <item>
-               <layout class="QHBoxLayout" name="_viewSubButton">
-                <item>
-                 <spacer name="horizontalSpacer">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>60</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item>
-                 <widget class="QLabel" name="label">
-                  <property name="text">
-                   <string>Zoom</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QDoubleSpinBox" name="_sourceZoomSpinBox">
-                  <property name="decimals">
-                   <number>1</number>
-                  </property>
-                  <property name="minimum">
-                   <double>0.100000000000000</double>
-                  </property>
-                  <property name="maximum">
-                   <double>5.000000000000000</double>
-                  </property>
-                  <property name="singleStep">
-                   <double>0.500000000000000</double>
-                  </property>
-                  <property name="value">
-                   <double>1.000000000000000</double>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <widget class="QSlider" name="_frameSlider">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QGroupBox" name="groupBox_2">
-           <property name="title">
-            <string>Subimages</string>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout_2">
-            <item>
-             <widget class="QScrollArea" name="_subScrollArea">
-              <property name="widgetResizable">
-               <bool>true</bool>
-              </property>
-              <widget class="QWidget" name="scrollAreaWidgetContents_2">
-               <property name="geometry">
-                <rect>
-                 <x>0</x>
-                 <y>0</y>
-                 <width>481</width>
-                 <height>290</height>
-                </rect>
-               </property>
-              </widget>
-             </widget>
-            </item>
-            <item>
-             <layout class="QVBoxLayout" name="verticalLayout_4">
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout">
-                <item>
-                 <widget class="QComboBox" name="_subimageComboBox"/>
-                </item>
-                <item>
-                 <spacer name="horizontalSpacer_4">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>30</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item>
-                 <widget class="QLabel" name="label_2">
-                  <property name="text">
-                   <string>Zoom</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QDoubleSpinBox" name="_subimageZoomSpinBox">
-                  <property name="decimals">
-                   <number>1</number>
-                  </property>
-                  <property name="minimum">
-                   <double>0.100000000000000</double>
-                  </property>
-                  <property name="maximum">
-                   <double>4.000000000000000</double>
-                  </property>
-                  <property name="singleStep">
-                   <double>0.500000000000000</double>
-                  </property>
-                  <property name="value">
-                   <double>1.000000000000000</double>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </widget>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="tab_2">
-       <attribute name="title">
-        <string>Video Statistics</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_7">
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayout_6">
-          <item>
-           <widget class="QScrollArea" name="_tab2ScrollArea">
-            <property name="widgetResizable">
-             <bool>true</bool>
-            </property>
-            <widget class="QWidget" name="scrollAreaWidgetContents_3">
-             <property name="geometry">
-              <rect>
-               <x>0</x>
-               <y>0</y>
-               <width>880</width>
-               <height>342</height>
-              </rect>
-             </property>
-            </widget>
-           </widget>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="_viewSubButton_2">
-            <item>
-             <spacer name="horizontalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>60</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_3">
-              <property name="text">
-               <string>Zoom</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QDoubleSpinBox" name="_tab2ZoomSpinBox">
-              <property name="decimals">
-               <number>1</number>
-              </property>
-              <property name="minimum">
-               <double>0.100000000000000</double>
-              </property>
-              <property name="maximum">
-               <double>5.000000000000000</double>
-              </property>
-              <property name="singleStep">
-               <double>0.500000000000000</double>
-              </property>
-              <property name="value">
-               <double>1.000000000000000</double>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </widget>
      </widget>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0,0,0">
-      <item>
-       <widget class="QPushButton" name="_saveResultsButton">
-        <property name="text">
-         <string>Save Results</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="_loadResultsButton">
-        <property name="text">
-         <string>Load Results</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer_3">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QPushButton" name="_exitButton">
-        <property name="text">
-         <string>Quit</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
     </item>
    </layout>
   </widget>
@@ -323,13 +48,13 @@
     <property name="title">
      <string>Open </string>
     </property>
-    <addaction name="_actionOpen"/>
     <addaction name="_actionNewProject"/>
+    <addaction name="_actionLoadVideo"/>
     <addaction name="_actionLoadProject"/>
-    <addaction name="_actionSaveProject"/>
-    <addaction name="_actionReload_Results"/>
+    <addaction name="_actionReloadResults"/>
+    <addaction name="_actionProjectParameters"/>
     <addaction name="separator"/>
-    <addaction name="_actionSaveSubimages"/>
+    <addaction name="_actionSaveProject"/>
     <addaction name="_actionSaveCurrentSubimage"/>
     <addaction name="_actionSaveResults"/>
     <addaction name="separator"/>
@@ -338,9 +63,9 @@
    <addaction name="menuOpen"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="_actionOpen">
+  <action name="_actionNewProject">
    <property name="text">
-    <string>Open Video</string>
+    <string>New Project</string>
    </property>
   </action>
   <action name="_actionExit">
@@ -348,34 +73,9 @@
     <string>Exit</string>
    </property>
   </action>
-  <action name="_actionSaveSubimages">
-   <property name="text">
-    <string>Save Subimages</string>
-   </property>
-  </action>
   <action name="_actionSaveCurrentSubimage">
    <property name="text">
     <string>Save Subimage</string>
-   </property>
-  </action>
-  <action name="_actionSaveResults">
-   <property name="text">
-    <string>Save Results</string>
-   </property>
-  </action>
-  <action name="_actionReload_Results">
-   <property name="text">
-    <string>Reload Results</string>
-   </property>
-  </action>
-  <action name="_actionNewProject">
-   <property name="text">
-    <string>New Project</string>
-   </property>
-  </action>
-  <action name="_actionLoadProject">
-   <property name="text">
-    <string>Load Project</string>
    </property>
   </action>
   <action name="_actionSaveProject">
@@ -383,25 +83,39 @@
     <string>Save Project</string>
    </property>
   </action>
+  <action name="_actionLoadProject">
+   <property name="text">
+    <string>Load Project</string>
+   </property>
+  </action>
+  <action name="_actionProjectParameters">
+   <property name="text">
+    <string>Project Parameters</string>
+   </property>
+  </action>
+  <action name="_actionLoadVideo">
+   <property name="text">
+    <string>Load Video</string>
+   </property>
+  </action>
+  <action name="actionSave_Project">
+   <property name="text">
+    <string>Save Project</string>
+   </property>
+  </action>
+  <action name="_actionSaveResults">
+   <property name="text">
+    <string>Save Results</string>
+   </property>
+  </action>
+  <action name="_actionReloadResults">
+   <property name="text">
+    <string>Reload Results</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections>
-  <connection>
-   <sender>_exitButton</sender>
-   <signal>pressed()</signal>
-   <receiver>CrystalGrowthTrackerMain</receiver>
-   <slot>close()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>953</x>
-     <y>278</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>511</x>
-     <y>169</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>_actionExit</sender>
    <signal>triggered()</signal>
@@ -419,78 +133,14 @@
    </hints>
   </connection>
   <connection>
-   <sender>_actionOpen</sender>
+   <sender>_actionNewProject</sender>
    <signal>triggered()</signal>
    <receiver>CrystalGrowthTrackerMain</receiver>
-   <slot>load_image()</slot>
+   <slot>new_project()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
      <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>511</x>
-     <y>169</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>_actionSaveSubimages</sender>
-   <signal>triggered()</signal>
-   <receiver>CrystalGrowthTrackerMain</receiver>
-   <slot>save_subimages()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>511</x>
-     <y>169</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>_sourceZoomSpinBox</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>CrystalGrowthTrackerMain</receiver>
-   <slot>source_zoom()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>304</x>
-     <y>219</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>511</x>
-     <y>169</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>_subimageZoomSpinBox</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>CrystalGrowthTrackerMain</receiver>
-   <slot>subimage_zoom()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>966</x>
-     <y>216</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>511</x>
-     <y>169</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>_subimageComboBox</sender>
-   <signal>currentIndexChanged(int)</signal>
-   <receiver>CrystalGrowthTrackerMain</receiver>
-   <slot>display_subimage()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>424</x>
-     <y>216</y>
     </hint>
     <hint type="destinationlabel">
      <x>511</x>
@@ -502,7 +152,7 @@
    <sender>_actionSaveCurrentSubimage</sender>
    <signal>triggered()</signal>
    <receiver>CrystalGrowthTrackerMain</receiver>
-   <slot>save_current_subimage()</slot>
+   <slot>save_subimage()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
@@ -515,78 +165,14 @@
    </hints>
   </connection>
   <connection>
-   <sender>_tabWidget</sender>
-   <signal>currentChanged(int)</signal>
-   <receiver>CrystalGrowthTrackerMain</receiver>
-   <slot>tab_changed()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>470</x>
-     <y>268</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>470</x>
-     <y>291</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>_actionSaveResults</sender>
+   <sender>_actionSaveProject</sender>
    <signal>triggered()</signal>
    <receiver>CrystalGrowthTrackerMain</receiver>
-   <slot>save_results()</slot>
+   <slot>save_project()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
      <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>470</x>
-     <y>291</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>_saveResultsButton</sender>
-   <signal>clicked()</signal>
-   <receiver>CrystalGrowthTrackerMain</receiver>
-   <slot>save_results()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>75</x>
-     <y>521</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>470</x>
-     <y>291</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>_actionReload_Results</sender>
-   <signal>triggered()</signal>
-   <receiver>CrystalGrowthTrackerMain</receiver>
-   <slot>reload_results()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>470</x>
-     <y>291</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>_loadResultsButton</sender>
-   <signal>clicked()</signal>
-   <receiver>CrystalGrowthTrackerMain</receiver>
-   <slot>reload_results()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>208</x>
-     <y>521</y>
     </hint>
     <hint type="destinationlabel">
      <x>470</x>
@@ -611,10 +197,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>_actionNewProject</sender>
+   <sender>_actionProjectParameters</sender>
    <signal>triggered()</signal>
    <receiver>CrystalGrowthTrackerMain</receiver>
-   <slot>new_project()</slot>
+   <slot>project_parameters()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
@@ -627,10 +213,58 @@
    </hints>
   </connection>
   <connection>
-   <sender>_actionSaveProject</sender>
+   <sender>_tabWidget</sender>
+   <signal>currentChanged(int)</signal>
+   <receiver>CrystalGrowthTrackerMain</receiver>
+   <slot>tab_changed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>470</x>
+     <y>291</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>470</x>
+     <y>291</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_actionLoadVideo</sender>
    <signal>triggered()</signal>
    <receiver>CrystalGrowthTrackerMain</receiver>
-   <slot>save_project()</slot>
+   <slot>load_video()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>470</x>
+     <y>291</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_actionReloadResults</sender>
+   <signal>triggered()</signal>
+   <receiver>CrystalGrowthTrackerMain</receiver>
+   <slot>reload_results()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>470</x>
+     <y>291</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_actionSaveResults</sender>
+   <signal>triggered()</signal>
+   <receiver>CrystalGrowthTrackerMain</receiver>
+   <slot>save_results()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
