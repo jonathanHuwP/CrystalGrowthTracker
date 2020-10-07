@@ -130,6 +130,27 @@ class CGTProject(dict):
         # the results
         self["results"] = None
         
+    def auto_start(self) 
+        """
+        fill in the data for a new project
+        """
+        prog = 'CGT'
+        description = 'Semi-automatically tracks the growth of crystals from X-ray videos.'
+
+        self["prog"] = prog
+        self["description"] = description
+        self["start"] = utils.timestamp()
+        self['host'], self['ip_address'], self['operating_system'] = utils.find_hostname_and_ip()
+        
+    def auto_fill(self):
+        """
+        fill in all basic project data in one governing
+        
+            Returns:
+                None
+        """
+        pass
+        
     def set_results(self, results):
         """
         set a results object
