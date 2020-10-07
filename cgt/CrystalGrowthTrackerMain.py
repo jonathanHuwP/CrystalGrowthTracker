@@ -86,17 +86,114 @@ class CGTProject(dict):
         self["start"] = start
         self['host'], self['ip_address'], self['operating_system'] = utils.find_hostname_and_ip()
 
-        #info['in_file_no_path'] = "filename_in.avi"
-        #info['in_file_no_extension'] = os.path.splitext("filename_in")[0]
-        #info['frame_rate'] = 20
-        #info['resolution'] = 10
-        #info['resolution_units'] = "nm"
-
+        # the source video for the project
         self["source"] = None
+        
+        # an enhanced video derived from the source, may be null
         self["processed"] = None
+        
+        # the path to the directory holding the project
         self["proj_dir"] = None
+        
+        # the name of the projcet
         self["proj_name"] = None
+        
+        # the users notes
         self["notes"] = None
+        
+        # the video frame rate
+        self["frame_rate"] = None
+        
+        # the edge length of square pixel
+        self["resolution"] = None
+        
+        # the unit of pixel resolution
+        self["resolution_units"] = None
+        
+        # the results
+        self["results"] = None
+        
+    def set_source(self, source):
+        """
+        set the source file
+        
+            Args:
+                source (pathlib.Path) the source file for the project
+                
+            Returns:
+        """
+        self["source"] = Path(source)
+
+    def get_source_no_path(self):
+        """
+        the plain file name of the source
+        
+            Return:
+                file name of source without path
+        """
+        return self["source"].name
+        
+    @property
+    def source_path(self):
+        """
+        the directory path of the source without the file name
+        
+            Reuturn:
+                the directory path to the source
+        """
+        return self["source"].parent
+        
+    def set_processed(self, processed):
+        """
+        set the processed file
+        
+            Args:
+                processed (pathlib.Path) the processed file for the project
+                
+            Returns:
+        """
+        self["processed"] = Path(processed)
+
+    def get_processed_no_path(self):
+        """
+        the plain file name of the processed
+        
+            Return:
+                file name of processed without path
+        """
+        return self["processed"].name
+        
+    @property
+    def processed_path(self):
+        """
+        the directory path of the processed without the file name
+        
+            Reuturn:
+                the directory path to the processed
+        """
+        return self["processed"].parent
+        
+    def set_results(self, results):
+        """
+        set a results object
+        
+            Args:
+                results (VideoAnalysisResultsStore) the object to be set
+            
+            Returns:
+                None
+        """
+        self["results"] = results
+        
+    def get_results(self):
+        """
+        getter for the results object
+        
+            Returns:
+                the results object or None
+        """
+        return self["results"]
+        
 
 class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     """
@@ -132,9 +229,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         ## storage for the open video source
         self._video_reader = None
 
-        ## storage for the result
-        self._result = None
-
         ## the project data structure
         self._project = CGTProject()
 
@@ -167,10 +261,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         # set up the title
         self.set_title()
-
-        #self.read_video("..\\doc\\video\\file_example_AVI_640_800kB.avi")
-
-
 
     def add_tab(self, tab_widget, target_widget, title):
         """
@@ -215,7 +305,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Return:
                 the current results object
         """
-        return self._result
+        return self._project.get_results()
 
     def get_regions(self):
         """
@@ -224,7 +314,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 regions list
         """
-        return self._result.regions
+        return self._project.get_results().regions
 
     @qc.pyqtSlot()
     def new_project(self):
@@ -413,7 +503,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 iterator of regions
         """
-        return iter(self._result.regions)
+        return iter(self._project.get_results().regions)
 
     def get_selected_region(self, index):
         """
@@ -425,17 +515,17 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 region or None if no regions entered
         """
-        if len(self._result.regions) < 1 or index < 0:
+        if len(self._project.get_results().regions) < 1 or index < 0:
             return None
 
-        return self._result.regions[index]
+        return self._project.get_results().regions[index]
 
     def append_region(self, region):
-        self._result.add_region(region)
+        self._project.get_results().add_region(region)
         self._drawingWidget.new_region()
 
     def get_video_data(self):
-        return self._result.video
+        return self._project.get_results().video
 
     def get_video_reader(self):
         return self._video_reader
@@ -459,7 +549,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self.setWindowTitle(title)
 
     def make_pixmap(self, index, frame):
-        region = self._result.regions[index]
+        region = self._project.get_results().regions[index]
 
         raw = self._video_reader.get_data(frame)
         tmp = raw[region.top:region.bottom, region.left:region.right]
@@ -582,10 +672,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self._video_reader.count_frames(),
             meta_data["size"][0],
             meta_data["size"][1])
-
-        self._result = VideoAnalysisResultsStore(video_data)
-        self._result.append_history()
-
+            
+        result = VideoAnalysisResultsStore(video_data)
+        result.append_history()
+        self._project.set_results(result)
+       
         self._selectWidget.show_video()
 
     @qc.pyqtSlot()
