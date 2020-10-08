@@ -700,22 +700,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             # dispose of the event in the approved way
             event.ignore()
 
-# TODO move to qt utility
-def ndarray_to_qpixmap(data):
-
-    tmp = arr.array('B', data.reshape(data.size))
-
-    im_format = qg.QImage.Format_Grayscale8
-
-    image = qg.QImage(
-        tmp,
-        data.shape[1],
-        data.shape[0],
-        data.shape[1],
-        im_format)
-
-    return qg.QPixmap.fromImage(image)
-
 ######################################
 
 def get_translators(lang):

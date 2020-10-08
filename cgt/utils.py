@@ -81,7 +81,6 @@ def timestamp():
         Args:
             NONE
         Returns:
-            timestamp (str):  In the format of year_month_day_hour_minute_second.  
+            timestamp (str):  In the format of year_month_day_hour_minute_second.
     '''
     return datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-
