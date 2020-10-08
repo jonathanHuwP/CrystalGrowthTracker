@@ -657,7 +657,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             meta_data["size"][1])
             
         result = VideoAnalysisResultsStore(video_data)
-        result.append_history()
         self._project.set_results(result)
        
         self._selectWidget.show_video()

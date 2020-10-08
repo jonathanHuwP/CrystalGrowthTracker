@@ -75,20 +75,7 @@ class TestResults1(unittest.TestCase):
                                  self._width,
                                  self._height)
 
-        user_record = vas.DateUser(self._date, self._user)
-
-        return vas.VideoAnalysisResultsStore(source, history=[user_record])
-
-    def test_history(self):
-        """
-        test that the history is correct
-        """
-        self.assertEqual(len(self._test_result.history), 1,
-                         "history length is wrong")
-        self.assertEqual(self._test_result.history[0].date, self._date,
-                         "date is wrong")
-        self.assertEqual(self._test_result.history[0].user_name, self._user,
-                         "the user login is wrong")
+        return vas.VideoAnalysisResultsStore(source)
 
     def test_video(self):
         """
