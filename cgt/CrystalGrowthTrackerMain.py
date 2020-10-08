@@ -119,7 +119,7 @@ class CGTProject(dict):
 
         # the name of the project
         self["proj_name"] = None
-        
+
         # the full path to the project
         self["proj_full_path"] = None
 
@@ -513,7 +513,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     def set_title(self):
         """
         sets window title
-        
+
             Returns:
                 None
         """
@@ -764,20 +764,16 @@ def run_growth_tracker():
         Returns:
             None
     """
+    app = qw.QApplication(sys.argv)
+    translators = select_translator()
+    for translator in translators:
+        qc.QCoreApplication.installTranslator(translator)
 
-    def inner_run():
-        app = qw.QApplication(sys.argv)
-        translators = select_translator()
-        for translator in translators:
-            qc.QCoreApplication.installTranslator(translator)
+    window = CrystalGrowthTrackerMain()
 
-        window = CrystalGrowthTrackerMain()
+    window.show()
 
-        window.show()
-
-        app.exec_()
-
-    inner_run()
+    app.exec_()
 
 if __name__ == "__main__":
     run_growth_tracker()
