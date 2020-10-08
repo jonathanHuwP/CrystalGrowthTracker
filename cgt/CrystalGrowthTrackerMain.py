@@ -272,28 +272,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self._tabWidget.setCurrentWidget(self._propertiesTab)
 
-
-    def get_result(self):
-        """
-        getter for the current results object
-
-            Return:
-                the current results object
-        """
-        if self._project:
-            return self._project["results"]
-
-        return None
-
-    def get_regions(self):
-        """
-        getter for the list of regions
-
-            Returns:
-                regions list
-        """
-        return self._project["results"].regions
-
     @qc.pyqtSlot()
     def new_project(self):
         """
@@ -466,34 +444,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         print("tab changed")
 
-    def get_regions_iter(self):
-        """
-        get an iterator for the list of regions
-
-            Returns:
-                iterator of regions
-        """
-        return iter(self._project["results"].regions)
-
-    def get_selected_region(self, index):
-        """
-        getter for the region selected via the combo box,
-
-            Args:
-                index (int) the list index of the region
-
-            Returns:
-                region or None if no regions entered
-        """
-        if len(self._project["results"].regions) < 1 or index < 0:
-            return None
-
-        return self._project["results"].regions[index]
-
-    def append_region(self, region):
-        self._project["results"].add_region(region)
-        self._drawingWidget.new_region()
-
     def get_video_reader(self):
         return self._video_reader
 
@@ -508,6 +458,31 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             return self._project["frame_rate"], self._project["resolution"]
 
         return None, None
+        
+    def get_result(self):
+        """
+        getter for the current results object
+
+            Return:
+                the current results object
+        """
+        if self._project:
+            return self._project["results"]
+
+        return None
+        
+    def append_region(self, region):
+        """
+        add a region to the results and notify the crystal drawing widget
+        
+            Args:
+                region (Region) the region
+
+            Returns:
+                None
+        """
+        self._project["results"].add_region(region)
+        self._drawingWidget.new_region()
 
     def set_title(self):
         """
