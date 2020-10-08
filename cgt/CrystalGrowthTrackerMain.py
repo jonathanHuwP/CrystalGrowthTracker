@@ -68,7 +68,7 @@ from cgt import readcsvreports
 class CGTProject(dict):
     """
     a store for a the project data and results
-    
+
     Contents:
         prog: (string) name of program
         description: (string) description of the program
@@ -96,80 +96,80 @@ class CGTProject(dict):
         super().__init__()
         # program name
         self["prog"] = None
-        
+
         # program description
         self["description"] = None
-        
-        # 
+
+        #
         self["start_datetime"] = None
-        
+
         # name of computer on which we are running
         self['host'] = None
-        
+
         # ip address of computer on which the project started
         self['ip_address'] = None
-        
+
         # operating system on we which the project started
         self['operating_system'] = None
 
         # the source video for the project
         self["source"] = None
-        
+
         # an enhanced video derived from the source, may be null
         self["processed"] = None
-        
+
         # the path to the directory holding the project
         self["proj_dir"] = None
-        
+
         # the name of the projcet
         self["proj_name"] = None
-        
+
         # the users notes
         self["notes"] = None
-        
+
         # the video frame rate
         self["frame_rate"] = None
-        
+
         # the edge length of square pixel
         self["resolution"] = None
-        
+
         # the unit of pixel resolution
         self["resolution_units"] = None
-        
+
         # the results
         self["results"] = None
-        
+
         # the path to the source
         self["source_path"] = None
-    
+
         # the plain file name of the source
         self['source_no_path'] = None
-        
+
         # the file extension of the source
         self['source_no_extension'] = None
-        
+
         # the path to the processed video file
         self['processed_path'] = None
-        
+
         # the plain file name of the processed video file
         self['processed_no_path'] = None
-        
+
         # the file extension of the processed video file
         self['processed_no_extension'] = None
-        
+
         # the user who stated the project
         self['start_user'] = None
-            
+
         # the video frame rate
         self['frame_rate'] = 8
-        
+
         # the real world distance represented by the edge length of a pixel
         self['resolution'] = 10
-        
-        # the units of the resolution 
+
+        # the units of the resolution
         self['resolution_units'] = "microns"
-        
-    def init_new_project(self): 
+
+    def init_new_project(self):
         """
         fill in the data for a new project
         """
@@ -288,19 +288,19 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     def get_result(self):
         """
         getter for the current results object
-        
+
             Return:
                 the current results object
         """
         if self._project:
             return self._project["results"]
-            
+
         return None
 
     def get_regions(self):
         """
         getter for the list of regions
-        
+
             Returns:
                 regions list
         """
@@ -356,7 +356,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         print("save project")
         writecsvreports.save_csv_project(self._project)
 
-    @qc.pyqtSlot()
     def start_project(self,
                       source,
                       processed,
@@ -385,10 +384,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             message = "Project {} already exists you are not allowd to overwrite.".format(proj_name)
             qw.QMessageBox.critical(self, "Project Exists!", message)
             return
-        
+
         self._project = CGTProject()
         self._project.init_new_project()
-        
+
         try:
             path.mkdir()
         except (FileNotFoundError, OSError) as err:
@@ -437,7 +436,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self._project["source"] = source
             if processed is not None:
                 self._project["processed"] = processed
-                
+
         if notes is not None and not notes.isspace() and notes:
             notes_file_name = proj_name + "_notes.txt"
             notes_file = path.joinpath(notes_file_name)
@@ -449,7 +448,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             except IOError as error:
                 message = "Can't open file for the notes"
                 qw.QMessageBox.critical(self, "Error making directory!", message)
-                
+
         self._project['source_path'] = source.parent
         self._project['source_no_path'] = source.name
         self._project['source_no_extension'] = source.stem
@@ -604,7 +603,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         if dir_name is not None:
             readcsvreports.read_csv_reports(dir_name)
             pass
-            
+
             readcsvreports.read_csv_reports(dir_name)
 
     @qc.pyqtSlot()
@@ -672,26 +671,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 None
         """
         print("load project")
-
-    @qc.pyqtSlot()
-    def save_subimage(self):
-        """
-        callback for saving the current image
-
-            Returns:
-                None
-        """
-        print("Save image")
-
-    @qc.pyqtSlot()
-    def project_parameters(self):
-        """
-        display the paramertes of the current project
-
-            Returns:
-                None
-        """
-        print("Project Parameters")
 
     @qc.pyqtSlot()
     def closeEvent(self, event):
