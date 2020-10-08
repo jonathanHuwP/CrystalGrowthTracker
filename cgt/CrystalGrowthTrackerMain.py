@@ -26,17 +26,10 @@ specific language governing permissions and limitations under the License.
 import sys
 import os
 
-# TODO check if needed
-#import datetime
-
 from imageio import get_reader as imio_get_reader
 import array as arr
 
-# TODO check if needed
-#from astropy.table import info
-
 sys.path.insert(0, '..\\CrystalGrowthTracker')
-from pathlib import Path
 import getpass
 
 from cgt import utils
@@ -72,18 +65,22 @@ class CGTProject(dict):
     Contents:
         prog: (string) name of program
         description: (string) description of the program
-        start: (string) timestamp of start of project
+        start_datetime: (string) timestamp of start of project
         host: (string) name of computer
         ip_address: (string) ip address of computer
         operating_system: (string) operating system of computer
-        enhanced_video: (pathlib.Path)
-        raw_video: (pathlib.Path)
-        proj_name: (string)
-        notes: (string)
-        frame_rate: (int)
-        resolution: (float)
-        resolution_units: (string)
-        results: (VideoAnalysisResultsStore)
+        enhanced_video_path: (pathlib.Path) the full path of the image enhanced video
+        enhanced_video_no_path: the name of the enhanced video file
+        enhanced_video_no_extension: name of the enhanced video file without extension
+        raw_video: (pathlib.Path) the full path and name of the original video
+        raw_video_no_path: (string) the name of the original video file
+        raw_video_no_extension: (string) the name of the original video file without extension
+        proj_name: (string) the name of the projcect
+        notes: (string) notes input by user
+        frame_rate: (int) the frame rate
+        resolution: (float) the real world size of a pixel
+        resolution_units: (string) the units of size of a pixel
+        results: (VideoAnalysisResultsStore) the results
     """
     def __init__(self):
         """
@@ -129,12 +126,6 @@ class CGTProject(dict):
         # the video frame rate
         self["frame_rate"] = None
 
-        # the edge length of square pixel
-        self["resolution"] = None
-
-        # the unit of pixel resolution
-        self["resolution_units"] = None
-
         # the results
         self["results"] = None
 
@@ -144,7 +135,7 @@ class CGTProject(dict):
         # the plain file name of the enhanced_video
         self['enhanced_video_no_path'] = None
 
-        # the file extension of the enhanced_video
+        # the file name of the enhanced_video without postfix
         self['enhanced_video_no_extension'] = None
 
         # the path to the raw_video video file
@@ -265,8 +256,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         tab_widget.setLayout(layout)
 
         self._tabWidget.addTab(tab_widget, title)
-
-
 
     def display_properties(self):
         """
@@ -462,6 +451,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._project['resolution_units'] = "nm"
 
         print(self._project)
+        self.read_video()
         self.display_properties()
 
     @qc.pyqtSlot()
@@ -504,11 +494,20 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._project["results"].add_region(region)
         self._drawingWidget.new_region()
 
-    def get_video_data(self):
-        return self._project["results"].video
-
     def get_video_reader(self):
         return self._video_reader
+
+    def get_fps_and_resolution(self):
+        """
+        getter for the frames per second and the resolution of the video
+
+            Returns:
+                frames per second (int), resolution (float)
+        """
+        if self._project is not None:
+            return self._project["frame_rate"], self._project["resolution"]
+
+        return None, None
 
     def set_title(self):
         """
@@ -550,11 +549,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 None
         """
-        #dir_name = qw.QFileDialog().getExistingDirectory(
-        #    self,
-        #    self.tr("Select Directory for the Report"),
-        #    "")
-
         dir_name = self._project["proj_full_path"]
 
         print("dir_name: ", dir_name)
@@ -600,48 +594,21 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
             readcsvreports.read_csv_reports(dir_name)
 
-    @qc.pyqtSlot()
-    def load_video(self):
-        """
-        seperate video loding callback for use in development
-
-        TODO remove as function provided in new project
-        """
-
-        options = qw.QFileDialog.Options()
-        options |= qw.QFileDialog.DontUseNativeDialog
-        file_name, _ = qw.QFileDialog.getOpenFileName(
-            self,
-            self.tr("Select File"),
-            "",
-            " Audio Video Interleave (*.avi)",
-            options=options)
-
-        if file_name:
-            self.read_video(file_name)
-
-    def read_video(self, file_name):
+    def read_video(self):
         """
         read in a video and display
-
-            Args:
-                file_name (string) the file name of the video
 
             Returns:
                 None
         """
         try:
-            self._video_reader = imio_get_reader(file_name, 'ffmpeg')
+            self._video_reader = imio_get_reader(self._project["enhanced_video"], 'ffmpeg')
         except (FileNotFoundError, IOError) as ex:
             message = "Unexpected error reading {}: {} => {}".format(file_name, type(ex), ex.args)
             qw.QMessageBox.warning(self,
                                    "Video Read Error",
                                    message)
             return
-
-        # how to get data from source
-        # fps = self._video_reader.get_meta_data()["fps"]
-        # total_frames = self._video_reader.count_frames()
 
         self._project["results"] = VideoAnalysisResultsStore()
         self._selectWidget.show_video()

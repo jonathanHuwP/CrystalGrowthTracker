@@ -96,6 +96,9 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         self._source_label.setMargin(0)
         self._source_label.new_selection.connect(self.start_new_region)
         self._source_label.set_adding()
+        
+        ## the length of the current video
+        self._video_frame_count = 0
 
         ## the image that is being viewed
         self._current_image = -1
@@ -142,7 +145,8 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             Returns:
                 the video time in seconds (float) and the frame number (int)
         """
-        return float(self._current_image) / float(self._owner.get_video_data().frame_rate), self._current_image
+        frame_rate, _ = self._owner.get_fps_and_resolution()
+        return float(self._current_image) / float(frame_rate), self._current_image
 
     def set_frame(self, number):
         """
@@ -156,7 +160,7 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
 
             message = "Frame {:d} of {:d}, approx {:.2f} seconds"
             time, _ = self.get_current_video_time()
-            message = message.format(number, self._owner.get_video_data().frame_count+1, time)
+            message = message.format(number, self._video_frame_count+1, time)
             self._timeStatusLabel.setText(message)
 
             self.display_pixmap()
@@ -314,7 +318,6 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         self._cancelButton.setEnabled(flag)
         self._regionsGroupBox.setEnabled(not flag)
 
-
     def get_zoom(self):
         """
         getter for the level of zoom
@@ -335,9 +338,10 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
                 None
         """
 
+        self._video_frame_count = self._owner.get_video_reader().count_frames()
         self._current_image = 0
         self.display_pixmap()
-        self._videoControls.set_range(0, self._owner.get_video_data().frame_count)
+        self._videoControls.set_range(0, self._video_frame_count)
         self._videoControls.enable(True)
 
     def display_pixmap(self):
