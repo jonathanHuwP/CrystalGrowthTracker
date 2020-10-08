@@ -209,7 +209,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         ## the project data structure
         self._project = None
 
-        ## base widget for region selection tab
+
+        ## base widget for properties tab
         self._propertiesTab = qw.QWidget(self)
 
         ## the region selection widget
@@ -217,6 +218,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         # set up tab
         self.add_tab(self._propertiesTab, self._propertiesWidget, "Project Properties")
+
 
         ## base widget for region selection tab
         self._selectTab = qw.QWidget(self)
@@ -227,6 +229,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         # set up tab
         self.add_tab(self._selectTab, self._selectWidget, "Select Regions")
 
+
         ## base widget of crystal drawing tab
         self._drawingTab = qw.QWidget(self)
 
@@ -235,6 +238,27 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         # set up tab
         self.add_tab(self._drawingTab, self._drawingWidget, "Trace Crystals")
+        
+        
+        ## base widget for results tab
+        self._resultsTab = qw.QWidget(self)
+
+        ## the results widget
+        self._resultsWidget = None #ResultsDisplayWidget(self._selectTab, self)
+
+        # set up tab
+        self.add_tab(self._resultsTab, self._resultsWidget, "Results Overview")
+        
+  
+        ## base widget for Report tab
+        self._reportTab = qw.QWidget(self)
+
+        ## the report widget
+        self._reportWidget = None #ReportDisplayWidget(self._selectTab, self)
+
+        # set up tab
+        self.add_tab(self._reportTab, self._reportWidget, "Current Report")  
+        
 
         # set up the title
         self.set_title()
@@ -251,9 +275,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 None
         """
-        layout = qw.QVBoxLayout()
-        layout.addWidget(target_widget)
-        tab_widget.setLayout(layout)
+        if target_widget is not None:
+            layout = qw.QVBoxLayout()
+            layout.addWidget(target_widget)
+            tab_widget.setLayout(layout)
 
         self._tabWidget.addTab(tab_widget, title)
 

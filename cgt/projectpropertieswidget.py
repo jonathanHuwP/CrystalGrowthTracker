@@ -72,6 +72,10 @@ class ProjectPropertiesWidget(qw.QWidget, Ui_ProjectPropertiesWidget):
                 None
         """
         self._propertiesBrowser.append(text)
+        
+    @qc.pyqtSlot()
+    def change_frame_rate_and_resolution(self):
+        print("ProjectPropertiesWidget.change_frame_rate_and_resolution")
 
 #####################################
 

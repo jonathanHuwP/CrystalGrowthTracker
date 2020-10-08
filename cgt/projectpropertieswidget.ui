@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>299</height>
+    <width>712</width>
+    <height>466</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,33 +24,9 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QLabel" name="label">
+      <widget class="QPushButton" name="_changeRateButton">
        <property name="text">
-        <string>Frame Rate Adjust </string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>Pixel Size</string>
+        <string>Change Rate/Resolution</string>
        </property>
       </widget>
      </item>
@@ -72,5 +48,22 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>_changeRateButton</sender>
+   <signal>clicked()</signal>
+   <receiver>ProjectPropertiesWidget</receiver>
+   <slot>change_frame_rate_and_resolution()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>100</x>
+     <y>417</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>355</x>
+     <y>232</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
