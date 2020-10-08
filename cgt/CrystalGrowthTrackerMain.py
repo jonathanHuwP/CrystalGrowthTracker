@@ -37,6 +37,7 @@ import array as arr
 
 sys.path.insert(0, '..\\CrystalGrowthTracker')
 from pathlib import Path
+import getpass
 
 from cgt import utils
 from cgt.utils import find_hostname_and_ip
@@ -93,15 +94,23 @@ class CGTProject(dict):
                 None
         """
         super().__init__()
-
-        prog = 'CGT'
-        description = 'Semi-automatically tracks the growth of crystals from X-ray videos.'
-
-        self["prog"] = prog
-        self["description"] = description
-        start = utils.timestamp()
-        self["start"] = start
-        self['host'], self['ip_address'], self['operating_system'] = utils.find_hostname_and_ip()
+        # program name
+        self["prog"] = None
+        
+        # program description
+        self["description"] = None
+        
+        # 
+        self["start_datetime"] = None
+        
+        # name of computer on which we are running
+        self['host'] = None
+        
+        # ip address of computer on which the project started
+        self['ip_address'] = None
+        
+        # operating system on we which the project started
+        self['operating_system'] = None
 
         # the source video for the project
         self["source"] = None
@@ -130,7 +139,37 @@ class CGTProject(dict):
         # the results
         self["results"] = None
         
-    def auto_start(self) 
+        # the path to the source
+        self["source_path"] = None
+    
+        # the plain file name of the source
+        self['source_no_path'] = None
+        
+        # the file extension of the source
+        self['source_no_extension'] = None
+        
+        # the path to the processed video file
+        self['processed_path'] = None
+        
+        # the plain file name of the processed video file
+        self['processed_no_path'] = None
+        
+        # the file extension of the processed video file
+        self['processed_no_extension'] = None
+        
+        # the user who stated the project
+        self['start_user'] = None
+            
+        # the video frame rate
+        self['frame_rate'] = 8
+        
+        # the real world distance represented by the edge length of a pixel
+        self['resolution'] = 10
+        
+        # the units of the resolution 
+        self['resolution_units'] = "microns"
+        
+    def init_new_project(self): 
         """
         fill in the data for a new project
         """
@@ -139,39 +178,9 @@ class CGTProject(dict):
 
         self["prog"] = prog
         self["description"] = description
-        self["start"] = utils.timestamp()
+        self["start_datetime"] = utils.timestamp()
         self['host'], self['ip_address'], self['operating_system'] = utils.find_hostname_and_ip()
-        
-    def auto_fill(self):
-        """
-        fill in all basic project data in one governing
-        
-            Returns:
-                None
-        """
-        pass
-        
-    def set_results(self, results):
-        """
-        set a results object
-        
-            Args:
-                results (VideoAnalysisResultsStore) the object to be set
-            
-            Returns:
-                None
-        """
-        self["results"] = results
-        
-    def get_results(self):
-        """
-        getter for the results object
-        
-            Returns:
-                the results object or None
-        """
-        return self["results"]
-        
+        self["start_user"] = getpass.getuser()
 
 class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     """
@@ -208,7 +217,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._video_reader = None
 
         ## the project data structure
-        self._project = CGTProject()
+        self._project = None
 
         ## base widget for region selection tab
         self._propertiesTab = qw.QWidget(self)
@@ -283,7 +292,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Return:
                 the current results object
         """
-        return self._project.get_results()
+        if self._project:
+            return self._project["results"]
+            
+        return None
 
     def get_regions(self):
         """
@@ -292,7 +304,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 regions list
         """
-        return self._project.get_results().regions
+        return self._project["results"].regions
 
     @qc.pyqtSlot()
     def new_project(self):
@@ -373,7 +385,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             message = "Project {} already exists you are not allowd to overwrite.".format(proj_name)
             qw.QMessageBox.critical(self, "Project Exists!", message)
             return
-
+        
+        self._project = CGTProject()
+        self._project.init_new_project()
+        
         try:
             path.mkdir()
         except (FileNotFoundError, OSError) as err:
@@ -435,23 +450,15 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 message = "Can't open file for the notes"
                 qw.QMessageBox.critical(self, "Error making directory!", message)
                 
-        # TODO simplify using pathlib
-        source_path, source_no_path = os.path.split(source)
-        self._project['source_path'] = source_path
-        self._project['source_no_path'] = source_no_path
-        self._project['source_no_extension'] = os.path.splitext(source_no_path)[0]
+        self._project['source_path'] = source.parent
+        self._project['source_no_path'] = source.name
+        self._project['source_no_extension'] = source.stem
 
         if processed is not None:
-            # TODO simplify using pathlib
             processed_path, processed_no_path = os.path.split(processed)
-            self._project['processed_path'] = processed_path
-            self._project['processed_no_path'] = processed_no_path
-            self._project['processed_no_extension'] = os.path.splitext(processed_no_path)[0]
-        else:
-            print("Processed in None.")
-            self._project['processed_path'] = None
-            self._project['processed_no_path'] = None
-            self._project['processed_no_extension'] = None
+            self._project['processed_path'] = processed.parent
+            self._project['processed_no_path'] = processed.name
+            self._project['processed_no_extension'] = processed.stem
 
         # TODO these must be user input
         self._project['frame_rate'] = 8
@@ -480,7 +487,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 iterator of regions
         """
-        return iter(self._project.get_results().regions)
+        return iter(self._project["results"].regions)
 
     def get_selected_region(self, index):
         """
@@ -492,17 +499,17 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 region or None if no regions entered
         """
-        if len(self._project.get_results().regions) < 1 or index < 0:
+        if len(self._project["results"].regions) < 1 or index < 0:
             return None
 
-        return self._project.get_results().regions[index]
+        return self._project["results"].regions[index]
 
     def append_region(self, region):
-        self._project.get_results().add_region(region)
+        self._project["results"].add_region(region)
         self._drawingWidget.new_region()
 
     def get_video_data(self):
-        return self._project.get_results().video
+        return self._project["results"].video
 
     def get_video_reader(self):
         return self._video_reader
@@ -519,14 +526,14 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         name = "No project"
 
-        if self._project["proj_name"] is not None:
+        if self._project is not None:
             name = self._project["proj_name"]
 
         title = self._translated_name + " - " + name
         self.setWindowTitle(title)
 
     def make_pixmap(self, index, frame):
-        region = self._project.get_results().regions[index]
+        region = self._project["results"].regions[index]
 
         raw = self._video_reader.get_data(frame)
         tmp = raw[region.top:region.bottom, region.left:region.right]
@@ -573,7 +580,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             info['resolution'] = 10
             info['resolution_units'] = "nm"
             start = utils.timestamp()
-            info['start'] = start
+            info['start_datetime'] = start
             print(start)
             info['host'], info['ip_address'], info['operating_system'] = utils.find_hostname_and_ip()
             print(find_hostname_and_ip())
@@ -597,8 +604,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         if dir_name is not None:
             readcsvreports.read_csv_reports(dir_name)
             pass
-
-
+            
             readcsvreports.read_csv_reports(dir_name)
 
     @qc.pyqtSlot()
