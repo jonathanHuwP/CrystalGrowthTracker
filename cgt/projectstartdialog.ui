@@ -19,19 +19,19 @@
      <item>
       <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>Source Video</string>
+        <string>Enhanced Video</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="_sourceVideo">
+      <widget class="QLineEdit" name="_enhancedVideo">
        <property name="text">
         <string>Required</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="_sVidPushButton">
+      <widget class="QPushButton" name="_enhancedVidPushButton">
        <property name="text">
         <string>Find</string>
        </property>
@@ -57,15 +57,15 @@
      <item>
       <widget class="QLabel" name="label_5">
        <property name="text">
-        <string>Processed Video</string>
+        <string>Raw Video</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="_processedVideo"/>
+      <widget class="QLineEdit" name="_rawVideo"/>
      </item>
      <item>
-      <widget class="QPushButton" name="_pVidPushButton">
+      <widget class="QPushButton" name="_rawVidPushButton">
        <property name="text">
         <string>Find</string>
        </property>
@@ -221,10 +221,10 @@
  <resources/>
  <connections>
   <connection>
-   <sender>_sVidPushButton</sender>
+   <sender>_enhancedVidPushButton</sender>
    <signal>clicked()</signal>
    <receiver>ProjectStartDialog</receiver>
-   <slot>find_source_file()</slot>
+   <slot>find_enhanced_video_file()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>407</x>
@@ -237,10 +237,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>_pVidPushButton</sender>
+   <sender>_rawVidPushButton</sender>
    <signal>clicked()</signal>
    <receiver>ProjectStartDialog</receiver>
-   <slot>find_processed_file()</slot>
+   <slot>find_raw_video_file()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>418</x>

@@ -76,9 +76,8 @@ class CGTProject(dict):
         host: (string) name of computer
         ip_address: (string) ip address of computer
         operating_system: (string) operating system of computer
-        source: (pathlib.Path)
-        processed: (pathlib.Path)
-        proj_dir: (path.lib.Path)
+        enhanced_video: (pathlib.Path)
+        raw_video: (pathlib.Path)
         proj_name: (string)
         notes: (string)
         frame_rate: (int)
@@ -100,7 +99,7 @@ class CGTProject(dict):
         # program description
         self["description"] = None
 
-        #
+        # a time stamp for the start of the project
         self["start_datetime"] = None
 
         # name of computer on which we are running
@@ -112,17 +111,17 @@ class CGTProject(dict):
         # operating system on we which the project started
         self['operating_system'] = None
 
-        # the source video for the project
-        self["source"] = None
+        # the video on which the program will operate
+        self["enhanced_video"] = None
 
-        # an enhanced video derived from the source, may be null
-        self["processed"] = None
+        # the original video before image enhancment, may be null
+        self["raw_video"] = None
 
-        # the path to the directory holding the project
-        self["proj_dir"] = None
-
-        # the name of the projcet
+        # the name of the project
         self["proj_name"] = None
+        
+        # the full path to the project
+        self["proj_full_path"] = None
 
         # the users notes
         self["notes"] = None
@@ -139,23 +138,23 @@ class CGTProject(dict):
         # the results
         self["results"] = None
 
-        # the path to the source
-        self["source_path"] = None
+        # the path to the enhanced_video
+        self["enhanced_video_path"] = None
 
-        # the plain file name of the source
-        self['source_no_path'] = None
+        # the plain file name of the enhanced_video
+        self['enhanced_video_no_path'] = None
 
-        # the file extension of the source
-        self['source_no_extension'] = None
+        # the file extension of the enhanced_video
+        self['enhanced_video_no_extension'] = None
 
-        # the path to the processed video file
-        self['processed_path'] = None
+        # the path to the raw_video video file
+        self['raw_video_path'] = None
 
-        # the plain file name of the processed video file
-        self['processed_no_path'] = None
+        # the plain file name of the raw_video video file
+        self['raw_video_no_path'] = None
 
-        # the file extension of the processed video file
-        self['processed_no_extension'] = None
+        # the file extension of the raw_video video file
+        self['raw_video_no_extension'] = None
 
         # the user who stated the project
         self['start_user'] = None
@@ -213,7 +212,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         ## the videos data
         self._video_data = None
 
-        ## storage for the open video source
+        ## a pointer for the video file reader
         self._video_reader = None
 
         ## the project data structure
@@ -357,8 +356,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         writecsvreports.save_csv_project(self._project)
 
     def start_project(self,
-                      source,
-                      processed,
+                      enhanced_video,
+                      raw_video,
                       proj_dir,
                       proj_name,
                       notes,
@@ -367,12 +366,12 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         function for starting a new project
 
             Args
-                source (pathlib.Path) the main source video
-                processed (pathlib.Path) secondary processed video
+                enhanced_video (pathlib.Path) the video on which the program will run
+                raw_video (pathlib.Path) secondary raw_video video
                 proj_dir  (pathlib.Path) parent directory of project directory
                 proj_name (string) the name of project, will be directory name
                 notes (string) project notes
-                copy_files (bool) if true the source and processed files are copied to project dir
+                copy_files (bool) if true the enhanced_video and raw_video files are copied to project dir
 
             Returns:
                 None
@@ -396,14 +395,13 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             return
 
         self._project["proj_name"] = proj_name
-        self._project["proj_dir"] = proj_dir
         self._project["proj_full_path"] = path
 
         if copy_files:
             try:
-                copy2(source, path)
-                # if copied source is project path + file name
-                self._project["source"] = path.joinpath(source.name)
+                copy2(enhanced_video, path)
+                # if copied enhanced_video is project path + file name
+                self._project["enhanced_video"] = path.joinpath(enhanced_video.name)
 
             except (IOError, os.error) as why:
                 qw.QMessageBox.warning(
@@ -416,11 +414,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                     "Problem copying File",
                     "Error message: {}".format(err.args[0]))
 
-            if processed is not None:
+            if raw_video is not None:
                 try:
-                    copy2(processed, path)
-                    # if used and copied processed is project path + file name
-                    self._project["processed"] = path.joinpath(processed.name)
+                    copy2(raw_video, path)
+                    # if used and copied raw_video is project path + file name
+                    self._project["raw_video"] = path.joinpath(raw_video.name)
                 except (IOError, os.error) as why:
                     qw.QMessageBox.warning(
                         self,
@@ -433,9 +431,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                         "Error message: {}".format(err.args[0]))
         else:
             # set sourec and project to their user input values
-            self._project["source"] = source
-            if processed is not None:
-                self._project["processed"] = processed
+            self._project["enhanced_video"] = enhanced_video
+            if raw_video is not None:
+                self._project["raw_video"] = raw_video
 
         if notes is not None and not notes.isspace() and notes:
             notes_file_name = proj_name + "_notes.txt"
@@ -449,15 +447,14 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 message = "Can't open file for the notes"
                 qw.QMessageBox.critical(self, "Error making directory!", message)
 
-        self._project['source_path'] = source.parent
-        self._project['source_no_path'] = source.name
-        self._project['source_no_extension'] = source.stem
+        self._project['enhanced_video_path'] = enhanced_video.parent
+        self._project['enhanced_video_no_path'] = enhanced_video.name
+        self._project['enhanced_video_no_extension'] = enhanced_video.stem
 
-        if processed is not None:
-            processed_path, processed_no_path = os.path.split(processed)
-            self._project['processed_path'] = processed.parent
-            self._project['processed_no_path'] = processed.name
-            self._project['processed_no_extension'] = processed.stem
+        if raw_video is not None:
+            self._project['raw_video_path'] = raw_video.parent
+            self._project['raw_video_no_path'] = raw_video.name
+            self._project['raw_video_no_extension'] = raw_video.stem
 
         # TODO these must be user input
         self._project['frame_rate'] = 8
@@ -515,11 +512,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
     def set_title(self):
         """
-        assignes the source and sets window title
-
-            Args:
-                source (string): the path (or file name) of the current main image
-
+        sets window title
+        
             Returns:
                 None
         """
