@@ -34,60 +34,7 @@ sys.path.insert(0, '..\\CrystalGrowthTracker')
 
 # pylint: disable = too-many-instance-attributes
 
-class TestResults1(unittest.TestCase):
-    """
-    basic tests of the Results class
-    """
-
-    def setUp(self):
-        """
-        build a full test class
-        """
-        self._video_name = "ladkj.mp4"
-        self._frame_rate = 8
-        self._frame_count = 500
-        self._width = 800
-        self._height = 600
-        self._user = "who@dodgy_mail.com"
-        self._date = dt.datetime.now().strftime("%d %b, %Y, %H:%M:%S")
-        self._test_result = self.make_test_result()
-
-    def tearDown(self):
-        """
-        delete the test class
-        """
-        self._video_name = None
-        self._frame_rate = None
-        self._frame_count = None
-        self._width = None
-        self._height = None
-        self._user = None
-        self._date = None
-        self._test_result = None
-
-    def make_test_result(self):
-        """
-        factory function to procduce a Results object
-        """
-        source = vas.VideoSource(self._video_name,
-                                 self._frame_rate,
-                                 self._frame_count,
-                                 self._width,
-                                 self._height)
-
-        return vas.VideoAnalysisResultsStore(source)
-
-    def test_video(self):
-        """
-        test the video data struct
-        """
-        self.assertEqual(self._test_result.video.name, self._video_name)
-        self.assertEqual(self._test_result.video.frame_rate, self._frame_rate)
-        self.assertEqual(self._test_result.video.frame_count, self._frame_count)
-        self.assertEqual(self._test_result.video.width, self._width)
-        self.assertEqual(self._test_result.video.height, self._height)
-
-class TestResults2(unittest.TestCase):
+class TestResults(unittest.TestCase):
     """
     advanced tests of Results class
     """
@@ -120,13 +67,19 @@ class TestResults2(unittest.TestCase):
         """
         factory function to procduce a Results object
         """
-        source = vas.VideoSource("ladkj.mp4", 8, 500, 800, 600)
-
-        region1, _ = self.make_region1()
-        region2, _ = self.make_region2()
+        region1, crystals1 = self.make_region1()
+        region2, crystals2 = self.make_region2()
         regions = [region1, region2]
 
-        return vas.VideoAnalysisResultsStore(source, regions)
+        store = vas.VideoAnalysisResultsStore(regions)
+
+        for crystal in crystals1:
+            store.add_crystal(crystal, 0)
+
+        for crystal in crystals2:
+            store.add_crystal(crystal, 1)
+
+        return store
 
     def make_region1(self):
         """
@@ -140,7 +93,6 @@ class TestResults2(unittest.TestCase):
         line2 = ia.ImageLineSegment(ia.ImagePoint(50, 50),
                                     ia.ImagePoint(150, 150),
                                     "02")
-
 
         crystal = Crystal(notes="01")
 
@@ -191,11 +143,12 @@ class TestResults2(unittest.TestCase):
 
         return region, [crystal]
 
-    def test_something(self):
-        """
-        test whatever
-        """
-        self.assertEqual(self._test_result.video.name, "ladkj.mp4", "store name is wrong")
+    def test_data(self):
+
+        test_result = self.make_test_result()
+
+        self.assertEqual(test_result.number_of_regions, 2,
+                         msg="number of regions in test result is wrong")
 
 if __name__ == "__main__":
     unittest.main()

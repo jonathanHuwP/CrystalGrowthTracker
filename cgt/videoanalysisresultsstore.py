@@ -21,29 +21,12 @@ specific language governing permissions and limitations under the License.
 # pylint: disable = too-many-arguments
 
 from collections import namedtuple
-import os
-import datetime as dt
-
-## a tuple for the video on which the analysis is based
-##
-## Args:
-##
-## name the video file name or path
-##
-## frame_rate number of frames per second
-##
-## frame_count the numer of frames in the video
-##
-## width the horizontal size of the video in pixels
-##
-## height the vertical size of the video in pixels
-VideoSource = namedtuple("VideoSource", ["name", "frame_rate", "frame_count", "width", "height"])
 
 class VideoAnalysisResultsStore:
     """
     a storage class that records the results of a video analysis
     """
-    def __init__(self, video, regions=None, crystals=None, region_crystal=None):
+    def __init__(self, regions=None, crystals=None, region_crystal=None):
         """
         initalize an object
 
@@ -56,10 +39,6 @@ class VideoAnalysisResultsStore:
 
                 region_crystal ([(int, int)] a mapping (<region index>, <crystal index>)
         """
-
-        ## the source video on which the analysis is based
-        self._video = video
-
         ## storage for the regions
         self._regions = []
 
@@ -77,16 +56,6 @@ class VideoAnalysisResultsStore:
 
         if region_crystal is not None:
             self._region_crystal = region_crystal
-
-    @property
-    def video(self):
-        """
-        getter for the description of the video
-
-            Returns:
-                the description of the video source
-        """
-        return self._video
 
     @property
     def regions(self):

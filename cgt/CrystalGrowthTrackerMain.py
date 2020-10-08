@@ -42,7 +42,7 @@ import getpass
 from cgt import utils
 from cgt.utils import find_hostname_and_ip
 from cgt.cgtutility import RegionEnd
-from videoanalysisresultsstore import VideoAnalysisResultsStore, DateUser, VideoSource
+from videoanalysisresultsstore import VideoAnalysisResultsStore
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
@@ -646,19 +646,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                                    message)
             return
 
-        # TODO allow for user override of frame rate
-        # set up the video data struct
-        meta_data = self._video_reader.get_meta_data()
-        video_data = VideoSource(
-            file_name,
-            meta_data["fps"],
-            self._video_reader.count_frames(),
-            meta_data["size"][0],
-            meta_data["size"][1])
-            
-        result = VideoAnalysisResultsStore(video_data)
-        self._project.set_results(result)
-       
+        # how to get data from source
+        # fps = self._video_reader.get_meta_data()["fps"]
+        # total_frames = self._video_reader.count_frames()
+
+        self._project["results"] = VideoAnalysisResultsStore()
         self._selectWidget.show_video()
 
     @qc.pyqtSlot()
