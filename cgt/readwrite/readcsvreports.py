@@ -24,7 +24,7 @@ specific language governing permissions and limitations under the License.
 import os
 from pathlib import Path
 import csv
-from cgt import videoanalysisresultsstore as vas
+from cgt.videoanalysisresultsstore import VideoAnalysisResultsStore
 #import cgt.videoanalysisresultsstore as vas
 from cgt.crystal import Crystal
 from cgt.region import Region
@@ -88,9 +88,7 @@ def read_csv_project(dir, info):
         error_code = 1
 
     if error_code == 0:
-        source = vas.VideoSource(info_data["source"], 8, 700, 800, 600)
-        store = vas.VideoAnalysisResultsStore(source)
-        store.append_history()
+        store = VideoAnalysisResultsStore()
         storeregions(store, region_data)
         storecrystals(crystal_data, line_data)
 
