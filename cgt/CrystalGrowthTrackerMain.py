@@ -50,6 +50,7 @@ from cgt.projectpropertieswidget import ProjectPropertiesWidget
 
 from cgt.regionselectionwidget import RegionSelectionWidget
 from cgt.crystaldrawingwidget import CrystalDrawingWidget
+from cgt.videoparametersdialog import VideoParametersDialog
 
 # import UI
 from cgt.Ui_CrystalGrowthTrackerMain import Ui_CrystalGrowthTrackerMain
@@ -151,13 +152,13 @@ class CGTProject(dict):
         self['start_user'] = None
 
         # the video frame rate
-        self['frame_rate'] = 8
+        self['frame_rate'] = None
 
         # the real world distance represented by the edge length of a pixel
-        self['resolution'] = 10
+        self['resolution'] = None
 
         # the units of the resolution
-        self['resolution_units'] = "microns"
+        self['resolution_units'] = None
 
     def init_new_project(self):
         """
@@ -447,14 +448,40 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self._project['raw_video_path'] = raw_video.parent
             self._project['raw_video_no_path'] = raw_video.name
             self._project['raw_video_no_extension'] = raw_video.stem
-
-        # TODO these must be user input
-        self._project['frame_rate'] = 8
-        self._project['resolution'] = 10
-        self._project['resolution_units'] = "nm"
+        
+        self.set_video_scale_parameters()
 
         print(self._project)
         self.read_video()
+        
+    def set_video_scale_parameters(self):
+        """
+        get the video scaling parameters from the user
+        
+            Returns:
+                None
+        """
+        if self._project['frame_rate'] is not None:
+            fps = self._project['frame_rate']
+        else:
+            fps = 8
+            
+        if self._project['resolution'] is not None:
+            resolution = self._project['resolution']
+        else:
+            resolution = 0.81
+            
+        if self._project['resolution_units'] is not None:
+            units = self._project['resolution_units']
+        else:
+            units = VideoParametersDialog.RESOLUTION_UNITS[1]
+        
+        fps, resolution, units = VideoParametersDialog.get_values_from_user(self, fps, resolution, units)
+        
+        self._project['frame_rate'] = fps
+        self._project['resolution'] = resolution
+        self._project['resolution_units'] = units
+        
         self.display_properties()
 
     @qc.pyqtSlot()

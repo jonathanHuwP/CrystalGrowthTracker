@@ -22,13 +22,24 @@ class VideoParametersDialog(qw.QDialog, Ui_VideoParametersDialog):
     """
     a qDialog the allows the user to start a new project
     """
+    
+    ## the available units for the resolution
+    RESOLUTION_UNITS = ["nanometers", "microns", "mm"]
+    
+    def get_values_from_user(parent, fps, resolution, units):
+        window = VideoParametersDialog(parent, fps, resolution, units)
+        window.exec_()
+        return  window.get_values()
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, fps=None, resolution=None, units=None):
         """
         set up the dialog
 
             Args:
                 parent (QObject) the parent object
+                fps: (int) frames pre second
+                resolution (float) the real world size of a pixel
+                unit (string) the units, must be in RESOLUTION_UNITS
 
             Returns:
                 None
@@ -42,9 +53,27 @@ class VideoParametersDialog(qw.QDialog, Ui_VideoParametersDialog):
         self._translated_name = self.tr("VideoParametersDialog")
 
         self.setupUi(self)
+ 
+        ## storage for the frames per second
+        self._fps = fps
         
-        units = ["nanometers", "microns", "mm"]
-        self._unitsComboBox.addItems(units)
+        ## storage for the resolution
+        self._resolution = resolution
+        
+        index = VideoParametersDialog.RESOLUTION_UNITS.index(units)
+        ## storage for the resolution units
+        self._resolutionUnits = units
+        
+        self._unitsComboBox.addItems(VideoParametersDialog.RESOLUTION_UNITS)
+        
+        if fps is not None:
+            self._fpsBox.setValue(fps)
+            
+        if resolution is not None:
+            self._resolutionBox.setValue(resolution)
+            
+        if units is not None:
+            self._unitsComboBox.setCurrentIndex(index)
 
     @qc.pyqtSlot()
     def set_parameters(self):
@@ -54,12 +83,14 @@ class VideoParametersDialog(qw.QDialog, Ui_VideoParametersDialog):
             Returns:
                 None
         """
-        s = "VideoParametersDialog.set_parameters({} {} {})"
-        s = s.format(self._unitsComboBox.currentText(),
-                     self._resolutionBox.value(),
-                     self._fpsBox.value())
-
-        print(s)
+        self._fps = self._fpsBox.value()
+        self._resolution = self._resolutionBox.value()
+        self._resolutionUnits = self._unitsComboBox.currentText()
+        
+        self.close()
+        
+    def get_values(self):
+        return self._fps, self._resolution, self._resolutionUnits
 
 
 #######################################
@@ -73,9 +104,12 @@ def run():
     """
     app = qw.QApplication(sys.argv)
 
-    window = VideoParametersDialog()
+    window = VideoParametersDialog(fps=8, resolution=0.81, units="nanometers")
     window.show()
     app.exec_()
+    
+    tmp = window.get_values()
+    print(tmp)
 
 if __name__ == "__main__":
     run()

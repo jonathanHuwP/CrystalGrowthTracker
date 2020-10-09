@@ -25,6 +25,9 @@
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="_changeRateButton">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
        <property name="text">
         <string>Change Rate/Resolution</string>
        </property>
@@ -53,7 +56,7 @@
    <sender>_changeRateButton</sender>
    <signal>clicked()</signal>
    <receiver>ProjectPropertiesWidget</receiver>
-   <slot>change_frame_rate_and_resolution()</slot>
+   <slot>set_video_scale_parameters()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>100</x>
