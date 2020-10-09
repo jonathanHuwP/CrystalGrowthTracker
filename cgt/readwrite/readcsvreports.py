@@ -91,6 +91,7 @@ def read_csv_project(dir, info):
         store = VideoAnalysisResultsStore()
         storeregions(store, region_data)
         storecrystals(crystal_data, line_data)
+        info["results"] = store
 
 
     return info_data, error_code
