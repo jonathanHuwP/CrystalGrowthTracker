@@ -256,7 +256,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._reportTab = qw.QWidget(self)
 
         ## the report widget
-        self._reportWidget = None #ReportDisplayWidget(self._selectTab, self)
+        self._reportWidget = ReportViewWidget(self._selectTab, self)
+        self._reportWidget.set_html("<!DOCTYPE html><html><body><h1 style=\"color:blue;\">Hello World!</h1><p style=\"color:red;\">There is no report.</p></body></html>")
 
         # set up tab
         self.add_tab(self._reportTab, self._reportWidget, "Current Report")  
