@@ -365,6 +365,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         if dir_name != '':
             print("Loading Project.")
+            self._project = CGTProject()
             data, error_code = readcsvreports.read_csv_project(dir_name, self._project)
             if error_code == 0:
                 print("The project was loaded.")
