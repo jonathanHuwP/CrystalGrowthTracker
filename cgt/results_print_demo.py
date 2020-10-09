@@ -29,17 +29,14 @@ from cgt.region import Region
 from cgt.imagepoint import ImagePoint
 from cgt.imagelinesegment import ImageLineSegment
 
-
 sys.path.insert(0, '..\\CrystalGrowthTracker')
 
 def make_test_result():
     """
     factory function to procduce a Results object
     """
-    source = vas.VideoSource("ladkj.mp4", 8, 700, 800, 600)
-    store = vas.VideoAnalysisResultsStore(source)
-    store.append_history()
-
+    store = vas.VideoAnalysisResultsStore()
+    
     index = store.add_region(Region(450, 200, 675, 400, 250, 500))
     store.add_crystal(make_crystal1(), index)
 
@@ -103,12 +100,6 @@ def main():
     runner for the demonstration
     """
     results = make_test_result()
-
-    for record in results.history:
-        print(record)
-
-    video = results.video
-    print(video.name, video.frame_rate, video.frame_count, video.width, video.height)
 
     print("Number of regions {}".format(len(results.regions)))
     for region in results.regions:
