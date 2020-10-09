@@ -89,15 +89,13 @@ def run_main():
             None
     """
 
-    def inner_run():
-        app = qw.QApplication(sys.argv)
-        window = ProjectPropertiesWidget()
-        window.clear_and_display_text("This is some <b>text</b>")
-        window.append_text("<p>More text</p>")
-        window.show()
-        app.exec_()
+    app = qw.QApplication(sys.argv)
+    window = ProjectPropertiesWidget()
+    window.clear_and_display_text("This is some <b>text</b>")
+    window.append_text("<p>More text</p>")
+    window.show()
+    app.exec_()
 
-    inner_run()
 
 if __name__ == "__main__":
     run_main()

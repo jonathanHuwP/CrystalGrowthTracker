@@ -175,16 +175,13 @@ def run():
         Returns:
             None
     """
-    def inner_run():
-        app = qw.QApplication(sys.argv)
+    app = qw.QApplication(sys.argv)
 
-        window = VideoControlWidget()
-        window.enable()
-        window.set_range(0, 25)
-        window.show()
+    window = VideoControlWidget()
+    window.enable()
+    window.set_range(0, 25)
+    window.show()
         app.exec_()
-
-    inner_run()
 
 if __name__ == "__main__":
     run()  

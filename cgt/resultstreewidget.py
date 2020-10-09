@@ -218,14 +218,11 @@ def run():
         Returns:
             None
     """
-    def inner_run():
-        app = qw.QApplication(sys.argv)
+    app = qw.QApplication(sys.argv)
 
-        window = ResultsTreeWidget(data_source = TestOwner())
-        window.show()
-        app.exec_()
-
-    inner_run()
-
+    window = ResultsTreeWidget(data_source = TestOwner())
+    window.show()
+    app.exec_()
+        
 if __name__ == "__main__":
     run()

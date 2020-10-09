@@ -196,14 +196,12 @@ def run():
         Returns:
             None
     """
-    def inner_run():
-        app = qw.QApplication(sys.argv)
 
-        window = ProjectStartDialog()
-        window.show()
-        app.exec_()
+    app = qw.QApplication(sys.argv)
 
-    inner_run()
+    window = ProjectStartDialog()
+    window.show()
+    app.exec_()
 
 if __name__ == "__main__":
     run()

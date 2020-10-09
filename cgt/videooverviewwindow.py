@@ -283,19 +283,15 @@ def run_video_overview():
     """
     use a local function to make an isolated the QApplication object
     """
+    app = qw.QApplication(sys.argv)
 
-    def inner_run():
-        app = qw.QApplication(sys.argv)
+    translators = select_translator()
+    for translator in translators:
+        qc.QCoreApplication.installTranslator(translator)
 
-        translators = select_translator()
-        for translator in translators:
-            qc.QCoreApplication.installTranslator(translator)
-
-        window = VideoOverviewWindow(app)
-        window.show()
-        app.exec_()
-
-    inner_run()
+    window = VideoOverviewWindow(app)
+    window.show()
+    app.exec_()
 
 if __name__ == "__main__":
     run_video_overview()
