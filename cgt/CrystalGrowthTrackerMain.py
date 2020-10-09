@@ -321,13 +321,25 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 None
         """
         print("CrystalGrowthTrackerMain.load_project()")
+        
+        if self._project is not None:
+            mb_reply = qw.QMessageBox.question(self,
+                                               self.tr('CrystalGrowthTracker'),
+                                               self.tr('You have a project that will be overwriten. Proceed?'),
+                                               qw.QMessageBox.Yes | qw.QMessageBox.No,
+                                               qw.QMessageBox.No)
+
+            if mb_reply == qw.QMessageBox.No:
+                return
+            
 
         dir_name = qw.QFileDialog().getExistingDirectory(
             self,
             self.tr("Select the Project Directory."),
             "")
-
-        if dir_name is not None:
+            
+        # TODO use Path to check result dir is valid
+        if dir_name != '':
             print("Loading Project.")
             data, error_code = readcsvreports.read_csv_project(dir_name, self._project)
             if error_code == 0:
@@ -641,26 +653,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self._project["results"] = VideoAnalysisResultsStore()
         self._selectWidget.show_video()
-
-    @qc.pyqtSlot()
-    def save_project(self):
-        """
-        Save the current project
-
-            Returns:
-                None
-        """
-        print("Save Project")
-
-    @qc.pyqtSlot()
-    def load_project(self):
-        """
-        load an existing project
-
-            Returns:
-                None
-        """
-        print("load project")
 
     @qc.pyqtSlot()
     def closeEvent(self, event):
