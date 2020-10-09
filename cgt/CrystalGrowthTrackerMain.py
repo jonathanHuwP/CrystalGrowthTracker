@@ -614,6 +614,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             print(find_hostname_and_ip())
             htmlreport.save_html_report(dir_name, info)
             writecsvreports.save_csv_reports(dir_name, info)
+            
+    @qc.pyqtSlot()
+    def save_report(self):
+        print("CGTMain.save_report")
 
     @qc.pyqtSlot()
     def reload_results(self):
