@@ -181,7 +181,7 @@ def run():
     window.enable()
     window.set_range(0, 25)
     window.show()
-        app.exec_()
+    app.exec_()
 
 if __name__ == "__main__":
     run()  

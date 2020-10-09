@@ -164,7 +164,12 @@ class ResultsTreeWidget(qw.QWidget, Ui_ResultsTreeWidget):
                 None
         """
         self._tree.clear()
+        
+        if self._data_source is None:
+            return
+            
         result = self._data_source.get_result()
+        
         if result is None:
             return
 
