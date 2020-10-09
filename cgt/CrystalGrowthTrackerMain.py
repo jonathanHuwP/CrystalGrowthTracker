@@ -366,14 +366,16 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         if dir_name != '':
             print("Loading Project.")
             self._project = CGTProject()
-            data, error_code = readcsvreports.read_csv_project(dir_name, self._project)
+            error_code = readcsvreports.read_csv_project(dir_name, self._project)
             if error_code == 0:
                 print("The project was loaded.")
-                self._project = data
+                #self._project = data
             else:
                 print("The project was not loaded.")
 
+            print("self._project: ", self._project)
             self.display_properties()
+            self.read_video()
 
     @qc.pyqtSlot()
     def save_project(self):
@@ -487,12 +489,16 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self._project['raw_video_path'] = raw_video.parent
             self._project['raw_video_no_path'] = raw_video.name
             self._project['raw_video_no_extension'] = raw_video.stem
-        
+
         self.set_video_scale_parameters()
 
         print(self._project)
         self.read_video()
-        
+        writecsvreports.save_csv_project(self._project)
+        #cgt.readwrite.save_csv_project(self._project)
+
+
+
     def set_video_scale_parameters(self):
         """
         get the video scaling parameters from the user
@@ -522,6 +528,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._project['resolution_units'] = units
         
         self.display_properties()
+
 
     @qc.pyqtSlot()
     def tab_changed(self):

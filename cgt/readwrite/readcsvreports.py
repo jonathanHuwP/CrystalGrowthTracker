@@ -33,7 +33,7 @@ from cgt.imagelinesegment import ImageLineSegment
 from cgt.results_print_demo import make_test_result
 
 
-def read_csv_project(dir, info):
+def read_csv_project(dir, new_project):
     '''Coordinates the reading of a selection of csv reports.
 
     Args:
@@ -71,7 +71,7 @@ def read_csv_project(dir, info):
                 crystal_data, error_crystal = readcsv2listofdicts(file, dirpath)
             if "project_info" in file:
                 print("Info!")
-                info_data, error_info = readcsvinfo2dict(file, dirpath)
+                error_info = readcsvinfo2dict(new_project, file, dirpath)
             if "project_lines" in file:
                 print("Lines!")
                 line_data, error_line = readcsv2listofdicts(file, dirpath)
@@ -82,7 +82,7 @@ def read_csv_project(dir, info):
     print("crystal_data: ", crystal_data)
     print("line_data: ", line_data)
     print("region_data: ", region_data)
-    print("info_data: ", info_data)
+    print("new_project: ", new_project)
 
     if error_crystal or error_line or error_region or error_info == 1:
         error_code = 1
@@ -91,10 +91,10 @@ def read_csv_project(dir, info):
         store = VideoAnalysisResultsStore()
         storeregions(store, region_data)
         storecrystals(crystal_data, line_data)
-        info["results"] = store
+        new_project["results"] = store
 
 
-    return info_data, error_code
+    return error_code
 
 
 
@@ -211,7 +211,7 @@ def readcsv2listofdicts(file, dirpath):
     return (data, error_code)
 
 
-def readcsvinfo2dict(file, dirpath):
+def readcsvinfo2dict(new_project, file, dirpath):
     '''Reads csv reports created by the Crystal Growth Tracker as a list of dictionaries.
        This allows means varaibles are read with the header as a pair so can be searched 
        by its semantic meaning.
@@ -231,7 +231,7 @@ def readcsvinfo2dict(file, dirpath):
     file_to_open = dir_in / file
     print(file_to_open)
 
-    data = {}
+#    data = {}
 
     if not os.path.exists(file_to_open):
         print("ERROR; The input file does not exist.")
@@ -249,7 +249,7 @@ def readcsvinfo2dict(file, dirpath):
                 if len(row) == 2:
                     key = row[0]
                     value = row[1]
-                    data[key] = value
+                    new_project[key] = value
     except (IOError, OSError, EOFError) as exception:
         print(exception)
         error_code = 1
@@ -259,9 +259,9 @@ def readcsvinfo2dict(file, dirpath):
     finally:
         print("Read file: ", file)
 
-    print("data: ", data)
+    print("new_project: ", new_project)
 
-    return (data, error_code)
+    return (error_code)
 
 
 
