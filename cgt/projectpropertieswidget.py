@@ -74,8 +74,8 @@ class ProjectPropertiesWidget(qw.QWidget, Ui_ProjectPropertiesWidget):
         self._propertiesBrowser.append(text)
         
     @qc.pyqtSlot()
-    def change_frame_rate_and_resolution(self):
-        print("ProjectPropertiesWidget.change_frame_rate_and_resolution")
+    def set_video_scale_parameters(self):
+        print("ProjectPropertiesWidget.'set_video_scale_parameters'")
         if self._owner is not None:
             self._owner.set_video_scale_parameters()
 

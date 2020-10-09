@@ -51,6 +51,7 @@ from cgt.projectpropertieswidget import ProjectPropertiesWidget
 from cgt.regionselectionwidget import RegionSelectionWidget
 from cgt.crystaldrawingwidget import CrystalDrawingWidget
 from cgt.videoparametersdialog import VideoParametersDialog
+from cgt.reportviewwidget import ReportViewWidget
 
 # import UI
 from cgt.Ui_CrystalGrowthTrackerMain import Ui_CrystalGrowthTrackerMain
