@@ -47,7 +47,7 @@ class ResultsTreeWidget(qw.QWidget, Ui_ResultsTreeWidget):
     a widget providing a tree view on results data
     """
 
-    def __init__(self, parent=None, owner=None):
+    def __init__(self, parent=None, data_source=None):
         """
         set up the dialog
 
@@ -60,28 +60,28 @@ class ResultsTreeWidget(qw.QWidget, Ui_ResultsTreeWidget):
         super(ResultsTreeWidget, self).__init__(parent)
         self.setupUi(self)
         
-        ## the owner object holding the results 
-        self._owner = owner
+        ## the data_source object holding the results 
+        self._data_source = data_source
 
         # set up the tree and display
         h_list = ["Region", "Crystal", "Time", "Line"]
         self._tree.setColumnCount(len(h_list))
         self._tree.setHeaderLabels(h_list)
         
-        if owner is not None:
+        if data_source is not None:
             self.fill_tree()
             
-    def set_owner(self, owner):
+    def set_data_source(self, data_source):
         """
         setter for the object holding the data to be displayed
         
             Args:
-                owner (CrystalGrowthTrackerMain) object holding data
+                data_source (CrystalGrowthTrackerMain) object holding data
                 
             Returns:
                 None
         """
-        self._owner = owner
+        self._data_source = data_source
         self.fill_tree()
 
     @qc.pyqtSlot()
@@ -158,13 +158,13 @@ class ResultsTreeWidget(qw.QWidget, Ui_ResultsTreeWidget):
 
     def fill_tree(self):
         """
-        clear the tree and fill with data from the owner
+        clear the tree and fill with data from the data_source
         
             Returns:
                 None
         """
         self._tree.clear()
-        result = self._owner.get_result()
+        result = self._data_source.get_result()
         if result is None:
             return
 
@@ -221,7 +221,7 @@ def run():
     def inner_run():
         app = qw.QApplication(sys.argv)
 
-        window = ResultsTreeWidget(owner = TestOwner())
+        window = ResultsTreeWidget(data_source = TestOwner())
         window.show()
         app.exec_()
 

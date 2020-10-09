@@ -16,25 +16,12 @@ import os
 from pathlib import Path
 import random
 import string
+import utils
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
 
 from cgt.Ui_projectstartdialog import Ui_ProjectStartDialog
-
-def get_random_string(length):
-    """
-    generator for random strings
-
-        Args:
-            length (int) the number of characters needed
-
-        Returns:
-            random string of characters
-    """
-    letters = string.ascii_lowercase
-    result_str = ''.join(random.choice(letters) for i in range(length))
-    return result_str
 
 class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
     """
@@ -82,9 +69,9 @@ class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
             self._projDir.setText(dir_name)
 
     @qc.pyqtSlot()
-    def find_source_file(self):
+    def find_enhanced_video_file(self):
         """
-        callback for running a file dialog to find the source file
+        callback for running a file dialog to find the enhanced_video file
 
             Returns:
                 None
@@ -96,16 +83,16 @@ class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
             self.tr("AVI (*.avi)"))
 
         if file_name is not None:
-            self._sourceVideo.setText(file_name)
-            file = os.path.basename(self._sourceVideo.text())
+            self._enhancedVideo.setText(file_name)
+            file = os.path.basename(self._enhancedVideo.text())
             file = file.rsplit('.', 1)[0]
-            file += "_" + get_random_string(8)
+            file += "_" + utils.timestamp()
             self._projName.setText(file)
 
     @qc.pyqtSlot()
-    def find_processed_file(self):
+    def find_raw_video_file(self):
         """
-        callback for running a file dialog to find the processed file
+        callback for running a file dialog to find the raw_video file
 
             Returns:
                 None
@@ -117,7 +104,7 @@ class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
             self.tr("AVI (*.avi)"))
 
         if file_name is not None:
-            self._processedVideo.setText(file_name)
+            self._rawVideo.setText(file_name)
 
     @qc.pyqtSlot()
     def make_project(self):
@@ -128,34 +115,34 @@ class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
             Returns:
                 None
         """
-        text = self._sourceVideo.text().strip()
+        text = self._enhancedVideo.text().strip()
         if not text:
-            message = self.tr("You must provide a source file")
+            message = self.tr("You must provide a enhanced_video file")
             qw.QMessageBox.warning(self, "Error", message)
             return
 
-        source = Path(text)
-        if not source.exists():
+        enhanced_video = Path(text)
+        if not enhanced_video.exists():
             message = self.tr("Source file \"{}\" does not exist!")
-            message = message.format(source)
+            message = message.format(enhanced_video)
             qw.QMessageBox.critical(self, "Error", message)
             return
 
-        text = self._processedVideo.text().strip()
+        text = self._rawVideo.text().strip()
         if text:
-            processed = Path(text)
-            if not processed.exists():
+            raw_video = Path(text)
+            if not raw_video.exists():
                 message = self.tr("Processed file {} does not exist!")
-                message = message.format(processed)
+                message = message.format(raw_video)
                 qw.QMessageBox.critical(self, "Error", message)
                 return
 
-            if processed.resolve() == source.resolve():
-                message = self.tr("The source and processed files are the same!")
+            if raw_video.resolve() == enhanced_video.resolve():
+                message = self.tr("The enhanced_video and raw_video files are the same!")
                 qw.QMessageBox.critical(self, "Error", message)
                 return
         else:
-            processed = None
+            raw_video = None
 
         proj_name = self._projName.text().strip()
 
@@ -181,8 +168,8 @@ class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
 
         if self.parent() is not None:
             self.parent().start_project(
-                source,
-                processed,
+                enhanced_video,
+                raw_video,
                 proj_dir,
                 proj_name,
                 notes,
@@ -190,10 +177,10 @@ class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
 
             self.close()
         else:
-            message = "Source: {}\nProcessed: {}\nPath: {}\nName: {}\nCopy video: {}"
+            message = "Enhanced: {}\nRaw: {}\nPath: {}\nName: {}\nCopy video: {}"
             message = message.format(
-                source,
-                processed,
+                enhanced_video,
+                raw_video,
                 proj_dir,
                 proj_name,
                 self._copyCheckBox.isChecked())

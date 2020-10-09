@@ -37,13 +37,13 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
     the widget in which the user will draw the crystals
     """
 
-    def __init__(self, parent=None, owner=None):
+    def __init__(self, parent=None, data_source=None):
         """
         set up the dialog
 
             Args:
                 parent (QObject) the parent object
-                owner (CrystalGrowthTrackerMain) the object holding the project data
+                data_source (CrystalGrowthTrackerMain) the object holding the project data
 
             Returns:
                 None
@@ -51,7 +51,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         super(CrystalDrawingWidget, self).__init__(parent)
 
         ## the widget holding the project data
-        self._owner = owner
+        self._data_source = data_source
 
         ## the name in translation, if any
         self._translated_name = self.tr("CrystalDrawingWidget")
@@ -72,19 +72,19 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         self._videoControl.frame_changed.connect(self.frame_changed)
 
         # set data source for tree widget
-        self._treeWidget.set_owner(owner)
+        self._treeWidget.set_data_source(data_source)
 
-    def set_owner(self, owner):
+    def set_data_source(self, data_source):
         """
         setter for the object holding the data to be displayed
 
             Args:
-                owner (CrystalGrowthTrackerMain) object holding data
+                data_source (CrystalGrowthTrackerMain) object holding data
 
             Returns:
                 None
         """
-        self._owner = owner
+        self._data_source = data_source
 
     def display_region(self):
         """
@@ -98,14 +98,14 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
 
         frame = self._videoControl.get_current_frame()
 
-        pixmap = self._owner.make_pixmap(self._current_region, frame)
+        pixmap = self._data_source.make_pixmap(self._current_region, frame)
 
         self._drawing.set_backgroud_pixmap(pixmap)
         self._drawing.redisplay()
 
     def new_region(self):
         """
-        called by owner to indicate a new region has been added, index added to spin box
+        called by data_source to indicate a new region has been added, index added to spin box
 
             Returns:
                 None
@@ -201,9 +201,9 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         """
         qw.QWidget.showEvent(self, event)
 
-        if self._owner is not None:
-            if self._owner.get_video_reader() is not None:
-                if len(self._owner.get_regions()) > 0:
+        if self._data_source is not None:
+            if self._data_source.get_video_reader() is not None:
+                if len(self._data_source.get_result().regions) > 0:
                     self._videoControl.enable(True)
                     self.display_region()
 
@@ -245,7 +245,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         self._drawing.clear_all()
 
         self._current_region = r_index
-        region = self._owner.get_selected_region(r_index)
+        region = self._data_source.get_result().regions[r_index]
 
         self._videoControl.set_range(region.start_frame, region.end_frame)
         self.display_region()
@@ -268,7 +268,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
 
         crystal.add_faces(lines, self._videoControl.get_current_frame())
 
-        results = self._owner.get_result()
+        results = self._data_source.get_result()
         results.add_crystal(crystal, self._current_region)
         self._drawing.clear_all()
         self._treeWidget.fill_tree()
@@ -308,7 +308,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             self._drawing.clear_all()
             print("clear all")
 
-        results = self._owner.get_result()
+        results = self._data_source.get_result()
         print("Results {}".format(results))
         crystals = results.get_crystals(r_index)
         print("Crystals {}".format(crystals))

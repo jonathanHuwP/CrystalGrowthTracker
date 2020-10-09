@@ -347,9 +347,7 @@ class RegionSelectionLabel(qw.QLabel):
             Returns:
                 None
         """
-        regions = self._regions_store.get_regions_iter()
-
-        for region in regions:
+        for region in self._regions_store.get_result().regions:
             if time:
                 if region.time_in_region(self._parent.current_image):
                     self.draw_region(painter, region)

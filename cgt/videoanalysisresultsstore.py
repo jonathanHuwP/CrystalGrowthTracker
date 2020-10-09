@@ -21,45 +21,17 @@ specific language governing permissions and limitations under the License.
 # pylint: disable = too-many-arguments
 
 from collections import namedtuple
-import os
-import datetime as dt
-
-## define a date user pair for the history
-##
-## Args:
-##
-## date the date on which a results were added
-##
-## user_name the login of the user who added the results
-DateUser = namedtuple("DateUser", ["date", "user_name"])
-
-## a tuple for the video on which the analysis is based
-##
-## Args:
-##
-## name the video file name or path
-##
-## frame_rate number of frames per second
-##
-## frame_count the numer of frames in the video
-##
-## width the horizontal size of the video in pixels
-##
-## height the vertical size of the video in pixels
-VideoSource = namedtuple("VideoSource", ["name", "frame_rate", "frame_count", "width", "height"])
 
 class VideoAnalysisResultsStore:
     """
-    a storage class that records the results and history of a video analysis
+    a storage class that records the results of a video analysis
     """
-    def __init__(self, video, history=None, regions=None, crystals=None, region_crystal=None):
+    def __init__(self, regions=None, crystals=None, region_crystal=None):
         """
         initalize an object
 
             Args:
                 video (video_source) description of the original video sequence
-
-                history ([date_user]) a list of (date, unser name) recording changes
 
                 regions ([Region]) the region objects
 
@@ -67,16 +39,6 @@ class VideoAnalysisResultsStore:
 
                 region_crystal ([(int, int)] a mapping (<region index>, <crystal index>)
         """
-
-        ## a record of the date and user for all saves
-        self._history = []
-
-        if history is not None:
-            self._history = history
-
-        ## the source video on which the analysis is based
-        self._video = video
-
         ## storage for the regions
         self._regions = []
 
@@ -94,32 +56,6 @@ class VideoAnalysisResultsStore:
 
         if region_crystal is not None:
             self._region_crystal = region_crystal
-
-    def append_history(self):
-        """
-        add an item to the history
-        """
-        self._history.append(DateUser(str(dt.date.today()), os.getlogin()))
-
-    @property
-    def video(self):
-        """
-        getter for the description of the video
-
-            Returns:
-                the description of the video source
-        """
-        return self._video
-
-    @property
-    def history(self):
-        """
-        getter for the history
-
-            Returns:
-                the list of (date, user name) pairs
-        """
-        return self._history
 
     @property
     def regions(self):

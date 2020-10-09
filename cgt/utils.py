@@ -25,27 +25,6 @@ specific language governing permissions and limitations under the License.
 import socket
 from sys import platform as _platform
 import datetime
-from collections import namedtuple
-
-
-## a tuple representing one end of a region
-##
-## Args:
-## rectangle the subimage in screen pixel coordinates
-## frame the number of the frame
-RegionEnd = namedtuple("RegionEnd", ["rectangle", "frame"])
-
-
-## a tuple for the video on which the analysis is based
-##
-## Args:
-## name the video file name or path
-## frame_rate number of frames per second
-## frame_count the numer of frames in the video
-## width the horizontal size of the video in pixels
-## height the vertical size of the video in pixels
-VideoSource = namedtuple("VideoSource", ["name", "frame_rate", "frame_count", "width", "height"])
-
 
 def find_hostname_and_ip():
     """Finds the hostname and IP address to go in the log file.
@@ -104,5 +83,3 @@ def timestamp():
             timestamp (str):  In the format of year_month_day_hour_minute_second.
     '''
     return datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-
-
