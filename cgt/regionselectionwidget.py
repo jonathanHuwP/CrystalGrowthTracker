@@ -352,7 +352,12 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             Returns:
                 None
         """
-        img = self._data_source.get_video_reader().get_data(self._current_image)
+        reader = self._data_source.get_video_reader()
+        
+        if reader is None:
+            return
+            
+        img = reader.get_data(self._current_image)
 
         im_format = qg.QImage.Format_RGB888
         image = qg.QImage(

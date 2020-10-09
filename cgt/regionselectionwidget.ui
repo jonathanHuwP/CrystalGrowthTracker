@@ -26,7 +26,7 @@
      <item>
       <widget class="QDoubleSpinBox" name="_zoomSpinBox">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="decimals">
         <number>2</number>
