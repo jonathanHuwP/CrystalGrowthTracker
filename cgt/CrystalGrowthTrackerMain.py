@@ -464,6 +464,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self._project['raw_video_no_extension'] = raw_video.stem
         
         self.set_video_scale_parameters()
+        self.save_project()
 
         print(self._project)
         self.read_video()
