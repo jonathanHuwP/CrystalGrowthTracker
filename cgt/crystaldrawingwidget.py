@@ -257,9 +257,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
-        print("CrystalDrawingWidget.save_crystal")
-        # TODO popup request for note
-        note = qw.QInputDialog.getText(self, "Crystal Note", "What")
+        note = qw.QInputDialog.getText(self, "Crystal Note", "If needed add note.")
         crystal = Crystal(notes=note)
         lines = []
         for line in self._drawing.lines_base:
