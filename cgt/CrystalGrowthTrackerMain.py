@@ -333,7 +333,17 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 None
         """
-        print("CrystalGrowthTrackerMain.new_project()")
+        if self._project is not None:
+            mb_reply = qw.QMessageBox.question(
+                self,
+                self.tr('CrystalGrowthTracker'),
+                self.tr('You have a project that will be overwriten. Proceed?'),
+                qw.QMessageBox.Yes | qw.QMessageBox.No,
+                qw.QMessageBox.No)
+
+            if mb_reply == qw.QMessageBox.No:
+                return
+                
         dia = ProjectStartDialog(self)
         dia.show()
 
@@ -386,8 +396,42 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         Returns:
             None
         '''
-        print("save project")
+        if self._project is None:
+            qw.QMessageBox.warning(self,
+                                   "CGT Error",
+                                   "You do not have a project to save!")
+            return
+            
         writecsvreports.save_csv_project(self._project)
+        
+    @qc.pyqtSlot()
+    def save_report(self):
+        """
+        generate and save a report of the current state of the project
+
+            Returns:
+                None
+        """
+        if self._project is None:
+            qw.QMessageBox.warning(self,
+                                   "CGT Error",
+                                   "You do not have a project to report!")
+            return
+            
+        dir_name = self._project["proj_full_path"]
+
+        print("dir_name: ", dir_name)
+
+        if dir_name is not None:
+
+            print("Printing html report.")
+
+            time_stamp = utils.timestamp()
+            print(time_stamp)
+
+            self._project["latest_report"] = htmlreport.save_html_report1(self._project, time_stamp)
+            #htmlreport.save_html_report1(self._project, time_stamp)
+            #writecsvreports.save_csv_reports(dir_name, info)
 
     def start_project(self,
                       enhanced_video,
@@ -614,29 +658,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             im_format)
 
         return qg.QPixmap.fromImage(image)
-
-    @qc.pyqtSlot()
-    def save_results(self):
-        """
-        Save the current set of results
-
-            Returns:
-                None
-        """
-        dir_name = self._project["proj_full_path"]
-
-        print("dir_name: ", dir_name)
-
-        if dir_name is not None:
-
-            print("Printing html report.")
-
-            time_stamp = utils.timestamp()
-            print(time_stamp)
-
-            self._project["latest_report"] = htmlreport.save_html_report1(self._project, time_stamp)
-            #htmlreport.save_html_report1(self._project, time_stamp)
-            #writecsvreports.save_csv_reports(dir_name, info)
 
     @qc.pyqtSlot()
     def reload_results(self):
