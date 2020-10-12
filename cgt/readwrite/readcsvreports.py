@@ -24,7 +24,8 @@ specific language governing permissions and limitations under the License.
 import os
 from pathlib import Path
 import csv
-import cgt.videoanalysisresultsstore as vas
+from cgt.videoanalysisresultsstore import VideoAnalysisResultsStore
+#import cgt.videoanalysisresultsstore as vas
 from cgt.crystal import Crystal
 from cgt.region import Region
 from cgt.imagepoint import ImagePoint
@@ -32,7 +33,7 @@ from cgt.imagelinesegment import ImageLineSegment
 from cgt.results_print_demo import make_test_result
 
 
-def read_csv_project(dir, info):
+def read_csv_project(dir, new_project):
     '''Coordinates the reading of a selection of csv reports.
 
     Args:
@@ -40,8 +41,9 @@ def read_csv_project(dir, info):
                            results in.
 
     Returns:
-        error_code (int):  An error code is returned a 0 (zero) values means all file were read while 
-                           a 1 (one) value means 1 or more files were not read.
+        error_code (int):  An error code is returned a 0 (zero) values means all
+                           file were read while a 1 (one) value means 1 or more
+                           files were not read.
     '''
     print("hello from read_csv_reports")
     error_code = 0
@@ -69,7 +71,7 @@ def read_csv_project(dir, info):
                 crystal_data, error_crystal = readcsv2listofdicts(file, dirpath)
             if "project_info" in file:
                 print("Info!")
-                info_data, error_info = readcsvinfo2dict(file, dirpath)
+                error_info = readcsvinfo2dict(new_project, file, dirpath)
             if "project_lines" in file:
                 print("Lines!")
                 line_data, error_line = readcsv2listofdicts(file, dirpath)
@@ -80,20 +82,19 @@ def read_csv_project(dir, info):
     print("crystal_data: ", crystal_data)
     print("line_data: ", line_data)
     print("region_data: ", region_data)
-    print("info_data: ", info_data)
+    print("new_project: ", new_project)
 
     if error_crystal or error_line or error_region or error_info == 1:
         error_code = 1
 
     if error_code == 0:
-        source = vas.VideoSource(info_data["source"], 8, 700, 800, 600)
-        store = vas.VideoAnalysisResultsStore(source)
-        store.append_history()
+        store = VideoAnalysisResultsStore()
         storeregions(store, region_data)
-        storecrystals(store, crystal_data, line_data)
+        storecrystals(crystal_data, line_data)
+        new_project["results"] = store
 
 
-    return info_data, error_code
+    return error_code
 
 
 
@@ -105,8 +106,9 @@ def read_csv_reports(results_dir):
                            results in.
 
     Returns:
-        error_code (int):  An error code is returned a 0 (zero) values means all file were read while 
-                           a 1 (one) value means 1 or more files were not read.
+        error_code (int):  An error code is returned a 0 (zero) values means all
+                           file were read while a 1 (one) value means 1 or more
+                           files were not read.
     '''
     print("hello from read_csv_reports")
     error_code = 0
@@ -146,15 +148,15 @@ def read_csv_reports(results_dir):
     print("region_data: ", region_data)
 
 
-    if error_crystal or error_line or error_region is 1:
+    if error_crystal or error_line or error_region == 1:
         error_code = 1
-        
+
     if error_code == 0:
         source = vas.VideoSource("ladkj.mp4", 8, 700, 800, 600)
         store = vas.VideoAnalysisResultsStore(source)
         store.append_history()
         storeregions(store, region_data)
-        storecrystals(store, crystal_data, line_data)
+        storecrystals(crystal_data, line_data)
 
     return error_code
 
@@ -209,7 +211,7 @@ def readcsv2listofdicts(file, dirpath):
     return (data, error_code)
 
 
-def readcsvinfo2dict(file, dirpath):
+def readcsvinfo2dict(new_project, file, dirpath):
     '''Reads csv reports created by the Crystal Growth Tracker as a list of dictionaries.
        This allows means varaibles are read with the header as a pair so can be searched 
        by its semantic meaning.
@@ -229,7 +231,7 @@ def readcsvinfo2dict(file, dirpath):
     file_to_open = dir_in / file
     print(file_to_open)
 
-    data = {}
+#    data = {}
 
     if not os.path.exists(file_to_open):
         print("ERROR; The input file does not exist.")
@@ -247,7 +249,7 @@ def readcsvinfo2dict(file, dirpath):
                 if len(row) == 2:
                     key = row[0]
                     value = row[1]
-                    data[key] = value
+                    new_project[key] = value
     except (IOError, OSError, EOFError) as exception:
         print(exception)
         error_code = 1
@@ -257,9 +259,9 @@ def readcsvinfo2dict(file, dirpath):
     finally:
         print("Read file: ", file)
 
-    print("data: ", data)
+    print("new_project: ", new_project)
 
-    return (data, error_code)
+    return (error_code)
 
 
 
@@ -289,13 +291,12 @@ def storeregions(store, regions_data):
 
 
 
-def storecrystals(store, crystal_data, line_data):
+def storecrystals(crystal_data, line_data):
     ''' Writes the crystal_data list/array which is read in from a csv file created by the
         Crystal Growth Tracker to a results object. To do this is must also use the line_data
         which is again a list/array which is read in from a csv file created by the
         Crystal Growth Tracker.
     Args:
-        store:    A results class object.
         crystal_data (list of doctionaries): A list of dictionaries where each item in the list
                                             is a row from the file read.
         line_data (list of doctionaries): A list of dictionaries where each item in the list
@@ -305,18 +306,14 @@ def storecrystals(store, crystal_data, line_data):
         Nothing
     '''
 
-    #temp_crystal = Crystal()
-    crystal_count = 0
+
     for crystal in crystal_data:
         #print("crystal: ", crystal)
-        #if crystal_count == 0:
-
-
         crystal_index = int(crystal["Crystal index"])
         print("crystal_index: ", crystal_index)
-        region_index = int(crystal["Region index"])
+        #region_index = int(crystal["Region index"])
         note = str(crystal["Note"])
-        number_of_frames = int(crystal["Number of frames"])
+        #number_of_frames = int(crystal["Number of frames"])
         frame_number = int(crystal["Frame number"])
 
         if note:

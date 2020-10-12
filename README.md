@@ -65,6 +65,17 @@ To remove the environment, if you no longer want to use CGT:
 
 `conda remove --name CGT --all` 
 
+## DOXYGEN DOCUMENTATION
+Doxygen documentation for this project can be created. Python doxygen is part of the PERPL environment so you do not need to install doxygen.
+
+Run the command in the top directory of the source code:
+
+`doxygen`
+
+After this has run a doc/html directory will appear. Open the index.html file in this directory.
+
+The doxygen documentation for this project lists gives the API (Application Programmers Interface) for all the modules and scripts in this project making it useful to developers who wish to further develop this software.
+
 ## Notes for Developers
 
 ### QT5

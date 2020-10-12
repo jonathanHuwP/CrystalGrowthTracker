@@ -18,13 +18,21 @@ specific language governing permissions and limitations under the License.
 @copyright 2020
 @author: j.h.pickering@leeds.ac.uk
 """
-# set up linting conditions
-# pylint: disable = too-many-public-methods
-# pylint: disable = c-extension-no-member
-# pylint: disable = too-many-instance-attributes
 
 import sys
 import os
+import datetime
+sys.path.insert(0, '..\\CrystalGrowthTracker')
+
+from cgt import utils
+from cgt.utils import find_hostname_and_ip
+
+import array as arr
+import pickle as pk
+import numpy as np
+from PIL import Image
+import matplotlib.image as mpimg
+from skimage import color
 
 from imageio import get_reader as imio_get_reader
 import array as arr
@@ -34,7 +42,7 @@ import getpass
 
 from cgt import utils
 from cgt.utils import find_hostname_and_ip
-from cgt.cgtutility import RegionEnd
+
 from videoanalysisresultsstore import VideoAnalysisResultsStore
 
 import PyQt5.QtWidgets as qw
@@ -42,11 +50,15 @@ import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
 from shutil import copy2
-from pathlib import Path
+#from pathlib import Path
 
-from ImageLabel import ImageLabel
+from cgt import ImageLabel
 from cgt.projectstartdialog import ProjectStartDialog
 from cgt.projectpropertieswidget import ProjectPropertiesWidget
+
+# set up linting conditions
+# pylint: disable = too-many-public-methods
+# pylint: disable = c-extension-no-member
 
 from cgt.regionselectionwidget import RegionSelectionWidget
 from cgt.crystaldrawingwidget import CrystalDrawingWidget
@@ -56,9 +68,18 @@ from cgt.reportviewwidget import ReportViewWidget
 # import UI
 from cgt.Ui_CrystalGrowthTrackerMain import Ui_CrystalGrowthTrackerMain
 
-from cgt import htmlreport
-from cgt import writecsvreports
-from cgt import readcsvreports
+#from cgt import htmlreport
+from cgt.readwrite import htmlreport
+#from cgt import writecsvreports
+from cgt.readwrite import writecsvreports
+from cgt.readwrite import readcsvreports
+#from cgt import readcsvreports
+from cgt import utils
+
+
+sys.path.insert(0, '..\\CrystalGrowthTracker')
+
+
 
 class CGTProject(dict):
     """
@@ -160,6 +181,9 @@ class CGTProject(dict):
 
         # the units of the resolution
         self['resolution_units'] = None
+        
+        # path to latest saved report
+        self["latest_report"] = None
 
     def init_new_project(self):
         """
@@ -173,6 +197,7 @@ class CGTProject(dict):
         self["start_datetime"] = utils.timestamp()
         self['host'], self['ip_address'], self['operating_system'] = utils.find_hostname_and_ip()
         self["start_user"] = getpass.getuser()
+
 
 class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     """
@@ -316,18 +341,18 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     def load_project(self):
         """
         callback for loading an existing project
-
             Returns:
                 None
         """
         print("CrystalGrowthTrackerMain.load_project()")
         
         if self._project is not None:
-            mb_reply = qw.QMessageBox.question(self,
-                                               self.tr('CrystalGrowthTracker'),
-                                               self.tr('You have a project that will be overwriten. Proceed?'),
-                                               qw.QMessageBox.Yes | qw.QMessageBox.No,
-                                               qw.QMessageBox.No)
+            mb_reply = qw.QMessageBox.question(
+                self,
+                self.tr('CrystalGrowthTracker'),
+                self.tr('You have a project that will be overwriten. Proceed?'),
+                qw.QMessageBox.Yes | qw.QMessageBox.No,
+                qw.QMessageBox.No)
 
             if mb_reply == qw.QMessageBox.No:
                 return
@@ -337,18 +362,20 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self,
             self.tr("Select the Project Directory."),
             "")
-            
-        # TODO use Path to check result dir is valid
+
         if dir_name != '':
             print("Loading Project.")
-            data, error_code = readcsvreports.read_csv_project(dir_name, self._project)
+            self._project = CGTProject()
+            error_code = readcsvreports.read_csv_project(dir_name, self._project)
             if error_code == 0:
                 print("The project was loaded.")
-                self._project = data
+                #self._project = data
             else:
                 print("The project was not loaded.")
 
+            print("self._project: ", self._project)
             self.display_properties()
+            self.read_video()
 
     @qc.pyqtSlot()
     def save_project(self):
@@ -462,13 +489,17 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self._project['raw_video_path'] = raw_video.parent
             self._project['raw_video_no_path'] = raw_video.name
             self._project['raw_video_no_extension'] = raw_video.stem
-        
+
         self.set_video_scale_parameters()
         self.save_project()
 
         print(self._project)
         self.read_video()
-        
+        writecsvreports.save_csv_project(self._project)
+        #cgt.readwrite.save_csv_project(self._project)
+
+
+
     def set_video_scale_parameters(self):
         """
         get the video scaling parameters from the user
@@ -498,6 +529,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._project['resolution_units'] = units
         
         self.display_properties()
+
 
     @qc.pyqtSlot()
     def tab_changed(self):
@@ -598,27 +630,13 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         if dir_name is not None:
 
             print("Printing html report.")
-            prog = 'CGT'
-            description = 'Semi-automatically tracks the growth of crystals from X-ray videos.'
 
-            info = {'prog':prog,
-                    'description':description}
-            info['in_file_no_path'] = "filename_in.avi"
-            info['in_file_no_extension'] = os.path.splitext("filename_in")[0]
-            info['frame_rate'] = 20
-            info['resolution'] = 10
-            info['resolution_units'] = "nm"
-            start = utils.timestamp()
-            info['start_datetime'] = start
-            print(start)
-            info['host'], info['ip_address'], info['operating_system'] = utils.find_hostname_and_ip()
-            print(find_hostname_and_ip())
-            htmlreport.save_html_report(dir_name, info)
-            writecsvreports.save_csv_reports(dir_name, info)
-            
-    @qc.pyqtSlot()
-    def save_report(self):
-        print("CGTMain.save_report")
+            time_stamp = utils.timestamp()
+            print(time_stamp)
+
+            self._project["latest_report"] = htmlreport.save_html_report1(self._project, time_stamp)
+            #htmlreport.save_html_report1(self._project, time_stamp)
+            #writecsvreports.save_csv_reports(dir_name, info)
 
     @qc.pyqtSlot()
     def reload_results(self):
@@ -641,6 +659,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             readcsvreports.read_csv_reports(dir_name)
 
     def read_video(self):
+
         """
         read in a video and display
 

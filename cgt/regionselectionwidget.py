@@ -39,7 +39,12 @@ from region import Region
 # import UI
 from cgt.Ui_regionselectionwidget import Ui_RegionSelectionWidget
 
-from cgt.cgtutility import RegionEnd, VideoSource
+## a tuple representing one end of a region
+##
+## Args:
+## rectangle the subimage in screen pixel coordinates
+## frame the number of the frame
+RegionEnd = namedtuple("RegionEnd", ["rectangle", "frame"])
 
 def memview_3b_to_qpixmap(pixels, width, height):
     """
@@ -143,7 +148,8 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         rather than property to allow use in pyqtSlots
 
             Returns:
-                the video time in seconds (float) and the frame number (int)
+                the video time in seconds (float)
+                the frame number (int)
         """
         frame_rate, _ = self._data_source.get_fps_and_resolution()
         return float(self._current_image) / float(frame_rate), self._current_image
