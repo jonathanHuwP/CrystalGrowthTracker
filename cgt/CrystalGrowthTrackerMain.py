@@ -18,6 +18,9 @@ specific language governing permissions and limitations under the License.
 @copyright 2020
 @author: j.h.pickering@leeds.ac.uk
 """
+# set up linting conditions
+# pylint: disable = too-many-public-methods
+# pylint: disable = c-extension-no-member
 
 import sys
 import os
@@ -28,11 +31,7 @@ from cgt import utils
 from cgt.utils import find_hostname_and_ip
 
 import array as arr
-import pickle as pk
 import numpy as np
-from PIL import Image
-import matplotlib.image as mpimg
-from skimage import color
 
 from imageio import get_reader as imio_get_reader
 import array as arr
@@ -50,15 +49,10 @@ import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
 from shutil import copy2
-#from pathlib import Path
 
 from cgt import ImageLabel
 from cgt.projectstartdialog import ProjectStartDialog
 from cgt.projectpropertieswidget import ProjectPropertiesWidget
-
-# set up linting conditions
-# pylint: disable = too-many-public-methods
-# pylint: disable = c-extension-no-member
 
 from cgt.regionselectionwidget import RegionSelectionWidget
 from cgt.crystaldrawingwidget import CrystalDrawingWidget
@@ -68,18 +62,12 @@ from cgt.reportviewwidget import ReportViewWidget
 # import UI
 from cgt.Ui_CrystalGrowthTrackerMain import Ui_CrystalGrowthTrackerMain
 
-#from cgt import htmlreport
 from cgt.readwrite import htmlreport
-#from cgt import writecsvreports
 from cgt.readwrite import writecsvreports
 from cgt.readwrite import readcsvreports
-#from cgt import readcsvreports
 from cgt import utils
 
-
 sys.path.insert(0, '..\\CrystalGrowthTracker')
-
-
 
 class CGTProject(dict):
     """
@@ -360,32 +348,32 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             mb_reply = qw.QMessageBox.question(
                 self,
                 self.tr('CrystalGrowthTracker'),
-                self.tr('You have a project that will be overwriten. Proceed?'),
+                self.tr('You have a project loaded that will be lost when you load. Proceed?'),
                 qw.QMessageBox.Yes | qw.QMessageBox.No,
                 qw.QMessageBox.No)
 
             if mb_reply == qw.QMessageBox.No:
                 return
-            
-
+ 
         dir_name = qw.QFileDialog().getExistingDirectory(
             self,
             self.tr("Select the Project Directory."),
             "")
 
         if dir_name != '':
-            print("Loading Project.")
             self._project = CGTProject()
             error_code = readcsvreports.read_csv_project(dir_name, self._project)
             if error_code == 0:
                 print("The project was loaded.")
                 #self._project = data
             else:
-                print("The project was not loaded.")
+                message = "The projcect could not be loaded"
+                qw.QMessageBox.warning(self,
+                                       message,
+                                       "CGT Error Loading Projcet")
+                return
 
-            print("self._project: ", self._project)
             self.display_properties()
-            self.read_video()
 
     @qc.pyqtSlot()
     def save_project(self):
@@ -655,6 +643,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         return qg.QPixmap.fromImage(image)
 
+    @qc.pyqtSlot()
     def read_video(self):
 
         """
@@ -663,16 +652,31 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 None
         """
+        error_title = self.tr("CGT Video File Error")
+        if self._project is None:
+            message = self.tr("You must load/create a project before loading video")
+            qw.QMessageBox.warning(self,
+                                   error_title,
+                                   message)
+            return
+        
+        if self._project["enhanced_video"] is None:
+            message = self.tr("The current project contains no video file")
+            qw.QMessageBox.warning(self,
+                                   error_title,
+                                   message)
+            return
+            
         try:
             self._video_reader = imio_get_reader(self._project["enhanced_video"], 'ffmpeg')
         except (FileNotFoundError, IOError) as ex:
-            message = "Unexpected error reading {}: {} => {}".format(file_name, type(ex), ex.args)
+            message = self.tr("Unexpected error reading {}: {} => {}")
+            message = meassge.format(file_name, type(ex), ex.args)
             qw.QMessageBox.warning(self,
-                                   "Video Read Error",
+                                   error_title,
                                    message)
             return
 
-        self._project["results"] = VideoAnalysisResultsStore()
         self._selectWidget.show_video()
 
     @qc.pyqtSlot()
