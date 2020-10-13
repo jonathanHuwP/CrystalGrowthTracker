@@ -540,9 +540,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         print(self._project)
         self.read_video()
         writecsvreports.save_csv_project(self._project)
-        #cgt.readwrite.save_csv_project(self._project)
-
-
 
     def set_video_scale_parameters(self):
         """
@@ -573,7 +570,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._project['resolution_units'] = units
         
         self.display_properties()
-
 
     @qc.pyqtSlot()
     def tab_changed(self):
@@ -658,26 +654,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             im_format)
 
         return qg.QPixmap.fromImage(image)
-
-    @qc.pyqtSlot()
-    def reload_results(self):
-        """
-        reload a set of results
-
-            Returns:
-                None
-        """
-        print("reload results")
-        dir_name = qw.QFileDialog().getExistingDirectory(
-            self,
-            self.tr("Select Directory for Reload"),
-            "")
-
-        if dir_name is not None:
-            readcsvreports.read_csv_reports(dir_name)
-            pass
-
-            readcsvreports.read_csv_reports(dir_name)
 
     def read_video(self):
 

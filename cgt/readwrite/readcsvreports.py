@@ -59,10 +59,14 @@ def read_csv_project(dir, new_project):
     error_crystal = 0
     error_line = 0
     error_region = 0
+    error_info = 0
+    
     print(files)
+    
     crystal_data = []
     line_data = []
     region_data = []
+    
     for file in files:
         if file[-4:] == '.csv':
             print(file)
