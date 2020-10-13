@@ -46,7 +46,7 @@
    </property>
    <widget class="QMenu" name="menuOpen">
     <property name="title">
-     <string>Open </string>
+     <string>File</string>
     </property>
     <addaction name="_actionNewProject"/>
     <addaction name="_actionLoadProject"/>
