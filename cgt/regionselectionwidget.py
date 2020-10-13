@@ -133,7 +133,6 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         
     @qc.pyqtSlot()
     def load_video(self):
-        print("RegionSelectionWidget.load_video")
         self._data_source.load_video()
 
     @property
@@ -212,7 +211,6 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         img, rect = self.get_current_subimage()
 
         pixmap = memview_3b_to_qpixmap(img, rect.width, rect.height)
-        # TODO zoom of source goes here ?
 
         self._endImageLabel.setPixmap(pixmap)
 
@@ -285,6 +283,18 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         self._regionComboBox.addItem(str(len(results.regions)))
         self.reset_enter_region()
 
+    def reload_combobox(self):
+        """
+        clear and reload the combobox
+        
+            Returns:
+                None
+        """
+        self._regionComboBox.clear()
+        results = self._data_source.get_result()
+        for index in range(len(results.regions)):
+            self._regionComboBox.addItem(str(index))
+        
     def get_selected_region(self):
         index = self._regionComboBox.currentIndex()
         

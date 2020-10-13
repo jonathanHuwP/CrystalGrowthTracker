@@ -407,6 +407,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 return
 
             self.display_properties()
+            self._selectWidget.reload_combobox()
             self._project.reset_changed()
 
     @qc.pyqtSlot()
@@ -557,6 +558,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self._project['raw_video_no_path'] = raw_video.name
             self._project['raw_video_no_extension'] = raw_video.stem
 
+        self._project["results"] = VideoAnalysisResultsStore()
+        
         self.set_video_scale_parameters()
         self.save_project()
 
