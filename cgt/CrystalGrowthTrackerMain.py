@@ -101,6 +101,10 @@ class CGTProject(dict):
                 None
         """
         super().__init__()
+        
+        ## a flag to indicate the dictionary has been changed. can be unset after a save
+        self._changed = False
+        
         # program name
         self["prog"] = None
 
@@ -185,6 +189,35 @@ class CGTProject(dict):
         self["start_datetime"] = utils.timestamp()
         self['host'], self['ip_address'], self['operating_system'] = utils.find_hostname_and_ip()
         self["start_user"] = getpass.getuser()
+        
+    def __setitem__(self, item, value):
+        """
+        override setitem to allow changs flag to be set on any data change
+        
+            Returns:
+                None
+        """
+        super(CGTProject, self).__setitem__(item, value)
+        self._changed = True
+    
+    def reset_changed(self):
+        """
+        make the changed status false
+        
+            Returns:
+                None
+        """
+        self._changed = False
+        
+    def has_been_changed(self):
+        """
+        getter for the current changed status
+        
+            Return:
+                true if the dictionary contains new data else false
+        """
+        # TODO add changed status from the results, if any
+        return self._changed
 
 
 class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
@@ -374,6 +407,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 return
 
             self.display_properties()
+            self._project.reset_changed()
 
     @qc.pyqtSlot()
     def save_project(self):
@@ -391,6 +425,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             return
             
         writecsvreports.save_csv_project(self._project)
+        self._project.reset_changed()
         
     @qc.pyqtSlot()
     def save_report(self):
@@ -691,9 +726,16 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 None
         """
+        
+        message = self.tr('Do you want to leave?')
+        changed = self.tr('You have unsaved data.')
+        
+        if self._project is not None and self._project.has_been_changed():
+            message = changed + "\n" + message
+            
         mb_reply = qw.QMessageBox.question(self,
-                                           self.tr('CrystalGrowthTracker'),
-                                           self.tr('Do you want to leave?'),
+                                           'CrystalGrowthTracker',
+                                           message,
                                            qw.QMessageBox.Yes | qw.QMessageBox.No,
                                            qw.QMessageBox.No)
 
