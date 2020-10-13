@@ -21,6 +21,8 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
+from editnotesdialog import EditNotesDialog
+
 # import UI
 from Ui_projectpropertieswidget import Ui_ProjectPropertiesWidget
 
@@ -78,6 +80,15 @@ class ProjectPropertiesWidget(qw.QWidget, Ui_ProjectPropertiesWidget):
         print("ProjectPropertiesWidget.'set_video_scale_parameters'")
         if self._owner is not None:
             self._owner.set_video_scale_parameters()
+            
+    @qc.pyqtSlot()
+    def edit_notes(self):
+        print("ProjectPropertiesWidget.edit_notes")
+        if self._owner._project is None:
+            return
+            
+        ew = EditNotesDialog(self._owner, self._owner._project)
+        ew.show()
 
 #####################################
 
