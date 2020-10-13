@@ -50,7 +50,6 @@
     </property>
     <addaction name="_actionNewProject"/>
     <addaction name="_actionLoadProject"/>
-    <addaction name="_actionLoadVideo"/>
     <addaction name="separator"/>
     <addaction name="_actionSaveReport"/>
     <addaction name="_actionSaveProject"/>
@@ -83,14 +82,6 @@
   <action name="_actionSaveReport">
    <property name="text">
     <string>Save Report</string>
-   </property>
-  </action>
-  <action name="_actionLoadVideo">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Load Video</string>
    </property>
   </action>
  </widget>
@@ -181,22 +172,6 @@
    <signal>triggered()</signal>
    <receiver>CrystalGrowthTrackerMain</receiver>
    <slot>save_report()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>470</x>
-     <y>291</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>_actionLoadVideo</sender>
-   <signal>triggered()</signal>
-   <receiver>CrystalGrowthTrackerMain</receiver>
-   <slot>read_video()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>

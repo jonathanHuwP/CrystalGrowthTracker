@@ -355,10 +355,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             if mb_reply == qw.QMessageBox.No:
                 return
  
-        dir_name = qw.QFileDialog().getExistingDirectory(
+        dir_name = qw.QFileDialog.getExistingDirectory(
             self,
             self.tr("Select the Project Directory."),
-            "")
+            os.path.expanduser('~'))
 
         if dir_name != '':
             self._project = CGTProject()
@@ -526,7 +526,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self.save_project()
 
         print(self._project)
-        self.read_video()
         writecsvreports.save_csv_project(self._project)
 
     def set_video_scale_parameters(self):
@@ -644,7 +643,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         return qg.QPixmap.fromImage(image)
 
     @qc.pyqtSlot()
-    def read_video(self):
+    def load_video(self):
 
         """
         read in a video and display

@@ -130,6 +130,11 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         """
         frame = self._videoControls.get_current_frame()
         self.set_frame(frame)
+        
+    @qc.pyqtSlot()
+    def load_video(self):
+        print("RegionSelectionWidget.load_video")
+        self._data_source.load_video()
 
     @property
     def current_image(self):
