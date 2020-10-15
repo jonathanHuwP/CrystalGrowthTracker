@@ -133,7 +133,8 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         
     @qc.pyqtSlot()
     def load_video(self):
-        self._data_source.load_video()
+        if self._data_source.get_video_reader() is None:
+            self._data_source.load_video()
 
     @property
     def current_image(self):
