@@ -101,10 +101,10 @@ class CGTProject(dict):
                 None
         """
         super().__init__()
-        
+
         ## a flag to indicate the dictionary has been changed. can be unset after a save
         self._changed = False
-        
+
         # program name
         self["prog"] = None
 
@@ -173,7 +173,7 @@ class CGTProject(dict):
 
         # the units of the resolution
         self['resolution_units'] = None
-        
+
         # path to latest saved report
         self["latest_report"] = None
 
@@ -189,30 +189,30 @@ class CGTProject(dict):
         self["start_datetime"] = utils.timestamp()
         self['host'], self['ip_address'], self['operating_system'] = utils.find_hostname_and_ip()
         self["start_user"] = getpass.getuser()
-        
+
     def __setitem__(self, item, value):
         """
         override setitem to allow changs flag to be set on any data change
-        
+
             Returns:
                 None
         """
         super(CGTProject, self).__setitem__(item, value)
         self._changed = True
-    
+
     def reset_changed(self):
         """
         make the changed status false
-        
+
             Returns:
                 None
         """
         self._changed = False
-        
+
     def has_been_changed(self):
         """
         getter for the current changed status
-        
+
             Return:
                 true if the dictionary contains new data else false
         """
@@ -286,8 +286,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         # set up tab
         self.add_tab(self._drawingTab, self._drawingWidget, "Trace Crystals")
-        
-        
+
+
         ## base widget for results tab
         self._resultsTab = qw.QWidget(self)
 
@@ -296,8 +296,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         # set up tab
         self.add_tab(self._resultsTab, self._resultsWidget, "Results Overview")
-        
-  
+
+
         ## base widget for Report tab
         self._reportTab = qw.QWidget(self)
 
@@ -306,8 +306,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._reportWidget.set_html("<!DOCTYPE html><html><body><h1 style=\"color:blue;\">Hello World!</h1><p style=\"color:red;\">There is no report.</p></body></html>")
 
         # set up tab
-        self.add_tab(self._reportTab, self._reportWidget, "Current Report")  
-        
+        self.add_tab(self._reportTab, self._reportWidget, "Current Report")
+
 
         # set up the title
         self.set_title()
@@ -364,7 +364,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
             if mb_reply == qw.QMessageBox.No:
                 return
-                
+
         dia = ProjectStartDialog(self)
         dia.show()
 
@@ -376,7 +376,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 None
         """
         print("CrystalGrowthTrackerMain.load_project()")
-        
+
         if self._project is not None:
             mb_reply = qw.QMessageBox.question(
                 self,
@@ -387,7 +387,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
             if mb_reply == qw.QMessageBox.No:
                 return
- 
+
         dir_name = qw.QFileDialog.getExistingDirectory(
             self,
             self.tr("Select the Project Directory."),
@@ -402,8 +402,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             else:
                 message = "The projcect could not be loaded"
                 qw.QMessageBox.warning(self,
-                                       message,
-                                       "CGT Error Loading Projcet")
+                                       "CGT Error Loading Projcet",
+                                       message)
                 return
 
             self.display_properties()
@@ -424,7 +424,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                                    "CGT Error",
                                    "You do not have a project to save!")
             return
-            
+
         try:
             writecsvreports.save_csv_project(self._project)
             self._project.reset_changed()
@@ -433,10 +433,12 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             print(message)
             for item in sys.exc_info():
                 print("{}".item)
-            qw.QMessageBox.warning(self,
-                                   message,
-                                   "CGT File Error")
-        
+            qw.QMessageBox.warning(self, "CGT File Error", message)
+            return
+
+        message = "Project saved to: {}".format(self._project["proj_full_path"])
+        qw.QMessageBox.information(self, "CGT File", message)
+
     @qc.pyqtSlot()
     def save_report(self):
         """
@@ -450,7 +452,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                                    "CGT Error",
                                    "You do not have a project to report!")
             return
-            
+
         dir_name = self._project["proj_full_path"]
 
         print("dir_name: ", dir_name)
@@ -568,14 +570,14 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self._project['raw_video_no_extension'] = raw_video.stem
 
         self._project["results"] = VideoAnalysisResultsStore()
-        
+
         self.set_video_scale_parameters()
         self.save_project()
 
     def set_video_scale_parameters(self):
         """
         get the video scaling parameters from the user
-        
+
             Returns:
                 None
         """
@@ -583,23 +585,23 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             fps = self._project['frame_rate']
         else:
             fps = 8
-            
+
         if self._project['resolution'] is not None:
             resolution = self._project['resolution']
         else:
             resolution = 0.81
-            
+
         if self._project['resolution_units'] is not None:
             units = self._project['resolution_units']
         else:
             units = VideoParametersDialog.RESOLUTION_UNITS[1]
-        
+
         fps, resolution, units = VideoParametersDialog.get_values_from_user(self, fps, resolution, units)
-        
+
         self._project['frame_rate'] = fps
         self._project['resolution'] = resolution
         self._project['resolution_units'] = units
-        
+
         self.display_properties()
 
     @qc.pyqtSlot()
@@ -628,7 +630,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             return self._project["frame_rate"], self._project["resolution"]
 
         return None, None
-        
+
     def get_result(self):
         """
         getter for the current results object
@@ -640,11 +642,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             return self._project["results"]
 
         return None
-        
+
     def append_region(self, region):
         """
         add a region to the results and notify the crystal drawing widget
-        
+
             Args:
                 region (Region) the region
 
@@ -702,14 +704,14 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                                    error_title,
                                    message)
             return
-        
+
         if self._project["enhanced_video"] is None:
             message = self.tr("The current project contains no video file")
             qw.QMessageBox.warning(self,
                                    error_title,
                                    message)
             return
-            
+
         try:
             self._video_reader = imio_get_reader(self._project["enhanced_video"], 'ffmpeg')
         except (FileNotFoundError, IOError) as ex:
@@ -735,13 +737,13 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 None
         """
-        
+
         message = self.tr('Do you want to leave?')
         changed = self.tr('You have unsaved data.')
-        
+
         if self._project is not None and self._project.has_been_changed():
             message = changed + "\n" + message
-            
+
         mb_reply = qw.QMessageBox.question(self,
                                            'CrystalGrowthTracker',
                                            message,
