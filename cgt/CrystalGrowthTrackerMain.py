@@ -215,9 +215,10 @@ class CGTProject(dict):
             Return:
                 true if the dictionary contains new data else false
         """
-        # TODO add changed status from the results, if any
-        return self._changed
-
+        if self["results"] is None:
+            return self._changed 
+        else:
+            return self._changed or self["results"].has_been_changed()
 
 class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     """

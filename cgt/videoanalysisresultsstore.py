@@ -144,6 +144,7 @@ class VideoAnalysisResultsStore:
                 IndexError if index out of range
         """
         self._regions[index] = region
+        self.set_changed()
 
     def add_region(self, region):
         """
@@ -157,6 +158,8 @@ class VideoAnalysisResultsStore:
         """
         index = len(self._regions)
         self._regions.append(region)
+        self.set_changed()
+        
         return index
 
     def reserve_crystals(self, size):
@@ -186,6 +189,7 @@ class VideoAnalysisResultsStore:
                 IndexError if index out of range
         """
         self._crystals[index] = crystal
+        self.set_changed()
 
     def add_crystal(self, crystal, region_index):
         """
@@ -198,6 +202,7 @@ class VideoAnalysisResultsStore:
         c_index = len(self._crystals)
         self._crystals.append(crystal)
         self._region_crystal.append((region_index, c_index))
+        self.set_changed()
 
     @property
     def number_of_regions(self):
