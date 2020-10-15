@@ -33,6 +33,30 @@
       </property>
      </widget>
     </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="_loadVideoButton">
+        <property name="text">
+         <string>Load Video</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -176,6 +200,22 @@
     <hint type="sourcelabel">
      <x>-1</x>
      <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>470</x>
+     <y>291</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_loadVideoButton</sender>
+   <signal>clicked()</signal>
+   <receiver>CrystalGrowthTrackerMain</receiver>
+   <slot>load_video()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>871</x>
+     <y>522</y>
     </hint>
     <hint type="destinationlabel">
      <x>470</x>

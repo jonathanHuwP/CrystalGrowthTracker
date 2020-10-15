@@ -49,6 +49,15 @@ class ProjectPropertiesWidget(qw.QWidget, Ui_ProjectPropertiesWidget):
 
         ## the class holding the data
         self._data_source = data_source
+        
+    def clear(self):
+        """
+        clear the contents
+        
+            Return:
+                None
+        """
+        self._propertiesBrowser.clear()
 
     def clear_and_display_text(self, text):
         """

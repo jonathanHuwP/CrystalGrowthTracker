@@ -302,13 +302,6 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="_loadVideoButton">
-       <property name="text">
-        <string>Load Video</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="_selectButton">
        <property name="enabled">
         <bool>false</bool>
@@ -414,22 +407,6 @@
    <hints>
     <hint type="sourcelabel">
      <x>891</x>
-     <y>459</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>480</x>
-     <y>245</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>_loadVideoButton</sender>
-   <signal>clicked()</signal>
-   <receiver>RegionSelectionWidget</receiver>
-   <slot>load_video()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>78</x>
      <y>459</y>
     </hint>
     <hint type="destinationlabel">

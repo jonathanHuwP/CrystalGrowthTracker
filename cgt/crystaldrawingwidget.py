@@ -73,6 +73,18 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
 
         # set data source for tree widget
         self._treeWidget.set_data_source(data_source)
+        
+    def clear(self):
+        """
+        clear the contents
+        
+            Return:
+                None
+        """
+        self._store = LineSetsAndFramesStore()
+        self._current_region = None
+        self._treeWidget.clear()
+        self._drawing.clear()
 
     def set_data_source(self, data_source):
         """

@@ -95,6 +95,7 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
 
         ## the label for displaying the current main image
         self._source_label = RegionSelectionLabel(self, self._data_source)
+        
         self._source_label.setAlignment(qc.Qt.AlignTop | qc.Qt.AlignLeft)
         self._source_label.setSizePolicy(
             qw.QSizePolicy.Fixed, qw.QSizePolicy.Fixed)
@@ -119,7 +120,26 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
 
         # connect up the change frame signals
         self._videoControls.frame_changed.connect(self.frame_changed)
-
+        
+    def clear(self):
+        """
+        clear the contents
+        
+            Return:
+                None
+        """
+        self._video_frame_count = 0
+        self._current_image = -1
+        self._region_end = None
+        self._user_frame_rate = None
+        self._regionComboBox.clear()
+        self._videoControls.clear()
+        self._endImageLabel.clear()
+        self._endLabel.clear()
+        self._startImageLabel.clear()
+        self._startLabel.clear()
+        self._source_label.clear()
+        
     @qc.pyqtSlot()
     def frame_changed(self):
         """
@@ -246,7 +266,6 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         """
         if self._selectedButton.isChecked():
             self._source_label.repaint()
-
 
     @qc.pyqtSlot()
     def select_region(self):

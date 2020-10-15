@@ -92,9 +92,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         ## the name of the project
         self._project_name = None
 
-        ## the videos data
-        self._video_data = None
-
         ## a pointer for the video file reader
         self._video_reader = None
 
@@ -242,9 +239,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         if dir_name != '':
             project = CGTProject()
             error_code = readcsvreports.read_csv_project(dir_name, project)
-            if error_code == 0:
-                print("The project was loaded.")
-            else:
+            if error_code != 0:
                 message = "The project could not be loaded"
                 qw.QMessageBox.warning(self,
                                        "CGT Error Loading Projcet",
@@ -253,9 +248,49 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
             self._project = project
             self._project.reset_changed()
-            self.display_properties()
-            self._selectWidget.reload_combobox()
-            self.set_title()
+            self.project_created_or_loaded()
+            
+    def project_created_or_loaded(self):
+        """
+        carry out action for a newly created or loaded project
+        
+            Returns:
+                None
+        """
+        self.reset_tab_wigets()
+
+        # remove old reader
+        self._video_reader = None 
+        
+        # dispaly project
+        self.display_properties()
+        self.set_title()
+        
+        # if project has regions
+        if self._project["results"] is not None:
+            if self._project["results"].number_of_regions > 0:
+                self._selectWidget.reload_combobox()
+                self._drawingWidget.new_region()
+                
+        self._selectWidget.setEnabled(False)
+        self._drawingWidget.setEnabled(False)
+        
+        if self._project["latest_report"] is not None:
+            if self._project["latest_report"] != "":
+                self._reportWidget.read_report(self._project["latest_report"])
+        
+    def reset_tab_wigets(self):
+        """
+        reset the tab widgets to inital conditions
+        
+            Returns:
+                None
+        """
+        self._drawingWidget.clear()
+        self._selectWidget.clear()
+        self._propertiesWidget.clear()
+        self._reportWidget.clear()
+        #self._resultsWidget.clear()
 
     @qc.pyqtSlot()
     def save_project(self):
@@ -546,7 +581,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
     @qc.pyqtSlot()
     def load_video(self):
-
         """
         read in a video and display
 
@@ -568,17 +602,26 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                                    message)
             return
 
+        message_box = qw.QMessageBox();
+        message_box.setText("Loading Video.");
+        message_box.setInformativeText("Loading video may take some time.");
         try:
+            message_box.show()
             self._video_reader = imio_get_reader(self._project["enhanced_video"], 'ffmpeg')
         except (FileNotFoundError, IOError) as ex:
+            message_box.close()
             message = self.tr("Unexpected error reading {}: {} => {}")
             message = meassge.format(file_name, type(ex), ex.args)
             qw.QMessageBox.warning(self,
                                    error_title,
                                    message)
             return
-
+            
+        message_box.close()
+        
+        self._selectWidget.setEnabled(True)
         self._selectWidget.show_video()
+        self._drawingWidget.setEnabled(True)
 
     @qc.pyqtSlot()
     def closeEvent(self, event):

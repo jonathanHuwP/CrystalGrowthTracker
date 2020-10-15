@@ -53,6 +53,15 @@ class ReportViewWidget(qw.QWidget, Ui_ReportViewWidget):
         self._text = qw.QTextBrowser(self)
         self._layout = qw.QVBoxLayout(self._text)
         self._scrollArea.setWidget(self._text)
+        
+    def clear(self):
+        """
+        clear any text and set up default
+        
+            Returns:
+                None
+        """
+        self._text.clear()
 
     def set_html(self, text=None):
         self._text.setText(text)

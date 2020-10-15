@@ -203,6 +203,15 @@ class ResultsTreeWidget(qw.QWidget, Ui_ResultsTreeWidget):
                         l_item.setData(3, qc.Qt.UserRole, l_var)
 
         self._tree.addTopLevelItems(items)
+        
+    def clear(self):
+        """
+        clear the tree 
+        
+            Returns:
+                None
+        """
+        self._tree.clear()
 
 
 ###############################

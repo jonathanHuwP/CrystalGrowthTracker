@@ -47,7 +47,6 @@ class VideoControlWidget(qw.QWidget, Ui_VideoControlWidget):
         # set disabled
         self.enable(self._enabled)
         
-
     @qc.pyqtSlot()        
     def up_clicked(self):
         """
@@ -134,6 +133,7 @@ class VideoControlWidget(qw.QWidget, Ui_VideoControlWidget):
             Returns:
                 None
         """
+        #TODO replace with qt .setEnabled()
         self._downButton.setEnabled(flag)
         self._upButton.setEnabled(flag)
         self._frameSlider.setEnabled(flag)
@@ -167,6 +167,21 @@ class VideoControlWidget(qw.QWidget, Ui_VideoControlWidget):
         
         self.enable(tmp)
        
+    def clear(self):
+        """
+        clear all the current data
+        
+            Returns:
+                None
+        """
+        tmp = self.is_enabled()
+        self.enable(False)
+        
+        self.set_frame(0)
+        self.set_range(0, 0)
+        
+        self.enable(tmp)
+        
     
 def run():
     """
