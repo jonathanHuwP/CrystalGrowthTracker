@@ -208,6 +208,9 @@ class CGTProject(dict):
         """
         self._changed = False
 
+        if self["results"] is not None:
+            self["results"].reset_changed()
+
     def has_been_changed(self):
         """
         getter for the current changed status
@@ -216,7 +219,7 @@ class CGTProject(dict):
                 true if the dictionary contains new data else false
         """
         if self["results"] is None:
-            return self._changed 
+            return self._changed
         else:
             return self._changed or self["results"].has_been_changed()
 
@@ -343,7 +346,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             text = "<p><b>{}:</b> {}"
             text = text.format(key, self._project[key])
             self._propertiesWidget.append_text(text)
-            
+
         self._propertiesWidget.show_top_text()
 
         self._tabWidget.setCurrentWidget(self._propertiesTab)
@@ -408,9 +411,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 return
 
             self._project = project
+            self._project.reset_changed()
             self.display_properties()
             self._selectWidget.reload_combobox()
-            self._project.reset_changed()
             self.set_title()
 
     @qc.pyqtSlot()
@@ -468,7 +471,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             print(time_stamp)
 
             self._project["latest_report"] = htmlreport.save_html_report1(self._project, time_stamp)
-            
+
             try:
                 self._reportWidget.read_report(self._project["latest_report"])
             except OSError as err:
@@ -476,7 +479,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 qw.QMessageBox.warning(self,
                                        "Report Error",
                                        message)
-                                       
+
             #htmlreport.save_html_report1(self._project, time_stamp)
             #writecsvreports.save_csv_reports(dir_name, info)
 
