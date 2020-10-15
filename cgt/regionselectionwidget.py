@@ -281,7 +281,7 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         
         self._data_source.append_region(region)
         results = self._data_source.get_result()
-        self._regionComboBox.addItem(str(len(results.regions)))
+        self._regionComboBox.addItem(str(len(results.regions)-1))
         self.reset_enter_region()
 
     def reload_combobox(self):
