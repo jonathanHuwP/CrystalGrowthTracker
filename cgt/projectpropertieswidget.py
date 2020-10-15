@@ -62,6 +62,7 @@ class ProjectPropertiesWidget(qw.QWidget, Ui_ProjectPropertiesWidget):
         """
         self._propertiesBrowser.clear()
         self._propertiesBrowser.setText(text)
+        self._propertiesBrowser.verticalScrollBar().setValue(0)
 
     def append_text(self, text):
         """
@@ -75,18 +76,22 @@ class ProjectPropertiesWidget(qw.QWidget, Ui_ProjectPropertiesWidget):
         """
         self._propertiesBrowser.append(text)
         
+    def show_top_text(self):
+        self._propertiesBrowser.verticalScrollBar().setValue(0)
+
+
     @qc.pyqtSlot()
     def set_video_scale_parameters(self):
         print("ProjectPropertiesWidget.'set_video_scale_parameters'")
         if self._owner is not None:
             self._owner.set_video_scale_parameters()
-            
+
     @qc.pyqtSlot()
     def edit_notes(self):
         print("ProjectPropertiesWidget.edit_notes")
         if self._owner._project is None:
             return
-            
+
         ew = EditNotesDialog(self._owner, self._owner._project)
         ew.show()
 

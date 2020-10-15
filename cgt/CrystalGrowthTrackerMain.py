@@ -343,6 +343,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             text = "<p><b>{}:</b> {}"
             text = text.format(key, self._project[key])
             self._propertiesWidget.append_text(text)
+            
+        self._propertiesWidget.show_top_text()
 
         self._tabWidget.setCurrentWidget(self._propertiesTab)
 
