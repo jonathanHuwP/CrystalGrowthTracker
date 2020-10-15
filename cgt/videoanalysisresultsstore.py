@@ -56,6 +56,36 @@ class VideoAnalysisResultsStore:
 
         if region_crystal is not None:
             self._region_crystal = region_crystal
+            
+        ## flag to indicate store has been changed
+        self._changed = False
+        
+    def has_been_changed(self):
+        """
+        getter for the changed status
+        
+            Returns:
+                the changed flag
+        """
+        return self._changed
+        
+    def reset_changed(self):
+        """
+        make the changed status false
+
+            Returns:
+                None
+        """
+        self._changed = False
+        
+    def set_changed(self):
+        """
+        set the changed status to true
+        
+            Returns:
+                None
+        """
+        self._changed = True
 
     @property
     def regions(self):

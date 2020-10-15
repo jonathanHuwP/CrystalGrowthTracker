@@ -34,7 +34,6 @@ import array as arr
 import numpy as np
 
 from imageio import get_reader as imio_get_reader
-import array as arr
 
 sys.path.insert(0, '..\\CrystalGrowthTracker')
 import getpass
@@ -303,7 +302,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         ## the report widget
         self._reportWidget = ReportViewWidget(self._selectTab, self)
-        self._reportWidget.set_html("<!DOCTYPE html><html><body><h1 style=\"color:blue;\">Hello World!</h1><p style=\"color:red;\">There is no report.</p></body></html>")
+        self._reportWidget.set_html("<!DOCTYPE html><html><body><h1 style=\"color:blue;\">No Report!</h1><p style=\"color:red;\">No report has been saved.</p></body></html>")
 
         # set up tab
         self.add_tab(self._reportTab, self._reportWidget, "Current Report")
@@ -411,6 +410,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self.display_properties()
             self._selectWidget.reload_combobox()
             self._project.reset_changed()
+            self.set_title()
 
     @qc.pyqtSlot()
     def save_project(self):
@@ -467,6 +467,15 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             print(time_stamp)
 
             self._project["latest_report"] = htmlreport.save_html_report1(self._project, time_stamp)
+            
+            try:
+                self._reportWidget.read_report(self._project["latest_report"])
+            except OSError as err:
+                message = "Could not open report file: {}".format(err)
+                qw.QMessageBox.warning(self,
+                                       "Report Error",
+                                       message)
+                                       
             #htmlreport.save_html_report1(self._project, time_stamp)
             #writecsvreports.save_csv_reports(dir_name, info)
 
@@ -575,6 +584,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self.set_video_scale_parameters()
         self.save_project()
+        self.set_title()
 
     def set_video_scale_parameters(self):
         """
@@ -667,11 +677,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         name = "No project"
 
-        if self._project is not None:
+        if self._project is not None and self._project["proj_name"] is not None:
             name = self._project["proj_name"]
 
-        title = self._translated_name + " - " + name
-        self.setWindowTitle(title)
+        self.setWindowTitle(name)
 
     def make_pixmap(self, index, frame):
         region = self._project["results"].regions[index]

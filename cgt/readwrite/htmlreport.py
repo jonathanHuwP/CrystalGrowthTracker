@@ -71,9 +71,9 @@ def save_html_report(results_dir, info):
 
     info['no_of_cystals'] = len(results.crystals)
     info['no_of_regions'] = len(results.regions)
-# 
+#
 #     print("crystals_array: ", crystals_array)
-# 
+#
     fout = write_html_report_start(fout, info,)
 
     fout = write_html_overview(fout, info, results)
@@ -122,7 +122,7 @@ def save_html_report1(info, time_stamp):
 
 
     fout = write_html_report_start1(fout, info,)
-# 
+#
 #     write_html_report_end(fout)
 
     return results_dir
@@ -164,7 +164,7 @@ def write_html_report_start1(fout, info):
 
     title_line1 = ("<title>Report on *** Produced by the Crystal Growth Tracker (+++) "
                    "Software</title>\n")
-    title = title_line1.replace("***", info['source_no_path'])
+    title = title_line1.replace("***", info['enhanced_video_path'])
     title = title.replace("+++", info['prog'])
     fout.write(title)
 
@@ -172,7 +172,7 @@ def write_html_report_start1(fout, info):
     fout.write("\n<body>\n")
     title_line2 = ("<h1 align=\"center\">Report on *** Produced by the "
                    "Crystal Growth Tracker (+++) Software</h1>\n")
-    title2 = title_line2.replace("***", info['source_no_path'])
+    title2 = title_line2.replace("***", info['enhanced_video_path'])
     title2 = title2.replace("+++", prog)
     fout.write(title2)
 
@@ -180,9 +180,9 @@ def write_html_report_start1(fout, info):
     fout.write(program_info)
 
 
-    report_info = (r"<p>This project was started at "+info['start']+r" on the "
+    report_info = (r"<p>This project was started at "+info['start_datetime']+r" on the "
                     +info['host']+r" host system with the "+info['operating_system']
-                    +" operating system. The video file, "+info['source_no_path']
+                    +" operating system. The video file, "+info['enhanced_video_no_path']
                     +r" was analysed and has a frame rate of "+str(info['frame_rate'])
                     +" and resolution of " +str(info['resolution'])
                     +" "+str(info['resolution_units'])+" per pixel. A note of caution "
@@ -252,7 +252,7 @@ def write_html_report_start(fout, info):
     fout.write(program_info)
 
 
-    report_info = (r"<p>This program ran at "+info['start']+r" on the "
+    report_info = (r"<p>This program ran at "+info['start_datetime']+r" on the "
                     +info['host']+r" host system with the "+info['operating_system']
                     +" operating system. The video file, "+info['in_file_no_path']
                     +r" was analysed and has a frame rate of "+str(info['frame_rate'])
@@ -359,7 +359,7 @@ def write_html_crystals(fout, info, results):
 
         write_frame_table(fout, results, i, crystal)
 
-        
+
 
     return fout
 
