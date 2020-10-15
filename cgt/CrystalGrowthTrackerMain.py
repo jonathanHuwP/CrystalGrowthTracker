@@ -584,12 +584,12 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 None
         """
         if self._project['frame_rate'] is not None:
-            fps = self._project['frame_rate']
+            fps = int(self._project['frame_rate'])
         else:
             fps = 8
 
         if self._project['resolution'] is not None:
-            resolution = self._project['resolution']
+            resolution = float(self._project['resolution'])
         else:
             resolution = 0.81
 
@@ -629,7 +629,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 frames per second (int), resolution (float)
         """
         if self._project is not None:
-            return self._project["frame_rate"], self._project["resolution"]
+            return int(self._project["frame_rate"]), float(self._project["resolution"])
 
         return None, None
 
