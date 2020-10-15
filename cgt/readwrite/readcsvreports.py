@@ -48,20 +48,22 @@ def read_csv_project(dir, new_project):
     print("hello from read_csv_reports")
     error_code = 0
 
-
     files = []
     dirpath = ""
     for (dirpath, dirnames, filenames) in os.walk(dir):
         files.extend(filenames)
         break
-
+        
+    # check there is a project_info file 
+    if not any("project_info" in s for s in files):
+        return 1
 
     error_crystal = 0
     error_line = 0
     error_region = 0
     error_info = 0
     
-    print(files)
+    print("Files: {}".format(files))
     
     crystal_data = []
     line_data = []
