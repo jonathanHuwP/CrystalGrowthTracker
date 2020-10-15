@@ -48,7 +48,7 @@ def save_csv_project(info):
 
     print("info: ", info)
 
-    results = make_test_result()
+    #results = make_test_result()
 
     print("results: ", results)
 
