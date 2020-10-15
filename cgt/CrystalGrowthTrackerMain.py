@@ -396,18 +396,18 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             os.path.expanduser('~'))
 
         if dir_name != '':
-            self._project = CGTProject()
-            error_code = readcsvreports.read_csv_project(dir_name, self._project)
+            project = CGTProject()
+            error_code = readcsvreports.read_csv_project(dir_name, project)
             if error_code == 0:
                 print("The project was loaded.")
-                #self._project = data
             else:
-                message = "The projcect could not be loaded"
+                message = "The project could not be loaded"
                 qw.QMessageBox.warning(self,
                                        "CGT Error Loading Projcet",
                                        message)
                 return
 
+            self._project = project
             self.display_properties()
             self._selectWidget.reload_combobox()
             self._project.reset_changed()
