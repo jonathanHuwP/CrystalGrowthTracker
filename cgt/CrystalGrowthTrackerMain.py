@@ -425,8 +425,17 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                                    "You do not have a project to save!")
             return
             
-        writecsvreports.save_csv_project(self._project)
-        self._project.reset_changed()
+        try:
+            writecsvreports.save_csv_project(self._project)
+            self._project.reset_changed()
+        except OSError as err:
+            message = "Error opening writing file: {}".format(err)
+            print(message)
+            for item in sys.exc_info():
+                print("{}".item)
+            qw.QMessageBox.warning(self,
+                                   message,
+                                   "CGT File Error")
         
     @qc.pyqtSlot()
     def save_report(self):
@@ -562,9 +571,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         
         self.set_video_scale_parameters()
         self.save_project()
-
-        print(self._project)
-        writecsvreports.save_csv_project(self._project)
 
     def set_video_scale_parameters(self):
         """
