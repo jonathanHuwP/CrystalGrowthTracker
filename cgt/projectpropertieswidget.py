@@ -32,13 +32,13 @@ class ProjectPropertiesWidget(qw.QWidget, Ui_ProjectPropertiesWidget):
     data-structures required to implement the intended behaviour
     """
 
-    def __init__(self, parent=None, owner=None):
+    def __init__(self, parent=None, data_source=None):
         """
         the object initalization function
 
             Args:
                 parent (QObject): the parent QObject for this window
-                owner (QObject): the object holding the data
+                data_source (QObject): the object holding the data
 
             Returns:
                 None
@@ -48,7 +48,7 @@ class ProjectPropertiesWidget(qw.QWidget, Ui_ProjectPropertiesWidget):
         self.setupUi(self)
 
         ## the class holding the data
-        self._owner = owner
+        self._data_source = data_source
 
     def clear_and_display_text(self, text):
         """
@@ -83,16 +83,16 @@ class ProjectPropertiesWidget(qw.QWidget, Ui_ProjectPropertiesWidget):
     @qc.pyqtSlot()
     def set_video_scale_parameters(self):
         print("ProjectPropertiesWidget.'set_video_scale_parameters'")
-        if self._owner is not None:
-            self._owner.set_video_scale_parameters()
+        if self._data_source is not None:
+            self._data_source.set_video_scale_parameters()
 
     @qc.pyqtSlot()
     def edit_notes(self):
         print("ProjectPropertiesWidget.edit_notes")
-        if self._owner._project is None:
+        if self._data_source._project is None:
             return
 
-        ew = EditNotesDialog(self._owner, self._owner._project)
+        ew = EditNotesDialog(self._data_source, self._data_source._project)
         ew.show()
 
 #####################################
