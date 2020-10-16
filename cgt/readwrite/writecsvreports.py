@@ -35,6 +35,12 @@ def save_csv_project(project):
 
         Args:
             project (CGTProject) the project to be saved
+            
+        Returns:
+            None
+            
+        Throws:
+            Error if a file cannot be opened
     """
     if project is None:
         return
@@ -51,6 +57,9 @@ def save_csv_results(project):
 
         Returns:
             None
+            
+        Throws:
+            Error if a file cannot be opened
     '''
 
     print("save_csv_results")
@@ -76,31 +85,24 @@ def save_csv_results(project):
     lines_array = []
     for index, crystal in enumerate(results.crystals):
 
-        region, region_index = results.get_region(index)
+        _, region_index = results.get_region(index)
 
         print("Crystal {} is in region {}".format(index, region_index))
         print("The number of times measured is {}".format(crystal.number_of_frames_held))
 
-
         note = ""
         if crystal.notes is not None:
             note = crystal.notes
-
+        
+        crystals_array.append([index, region_index, note])
+        
         for frame in crystal.list_of_frame_numbers:
             print("\tframe number {}".format(frame))
 
             faces = crystal.faces_in_frame(frame)
 
-
-            crystals_array.append([index,
-                region_index,
-                note,
-                crystal.number_of_frames_held,
-                frame])
-
             for face in faces:
                 lines_array.append([index,
-                                    region_index,
                                     frame,
                                     face.label,
                                     face.start.x,
@@ -279,13 +281,16 @@ def save_csv_regions(results_dir, info, regions_array):
 def save_csv_regions1(info, regions_array):
     '''Creates the csv report file for regions.
 
-    Args:
-        info (dict): A python dictionary containing a collection of useful parameters
-            such as the filenames and paths.
-        regions_array (array): Regions data in a format that is easy to write into a csv file.
+        Args:
+            info (dict): A python dictionary containing a collection of useful parameters
+                         such as the filenames and paths.
+            regions_array (array): Regions data in a format that is easy to write into a csv file.
 
-    Returns:
-       Nothing is returned.
+        Returns:
+            None
+            
+        Throws:
+            Error if file cannot be opened
     '''
 
     print("Hello from save_csv_regions1")
@@ -384,12 +389,16 @@ def save_csv_crystals(results_dir, info, crystals_array):
 def save_csv_crystals1(info, crystals_array):
     '''Creates the csv report file for crystals.
 
-    Args:
-        info (dict): A python dictionary containing a collection of useful parameters
-            such as the filenames and paths.
+        Args:
+            info (dict): A python dictionary containing a collection of useful parameters
+                         such as the filenames and paths.
+            crystals_array (list) a list of lists of output data
 
-    Returns:
-       Nothing is returned.
+        Returns:
+            None
+            
+        Throws:
+            Error if file cannot be opened
     '''
     print("Hello from save_csv_cystals1")
 
@@ -402,9 +411,7 @@ def save_csv_crystals1(info, crystals_array):
 
     header = ("Crystal index",
               "Region index",
-              "Note",
-              "Number of frames",
-              "Frame number")
+              "Note")
 
     with open(csv_outfile_name, "w") as fout:
         writer = csv.writer(fout, delimiter=',', lineterminator = '\n')
@@ -412,27 +419,6 @@ def save_csv_crystals1(info, crystals_array):
         for row in crystals_array:
             writer.writerow(row)
 
-#    header = ("Region number,",
-#              "Top left horizontal","Top left vertical",
-#              "Bottom right horizontal","Bottom right vertical",
-#              "Start frame","End frame")
-
-    #regions = [[1, 2, 3, 4, 5, 6],
-    #           [700, 800, 9, 10, 65, 29],
-    #           [10, 11, 12, 20 ,20 ,20]]
-#    results = make_test_result()
-
-#    regions_array = []
-#    index = 0
-#    for region in results.regions:
-#        regions_array.append([index,
-#                              region.top,
-#                              region.left,
-#                              region.bottom,
-#                              region.right,
-#                              region.start_frame,
-#                              region.end_frame])
-#        index = index + 1
 
 def save_csv_lines(results_dir, info, lines_array):
     '''Creates the csv report file for lines.
@@ -501,13 +487,16 @@ def save_csv_lines(results_dir, info, lines_array):
 def save_csv_lines1(info, lines_array):
     '''Creates the csv report file for lines.
 
-    Args:
-        info (dict): A python dictionary containing a collection of useful parameters
-            such as the filenames and paths.
-        regions_array (array): Regions data in a format that is easy to write into a csv file.
+        Args: 
+            info (dict): A python dictionary containing a collection of useful parameters
+                        such as the filenames and paths.
+            lines_array (array): lines data as array of arrays of output data.
 
-    Returns:
-       Nothing is returned.
+        Returns:
+            None
+ 
+        Throws:
+            Error if file cannot be opened
     '''
     print("Hello from save_csv_lines1")
 
@@ -519,28 +508,12 @@ def save_csv_lines1(info, lines_array):
                         +r"_"+info["proj_name"]+r"_project_lines.csv")
 
     header = ("Crystal index", 
-              "Region index",
               "Frame number", 
               "Line number",
               "x0",
               "y0",
               "x1",
-              "y1",)
-
-#    results = make_test_result()
-#
-#    regions_array = []
-#    index = 0
-#    for region in results.regions:
-#        regions_array.append([index, index,
-#                              region.top,
-#                              region.left,
-#                              region.bottom,
-#                              region.right,
-#                              region.start_frame,
-#                              region.end_frame])
-#        index = index + 1
-
+              "y1")
 
     with open(csv_outfile_name, "w") as fout:
         writer = csv.writer(fout, delimiter=',', lineterminator = '\n')
@@ -615,6 +588,4 @@ def save_csv_info1(info):
     with open(csv_outfile_name, "w") as fout:
         writer = csv.writer(fout, delimiter=',', lineterminator = '\n')
         for key, value in info.items():
-            #print("key: ", key)
-            #print("value: ", value)
             writer.writerow([key, value])

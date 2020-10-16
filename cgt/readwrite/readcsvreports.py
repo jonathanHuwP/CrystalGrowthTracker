@@ -24,14 +24,14 @@ specific language governing permissions and limitations under the License.
 import os
 from pathlib import Path
 import csv
+from itertools import groupby
+
 from cgt.videoanalysisresultsstore import VideoAnalysisResultsStore
-#import cgt.videoanalysisresultsstore as vas
 from cgt.crystal import Crystal
 from cgt.region import Region
 from cgt.imagepoint import ImagePoint
 from cgt.imagelinesegment import ImageLineSegment
 from cgt.results_print_demo import make_test_result
-
 
 def read_csv_project(dir, new_project):
     '''Coordinates the reading of a selection of csv reports.
@@ -53,8 +53,8 @@ def read_csv_project(dir, new_project):
     for (dirpath, dirnames, filenames) in os.walk(dir):
         files.extend(filenames)
         break
-        
-    # check there is a project_info file 
+
+    # check there is a project_info file
     if not any("project_info" in s for s in files):
         return 1
 
@@ -62,33 +62,24 @@ def read_csv_project(dir, new_project):
     error_line = 0
     error_region = 0
     error_info = 0
-    
+
     print("Files: {}".format(files))
-    
+
     crystal_data = []
     line_data = []
     region_data = []
-    
+
     for file in files:
         if file[-4:] == '.csv':
             print(file)
             if "project_crystals" in file:
-                print("Crystals!")
                 crystal_data, error_crystal = readcsv2listofdicts(file, dirpath)
             if "project_info" in file:
-                print("Info!")
                 error_info = readcsvinfo2dict(new_project, file, dirpath)
             if "project_lines" in file:
-                print("Lines!")
                 line_data, error_line = readcsv2listofdicts(file, dirpath)
             if "project_regions" in file:
-                print("Regions!")
                 region_data, error_region = readcsv2listofdicts(file, dirpath)
-
-    print("crystal_data: ", crystal_data)
-    print("line_data: ", line_data)
-    print("region_data: ", region_data)
-    print("new_project: ", new_project)
 
     if error_crystal or error_line or error_region or error_info == 1:
         error_code = 1
@@ -96,13 +87,10 @@ def read_csv_project(dir, new_project):
     if error_code == 0:
         store = VideoAnalysisResultsStore()
         storeregions(store, region_data)
-        storecrystals(crystal_data, line_data)
+        storecrystals(store, crystal_data, line_data)
         new_project["results"] = store
 
-
     return error_code
-
-
 
 def read_csv_reports(results_dir):
     '''Coordinates the reading of a selection of csv reports.
@@ -170,7 +158,7 @@ def read_csv_reports(results_dir):
 
 def readcsv2listofdicts(file, dirpath):
     '''Reads csv reports created by the Crystal Growth Tracker as a list of dictionaries.
-       This allows means varaibles are read with the header as a pair so can be searched 
+       This allows means varaibles are read with the header as a pair so can be searched
        by its semantic meaning.
 
     Args:
@@ -180,7 +168,7 @@ def readcsv2listofdicts(file, dirpath):
     Returns:
         data (list of doctionaries): A list of dictionaries where each item in the list is a row
                                      from the file read.
-        error_code (int):  An error code is returned a 0 (zero) values means all file were read 
+        error_code (int):  An error code is returned a 0 (zero) values means all file were read
                            while a 1 (one) value means 1 or more files were not read.
     '''
     error_code = 0
@@ -219,7 +207,7 @@ def readcsv2listofdicts(file, dirpath):
 
 def readcsvinfo2dict(new_project, file, dirpath):
     '''Reads csv reports created by the Crystal Growth Tracker as a list of dictionaries.
-       This allows means varaibles are read with the header as a pair so can be searched 
+       This allows means varaibles are read with the header as a pair so can be searched
        by its semantic meaning.
 
     Args:
@@ -297,52 +285,51 @@ def storeregions(store, regions_data):
 
 
 
-def storecrystals(crystal_data, line_data):
-    ''' Writes the crystal_data list/array which is read in from a csv file created by the
-        Crystal Growth Tracker to a results object. To do this is must also use the line_data
-        which is again a list/array which is read in from a csv file created by the
-        Crystal Growth Tracker.
-    Args:
-        crystal_data (list of doctionaries): A list of dictionaries where each item in the list
-                                            is a row from the file read.
-        line_data (list of doctionaries): A list of dictionaries where each item in the list
-                                            is a row from the file read.
-
-    Returns:
-        Nothing
+def storecrystals(store, crystal_data, line_data):
     '''
+        Writes the crystal_data and line_data dictionaries to a results object.
 
+        Args:
+            store (VideoAnalysisResultsStore) the results object to be filled
+            crystal_data (list of doctionaries): A list of dictionaries where each item in the list
+                                            is a row from the file read.
+            line_data (list of doctionaries): A list of dictionaries where each item in the list
+                                            is a row from the file read.
 
+        Returns:
+            None
+    '''
     for crystal in crystal_data:
-        #print("crystal: ", crystal)
         crystal_index = int(crystal["Crystal index"])
-        print("crystal_index: ", crystal_index)
-        #region_index = int(crystal["Region index"])
-        note = str(crystal["Note"])
-        #number_of_frames = int(crystal["Number of frames"])
-        frame_number = int(crystal["Frame number"])
+        region_index = int(crystal["Region index"])
 
-        if note:
-            temp_crystal = Crystal(notes=note)
+        temp_crystal = None
+        if crystal["Note"] is not None and crystal["Note"] != "":
+            temp_crystal = Crystal(notes=crystal["Note"])
         else:
             temp_crystal = Crystal()
 
         line_list = []
+        frame_numbers = []
         for line in line_data:
             crystal_index_from_line = int(line["Crystal index"])
-            print("crystal_index_from_line: ", crystal_index_from_line)
             if crystal_index == crystal_index_from_line:
-                print("line: ", line)
                 x0 = int(line["x0"])
                 y0 = int(line["y0"])
                 x1 = int(line["x1"])
                 y1 = int(line["y1"])
+                frame_number = int(line["Frame number"])
                 line_number = line["Line number"]
                 line = ImageLineSegment(ImagePoint(x0, y0),
-                                         ImagePoint(x1, y1),
-                                         line_number)
-                line_list.append(line)
-        temp_crystal.add_faces(line_list, frame_number)
+                                        ImagePoint(x1, y1),
+                                        line_number)
+                line_list.append((line, frame_number))
+                frame_numbers.append(frame_number)
 
+        unique_frame_numbers = [i for i, j in groupby(frame_numbers)]
 
+        for frame_number in unique_frame_numbers:
+            lines = [item[0] for item in line_list if item[1]==frame_number]
+            temp_crystal.add_faces(lines, frame_number)
 
+        store.add_crystal(temp_crystal, region_index)
