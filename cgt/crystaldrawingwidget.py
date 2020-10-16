@@ -155,7 +155,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
     @qc.pyqtSlot()
     def clear_crystal(self):
         """
-        clear the curren crystal
+        clear the current crystal
 
             Returns:
                 None
@@ -319,11 +319,10 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             print("clear all")
 
         results = self._data_source.get_result()
-        print("Results {}".format(results))
         crystals = results.get_crystals(r_index)
-        print("Crystals {}".format(crystals))
         crystal = crystals[c_index]
         lines = crystal.faces_in_frame(f_index)
+        self._videoControl.set_frame(f_index)
         self._drawing.set_lines_base(lines)
 
     def select_line(self, r_index, c_index, f_index, l_index):
