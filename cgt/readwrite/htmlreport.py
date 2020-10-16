@@ -23,6 +23,7 @@ specific language governing permissions and limitations under the License.
 '''
 import os
 import sys
+from pathlib import Path
 from cgt.results_print_demo import make_test_result
 
 
@@ -83,65 +84,51 @@ def save_html_report(results_dir, info):
     write_html_report_end(fout)
 
 
-
 def save_html_report1(info, time_stamp):
-    '''Creates the html report file sop that it can manage the report writing
+    '''
+    Creates the html report file sop that it can manage the report writing
     and pass the file handle to the functions that write the relevant parts.
 
-    Args:
-        results_dir (str): The directory name the user has selected to save the
-                           results in.
-        filename_in (str): The name of the video file that is being analysed.
+        Args:
+            info (dict): The dictionary subclass holding the project data and results.
+            
+            time_stamp (str): The name of the video file that is being analysed.
 
-    Returns:
-       Nothing is returned.
+        Returns:
+            None.
+            
+        Throws:
+            Error if the report directory cannot be made, or file cannot be opened
     '''
     print("hi from save_html_report1")
 
-    results_dir = (info["proj_full_path"]+r"/"+time_stamp)
-
-    print(results_dir)
-
-    path = os.path.abspath(os.path.realpath(results_dir))
+    results_dir = Path(info["proj_full_path"]).joinpath(time_stamp)
 
     prog = info["prog"]
 
-    try:
-        os.makedirs(path)
-    except OSError:
-        print("Unexpected error:", sys.exc_info()[0])
-        sys.exit("Could not create directory for the results.")
+    # allow exception to bubble up to main
+    os.makedirs(results_dir)
 
-    html_outfile_name = (results_dir+r"/"+prog+r"_report.html")
+    report_file = "{}_report.html".format(prog)
+    html_outfile = results_dir.joinpath(report_file)
 
-    try:
-        fout = open(html_outfile_name, "w")
-    except  OSError:
-        print("Could not open html report file, with error message: ", sys.exc_info()[0])
-        sys.exit("Could not create html report.")
-
-
-    fout = write_html_report_start1(fout, info,)
-#
-#     write_html_report_end(fout)
+    with open(html_outfile, "w") as fout:
+        write_html_report_start1(fout, info,)
 
     return results_dir
 
-
-
-
 def write_html_report_start1(fout, info):
-    '''Creates the start of an html report which is generic for the PERPL
-    scripts.
+    '''
+    Creates the start of a generic html report.
 
-    Args:
-        fout (file handler): The file handler allows this function to write out.
-        info (dict): A python dictionary containing a collection of useful parameters
-            such as the filenames and paths.
+        Args:
+            fout (file handler): The file handler allows this function to write out.
+            info (dict): A python dictionary containing a collection of useful parameters
+                         such as the filenames and paths.
 
-    Returns:
-       fout (file handler): The file handler is passed back so that other parts of
-                            the report can be written by different functions.
+        Returns:
+            fout (file handler): The file handler is passed back so that other parts of
+                                 the report can be written by different functions.
     '''
     prog = info['prog']
 
@@ -162,27 +149,24 @@ def write_html_report_start1(fout, info):
     fout.write("}\n")
     fout.write("</style>\n")
 
-    title_line1 = ("<title>Report on *** Produced by the Crystal Growth Tracker (+++) "
-                   "Software</title>\n")
-    title = title_line1.replace("***", info['enhanced_video_path'])
-    title = title.replace("+++", info['prog'])
+    title = "<title>Report on {} Produced by the Crystal Growth Tracker ({}) Software</title>\n"
+    title = title.format(info['enhanced_video_path'], info['prog'])
+    
     fout.write(title)
 
     fout.write("</head>\n")
     fout.write("\n<body>\n")
-    title_line2 = ("<h1 align=\"center\">Report on *** Produced by the "
-                   "Crystal Growth Tracker (+++) Software</h1>\n")
-    title2 = title_line2.replace("***", info['enhanced_video_path'])
-    title2 = title2.replace("+++", prog)
+    
+    title2 = "<h1 align=\"center\">Report on {} Produced by the Crystal Growth Tracker ({}) Software</h1>\n"
+    title2 = title2.format(info['enhanced_video'], info['prog'])
     fout.write(title2)
 
-    program_info = '<p><i>%s</i>: %s</p>\n' % (info['prog'], info['description'])
+    program_info = '<p><i>{}</i>: {}</p>\n'.format(info['prog'], info['description'])
     fout.write(program_info)
-
 
     report_info = (r"<p>This project was started at "+info['start_datetime']+r" on the "
                     +info['host']+r" host system with the "+info['operating_system']
-                    +" operating system. The video file, "+info['enhanced_video_no_path']
+                    +" operating system. The video file, "+str(info['enhanced_video_no_path'])
                     +r" was analysed and has a frame rate of "+str(info['frame_rate'])
                     +" and resolution of " +str(info['resolution'])
                     +" "+str(info['resolution_units'])+" per pixel. A note of caution "

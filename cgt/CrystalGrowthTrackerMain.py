@@ -335,29 +335,24 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                                    "You do not have a project to report!")
             return
 
-        dir_name = self._project["proj_full_path"]
-
-        print("dir_name: ", dir_name)
-
-        if dir_name is not None:
-
-            print("Printing html report.")
-
+        if self._project["proj_full_path"] is not None:
             time_stamp = utils.timestamp()
-            print(time_stamp)
-
-            self._project["latest_report"] = htmlreport.save_html_report1(self._project, time_stamp)
-
             try:
-                self._reportWidget.read_report(self._project["latest_report"])
+                self._project["latest_report"] = htmlreport.save_html_report1(self._project, time_stamp)
             except OSError as err:
-                message = "Could not open report file: {}".format(err)
+                message = "Problem creating report directory and file: {}".format(err)
                 qw.QMessageBox.warning(self,
                                        "Report Error",
                                        message)
 
-            #htmlreport.save_html_report1(self._project, time_stamp)
-            #writecsvreports.save_csv_reports(dir_name, info)
+            # read back in to the reports tab
+            try:
+                self._reportWidget.read_report(self._project["latest_report"])
+            except OSError as err:
+                message = "Could not open report file for reading: {}".format(err)
+                qw.QMessageBox.warning(self,
+                                       "Report Error",
+                                       message)
 
     def start_project(self,
                       enhanced_video,
