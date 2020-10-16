@@ -417,6 +417,7 @@ def save_csv_crystals1(info, crystals_array):
         writer = csv.writer(fout, delimiter=',', lineterminator = '\n')
         writer.writerow(header)
         for row in crystals_array:
+            print(row)
             writer.writerow(row)
 
 

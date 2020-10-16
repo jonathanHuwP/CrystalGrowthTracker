@@ -270,7 +270,10 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
                 None
         """
         note = qw.QInputDialog.getText(self, "Crystal Note", "If needed add note.")
-        crystal = Crystal(notes=note)
+        
+        if note[1]:
+            crystal = Crystal(notes=note[0])
+            
         lines = []
         for line in self._drawing.lines_base:
             print("\tadding: {}".format(line))
