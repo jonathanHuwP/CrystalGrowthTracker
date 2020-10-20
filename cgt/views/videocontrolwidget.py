@@ -18,16 +18,17 @@ specific language governing permissions and limitations under the License.
 import sys
 
 import PyQt5.QtWidgets as qw
-import PyQt5.QtGui as qg
+#import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
-from Ui_videocontrolwidget import Ui_VideoControlWidget
+#from Ui_videocontrolwidget import Ui_VideoControlWidget
+from cgt.views.videocontrolwidget_ui import Ui_VideoControlWidget
 
 class VideoControlWidget(qw.QWidget, Ui_VideoControlWidget):
 
     ## signal to indicate change of frame
     frame_changed = qc.pyqtSignal()
-    
+
     def __init__(self, parent=None):
         """
         set up the dialog
@@ -40,18 +41,17 @@ class VideoControlWidget(qw.QWidget, Ui_VideoControlWidget):
         """
         super(VideoControlWidget, self).__init__(parent)
         self.setupUi(self)
-        
+
         ## storage for enabled/disabled state
         self._enabled = False
-        
+
         # set disabled
         self.enable(self._enabled)
-        
-    @qc.pyqtSlot()        
+
+    @qc.pyqtSlot()
     def up_clicked(self):
         """
         callback for a click of the up button
-        
             Returns:
                 None
         """
@@ -62,18 +62,16 @@ class VideoControlWidget(qw.QWidget, Ui_VideoControlWidget):
     def down_clicked(self):
         """
         callback for a click of the down button
-        
             Returns:
                 None
         """
         if self._frameSpinBox.value() > self._frameSpinBox.minimum():
             self.set_frame(self._frameSpinBox.value()-1)
-        
-    @qc.pyqtSlot()   
+
+    @qc.pyqtSlot()
     def slider_moved(self):
         """
         callback for motion of the slider
-        
             Returns:
                 None
         """
@@ -83,22 +81,21 @@ class VideoControlWidget(qw.QWidget, Ui_VideoControlWidget):
     def spin_box_changed(self):
         """
         callback for a change in the frame count slider
-        
             Returns:
                 None
         """
         self.set_frame(self._frameSpinBox.value())
-        
+
+
     def set_frame(self, frame):
         """
         set a new value of the frame
-        
             Args:
                 frame (int) the new frame number
-                
+
             Returns:
                 None
-                
+
             Emits:
                 frame_changed if a change has occured
         """
@@ -106,30 +103,28 @@ class VideoControlWidget(qw.QWidget, Ui_VideoControlWidget):
         if self._frameSpinBox.value() != frame:
             self._frameSpinBox.setValue(frame)
             change = True
-            
+
         if self._frameSlider.sliderPosition() != frame:
             self._frameSlider.setSliderPosition(frame)
             change = True
-            
+
         if self.is_enabled() and change:
             self.frame_changed.emit()
-        
+
     def get_current_frame(self):
         """
         getter for the current frame number
-        
             Returns:
                 the current frame number
         """
         return self._frameSpinBox.value()
-        
+
     def enable(self, flag = True):
         """
         enable/disable the component widgets
-        
             Args
                 flag (bool) the enabled state
-                
+
             Returns:
                 None
         """
@@ -139,20 +134,20 @@ class VideoControlWidget(qw.QWidget, Ui_VideoControlWidget):
         self._frameSlider.setEnabled(flag)
         self._frameSpinBox.setEnabled(flag)
         self._enabled = flag
-        
+
     def is_enabled(self):
         """
         getter for the enabled/disabled state
-        
+
             Returns:
                 (bool) enabled/disabled state
         """
         return self._enabled
-        
+
     def set_range(self, minimum, maximum):
         """
         set the maximum and minimum frame range
-        
+
             Args:
                 minimum (int) the lower bound
                 maximum (int) the upper bound
@@ -161,28 +156,27 @@ class VideoControlWidget(qw.QWidget, Ui_VideoControlWidget):
         """
         tmp = self.is_enabled()
         self.enable(False)
-        
+
         self._frameSlider.setRange(minimum, maximum)
         self._frameSpinBox.setRange(minimum, maximum)
-        
+
         self.enable(tmp)
-       
+
     def clear(self):
         """
         clear all the current data
-        
             Returns:
                 None
         """
         tmp = self.is_enabled()
         self.enable(False)
-        
+
         self.set_frame(0)
         self.set_range(0, 0)
-        
+
         self.enable(tmp)
-        
-    
+
+
 def run():
     """
     use a local function to make an isolated the QApplication object
@@ -198,5 +192,6 @@ def run():
     window.show()
     app.exec_()
 
+
 if __name__ == "__main__":
-    run()  
+    run()

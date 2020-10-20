@@ -35,10 +35,12 @@ from PyQt5 import QtWidgets as qw
 from PyQt5 import QtGui as qg
 #import PyQt5.QtCore as qc
 from PyQt5 import QtCore as qc
-from cgt.Ui_VideoOverviewWindow import Ui_VideoOverviewWindow
+#from cgt.Ui_VideoOverviewWindow import Ui_VideoOverviewWindow
+from cgt.views.VideoOverviewWindow_ui import Ui_VideoOverviewWindow
 #from Ui_VideoOverviewWindow import Ui_VideoOverviewWindow
 from cgt import overviewplots
-from cgt import readers
+#from cgt import readers
+from cgt.readwrite import readers
 import cv2
 
 
@@ -172,7 +174,7 @@ class VideoOverviewWindow(qw.QMainWindow, Ui_VideoOverviewWindow):
         #print("hi read_video")
 
         cv2.VideoCapture()
-        
+
 
         try:
             video = get_reader(file_name, 'ffmpeg')

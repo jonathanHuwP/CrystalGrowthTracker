@@ -24,10 +24,10 @@ specific language governing permissions and limitations under the License.
 
 import sys
 import os
-import datetime
+#import datetime
 sys.path.insert(0, '..\\CrystalGrowthTracker')
 
-from cgt import utils
+#from cgt import utils
 from cgt.utils import find_hostname_and_ip
 
 import array as arr
@@ -38,7 +38,8 @@ from imageio import get_reader as imio_get_reader
 from cgt import utils
 from cgt.utils import find_hostname_and_ip
 
-from videoanalysisresultsstore import VideoAnalysisResultsStore
+#from videoanalysisresultsstore import VideoAnalysisResultsStore
+from cgt.videoanalysisresultsstore import VideoAnalysisResultsStore
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
@@ -46,23 +47,34 @@ import PyQt5.QtCore as qc
 
 from shutil import copy2
 
-from cgt import ImageLabel
-from cgt.projectstartdialog import ProjectStartDialog
-from cgt.projectpropertieswidget import ProjectPropertiesWidget
+#from cgt import ImageLabel
+from cgt.ImageLabel import ImageLabel
+#from cgt.projectstartdialog import ProjectStartDialog
+from cgt.views.projectstartdialog import ProjectStartDialog
+#from cgt.projectpropertieswidget import ProjectPropertiesWidget
+from cgt.views.projectpropertieswidget import ProjectPropertiesWidget
 
-from cgt.regionselectionwidget import RegionSelectionWidget
-from cgt.crystaldrawingwidget import CrystalDrawingWidget
-from cgt.videoparametersdialog import VideoParametersDialog
-from cgt.reportviewwidget import ReportViewWidget
+#from cgt.regionselectionwidget import RegionSelectionWidget
+from cgt.views.regionselectionwidget import RegionSelectionWidget
+#from cgt.crystaldrawingwidget import CrystalDrawingWidget
+from cgt.views.crystaldrawingwidget import CrystalDrawingWidget
+#from cgt.videoparametersdialog import VideoParametersDialog
+from cgt.views.videoparametersdialog import VideoParametersDialog
+#from cgt.reportviewwidget import ReportViewWidget
+from cgt.views.reportviewwidget import ReportViewWidget
 
 # import UI
+#from cgt.Ui_CrystalGrowthTrackerMain import Ui_CrystalGrowthTrackerMain
 from cgt.Ui_CrystalGrowthTrackerMain import Ui_CrystalGrowthTrackerMain
 
 from cgt.readwrite import htmlreport
+
 from cgt.readwrite import writecsvreports
 from cgt.readwrite import readcsvreports
-from cgt import utils
+#from cgt import utils
 from cgt.cgtproject import CGTProject
+
+
 
 class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     """
@@ -253,7 +265,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     def project_created_or_loaded(self):
         """
         carry out action for a newly created or loaded project
-        
             Returns:
                 None
         """
@@ -261,11 +272,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         # remove old reader
         self._video_reader = None 
-        
+
         # dispaly project
         self.display_properties()
         self.set_title()
-        
+
         # if project has regions
         if self._project["results"] is not None:
             if self._project["results"].number_of_regions > 0:

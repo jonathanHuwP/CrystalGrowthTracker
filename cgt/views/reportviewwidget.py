@@ -17,14 +17,15 @@ specific language governing permissions and limitations under the License.
 """
 import sys
 
-import pathlib 
+import pathlib
 
 import PyQt5.QtWidgets as qw
-import PyQt5.QtGui as qg
-import PyQt5.QtCore as qc
+#import PyQt5.QtGui as qg
+#import PyQt5.QtCore as qc
 
 # import UI
-from Ui_reportviewwidget import Ui_ReportViewWidget
+#from Ui_reportviewwidget import Ui_ReportViewWidget
+from cgt.views.reportviewwidget_ui import Ui_ReportViewWidget
 
 class ReportViewWidget(qw.QWidget, Ui_ReportViewWidget):
     """
@@ -53,11 +54,10 @@ class ReportViewWidget(qw.QWidget, Ui_ReportViewWidget):
         self._text = qw.QTextBrowser(self)
         self._layout = qw.QVBoxLayout(self._text)
         self._scrollArea.setWidget(self._text)
-        
+
     def clear(self):
         """
         clear any text and set up default
-        
             Returns:
                 None
         """
@@ -65,22 +65,22 @@ class ReportViewWidget(qw.QWidget, Ui_ReportViewWidget):
 
     def set_html(self, text=None):
         self._text.setText(text)
-        
+
     def read_report(self, path, name="CGT_report.html"):
         """
         read a report file and display text
-            
+
             Args:
                 path (string) the directory path to the report file
                 name (string) the name of the report file
-                
+
             Returns:
                 None
         """
         input_path = pathlib.Path(path).joinpath(name)
         with open(input_path, 'r') as infile:
             self.set_html(infile.read())
-        
+
 #########################
 
 def run_main():
@@ -109,5 +109,4 @@ def run_main():
 
 if __name__ == "__main__":
     run_main()
-
 

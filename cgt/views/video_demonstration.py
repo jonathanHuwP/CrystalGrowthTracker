@@ -33,11 +33,14 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
-from regionselectionlabel import RegionSelectionLabel
-from region import Region
+#from regionselectionlabel import RegionSelectionLabel
+from cgt.regionselectionlabel import RegionSelectionLabel
+#from region import Region
+from cgt.region import Region
 
 # import UI
-from Ui_video_demonstration import Ui_VideoDemo
+#from Ui_video_demonstration import Ui_VideoDemo
+from cgt.views.video_demonstration_ui import Ui_VideoDemo
 
 ## a tuple representing one end of a region
 ##
@@ -51,15 +54,10 @@ RegionEnd = namedtuple("RegionEnd", ["rectangle", "frame"])
 ## a tuple for the video on which the analysis is based
 ##
 ## Args:
-##
 ## name the video file name or path
-##
 ## frame_rate number of frames per second
-##
 ## frame_count the numer of frames in the video
-##
 ## width the horizontal size of the video in pixels
-##
 ## height the vertical size of the video in pixels
 VideoSource = namedtuple("VideoSource", ["name", "frame_rate", "frame_count", "width", "height"])
 
@@ -408,10 +406,10 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
                 None
         """
         default = 25
-        
+
         if self._video_data is not None:
             default = self._video_data.frame_rate
-        
+
         rate, flag = qw.QInputDialog.getDouble(
             self,
             "Set frames per second",
@@ -495,7 +493,7 @@ class VideoDemo(qw.QMainWindow, Ui_VideoDemo):
             frame_rate,
             meta_data["size"][0],
             meta_data["size"][1])
-            
+
         self._current_image = 0
 
         self.display_pixmap()

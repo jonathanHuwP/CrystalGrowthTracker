@@ -25,12 +25,17 @@ import sys
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
 
-from linesetsandframesstore import LineSetsAndFramesStore
+from cgt.linesetsandframesstore import LineSetsAndFramesStore
+#from linesetsandframesstore import LineSetsAndFramesStore
 
-from DrawingLabel import DrawingLabel
+from cgt.DrawingLabel import DrawingLabel
+#from DrawingLabel import DrawingLabel
 from cgt.crystal import Crystal
 
-from Ui_crystaldrawingwidget import Ui_CrystalDrawingWidget
+from cgt.views.crystaldrawingwidget_ui import Ui_CrystalDrawingWidget
+#import cgt.views.crystaldrawingwidget_ui
+#from cgt.views import crystaldrawingwidget_ui
+#from Ui_crystaldrawingwidget import Ui_CrystalDrawingWidget
 
 class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
     """
@@ -73,11 +78,11 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
 
         # set data source for tree widget
         self._treeWidget.set_data_source(data_source)
-        
+
     def clear(self):
         """
         clear the contents
-        
+
             Return:
                 None
         """
@@ -270,10 +275,10 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
                 None
         """
         note = qw.QInputDialog.getText(self, "Crystal Note", "If needed add note.")
-        
+
         if note[1]:
             crystal = Crystal(notes=note[0])
-            
+
         lines = []
         for line in self._drawing.lines_base:
             print("\tadding: {}".format(line))
@@ -356,6 +361,6 @@ def run():
     window = CrystalDrawingWidget()
     window.show()
     app.exec_()
-        
+
 if __name__ == "__main__":
     run()

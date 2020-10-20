@@ -16,7 +16,8 @@ import sys
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
 
-from cgt.Ui_editnotesdialog import Ui_EditNotesDialog
+#from cgt.Ui_editnotesdialog import Ui_EditNotesDialog
+from cgt.views.editnotesdialog_ui import Ui_EditNotesDialog
 
 # TODO upgrade to Dialog
 

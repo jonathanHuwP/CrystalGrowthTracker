@@ -18,13 +18,15 @@ specific language governing permissions and limitations under the License.
 import sys
 
 import PyQt5.QtWidgets as qw
-import PyQt5.QtGui as qg
+#import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
-from editnotesdialog import EditNotesDialog
+from cgt.views.editnotesdialog import EditNotesDialog
+#from editnotesdialog import EditNotesDialog
 
 # import UI
-from Ui_projectpropertieswidget import Ui_ProjectPropertiesWidget
+#from Ui_projectpropertieswidget import Ui_ProjectPropertiesWidget
+from cgt.views.projectpropertieswidget_ui import Ui_ProjectPropertiesWidget
 
 class ProjectPropertiesWidget(qw.QWidget, Ui_ProjectPropertiesWidget):
     """
@@ -49,11 +51,10 @@ class ProjectPropertiesWidget(qw.QWidget, Ui_ProjectPropertiesWidget):
 
         ## the class holding the data
         self._data_source = data_source
-        
+
     def clear(self):
         """
         clear the contents
-        
             Return:
                 None
         """
@@ -84,7 +85,7 @@ class ProjectPropertiesWidget(qw.QWidget, Ui_ProjectPropertiesWidget):
                 None
         """
         self._propertiesBrowser.append(text)
-        
+
     def show_top_text(self):
         self._propertiesBrowser.verticalScrollBar().setValue(0)
 
