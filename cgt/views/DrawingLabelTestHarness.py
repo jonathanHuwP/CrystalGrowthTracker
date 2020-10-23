@@ -27,14 +27,11 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
-from skimage import data
-from PIL import Image
+from cgt.linesetsandframesstore import LineSetsAndFramesStore
 
-from linesetsandframesstore import LineSetsAndFramesStore
+from cgt.DrawingLabel import DrawingLabel
 
-from DrawingLabel import DrawingLabel
-
-from Ui_DrawingLabelTestHarness import Ui_DrawingLabelTestHarness
+from cgt.views.DrawingLabelTestHarness_ui import Ui_DrawingLabelTestHarness
 
 class DrawingLabelTestHarness(qw.QDialog, Ui_DrawingLabelTestHarness):
     """

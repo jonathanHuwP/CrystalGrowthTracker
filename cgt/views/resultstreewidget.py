@@ -223,9 +223,9 @@ class ResultsTreeWidget(qw.QWidget, Ui_ResultsTreeWidget):
 class TestOwner():
     def __init__(self):
         self._results = make_test_result()
-        
+
     def get_result(self):
-        return self._results        
+        return self._results
 
 def run():
     """
@@ -239,6 +239,6 @@ def run():
     window = ResultsTreeWidget(data_source = TestOwner())
     window.show()
     app.exec_()
-        
+
 if __name__ == "__main__":
     run()

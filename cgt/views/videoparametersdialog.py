@@ -27,7 +27,7 @@ class VideoParametersDialog(qw.QDialog, Ui_VideoParametersDialog):
     ## the available units for the resolution
     RESOLUTION_UNITS = ["nanometers", "microns", "mm"]
 
-    def get_values_from_user(parent, fps, resolution, units):
+    def get_values_from_user(self, parent, fps, resolution, units):
         window = VideoParametersDialog(parent, fps, resolution, units)
         window.exec_()
         return  window.get_values()

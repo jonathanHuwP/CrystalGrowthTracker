@@ -317,7 +317,9 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
-        print("CrystalDrawingWidget.select_frame Region {}, Crystal {}, Frame {}".format(r_index, c_index, f_index))
+        print("CrystalDrawingWidget.select_frame Region {}, Crystal {}, Frame {}".format(r_index,
+                                                                                         c_index,
+                                                                                         f_index))
         if self._current_region != r_index:
             self.select_region(r_index)
             print("changed region")
@@ -346,7 +348,10 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
-        print("CrystalDrawingWidget Region {}, Crystal {}, Frame {}, Line {}".format(r_index, c_index, f_index, l_index))
+        print("CrystalDrawingWidget Region {}, Crystal {}, Frame {}, Line {}".format(r_index,
+                                                                                     c_index,
+                                                                                     f_index,
+                                                                                     l_index))
 
 
 def run():
