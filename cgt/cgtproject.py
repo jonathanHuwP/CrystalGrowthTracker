@@ -176,5 +176,5 @@ class CGTProject(dict):
         """
         if self["results"] is None:
             return self._changed
-        else:
-            return self._changed or self["results"].has_been_changed()
+
+        return self._changed or self["results"].has_been_changed()

@@ -143,5 +143,5 @@ def save_grayscale_frame(outpath, img, frame_number):
 
     fig_grayscale.savefig(filename, bbox_inches='tight')
     plt.close(fig_grayscale)
-    
+
     return filename

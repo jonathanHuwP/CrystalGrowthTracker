@@ -36,7 +36,7 @@ def make_test_result():
     factory function to procduce a Results object
     """
     store = vas.VideoAnalysisResultsStore()
-    
+
     index = store.add_region(Region(450, 200, 675, 400, 250, 500))
     store.add_crystal(make_crystal1(), index)
 

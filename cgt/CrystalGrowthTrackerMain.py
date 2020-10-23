@@ -24,56 +24,32 @@ specific language governing permissions and limitations under the License.
 
 import sys
 import os
-#import datetime
-sys.path.insert(0, '..\\CrystalGrowthTracker')
-
-#from cgt import utils
-from cgt.utils import find_hostname_and_ip
-
 import array as arr
-import numpy as np
-
-from imageio import get_reader as imio_get_reader
-
-from cgt import utils
-from cgt.utils import find_hostname_and_ip
-
-#from videoanalysisresultsstore import VideoAnalysisResultsStore
-from cgt.videoanalysisresultsstore import VideoAnalysisResultsStore
-
+from shutil import copy2
 import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
-from shutil import copy2
+from imageio import get_reader as imio_get_reader
 
-#from cgt import ImageLabel
-from cgt.ImageLabel import ImageLabel
-#from cgt.projectstartdialog import ProjectStartDialog
+from cgt import utils
+from cgt.videoanalysisresultsstore import VideoAnalysisResultsStore
 from cgt.views.projectstartdialog import ProjectStartDialog
-#from cgt.projectpropertieswidget import ProjectPropertiesWidget
 from cgt.views.projectpropertieswidget import ProjectPropertiesWidget
-
-#from cgt.regionselectionwidget import RegionSelectionWidget
 from cgt.views.regionselectionwidget import RegionSelectionWidget
-#from cgt.crystaldrawingwidget import CrystalDrawingWidget
 from cgt.views.crystaldrawingwidget import CrystalDrawingWidget
-#from cgt.videoparametersdialog import VideoParametersDialog
 from cgt.views.videoparametersdialog import VideoParametersDialog
-#from cgt.reportviewwidget import ReportViewWidget
 from cgt.views.reportviewwidget import ReportViewWidget
 
 # import UI
-#from cgt.Ui_CrystalGrowthTrackerMain import Ui_CrystalGrowthTrackerMain
 from cgt.Ui_CrystalGrowthTrackerMain import Ui_CrystalGrowthTrackerMain
-
 from cgt.readwrite import htmlreport
-
 from cgt.readwrite import writecsvreports
 from cgt.readwrite import readcsvreports
-#from cgt import utils
 from cgt.cgtproject import CGTProject
 
+
+sys.path.insert(0, '..\\CrystalGrowthTracker')
 
 
 class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
@@ -261,7 +237,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self._project = project
             self._project.reset_changed()
             self.project_created_or_loaded()
-            
+
     def project_created_or_loaded(self):
         """
         carry out action for a newly created or loaded project
@@ -271,7 +247,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self.reset_tab_wigets()
 
         # remove old reader
-        self._video_reader = None 
+        self._video_reader = None
 
         # dispaly project
         self.display_properties()
@@ -282,18 +258,17 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             if self._project["results"].number_of_regions > 0:
                 self._selectWidget.reload_combobox()
                 self._drawingWidget.new_region()
-                
+
         self._selectWidget.setEnabled(False)
         self._drawingWidget.setEnabled(False)
-        
+
         if self._project["latest_report"] is not None:
             if self._project["latest_report"] != "":
                 self._reportWidget.read_report(self._project["latest_report"])
-        
+
     def reset_tab_wigets(self):
         """
         reset the tab widgets to inital conditions
-        
             Returns:
                 None
         """
@@ -325,7 +300,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             message = "Error opening writing file: {}".format(err)
             print(message)
             for item in sys.exc_info():
-                print("{}".item)
+                print(item)
             qw.QMessageBox.warning(self, "CGT File Error", message)
             return
 
@@ -349,7 +324,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         if self._project["proj_full_path"] is not None:
             time_stamp = utils.timestamp()
             try:
-                self._project["latest_report"] = htmlreport.save_html_report1(self._project, time_stamp)
+                self._project["latest_report"] = htmlreport.save_html_report1(self._project,
+                                                                              time_stamp)
             except OSError as err:
                 message = "Problem creating report directory and file: {}".format(err)
                 qw.QMessageBox.warning(self,
@@ -381,7 +357,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 proj_dir  (pathlib.Path) parent directory of project directory
                 proj_name (string) the name of project, will be directory name
                 notes (string) project notes
-                copy_files (bool) if true the enhanced_video and raw_video files are copied to project dir
+                copy_files (bool) if true the enhanced_video and raw_video files are
+                                  copied to project dir
 
             Returns:
                 None
@@ -494,7 +471,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         else:
             units = VideoParametersDialog.RESOLUTION_UNITS[1]
 
-        fps, resolution, units = VideoParametersDialog.get_values_from_user(self, fps, resolution, units)
+        fps, resolution, units = VideoParametersDialog.get_values_from_user(self,
+                                                                            fps,
+                                                                            resolution, units)
 
         self._project['frame_rate'] = fps
         self._project['resolution'] = resolution
@@ -608,9 +587,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                                    message)
             return
 
-        message_box = qw.QMessageBox();
-        message_box.setText("Loading Video.");
-        message_box.setInformativeText("Loading video may take some time.");
+        message_box = qw.QMessageBox()
+        message_box.setText("Loading Video.")
+        message_box.setInformativeText("Loading video may take some time.")
         try:
             message_box.show()
             self._video_reader = imio_get_reader(self._project["enhanced_video"], 'ffmpeg')
@@ -622,9 +601,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                                    error_title,
                                    message)
             return
-            
+
         message_box.close()
-        
+
         self._selectWidget.setEnabled(True)
         self._selectWidget.show_video()
         self._drawingWidget.setEnabled(True)

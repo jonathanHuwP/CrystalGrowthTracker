@@ -30,8 +30,8 @@ import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 import numpy as np
 
-from imagepoint import ImagePoint
-from imagelinesegment import ImageLineSegment
+from cgt.imagepoint import ImagePoint
+from cgt.imagelinesegment import ImageLineSegment
 
 class WidgetState(IntEnum):
     """
@@ -72,18 +72,18 @@ class AdjustingState(IntEnum):
 class DrawingLabel(qw.QLabel):
     """
     subclass of label providing functions for drawing using a mouse.
-    
-    `DrawingLabel` is a subclass of QLabel its basic function is to store the original 
-    image as a constant pixmap, which is redisplayed with or without lines as the user 
-    requires. The mouse down, up and moved callback functions have been overridden, 
-    which allows for handling user input. Internally newly created lines are stored in 
-    a list called `_linedBase`, when they are moved the modified copies are stored in 
-    a list `_linesNew`. 
 
-    `DrawingLabel's` behaviour is governed by state variables, defined using Python 
-    `enum.IntEnum`. These relate to how the user's inputs are handled and how the lines 
-    are stored. In creating mode, the user is allowed to draw lines; in adjusting the 
-    user can select existing lines and move them (whole line or just end points); in 
+    `DrawingLabel` is a subclass of QLabel its basic function is to store the original
+    image as a constant pixmap, which is redisplayed with or without lines as the user
+    requires. The mouse down, up and moved callback functions have been overridden,
+    which allows for handling user input. Internally newly created lines are stored in
+    a list called `_linedBase`, when they are moved the modified copies are stored in
+    a list `_linesNew`.
+
+    `DrawingLabel's` behaviour is governed by state variables, defined using Python
+    `enum.IntEnum`. These relate to how the user's inputs are handled and how the lines
+    are stored. In creating mode, the user is allowed to draw lines; in adjusting the
+    user can select existing lines and move them (whole line or just end points); in
     copying mode existing lines can be adjusted and are then copied to new set.
     """
     def __init__(self, parent=None):
@@ -710,7 +710,7 @@ class DrawingLabel(qw.QLabel):
 
                 painter (QPainter) the painter to be used for the drawing, with pen set
 
-                allow_label (Boolean) if False the user labelling option is ignored and no label added
+                allow_label (bool) if False the user labelling option is ignored and no label added
 
             Returns:
                 None

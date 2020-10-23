@@ -24,7 +24,7 @@ import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 import numpy as np
 
-from DrawRect import DrawRect
+from cgt.DrawRect import DrawRect
 
 # set up linting conditions
 # pylint: disable = too-many-public-methods

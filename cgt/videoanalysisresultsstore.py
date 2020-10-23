@@ -20,7 +20,7 @@ specific language governing permissions and limitations under the License.
 # pylint: disable = too-many-public-methods
 # pylint: disable = too-many-arguments
 
-from collections import namedtuple
+#from collections import namedtuple
 
 class VideoAnalysisResultsStore:
     """
@@ -56,19 +56,18 @@ class VideoAnalysisResultsStore:
 
         if region_crystal is not None:
             self._region_crystal = region_crystal
-            
+
         ## flag to indicate store has been changed
         self._changed = False
-        
+
     def has_been_changed(self):
         """
         getter for the changed status
-        
             Returns:
                 the changed flag
         """
         return self._changed
-        
+
     def reset_changed(self):
         """
         make the changed status false
@@ -77,11 +76,10 @@ class VideoAnalysisResultsStore:
                 None
         """
         self._changed = False
-        
+
     def set_changed(self):
         """
         set the changed status to true
-        
             Returns:
                 None
         """
@@ -159,7 +157,7 @@ class VideoAnalysisResultsStore:
         index = len(self._regions)
         self._regions.append(region)
         self.set_changed()
-        
+
         return index
 
     def reserve_crystals(self, size):

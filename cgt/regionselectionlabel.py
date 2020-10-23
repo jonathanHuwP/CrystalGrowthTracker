@@ -24,7 +24,7 @@ import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 import numpy as np
 
-from DrawRect import DrawRect
+from cgt.DrawRect import DrawRect
 
 # set up linting conditions
 # pylint: disable = too-many-public-methods
@@ -70,7 +70,7 @@ class RegionSelectionLabel(qw.QLabel):
 
         ## (QObject) the parent object
         self._parent = parent
-        
+
         ## storage for the regions
         self._regions_store = regions_store
 
