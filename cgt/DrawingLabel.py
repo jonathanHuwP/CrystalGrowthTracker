@@ -763,16 +763,6 @@ class DrawingLabel(qw.QLabel):
         self._lines_new.clear()
         self.redisplay()
 
-    def get_pixmap(self):
-        """
-        get the current pixmap
-
-            Returns:
-                the current QPixmap
-        """
-        # TODO implement a grab
-        print("DrawingLabel.get_pixmap: not implemented")
-
     def save(self, file):
         """
         save the current image as a PNG file
