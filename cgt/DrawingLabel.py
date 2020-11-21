@@ -72,18 +72,18 @@ class AdjustingState(IntEnum):
 class DrawingLabel(qw.QLabel):
     """
     subclass of label providing functions for drawing using a mouse.
-    
-    `DrawingLabel` is a subclass of QLabel its basic function is to store the original 
-    image as a constant pixmap, which is redisplayed with or without lines as the user 
-    requires. The mouse down, up and moved callback functions have been overridden, 
-    which allows for handling user input. Internally newly created lines are stored in 
-    a list called `_linedBase`, when they are moved the modified copies are stored in 
-    a list `_linesNew`. 
 
-    `DrawingLabel's` behaviour is governed by state variables, defined using Python 
-    `enum.IntEnum`. These relate to how the user's inputs are handled and how the lines 
-    are stored. In creating mode, the user is allowed to draw lines; in adjusting the 
-    user can select existing lines and move them (whole line or just end points); in 
+    `DrawingLabel` is a subclass of QLabel its basic function is to store the original
+    image as a constant pixmap, which is redisplayed with or without lines as the user
+    requires. The mouse down, up and moved callback functions have been overridden,
+    which allows for handling user input. Internally newly created lines are stored in
+    a list called `_linedBase`, when they are moved the modified copies are stored in
+    a list `_linesNew`.
+
+    `DrawingLabel's` behaviour is governed by state variables, defined using Python
+    `enum.IntEnum`. These relate to how the user's inputs are handled and how the lines
+    are stored. In creating mode, the user is allowed to draw lines; in adjusting the
+    user can select existing lines and move them (whole line or just end points); in
     copying mode existing lines can be adjusted and are then copied to new set.
     """
     def __init__(self, parent=None):
@@ -481,7 +481,7 @@ class DrawingLabel(qw.QLabel):
             Returns:
                 None
         """
-        point = ImagePoint(event.x(), event.y())
+        point = ImagePoint(event.x(), event.y()).scale(1.0/self._current_zoom)
         if self._adjust_line == AdjustingState.START:
             self._current_line = self._lines_base[self._adjust_index].new_start(point)
         else:
@@ -500,7 +500,7 @@ class DrawingLabel(qw.QLabel):
                 None
         """
         shift_qt = event.pos() - self._start
-        shift_vec = ImagePoint(shift_qt.x(), shift_qt.y())
+        shift_vec = ImagePoint(shift_qt.x(), shift_qt.y()).scale(1.0/self._current_zoom)
         self._current_line = self._lines_base[self._adjust_index].shift(shift_vec)
 
         self.redisplay()
@@ -696,7 +696,6 @@ class DrawingLabel(qw.QLabel):
                 qc.QPoint(int(zoomed.start.x), int(zoomed.start.y)),
                 qc.QPoint(int(zoomed.end.x), int(zoomed.end.y)))
             painter.drawLine(qt_line)
-
         painter.end()
 
         self.setPixmap(pix)
@@ -771,7 +770,7 @@ class DrawingLabel(qw.QLabel):
             Returns:
                 the current QPixmap
         """
-
+        # TODO implement a grab
         print("DrawingLabel.get_pixmap: not implemented")
 
     def save(self, file):
@@ -784,6 +783,5 @@ class DrawingLabel(qw.QLabel):
             Returns
                 None.
         """
-
         file.open(qc.QIODevice.WriteOnly)
         self.pixmap().save(file, "PNG")
