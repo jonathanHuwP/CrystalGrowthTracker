@@ -43,7 +43,7 @@ ROOT_FILE_NAMES = ["crystaldrawingwidget",
 UI_PATH = "./resources/designer_ui/{}.ui"
 
 # relative path to the python source files
-PY_PATH = "./cgt/Ui_{}.py"
+PY_PATH = "./cgt/gui/Ui_{}.py"
 
 def get_args():
     """
