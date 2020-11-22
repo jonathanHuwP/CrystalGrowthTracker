@@ -33,11 +33,11 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
-from regionselectionlabel import RegionSelectionLabel
-from region import Region
+from cgt.gui.regionselectionlabel import RegionSelectionLabel
+from cgt.model.region import Region
 
 # import UI
-from cgt.Ui_regionselectionwidget import Ui_RegionSelectionWidget
+from cgt.gui.Ui_regionselectionwidget import Ui_RegionSelectionWidget
 
 ## a tuple representing one end of a region
 ##

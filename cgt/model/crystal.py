@@ -24,7 +24,7 @@ specific language governing permissions and limitations under the License.
 # pylint: disable = c-extension-no-member
 # pylint: disable = E0401
 
-from cgt.linesetsandframesstore import LineSetsAndFramesStore
+from cgt.model.linesetsandframesstore import LineSetsAndFramesStore
 
 class Crystal:
     """

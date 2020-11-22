@@ -24,9 +24,10 @@ specific language governing permissions and limitations under the License.
 import os
 import sys
 import csv
-import cgt.videoanalysisresultsstore as vas
-from cgt.crystal import Crystal
-from cgt.region import Region
+
+import cgt.model.videoanalysisresultsstore as vas
+from cgt.model.crystal import Crystal
+from cgt.model.region import Region
 from cgt.results_print_demo import make_test_result
 
 def save_csv_project(project):

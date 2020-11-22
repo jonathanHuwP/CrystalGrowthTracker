@@ -21,10 +21,10 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
-from editnotesdialog import EditNotesDialog
+from cgt.gui.editnotesdialog import EditNotesDialog
 
 # import UI
-from Ui_projectpropertieswidget import Ui_ProjectPropertiesWidget
+from cgt.gui.Ui_projectpropertieswidget import Ui_ProjectPropertiesWidget
 
 class ProjectPropertiesWidget(qw.QWidget, Ui_ProjectPropertiesWidget):
     """

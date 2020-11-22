@@ -16,12 +16,13 @@ import os
 from pathlib import Path
 import random
 import string
-import utils
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
 
-from cgt.Ui_projectstartdialog import Ui_ProjectStartDialog
+from cgt.util.utils import timestamp
+
+from cgt.gui.Ui_projectstartdialog import Ui_ProjectStartDialog
 
 class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
     """
@@ -86,7 +87,7 @@ class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
             self._enhancedVideo.setText(file_name)
             file = os.path.basename(self._enhancedVideo.text())
             file = file.rsplit('.', 1)[0]
-            file += "_" + utils.timestamp()
+            file += "_" + timestamp()
             self._projName.setText(file)
 
     @qc.pyqtSlot()

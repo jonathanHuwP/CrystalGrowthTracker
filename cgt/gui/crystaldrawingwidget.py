@@ -25,12 +25,12 @@ import sys
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
 
-from linesetsandframesstore import LineSetsAndFramesStore
+from cgt.model.linesetsandframesstore import LineSetsAndFramesStore
 
-from DrawingLabel import DrawingLabel
-from cgt.crystal import Crystal
+from cgt.gui.DrawingLabel import DrawingLabel
+from cgt.model.crystal import Crystal
 
-from Ui_crystaldrawingwidget import Ui_CrystalDrawingWidget
+from cgt.gui.Ui_crystaldrawingwidget import Ui_CrystalDrawingWidget
 
 class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
     """

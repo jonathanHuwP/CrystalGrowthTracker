@@ -26,7 +26,7 @@ specific language governing permissions and limitations under the License.
 from collections import namedtuple
 import numpy as np
 
-from cgt.imagepoint import ImagePoint
+from cgt.model.imagepoint import ImagePoint
 
 import sys
 sys.path.insert(0, '..\\CrystalGrowthTracker')

@@ -223,13 +223,13 @@
   <customwidget>
    <class>VideoControlWidget</class>
    <extends>QWidget</extends>
-   <header>videocontrolwidget</header>
+   <header>cgt.gui.videocontrolwidget</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>ResultsTreeWidget</class>
    <extends>QWidget</extends>
-   <header>resultstreewidget</header>
+   <header>cgt.gui.resultstreewidget</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

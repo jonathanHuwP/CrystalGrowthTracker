@@ -26,22 +26,21 @@ specific language governing permissions and limitations under the License.
 
 import sys
 import os
+
 from datetime import timedelta
 from timeit import default_timer as timer
 from imageio import get_reader
-#import PyQt5.QtWidgets as qw
+
 from PyQt5 import QtWidgets as qw
-#import PyQt5.QtGui as qg
 from PyQt5 import QtGui as qg
-#import PyQt5.QtCore as qc
 from PyQt5 import QtCore as qc
-from cgt.Ui_VideoOverviewWindow import Ui_VideoOverviewWindow
-#from Ui_VideoOverviewWindow import Ui_VideoOverviewWindow
-from cgt import overviewplots
-from cgt import readers
+
+from cgt.gui.Ui_VideoOverviewWindow import Ui_VideoOverviewWindow
+
+from cgt.util import overviewplots
+from cgt.io import readers
+
 import cv2
-
-
 
 class VideoOverviewWindow(qw.QMainWindow, Ui_VideoOverviewWindow):
     """

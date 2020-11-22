@@ -23,6 +23,8 @@ import PyQt5.QtCore as qc
 
 from enum import IntEnum
 
+from cgt.gui.Ui_resultstreewidget import Ui_ResultsTreeWidget
+
 class ResultType(IntEnum):
     """
     type codes for use in QTreeWidgetItem
@@ -33,14 +35,12 @@ class ResultType(IntEnum):
 
     ## the item represents a crystal
     CRYSTAL = 10
-    
+
     ## the set of lines at a given time
     FRAME_NUMBER = 20
 
     ## the item represents a line
     LINE = 30
-
-from Ui_resultstreewidget import Ui_ResultsTreeWidget
 
 class ResultsTreeWidget(qw.QWidget, Ui_ResultsTreeWidget):
     """
@@ -59,25 +59,25 @@ class ResultsTreeWidget(qw.QWidget, Ui_ResultsTreeWidget):
         """
         super(ResultsTreeWidget, self).__init__(parent)
         self.setupUi(self)
-        
-        ## the data_source object holding the results 
+
+        ## the data_source object holding the results
         self._data_source = data_source
 
         # set up the tree and display
         h_list = ["Region", "Crystal", "Time", "Line"]
         self._tree.setColumnCount(len(h_list))
         self._tree.setHeaderLabels(h_list)
-        
+
         if data_source is not None:
             self.fill_tree()
-            
+
     def set_data_source(self, data_source):
         """
         setter for the object holding the data to be displayed
-        
+
             Args:
                 data_source (CrystalGrowthTrackerMain) object holding data
-                
+
             Returns:
                 None
         """
@@ -104,7 +104,7 @@ class ResultsTreeWidget(qw.QWidget, Ui_ResultsTreeWidget):
     def region_selected(self, item):
         """
         a line has been selected
-        
+
             Returns:
                 None
         """
@@ -116,7 +116,7 @@ class ResultsTreeWidget(qw.QWidget, Ui_ResultsTreeWidget):
     def crystal_selected(self, item):
         """
         a line has been selected
-        
+
             Returns:
                 None
         """
@@ -125,11 +125,11 @@ class ResultsTreeWidget(qw.QWidget, Ui_ResultsTreeWidget):
         print("region {}, crystal {}".format(r_index, c_index))
         if self.parent() is not None:
             self.parent().parent().select_crystal(r_index, c_index)
-        
+
     def frame_selected(self, item):
         """
         a line has been selected
-        
+
             Returns:
                 None
         """
@@ -143,7 +143,7 @@ class ResultsTreeWidget(qw.QWidget, Ui_ResultsTreeWidget):
     def line_selected(self, item):
         """
         a line has been selected
-        
+
             Returns:
                 None
         """
@@ -159,17 +159,17 @@ class ResultsTreeWidget(qw.QWidget, Ui_ResultsTreeWidget):
     def fill_tree(self):
         """
         clear the tree and fill with data from the data_source
-        
+
             Returns:
                 None
         """
         self._tree.clear()
-        
+
         if self._data_source is None:
             return
-            
+
         result = self._data_source.get_result()
-        
+
         if result is None:
             return
 
@@ -180,20 +180,20 @@ class ResultsTreeWidget(qw.QWidget, Ui_ResultsTreeWidget):
             r_var = qc.QVariant(r_index)
             r_item.setData(0, qc.Qt.UserRole, r_var)
             items.append(r_item)
-            
+
             for c_index, crystal in enumerate(result.get_crystals(r_index)):
                 c_item = qw.QTreeWidgetItem(r_item, ["", str(c_index)], ResultType.CRYSTAL)
                 c_var = qc.QVariant(c_index)
                 c_item.setData(0, qc.Qt.UserRole, r_var)
                 c_item.setData(1, qc.Qt.UserRole, c_var)
-                
+
                 for frame_number in crystal.list_of_frame_numbers:
                     f_item = qw.QTreeWidgetItem(c_item, ["", "", str(frame_number)], ResultType.FRAME_NUMBER)
                     f_var = qc.QVariant(frame_number)
                     f_item.setData(0, qc.Qt.UserRole, r_var)
                     f_item.setData(1, qc.Qt.UserRole, c_var)
                     f_item.setData(2, qc.Qt.UserRole, f_var)
-                    
+
                     for l_index, line in enumerate(crystal.faces_in_frame(frame_number)):
                         l_item = qw.QTreeWidgetItem(c_item, ["", "", "", str(l_index)], ResultType.LINE)
                         l_var = qc.QVariant(l_index)
@@ -203,40 +203,12 @@ class ResultsTreeWidget(qw.QWidget, Ui_ResultsTreeWidget):
                         l_item.setData(3, qc.Qt.UserRole, l_var)
 
         self._tree.addTopLevelItems(items)
-        
+
     def clear(self):
         """
-        clear the tree 
-        
+        clear the tree
+
             Returns:
                 None
         """
         self._tree.clear()
-
-
-###############################
-
-from results_print_demo import make_test_result
-
-class TestOwner():
-    def __init__(self):
-        self._results = make_test_result()
-        
-    def get_result(self):
-        return self._results        
-
-def run():
-    """
-    use a local function to make an isolated the QApplication object
-
-        Returns:
-            None
-    """
-    app = qw.QApplication(sys.argv)
-
-    window = ResultsTreeWidget(data_source = TestOwner())
-    window.show()
-    app.exec_()
-        
-if __name__ == "__main__":
-    run()

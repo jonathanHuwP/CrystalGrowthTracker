@@ -24,7 +24,7 @@ import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
 # import UI
-from Ui_reportviewwidget import Ui_ReportViewWidget
+from cgt.gui.Ui_reportviewwidget import Ui_ReportViewWidget
 
 class ReportViewWidget(qw.QWidget, Ui_ReportViewWidget):
     """

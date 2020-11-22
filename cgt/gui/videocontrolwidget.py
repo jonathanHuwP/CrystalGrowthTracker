@@ -21,7 +21,7 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
-from Ui_videocontrolwidget import Ui_VideoControlWidget
+from cgt.gui.Ui_videocontrolwidget import Ui_VideoControlWidget
 
 class VideoControlWidget(qw.QWidget, Ui_VideoControlWidget):
 

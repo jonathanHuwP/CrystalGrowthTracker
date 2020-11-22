@@ -16,7 +16,7 @@ import sys
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
 
-from cgt.Ui_videoparametersdialog import Ui_VideoParametersDialog
+from cgt.gui.Ui_videoparametersdialog import Ui_VideoParametersDialog
 
 class VideoParametersDialog(qw.QDialog, Ui_VideoParametersDialog):
     """

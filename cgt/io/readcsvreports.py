@@ -26,11 +26,11 @@ from pathlib import Path
 import csv
 from itertools import groupby
 
-from cgt.videoanalysisresultsstore import VideoAnalysisResultsStore
-from cgt.crystal import Crystal
-from cgt.region import Region
-from cgt.imagepoint import ImagePoint
-from cgt.imagelinesegment import ImageLineSegment
+from cgt.model.videoanalysisresultsstore import VideoAnalysisResultsStore
+from cgt.model.crystal import Crystal
+from cgt.model.region import Region
+from cgt.model.imagepoint import ImagePoint
+from cgt.model.imagelinesegment import ImageLineSegment
 from cgt.results_print_demo import make_test_result
 
 def read_csv_project(dir, new_project):

@@ -30,8 +30,8 @@ import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 import numpy as np
 
-from imagepoint import ImagePoint
-from imagelinesegment import ImageLineSegment
+from cgt.model.imagepoint import ImagePoint
+from cgt.model.imagelinesegment import ImageLineSegment
 
 class WidgetState(IntEnum):
     """

@@ -23,20 +23,20 @@ specific language governing permissions and limitations under the License.
 # pylint: disable = c-extension-no-member
 
 import sys
-import cgt.videoanalysisresultsstore as vas
-from cgt.crystal import Crystal
-from cgt.region import Region
-from cgt.imagepoint import ImagePoint
-from cgt.imagelinesegment import ImageLineSegment
 
-sys.path.insert(0, '..\\CrystalGrowthTracker')
+import cgt.model.videoanalysisresultsstore as vas
+
+from cgt.model.crystal import Crystal
+from cgt.model.region import Region
+from cgt.model.imagepoint import ImagePoint
+from cgt.model.imagelinesegment import ImageLineSegment
 
 def make_test_result():
     """
     factory function to procduce a Results object
     """
     store = vas.VideoAnalysisResultsStore()
-    
+
     index = store.add_region(Region(450, 200, 675, 400, 250, 500))
     store.add_crystal(make_crystal1(), index)
 

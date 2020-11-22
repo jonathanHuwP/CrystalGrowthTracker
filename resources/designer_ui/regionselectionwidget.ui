@@ -329,7 +329,7 @@
   <customwidget>
    <class>VideoControlWidget</class>
    <extends>QWidget</extends>
-   <header>videocontrolwidget</header>
+   <header>cgt.gui.videocontrolwidget</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

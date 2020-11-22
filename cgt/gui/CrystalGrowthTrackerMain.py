@@ -27,18 +27,14 @@ import os
 import datetime
 sys.path.insert(0, '..\\CrystalGrowthTracker')
 
-from cgt import utils
-from cgt.utils import find_hostname_and_ip
+from cgt.util.utils import find_hostname_and_ip
 
 import array as arr
 import numpy as np
 
 from imageio import get_reader as imio_get_reader
 
-from cgt import utils
-from cgt.utils import find_hostname_and_ip
-
-from videoanalysisresultsstore import VideoAnalysisResultsStore
+from cgt.model.videoanalysisresultsstore import VideoAnalysisResultsStore
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
@@ -46,23 +42,23 @@ import PyQt5.QtCore as qc
 
 from shutil import copy2
 
-from cgt import ImageLabel
-from cgt.projectstartdialog import ProjectStartDialog
-from cgt.projectpropertieswidget import ProjectPropertiesWidget
+from cgt.gui import ImageLabel
+from cgt.gui.projectstartdialog import ProjectStartDialog
+from cgt.gui.projectpropertieswidget import ProjectPropertiesWidget
 
-from cgt.regionselectionwidget import RegionSelectionWidget
-from cgt.crystaldrawingwidget import CrystalDrawingWidget
-from cgt.videoparametersdialog import VideoParametersDialog
-from cgt.reportviewwidget import ReportViewWidget
+from cgt.gui.regionselectionwidget import RegionSelectionWidget
+from cgt.gui.crystaldrawingwidget import CrystalDrawingWidget
+from cgt.gui.videoparametersdialog import VideoParametersDialog
+from cgt.gui.reportviewwidget import ReportViewWidget
+
+from cgt.io import htmlreport
+from cgt.io import writecsvreports
+from cgt.io import readcsvreports
+
+from cgt.model.cgtproject import CGTProject
 
 # import UI
-from cgt.Ui_CrystalGrowthTrackerMain import Ui_CrystalGrowthTrackerMain
-
-from cgt.readwrite import htmlreport
-from cgt.readwrite import writecsvreports
-from cgt.readwrite import readcsvreports
-from cgt import utils
-from cgt.cgtproject import CGTProject
+from cgt.gui.Ui_CrystalGrowthTrackerMain import Ui_CrystalGrowthTrackerMain
 
 class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     """
@@ -249,40 +245,40 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self._project = project
             self._project.reset_changed()
             self.project_created_or_loaded()
-            
+
     def project_created_or_loaded(self):
         """
         carry out action for a newly created or loaded project
-        
+
             Returns:
                 None
         """
         self.reset_tab_wigets()
 
         # remove old reader
-        self._video_reader = None 
-        
+        self._video_reader = None
+
         # dispaly project
         self.display_properties()
         self.set_title()
-        
+
         # if project has regions
         if self._project["results"] is not None:
             if self._project["results"].number_of_regions > 0:
                 self._selectWidget.reload_combobox()
                 self._drawingWidget.new_region()
-                
+
         self._selectWidget.setEnabled(False)
         self._drawingWidget.setEnabled(False)
-        
+
         if self._project["latest_report"] is not None:
             if self._project["latest_report"] != "":
                 self._reportWidget.read_report(self._project["latest_report"])
-        
+
     def reset_tab_wigets(self):
         """
         reset the tab widgets to inital conditions
-        
+
             Returns:
                 None
         """
@@ -611,9 +607,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                                    error_title,
                                    message)
             return
-            
+
         message_box.close()
-        
+
         self._selectWidget.setEnabled(True)
         self._selectWidget.show_video()
         self._drawingWidget.setEnabled(True)

@@ -23,7 +23,7 @@ specific language governing permissions and limitations under the License.
 # pylint: disable = too-many-public-methods
 # pylint: disable = c-extension-no-member
 
-from cgt.imagelinesegment import ImageLineDifference
+from cgt.model.imagelinesegment import ImageLineDifference
 
 class LineSetsAndFramesStore(dict):
     """

@@ -22,7 +22,7 @@ specific language governing permissions and limitations under the License.
 
 import getpass
 
-from cgt import utils
+from cgt.util.utils import timestamp, find_hostname_and_ip
 
 class CGTProject(dict):
     """
@@ -141,8 +141,8 @@ class CGTProject(dict):
 
         self["prog"] = prog
         self["description"] = description
-        self["start_datetime"] = utils.timestamp()
-        self['host'], self['ip_address'], self['operating_system'] = utils.find_hostname_and_ip()
+        self["start_datetime"] = timestamp()
+        self['host'], self['ip_address'], self['operating_system'] = find_hostname_and_ip()
         self["start_user"] = getpass.getuser()
 
     def __setitem__(self, item, value):
