@@ -91,12 +91,12 @@ def save_html_report1(info, time_stamp):
 
         Args:
             info (dict): The dictionary subclass holding the project data and results.
-            
+
             time_stamp (str): The name of the video file that is being analysed.
 
         Returns:
             None.
-            
+
         Throws:
             Error if the report directory cannot be made, or file cannot be opened
     '''
@@ -151,12 +151,12 @@ def write_html_report_start1(fout, info):
 
     title = "<title>Report on {} Produced by the Crystal Growth Tracker ({}) Software</title>\n"
     title = title.format(info['enhanced_video_path'], info['prog'])
-    
+
     fout.write(title)
 
     fout.write("</head>\n")
     fout.write("\n<body>\n")
-    
+
     title2 = "<h1 align=\"center\">Report on {} Produced by the Crystal Growth Tracker ({}) Software</h1>\n"
     title2 = title2.format(info['enhanced_video'], info['prog'])
     fout.write(title2)

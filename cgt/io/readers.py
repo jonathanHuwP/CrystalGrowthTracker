@@ -27,7 +27,7 @@ import os
 from timeit import default_timer as timer
 from datetime import timedelta
 from imageio import get_reader
-from cgt import overviewplots
+from cgt.util import overviewplots
 
 
 

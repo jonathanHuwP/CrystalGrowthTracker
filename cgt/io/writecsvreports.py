@@ -13,8 +13,7 @@ Copyright 2020
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 this file except in compliance with the License. You may obtain a copy of the
-License at
-http://www.apache.org/licenses/LICENSE-2.0
+License at http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software distributed
 under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
@@ -25,9 +24,6 @@ import os
 import sys
 import csv
 
-import cgt.model.videoanalysisresultsstore as vas
-from cgt.model.crystal import Crystal
-from cgt.model.region import Region
 from cgt.results_print_demo import make_test_result
 
 def save_csv_project(project):
@@ -36,16 +32,16 @@ def save_csv_project(project):
 
         Args:
             project (CGTProject) the project to be saved
-            
+
         Returns:
             None
-            
+
         Throws:
             Error if a file cannot be opened
     """
     if project is None:
         return
-        
+
     save_csv_results(project)
     save_csv_info1(project)
 
@@ -58,7 +54,7 @@ def save_csv_results(project):
 
         Returns:
             None
-            
+
         Throws:
             Error if a file cannot be opened
     '''
@@ -94,9 +90,9 @@ def save_csv_results(project):
         note = ""
         if crystal.notes is not None:
             note = crystal.notes
-        
+
         crystals_array.append([index, region_index, note])
-        
+
         for frame in crystal.list_of_frame_numbers:
             print("\tframe number {}".format(frame))
 
@@ -289,7 +285,7 @@ def save_csv_regions1(info, regions_array):
 
         Returns:
             None
-            
+
         Throws:
             Error if file cannot be opened
     '''
@@ -397,7 +393,7 @@ def save_csv_crystals1(info, crystals_array):
 
         Returns:
             None
-            
+
         Throws:
             Error if file cannot be opened
     '''
@@ -489,14 +485,14 @@ def save_csv_lines(results_dir, info, lines_array):
 def save_csv_lines1(info, lines_array):
     '''Creates the csv report file for lines.
 
-        Args: 
+        Args:
             info (dict): A python dictionary containing a collection of useful parameters
                         such as the filenames and paths.
             lines_array (array): lines data as array of arrays of output data.
 
         Returns:
             None
- 
+
         Throws:
             Error if file cannot be opened
     '''
@@ -509,8 +505,8 @@ def save_csv_lines1(info, lines_array):
     csv_outfile_name = (path+r"/"+info["prog"]
                         +r"_"+info["proj_name"]+r"_project_lines.csv")
 
-    header = ("Crystal index", 
-              "Frame number", 
+    header = ("Crystal index",
+              "Frame number",
               "Line number",
               "x0",
               "y0",
@@ -574,7 +570,7 @@ def save_csv_info1(info):
 
         Returns:
             None
-            
+
         Throws:
             Error if file cannot be opened
     '''

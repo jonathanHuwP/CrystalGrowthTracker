@@ -22,8 +22,6 @@ specific language governing permissions and limitations under the License.
 # pylint: disable = too-many-public-methods
 # pylint: disable = c-extension-no-member
 
-import sys
-
 import cgt.model.videoanalysisresultsstore as vas
 
 from cgt.model.crystal import Crystal

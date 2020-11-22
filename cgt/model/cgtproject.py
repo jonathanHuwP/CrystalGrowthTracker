@@ -152,7 +152,7 @@ class CGTProject(dict):
             Returns:
                 None
         """
-        super(CGTProject, self).__setitem__(item, value)
+        super().__setitem__(item, value)
         self._changed = True
 
     def reset_changed(self):
@@ -176,5 +176,5 @@ class CGTProject(dict):
         """
         if self["results"] is None:
             return self._changed
-        else:
-            return self._changed or self["results"].has_been_changed()
+
+        return self._changed or self["results"].has_been_changed()

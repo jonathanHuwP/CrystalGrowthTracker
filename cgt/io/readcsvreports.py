@@ -31,9 +31,8 @@ from cgt.model.crystal import Crystal
 from cgt.model.region import Region
 from cgt.model.imagepoint import ImagePoint
 from cgt.model.imagelinesegment import ImageLineSegment
-from cgt.results_print_demo import make_test_result
 
-def read_csv_project(dir, new_project):
+def read_csv_project(results_dir, new_project):
     '''Coordinates the reading of a selection of csv reports.
 
     Args:
@@ -50,7 +49,7 @@ def read_csv_project(dir, new_project):
 
     files = []
     dirpath = ""
-    for (dirpath, dirnames, filenames) in os.walk(dir):
+    for (dirpath, _, filenames) in os.walk(results_dir):
         files.extend(filenames)
         break
 
@@ -110,7 +109,7 @@ def read_csv_reports(results_dir):
 
     files = []
     dirpath = ""
-    for (dirpath, dirnames, filenames) in os.walk(results_dir):
+    for (dirpath, _, filenames) in os.walk(results_dir):
         files.extend(filenames)
         break
 
@@ -146,11 +145,9 @@ def read_csv_reports(results_dir):
         error_code = 1
 
     if error_code == 0:
-        source = vas.VideoSource("ladkj.mp4", 8, 700, 800, 600)
-        store = vas.VideoAnalysisResultsStore(source)
-        store.append_history()
+        store = VideoAnalysisResultsStore()
         storeregions(store, region_data)
-        storecrystals(crystal_data, line_data)
+        storecrystals(store, crystal_data, line_data)
 
     return error_code
 
@@ -180,7 +177,7 @@ def readcsv2listofdicts(file, dirpath):
 
     if not os.path.exists(file_to_open):
         print("ERROR; The input file does not exist.")
-        return
+        return (1, None)
     print("file exists")
 
     try:
@@ -194,9 +191,6 @@ def readcsv2listofdicts(file, dirpath):
                 data.append(row)
     except (IOError, OSError, EOFError) as exception:
         print(exception)
-        error_code = 1
-    except:
-        print("Reading failed for file ", file)
         error_code = 1
     finally:
         print("Read file: ", file)
@@ -229,7 +223,7 @@ def readcsvinfo2dict(new_project, file, dirpath):
 
     if not os.path.exists(file_to_open):
         print("ERROR; The input file does not exist.")
-        return
+        return (1, None)
     print("file exists")
 
     try:
@@ -247,15 +241,12 @@ def readcsvinfo2dict(new_project, file, dirpath):
     except (IOError, OSError, EOFError) as exception:
         print(exception)
         error_code = 1
-    except:
-        print("Reading failed for file ", file)
-        error_code = 1
     finally:
         print("Read file: ", file)
 
     print("new_project: ", new_project)
 
-    return (error_code)
+    return error_code
 
 
 
