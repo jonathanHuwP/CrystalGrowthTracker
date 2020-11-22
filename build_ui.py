@@ -1,123 +1,77 @@
-# -*- coding: utf-8 -*-
-# -*- coding: utf-8 -*-
+## -*- coding: utf-8 -*-
 """
-Created on Wednesday Sept 30 2020
+Created on Tue 27 Oct 2020
 
-module results provides storage classes for CGT results.
-IO and analysis are provided seperatly.
+A utility for batch running pyuic to construct the Ui_*.py classes from the *.ui
+files produced by Qt Designer.
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 this file except in compliance with the License. You may obtain a copy of the
-License at
-http://www.apache.org/licenses/LICENSE-2.0
+License at http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software distributed
 under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 
+This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
+
 @copyright 2020
-@author: j.h.pickering@leeds.ac.uk
+@author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 """
+
 import os
 import argparse
-import pathlib
+
+# a list of the modules that the package requires
+ROOT_FILE_NAMES = ["CrystalGrowthTrackerMain"]
+
+# relative path to the Qt .ui files
+UI_PATH = "./resources/designer_ui/{}.ui"
+
+# relative path to the python source files
+PY_PATH = "./cgt/gui/Ui_{}.py"
 
 def get_args():
     """
     set up and get the command line arguments
-
         Returns
             namespace of arguments
     """
-    parser = argparse.ArgumentParser(
-        prog='build_ui',
-        epilog="""Script for automating the compilation of Qt 
-        user interfaces created with QDesigner""")
+    text = """
+           Automate the construction of Ui_*.py files from Qt Designer's *.ui files.
+           If run without command line options it will build all files.
+           If run with -f option it will build only one file.
+           """
+    parser = argparse.ArgumentParser(prog='build_ui', description = text)
 
-    parser.add_argument(
-        "-d",
-        "--directory",
-        help="Source directory",
-        required=True, type=str)
-    parser.add_argument(
-        "-c",
-        "--clean",
-        help="Remove existing Ui files",
-        action='store_true')
+    parser.add_argument("-f",
+                        "--file_name_root",
+                        help="the file name without postfix ",
+                        required=False,
+                        type=str)
 
     return parser.parse_args()
 
-def compile_user_interface(ui_file, py_file):
+def build(file_name_root):
     """
-    convert a qdesigner ui file to a python file
+    run pyuic5 on a single file
 
         Args:
-            ui_file (pathlib.Path) the full path to the ui file
-            py_file (pathlib.Path) the full path to the python file
-
-        Returns:
-            None
+            file_name_root (string) the module name with no decoration or postfix
     """
-    command = "pyuic5 {} -o {}"
-    os.system(command.format(ui_file, py_file))
+    ui_file = UI_PATH.format(file_name_root)
+    py_file = PY_PATH.format(file_name_root)
 
-def list_ui_files(directory):
-    """
-    list all ui files in a directory
-
-        Args:
-            directory (string) the directory
-
-        Returns:
-            list of files in directory ending in .ui
-    """
-    files = os.listdir(directory)
-    return [f for f in files if f.endswith(".ui")]
-
-def list_compiled_ui_files(directory):
-    """
-    list all compiled ui files (Ui_*) in a directory
-
-        Args:
-            directory (string) the directory
-
-        Returns:
-            list of files in directory starting with Ui_
-    """
-    files = os.listdir(directory)
-    return [f for f in files if f.startswith("Ui_")]
-
-def main():
-    """
-    the top level function
-    """
-    args = get_args()
-
-    path = pathlib.Path(args.directory)
-    if not path.is_dir():
-        print("Error {} is not a directory".format(path))
-        return
-    print("Path: {}".format(path))
-
-    if args.clean:
-        files = list_compiled_ui_files(path)
-        print("{} files to be removed".format(len(files)))
-        for file in files:
-            target = path.joinpath(file)
-            print("\t{}".format(target))
-            target.unlink()
-
-    files = list_ui_files(path)
-    print("{} files to be compiled:".format(len(files)))
-    for file in files:
-        source = path.joinpath(file)
-        file = file.rsplit('.', 1)[0]
-        file += ".py"
-        file = "Ui_" + file
-        target = path.joinpath(file)
-        print("\t{} => {}".format(source, target))
-        compile_user_interface(source, target)
+    # in the case of failure CPython will print its own error message
+    if os.system(f"pyuic5 {ui_file} -o {py_file}") == 0:
+        print(f"made {py_file}")
 
 if __name__ == "__main__":
-    main()
+    args = get_args()
+
+    if args.file_name_root:
+        build(args.file_name_root)
+    else:
+        for file in ROOT_FILE_NAMES:
+            build(file)
