@@ -22,6 +22,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 
 import os
 import argparse
+import pathlib
 
 # a list of the modules that the package requires
 ROOT_FILE_NAMES = ["CrystalGrowthTrackerMain"]
@@ -30,7 +31,7 @@ ROOT_FILE_NAMES = ["CrystalGrowthTrackerMain"]
 UI_PATH = "./resources/designer_ui/{}.ui"
 
 # relative path to the python source files
-PY_PATH = "./cgt/gui/Ui_{}.py"
+PY_PATH = "./cgt/Ui_{}.py"
 
 def get_args():
     """
@@ -60,8 +61,8 @@ def build(file_name_root):
         Args:
             file_name_root (string) the module name with no decoration or postfix
     """
-    ui_file = UI_PATH.format(file_name_root)
-    py_file = PY_PATH.format(file_name_root)
+    ui_file = pathlib.Path(UI_PATH.format(file_name_root))
+    py_file = pathlib.Path(PY_PATH.format(file_name_root))
 
     # in the case of failure CPython will print its own error message
     if os.system(f"pyuic5 {ui_file} -o {py_file}") == 0:
