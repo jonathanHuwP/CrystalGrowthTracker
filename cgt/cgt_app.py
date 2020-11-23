@@ -24,7 +24,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
 
-from cgt.gui.CrystalGrowthTrackerMain import CrystalGrowthTrackerMain
+from cgt.gui.crystalgrowthtrackermain import CrystalGrowthTrackerMain
 
 class CGTApp(qw.QApplication):
     """
