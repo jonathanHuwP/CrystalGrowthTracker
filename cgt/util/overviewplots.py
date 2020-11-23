@@ -5,27 +5,23 @@ This python module contains functions that create plots
 that provide an overview of an unprocessed (without Euler's Magnifier)
 video file showing dynamic crystallisation of X-ray synchrotron videos.
 
-Joanna Leng (an EPSRC funded Research Software Engineering Fellow (EP/R025819/1)
-University of Leeds
-June 2020
-
-Copyright 2020
-
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 this file except in compliance with the License. You may obtain a copy of the
-License at
-http://www.apache.org/licenses/LICENSE-2.0
+License at http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software distributed
 under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 
+This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
+
+@copyright 2020
+@author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 '''
 import os
 import seaborn as sns
 import matplotlib.pyplot as plt
-
 
 def plot_means(outpath, numbers, means):
     '''
@@ -143,5 +139,5 @@ def save_grayscale_frame(outpath, img, frame_number):
 
     fig_grayscale.savefig(filename, bbox_inches='tight')
     plt.close(fig_grayscale)
-    
+
     return filename
