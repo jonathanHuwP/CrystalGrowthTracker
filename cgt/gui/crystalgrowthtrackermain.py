@@ -21,32 +21,23 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 """
 # set up linting conditions
 # pylint: disable = too-many-public-methods
+# pylint: disable = too-many-instance-attributes
 # pylint: disable = c-extension-no-member
 
 import sys
 import os
-import datetime
-sys.path.insert(0, '..\\CrystalGrowthTracker')
-
-from cgt.util.utils import find_hostname_and_ip
-
 import array as arr
-import numpy as np
-
+from shutil import copy2
 from imageio import get_reader as imio_get_reader
-
-from cgt.model.videoanalysisresultsstore import VideoAnalysisResultsStore
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
-from shutil import copy2
+from cgt.model.videoanalysisresultsstore import VideoAnalysisResultsStore
 
-from cgt.gui import ImageLabel
 from cgt.gui.projectstartdialog import ProjectStartDialog
 from cgt.gui.projectpropertieswidget import ProjectPropertiesWidget
-
 from cgt.gui.regionselectionwidget import RegionSelectionWidget
 from cgt.gui.crystaldrawingwidget import CrystalDrawingWidget
 from cgt.gui.videoparametersdialog import VideoParametersDialog
@@ -55,6 +46,8 @@ from cgt.gui.reportviewwidget import ReportViewWidget
 from cgt.io import htmlreport
 from cgt.io import writecsvreports
 from cgt.io import readcsvreports
+
+import cgt.util.utils as utils
 
 from cgt.model.cgtproject import CGTProject
 
@@ -77,7 +70,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 None
         """
-        super(CrystalGrowthTrackerMain, self).__init__(parent)
+        super().__init__(parent)
         ## the parent object
         self._parent = parent
 
@@ -141,7 +134,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         ## the report widget
         self._reportWidget = ReportViewWidget(self._selectTab, self)
-        self._reportWidget.set_html("<!DOCTYPE html><html><body><h1 style=\"color:blue;\">No Report!</h1><p style=\"color:red;\">No report has been saved.</p></body></html>")
+        text = "<h1 style=\"color:blue;\">No Report!</h1>"
+        text += "<p style=\"color:red;\">No report has been saved.</p></body></html>"
+        self._reportWidget.set_html(text)
 
         # set up tab
         self.add_tab(self._reportTab, self._reportWidget, "Current Report")
@@ -308,10 +303,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             writecsvreports.save_csv_project(self._project)
             self._project.reset_changed()
         except OSError as err:
-            message = "Error opening writing file: {}".format(err)
-            print(message)
-            for item in sys.exc_info():
-                print("{}".item)
+            message = f"Error opening writing file: {err}"
             qw.QMessageBox.warning(self, "CGT File Error", message)
             return
 
@@ -367,7 +359,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 proj_dir  (pathlib.Path) parent directory of project directory
                 proj_name (string) the name of project, will be directory name
                 notes (string) project notes
-                copy_files (bool) if true the enhanced_video and raw_video files are copied to project dir
+                copy_files (bool) if true video files are copied to project dir
 
             Returns:
                 None
@@ -403,12 +395,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 qw.QMessageBox.warning(
                     self,
                     "Problem copying File",
-                    "Error message: {}".format(why))
-            except Error as err:
-                qw.QMessageBox.warning(
-                    self,
-                    "Problem copying File",
-                    "Error message: {}".format(err.args[0]))
+                    f"Error message: {why}")
 
             if raw_video is not None:
                 try:
@@ -419,12 +406,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                     qw.QMessageBox.warning(
                         self,
                         "Problem copying File",
-                        "Error message: {}".format(why))
-                except Error as err:
-                    qw.QMessageBox.warning(
-                        self,
-                        "Problem copying File",
-                        "Error message: {}".format(err.args[0]))
+                        f"Error message: {why}")
+
         else:
             # set sourec and project to their user input values
             self._project["enhanced_video"] = enhanced_video
@@ -440,7 +423,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 with open(notes_file, 'w') as n_file:
                     n_file.write(notes)
             except IOError as error:
-                message = "Can't open file for the notes"
+                message = f"Can't open file for notes {error}"
                 qw.QMessageBox.critical(self, "Error making directory!", message)
 
         self._project['enhanced_video_path'] = enhanced_video.parent
@@ -480,27 +463,24 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         else:
             units = VideoParametersDialog.RESOLUTION_UNITS[1]
 
-        fps, resolution, units = VideoParametersDialog.get_values_from_user(self, fps, resolution, units)
+        fps, res, units = VideoParametersDialog.get_values_from_user(self,
+                                                                     fps,
+                                                                     resolution,
+                                                                     units)
 
         self._project['frame_rate'] = fps
-        self._project['resolution'] = resolution
+        self._project['resolution'] = res
         self._project['resolution_units'] = units
 
         self.display_properties()
 
-    @qc.pyqtSlot()
-    def tab_changed(self):
+    def get_video_reader(self):
         """
-        callback for the tab widget to use when the tab is changed, put all
-        state change required between the two tabs in here. the currentIndex
-        function in _tabWidger will act as a state variable.
+        getter for the video reader object
 
             Returns:
-                None
+                (imageio.reader) video reader
         """
-        print("tab changed")
-
-    def get_video_reader(self):
         return self._video_reader
 
     def get_fps_and_resolution(self):
@@ -555,6 +535,16 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self.setWindowTitle(name)
 
     def make_pixmap(self, index, frame):
+        """
+        make a pixmap of a given region in a given frame
+
+            Args:
+                index (int) the index of the region
+                frame (int) the frame in the video
+
+            Returns:
+                QPixmap of the region
+        """
         region = self._project["results"].regions[index]
 
         raw = self._video_reader.get_data(frame)
@@ -594,16 +584,18 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                                    message)
             return
 
-        message_box = qw.QMessageBox();
-        message_box.setText("Loading Video.");
-        message_box.setInformativeText("Loading video may take some time.");
+        message_box = qw.QMessageBox()
+        message_box.setText("Loading Video.")
+        message_box.setInformativeText("Loading video may take some time.")
         try:
             message_box.show()
             self._video_reader = imio_get_reader(self._project["enhanced_video"], 'ffmpeg')
         except (FileNotFoundError, IOError) as ex:
             message_box.close()
             message = self.tr("Unexpected error reading {}: {} => {}")
-            message = meassge.format(file_name, type(ex), ex.args)
+            message = message.format(self._project["enhanced_video"],
+                                    type(ex),
+                                    ex.args)
             qw.QMessageBox.warning(self,
                                    error_title,
                                    message)

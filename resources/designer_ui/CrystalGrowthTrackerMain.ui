@@ -176,22 +176,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>_tabWidget</sender>
-   <signal>currentChanged(int)</signal>
-   <receiver>CrystalGrowthTrackerMain</receiver>
-   <slot>tab_changed()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>470</x>
-     <y>291</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>470</x>
-     <y>291</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>_actionSaveReport</sender>
    <signal>triggered()</signal>
    <receiver>CrystalGrowthTrackerMain</receiver>
