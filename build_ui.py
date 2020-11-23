@@ -40,10 +40,10 @@ ROOT_FILE_NAMES = ["crystaldrawingwidget",
                    "video_demonstration"]
 
 # relative path to the Qt .ui files
-UI_PATH = "./resources/designer_ui/{}.ui"
+UI_PATH = "./resources/designer_ui/"
 
 # relative path to the python source files
-PY_PATH = "./cgt/gui/Ui_{}.py"
+PY_PATH = "./cgt/gui/"
 
 def get_args():
     """
@@ -60,9 +60,14 @@ def get_args():
 
     parser.add_argument("-f",
                         "--file_name_root",
-                        help="the file name without postfix ",
+                        help="the file name without postfix",
                         required=False,
                         type=str)
+                        
+    parser.add_argument("-c",
+                        "--clean",
+                        help="remove all the existing Ui_ files",
+                        action="store_true")
 
     return parser.parse_args()
 
@@ -73,17 +78,31 @@ def build(file_name_root):
         Args:
             file_name_root (string) the module name with no decoration or postfix
     """
-    ui_file = pathlib.Path(UI_PATH.format(file_name_root))
-    py_file = pathlib.Path(PY_PATH.format(file_name_root))
+    ui_file = pathlib.Path(UI_PATH).joinpath(f"{file_name_root}.ui")
+    py_file = pathlib.Path(PY_PATH).joinpath(f"Ui_{file_name_root}.py")
 
     # in the case of failure CPython will print its own error message
     if os.system(f"pyuic5 {ui_file} -o {py_file}") == 0:
         print(f"made {py_file}")
+        
+def clean():
+    """
+    remove the existing Ui_* files
+    
+        Returns:
+            None
+    """
+    for item in pathlib.Path(PY_PATH).iterdir():
+        if str(item.name).startswith("Ui_"):
+            item.unlink()
+            print(f"Deleted {item}")
 
 if __name__ == "__main__":
     args = get_args()
-
-    if args.file_name_root:
+    
+    if args.clean:
+        clean()
+    elif args.file_name_root:
         build(args.file_name_root)
     else:
         for file in ROOT_FILE_NAMES:
