@@ -21,6 +21,8 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = c-extension-no-member
 # pylint: disable = import-error
 
+import sys
+
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
 
@@ -38,8 +40,51 @@ class CGTApp(qw.QApplication):
         self.setOrganizationName("School of Computer Science, University of Leeds, Leeds, UK")
         self.setOrganizationDomain("leeds.ac.uk")
         self.setAttribute(qc.Qt.AA_EnableHighDpiScaling)
+        
+        translators = select_translator()
+        for translator in translators:
+            qc.QCoreApplication.installTranslator(translator)
 
         window = CrystalGrowthTrackerMain()
         window.show()
 
         self.exec_()    # enter event loop
+
+def select_translator():
+    """
+    give the user the option to choose the language other than default English
+
+        Returns:
+            if English None, else the list of translators
+    """
+    languages = ["English", "German"]
+
+    lang = qw.QInputDialog.getItem(
+        None, "Select Language", "Language", languages)
+
+    if not lang[1]:
+        return None
+
+    return get_translators(lang[0])
+
+def get_translators(lang):
+    """
+    find the available translations files for a languages
+
+        Args:
+        lang (string) the name of the language
+
+        Returns:
+            a list consisting of [<translator>, <system translator>]
+    """
+    qt_translator = qc.QTranslator()
+    system_trans = qc.QTranslator()
+
+    if lang == "German":
+        if not qt_translator.load("./translation/cgt_german.qm"):
+            sys.stderr.write("failed to load file cgt_german.qm")
+        if not system_trans.load("qtbase_de.qm",
+                                 qc.QLibraryInfo.location(qc.QLibraryInfo.TranslationsPath)):
+            sys.stderr.write("failed to load file qtbase_de.qm")
+
+    return [qt_translator, system_trans]
