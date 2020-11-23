@@ -26,8 +26,7 @@ import pathlib
 
 # a list of the modules that the package requires
 ROOT_FILE_NAMES = ["crystaldrawingwidget",
-                   "CrystalGrowthTrackerMain",
-                   "DrawingLabelTestHarness",
+                   "crystalgrowthtrackermain",
                    "editnotesdialog",
                    "projectpropertieswidget",
                    "projectstartdialog",

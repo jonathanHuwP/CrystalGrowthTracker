@@ -52,7 +52,7 @@ import cgt.util.utils as utils
 from cgt.model.cgtproject import CGTProject
 
 # import UI
-from cgt.gui.Ui_CrystalGrowthTrackerMain import Ui_CrystalGrowthTrackerMain
+from cgt.gui.Ui_crystalgrowthtrackermain import Ui_CrystalGrowthTrackerMain
 
 class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     """
