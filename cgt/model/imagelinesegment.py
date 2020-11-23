@@ -28,11 +28,6 @@ import numpy as np
 
 from cgt.model.imagepoint import ImagePoint
 
-import sys
-sys.path.insert(0, '..\\CrystalGrowthTracker')
-
-
-
 ## data-struct for a directed line segment in pixel coordinates,
 ## basis for classes providing more functionality
 ##

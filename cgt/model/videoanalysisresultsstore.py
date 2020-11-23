@@ -4,23 +4,22 @@ Created on Tuesday August 18 2020
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 this file except in compliance with the License. You may obtain a copy of the
-License at
-http://www.apache.org/licenses/LICENSE-2.0
+License at http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software distributed
 under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 
+This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
+
 @copyright 2020
-@author: j.h.pickering@leeds.ac.uk
+@author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 """
 
 # set up linting conditions
 # pylint: disable = too-many-public-methods
 # pylint: disable = too-many-arguments
-
-from collections import namedtuple
 
 class VideoAnalysisResultsStore:
     """
@@ -56,19 +55,19 @@ class VideoAnalysisResultsStore:
 
         if region_crystal is not None:
             self._region_crystal = region_crystal
-            
+
         ## flag to indicate store has been changed
         self._changed = False
-        
+
     def has_been_changed(self):
         """
         getter for the changed status
-        
+
             Returns:
                 the changed flag
         """
         return self._changed
-        
+
     def reset_changed(self):
         """
         make the changed status false
@@ -77,11 +76,11 @@ class VideoAnalysisResultsStore:
                 None
         """
         self._changed = False
-        
+
     def set_changed(self):
         """
         set the changed status to true
-        
+
             Returns:
                 None
         """
@@ -159,7 +158,7 @@ class VideoAnalysisResultsStore:
         index = len(self._regions)
         self._regions.append(region)
         self.set_changed()
-        
+
         return index
 
     def reserve_crystals(self, size):
