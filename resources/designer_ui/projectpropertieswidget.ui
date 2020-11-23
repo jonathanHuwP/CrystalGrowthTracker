@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ProjectPropertiesWidget</class>
+ <widget class="QWidget" name="ProjectPropertiesWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>712</width>
+    <height>585</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Project Properties</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QTextBrowser" name="_propertiesBrowser">
+     <property name="lineWidth">
+      <number>2</number>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="_changeRateButton">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="text">
+        <string>Change Rate/Resolution</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="_editNotesButton">
+       <property name="text">
+        <string>Edit Notes</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>_changeRateButton</sender>
+   <signal>clicked()</signal>
+   <receiver>ProjectPropertiesWidget</receiver>
+   <slot>set_video_scale_parameters()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>100</x>
+     <y>417</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>355</x>
+     <y>232</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_editNotesButton</sender>
+   <signal>clicked()</signal>
+   <receiver>ProjectPropertiesWidget</receiver>
+   <slot>edit_notes()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>641</x>
+     <y>553</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>355</x>
+     <y>292</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
