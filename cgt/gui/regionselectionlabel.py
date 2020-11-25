@@ -79,7 +79,7 @@ class RegionSelectionLabel(qw.QLabel):
         self._state = SelectionState.NO_ACTION
 
         ## the translated name
-        self._translation_name = self.tr("ImageLabel")
+        self._translation_name = self.tr("RegionSelectionLabel")
 
         ## holder for start of drawing in pixel coordinates
         self._start = None
