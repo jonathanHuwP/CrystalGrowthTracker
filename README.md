@@ -40,6 +40,7 @@ To build the Qt widgets reqired
 #### run the software
 
 Open an Anaconda shell and navigate to the CrystalGrowthTracker directory then, activate the enviroment:
+
 `conda activate cgt`
 
 To run the software:
