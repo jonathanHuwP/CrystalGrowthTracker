@@ -11,27 +11,41 @@ Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 
 ## DEVELOPED WITH: 
-This was developed using Python 3.7 or above and Anaconda, Inc. on Windows 10 systems. The software has not been executed on Linux or Mac.
+This was developed using Python 3.7/3.8 and Anaconda, Inc. on Windows 10 systems. The software has not been executed on Linux or Mac.
 
-## QUICK START: 
-The followin instructions describe how you build and execute the CrytalGrowthTracker software. There are no explanations of the steps here. Please look at the rest of the README file if you have any problems.
 
 ### Install and First Run
-This software uses Anaconda with Python 3 so you will need to install and open an Anaconda shell. Once that is open, type the following the FIRST time you run the software, it is not required for later runs. During the first two commands you may be asked to install additional conda packages, you have to allow conda to do this. If you have installed conda at a system level rather than in user space, you will need to have administrator privaleged. On windows right click on the 'Anaconda PowerShell Prompt' in the start menu and select "Run as Administrator".
+This software uses Anaconda with Python 3.8, at present it will not work with 3.9. The packages required to run the software are listed in the file environment_CGT.yml.
+
+If you have installed Anaconda, you can install the software and run in two steps:, 
+
+####set-up the enviromet and build the software
+
+Download or clone from gitHub.
+
+Open an Anaconda shell and navigate to the CrystalGrowthTracker directory. 
+
+Set up the conda enviroment:
 
 `conda env create -f environment_CGT.yml`
 
 To activate the CGT Anaconda environment type the following:
 
-`conda activate CGT`
+`conda activate cgt`
 
 To build the Qt widgets reqired 
 
 `python .\build_ui.py`
 
-Finally run the Crystal Growth Tracker:
+####run the software
+
+Open an Anaconda shell and navigate to the CrystalGrowthTracker directory then type:
 
 `python .\run_cgt.py`
+
+you can also run from another directory using:
+
+`python C:\Users\<usre name>\Work\CrystalGrowthTracker\run_cgt.py`
 
 ### Runs Without Install
 In the future you will just need to start the CGT environment and then run the Crystal Growth Tracker.
