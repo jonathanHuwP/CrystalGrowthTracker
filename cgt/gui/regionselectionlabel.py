@@ -20,10 +20,11 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 @author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 """
 from enum import IntEnum
+import numpy as np
+
 import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
-import numpy as np
 
 from cgt.util.drawrect import DrawRect
 
@@ -71,7 +72,7 @@ class RegionSelectionLabel(qw.QLabel):
 
         ## (QObject) the parent object
         self._parent = parent
-        
+
         ## storage for the regions
         self._regions_store = regions_store
 
