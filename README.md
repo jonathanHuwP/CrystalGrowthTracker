@@ -14,33 +14,30 @@ Unless required by applicable law or agreed to in writing, software distributed 
 This was developed using Python 3.7 or above and Anaconda, Inc. on Windows 10 systems. The software has not been executed on Linux or Mac.
 
 ## QUICK START: 
-Immediately below are a set of instructions that allow you to execute the CrytalGrowthTracker software quickly. There are no explanations of the steps here. Please look at the rest of the README file if you have any problems.
+The followin instructions describe how you build and execute the CrytalGrowthTracker software. There are no explanations of the steps here. Please look at the rest of the README file if you have any problems.
 
-This software uses Anaconda with Python 3 so you will need to install and open an Anaconda shell. Once that is open, type the following the FIRST time you run the PERPL software (it is not required for later runs):
+### Install and First Run
+This software uses Anaconda with Python 3 so you will need to install and open an Anaconda shell. Once that is open, type the following the FIRST time you run the software, it is not required for later runs. During the first two commands you may be asked to install additional conda packages, you have to allow conda to do this. If you have installed conda at a system level rather than in user space, you will need to have administrator privaleged. On windows right click on the 'Anaconda PowerShell Prompt' in the start menu and select "Run as Administrator".
 
 `conda env create -f environment_CGT.yml`
 
-Next, activate the CGT Anaconda environment using the following command:
+To activate the CGT Anaconda environment type the following:
 
 `conda activate CGT`
 
-Compile the pyqt5 Code. 
- 
-`cd src`
+To build the Qt widgets reqired 
 
-`pyuic5 .\CrystalGrowthTrackerMain.ui -o .\Ui_CrystalGrowthTrackerMain.py`
-
-Several seperate widgets are required by CrystalGrowthTrackerMain, each with their own .ui file. To automate the building of the Ui_ files the script build_ui has been provided. The script scans a directory, passed by command line option '-d', lists the .ui files, and then compiles them all. The command line option '-c' will delete all Ui_ files before compiling. The full command is 
-
-`python .\build_ui.py -d .\cgt -c`
-
-Help can be provided by running with option '-h'. 
+`python .\build_ui.py`
 
 Finally run the Crystal Growth Tracker:
 
-`python .\CrystalGrowthTrackerMain.py`
+`python .\run_cgt.py`
 
+### Runs Without Install
 In the future you will just need to start the CGT environment and then run the Crystal Growth Tracker.
+
+`conda activate CGT`
+`python .\run_cgt.py`
 
 ## ENVIRONMENT:
 The Anaconda environment, with all the necessary modules, can be set up using the *environment_CGT.yml* file. 
