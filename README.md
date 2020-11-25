@@ -39,7 +39,10 @@ To build the Qt widgets reqired
 
 #### run the software
 
-Open an Anaconda shell and navigate to the CrystalGrowthTracker directory then type:
+Open an Anaconda shell and navigate to the CrystalGrowthTracker directory then, activate the enviroment:
+`conda activate cgt`
+
+To run the software:
 
 `python .\run_cgt.py`
 
@@ -47,18 +50,11 @@ you can also run from another directory using:
 
 `python C:\Users\<usre name>\Work\CrystalGrowthTracker\run_cgt.py`
 
-### Runs Without Install
-In the future you will just need to start the CGT environment and then run the Crystal Growth Tracker.
-
-`conda activate CGT`
-`python .\run_cgt.py`
-
 ### Remove the Software
 
 To remove software delete the CrystalGrowthTracker direcory, then delete the environment:
 
 `conda remove --name CGT --all`
-
 
 ## DOXYGEN DOCUMENTATION
 The software is documented with doxygen, to build the documentation you will have to add Doxygen to your enviroment
