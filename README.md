@@ -53,33 +53,19 @@ In the future you will just need to start the CGT environment and then run the C
 `conda activate CGT`
 `python .\run_cgt.py`
 
-## ENVIRONMENT:
-The Anaconda environment, with all the necessary modules, can be set up using the *environment_CGT.yml* file. 
+### Remove the Software
 
-To see what conda environments you have, run the command
-
-`conda env list`
-
-To create a new Anaconda environment for CGT, run the command
-
-`conda env create -f environment_CGT.yml`
-
-To start using the environment, run the command
-
-`conda activate CGT`
-
-To stop using that environment:
-
-`conda deactivate`
-
-To remove the environment, if you no longer want to use CGT:
+To remove software delete the CrystalGrowthTracker direcory, then delete the environment:
 
 `conda remove --name CGT --all` 
 
-## DOXYGEN DOCUMENTATION
-Doxygen documentation for this project can be created. Python doxygen is part of the PERPL environment so you do not need to install doxygen.
 
-Run the command in the top directory of the source code:
+## DOXYGEN DOCUMENTATION
+The software is documented with doxygen, to build the documentation you will have to add Doxygen to your enviroment
+
+`conda install doxygen`
+
+Then, in the CrystalGrowthTracker direcory, run the command:
 
 `doxygen`
 
