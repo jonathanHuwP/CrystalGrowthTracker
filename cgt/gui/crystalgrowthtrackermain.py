@@ -48,6 +48,7 @@ from cgt.io import writecsvreports
 from cgt.io import readcsvreports
 
 import cgt.util.utils as utils
+from cgt.util.cgtautosave import CGTAutoSave
 
 from cgt.model.cgtproject import CGTProject
 
@@ -144,6 +145,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         # set up the title
         self.set_title()
+        
+        # pointer for an autosave file
+        self._autosave = None
 
     def add_tab(self, tab_widget, target_widget, title):
         """
@@ -210,7 +214,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 None
         """
-        print("CrystalGrowthTrackerMain.load_project()")
+        # TODO check for autosave
 
         if self._project is not None:
             mb_reply = qw.QMessageBox.question(
@@ -293,6 +297,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         Returns:
             None
         '''
+        # TODO clear autosave
         if self._project is None:
             qw.QMessageBox.warning(self,
                                    "CGT Error",
@@ -437,6 +442,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self._project["results"] = VideoAnalysisResultsStore()
 
+        self._autosave = CGTAutoSave(self._project)
+        
         self.set_video_scale_parameters()
         self.save_project()
         self.set_title()
