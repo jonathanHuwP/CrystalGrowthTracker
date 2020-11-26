@@ -13,19 +13,18 @@ Unless required by applicable law or agreed to in writing, software distributed 
 ## DEVELOPED WITH:
 This was developed using Python 3.7/3.8 and Anaconda, Inc. on Windows 10 systems. The software has not been executed on Linux or Mac.
 
-
-## Installation and Runing
+## Installation, Use and Development
 This software uses Anaconda with Python 3.8, at present it will not work with 3.9. The packages required to run the software are listed in the file environment_CGT.yml.
 
 If you have installed Anaconda, you can install the software and run in two steps:,
 
-#### set-up the enviromet and build the software
+### Set-up the Enviromet and Build the Software
 
 Download or clone from gitHub.
 
 Open an Anaconda shell and navigate to the CrystalGrowthTracker directory.
 
-Set up the conda enviroment:
+Set up the conda enviroment (if you are a developer see below):
 
 `conda env create -f environment_CGT.yml`
 
@@ -37,13 +36,13 @@ To build the Qt widgets reqired
 
 `python .\build_ui.py`
 
-#### run the software
+### Runing the Software
 
-Open an Anaconda shell and navigate to the CrystalGrowthTracker directory then, activate the enviroment:
+Open an Anaconda shell and activate the enviroment
 
-`conda activate cgt`
+`conda activate CGT`
 
-To run the software:
+then navigate to the CrystalGrowthTracker directory and run by typing:
 
 `python .\run_cgt.py`
 
@@ -51,16 +50,21 @@ you can also run from another directory using:
 
 `python C:\Users\<usre name>\Work\CrystalGrowthTracker\run_cgt.py`
 
+or the path relative to your current location.
+
 ### Remove the Software
 
 To remove software delete the CrystalGrowthTracker direcory, then delete the environment:
 
-`conda remove --name CGT --all`
+`conda remove --name CGT --all` 
 
-## DOXYGEN DOCUMENTATION
-The software is documented with doxygen, to build the documentation you will have to add Doxygen to your enviroment
+### Development and Doxygen Documentation
 
-`conda install doxygen`
+The software is documented with doxygen, to build the documentation you will have to install and avtivate the development enviroment.
+
+`conda env create -f environment_CGT_DEV.yml`
+
+`conda activate cgt`
 
 Then, in the CrystalGrowthTracker direcory, run the command:
 
