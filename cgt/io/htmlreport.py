@@ -162,17 +162,17 @@ def write_html_report_start1(fout, info):
     fout.write(program_info)
 
     report_info = (r"<p>This project was started at "+info['start_datetime']+r" on the "
-                    +info['host']+r" host system with the "+info['operating_system']
-                    +" operating system. The video file, "+str(info['enhanced_video_no_path'])
-                    +r" was analysed and has a frame rate of "+str(info['frame_rate'])
-                    +" and resolution of " +str(info['resolution'])
-                    +" "+str(info['resolution_units'])+" per pixel. A note of caution "
-                    +"is needed here because sometimes the frame rate and resolution "
-                    +"are changed in the video header when the video is being "
-                    +"pre-processed so in this report we always give results in pixels "
-                    +"and frames as well as SI units where possible. This report provides "
-                    +"images and information on experimental X-ray videos created at "
-                    +"Diamond Light Source.</p>\n")
+                   +info['host']+r" host system with the "+info['operating_system']
+                   +" operating system. The video file, "+str(info['enhanced_video_no_path'])
+                   +r" was analysed and has a frame rate of "+str(info['frame_rate'])
+                   +" and resolution of " +str(info['resolution'])
+                   +" "+str(info['resolution_units'])+" per pixel. A note of caution "
+                   +"is needed here because sometimes the frame rate and resolution "
+                   +"are changed in the video header when the video is being "
+                   +"pre-processed so in this report we always give results in pixels "
+                   +"and frames as well as SI units where possible. This report provides "
+                   +"images and information on experimental X-ray videos created at "
+                   +"Diamond Light Source.</p>\n")
 
     fout.write(report_info)
 
@@ -234,17 +234,17 @@ def write_html_report_start(fout, info):
 
 
     report_info = (r"<p>This program ran at "+info['start_datetime']+r" on the "
-                    +info['host']+r" host system with the "+info['operating_system']
-                    +" operating system. The video file, "+info['in_file_no_path']
-                    +r" was analysed and has a frame rate of "+str(info['frame_rate'])
-                    +" and resolution of " +str(info['resolution'])
-                    +" "+str(info['resolution_units'])+" per pixel. A note of caution "
-                    +"is needed here because sometimes the frame rate and resolution "
-                    +"are changed in the video header when the video is being "
-                    +"pre-processed so in this report we always give results in pixels "
-                    +"and frames as well as SI units where possible. This report provides "
-                    +"images and information on experimental X-ray videos created at "
-                    +"Diamond Light Source.</p>\n")
+                   +info['host']+r" host system with the "+info['operating_system']
+                   +" operating system. The video file, "+info['in_file_no_path']
+                   +r" was analysed and has a frame rate of "+str(info['frame_rate'])
+                   +" and resolution of " +str(info['resolution'])
+                   +" "+str(info['resolution_units'])+" per pixel. A note of caution "
+                   +"is needed here because sometimes the frame rate and resolution "
+                   +"are changed in the video header when the video is being "
+                   +"pre-processed so in this report we always give results in pixels "
+                   +"and frames as well as SI units where possible. This report provides "
+                   +"images and information on experimental X-ray videos created at "
+                   +"Diamond Light Source.</p>\n")
 
     fout.write(report_info)
 
@@ -348,6 +348,18 @@ def write_html_crystals(fout, info, results):
 
 
 def write_html_region(fout, results, i):
+    '''Creates the section for each region in the html report.
+
+    Args:
+        fout (file handler): The file handler allows this function to write out.
+        crystal_number (int): The index for the crystal that is being reported.
+        info (dict): A python dictionary containing a collection of useful parameters
+            such as the filenames and paths.
+
+    Returns:
+       fout (file handler): The file handler is passed back so that other parts of
+                            the report can be written by different functions.
+    '''
 
     region, r_index = results.get_region(i)
     #print(results.get_region(i))
@@ -398,7 +410,7 @@ def write_frame_table(fout, results, i, crystal):
 
     last_frame_number = 0
     for frame in crystal.list_of_frame_numbers:
-        print("last_frame_number: ",last_frame_number)
+        print("last_frame_number: ", last_frame_number)
         faces = crystal.faces_in_frame(frame)
         print("faces:", len(faces))
 #         video = results.video

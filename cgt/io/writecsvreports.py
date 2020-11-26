@@ -69,12 +69,12 @@ def save_csv_results(project):
     for index, region in enumerate(results.regions):
         print("Region: ", index)
         regions_array.append([index,
-            region.top,
-            region.left,
-            region.bottom,
-            region.right,
-            region.start_frame,
-            region.end_frame])
+                              region.top,
+                              region.left,
+                              region.bottom,
+                              region.right,
+                              region.start_frame,
+                              region.end_frame])
 
     crystals_array = []
     lines_array = []
@@ -132,12 +132,12 @@ def save_csv_reports(results_dir, info):
     for index, region in enumerate(results.regions):
         print("Region: ", index)
         regions_array.append([index,
-            region.top,
-            region.left,
-            region.bottom,
-            region.right,
-            region.start_frame,
-            region.end_frame])
+                              region.top,
+                              region.left,
+                              region.bottom,
+                              region.right,
+                              region.start_frame,
+                              region.end_frame])
 
     crystals_array = []
     lines_array = []
@@ -160,10 +160,10 @@ def save_csv_reports(results_dir, info):
 
 
             crystals_array.append([index,
-                region_index,
-                note,
-                crystal.number_of_frames_held,
-                frame])
+                                   region_index,
+                                   note,
+                                   crystal.number_of_frames_held,
+                                   frame])
 
             for face in faces:
                 lines_array.append([index,
@@ -251,7 +251,7 @@ def save_csv_regions(results_dir, info, regions_array):
     info['results_dir'] = results_dir_final
 
     csv_outfile_name = (results_dir_final+r"/"+in_file_no_extension
-                         +r"_"+prog+r"_regions.csv")
+                        +r"_"+prog+r"_regions.csv")
 
     try:
         fout = open(csv_outfile_name, "w")
@@ -260,12 +260,12 @@ def save_csv_regions(results_dir, info, regions_array):
         sys.exit("Could not create csv regions report.")
 
     header = ("Region index",
-              "Top","Left",
-              "Bottom","Right",
-              "Start frame","End frame")
+              "Top", "Left",
+              "Bottom", "Right",
+              "Start frame", "End frame")
 
     with fout:
-        writer = csv.writer(fout, delimiter=',', lineterminator = '\n')
+        writer = csv.writer(fout, delimiter=',', lineterminator='\n')
         writer.writerow(header)
         for row in regions_array:
             writer.writerow(row)
@@ -295,16 +295,15 @@ def save_csv_regions1(info, regions_array):
 
 
     csv_outfile_name = (path+r"/"+info["prog"]
-                          +r"_"+info["proj_name"]+r"_project_regions.csv")
+                        +r"_"+info["proj_name"]+r"_project_regions.csv")
 
     header = ("Region index",
-              "Top","Left",
-              "Bottom","Right",
-              "Start frame",
-              "End frame")
+              "Top", "Left",
+              "Bottom", "Right",
+              "Start frame", "End frame")
 
     with open(csv_outfile_name, "w") as fout:
-        writer = csv.writer(fout, delimiter=',', lineterminator = '\n')
+        writer = csv.writer(fout, delimiter=',', lineterminator='\n')
         writer.writerow(header)
         for row in regions_array:
             writer.writerow(row)
@@ -338,7 +337,7 @@ def save_csv_crystals(results_dir, info, crystals_array):
     info['results_dir'] = results_dir_final
 
     csv_outfile_name = (results_dir_final+r"/"+in_file_no_extension
-                         +r"_"+prog+r"_crystals.csv")
+                        +r"_"+prog+r"_crystals.csv")
 
     try:
         fout = open(csv_outfile_name, "w")
@@ -347,8 +346,7 @@ def save_csv_crystals(results_dir, info, crystals_array):
         sys.exit("Could not create csv crystals report.")
 
 
-    header = ("Crystal index", "Region index", "Note",
-              "Number of frames","Frame number")
+    header = ("Crystal index", "Region index", "Note", "Number of frames", "Frame number")
 
 #    header = ("Region number,",
 #              "Top left horizontal","Top left vertical",
@@ -373,7 +371,7 @@ def save_csv_crystals(results_dir, info, crystals_array):
 #        index = index + 1
 
     with fout:
-        writer = csv.writer(fout, delimiter=',', lineterminator = '\n')
+        writer = csv.writer(fout, delimiter=',', lineterminator='\n')
         writer.writerow(header)
         for row in crystals_array:
             writer.writerow(row)
@@ -409,7 +407,7 @@ def save_csv_crystals1(info, crystals_array):
               "Note")
 
     with open(csv_outfile_name, "w") as fout:
-        writer = csv.writer(fout, delimiter=',', lineterminator = '\n')
+        writer = csv.writer(fout, delimiter=',', lineterminator='\n')
         writer.writerow(header)
         for row in crystals_array:
             print(row)
@@ -442,7 +440,7 @@ def save_csv_lines(results_dir, info, lines_array):
     info['results_dir'] = results_dir_final
 
     csv_outfile_name = (results_dir_final+r"/"+in_file_no_extension
-                         +r"_"+prog+r"_lines.csv")
+                        +r"_"+prog+r"_lines.csv")
 
     try:
         fout = open(csv_outfile_name, "w")
@@ -453,8 +451,8 @@ def save_csv_lines(results_dir, info, lines_array):
 
     header = ("Crystal index", "Region index",
               "Frame number", "Line number",
-              "x0","y0",
-              "x1","y1",)
+              "x0", "y0",
+              "x1", "y1",)
 
 #    results = make_test_result()
 #
@@ -472,7 +470,7 @@ def save_csv_lines(results_dir, info, lines_array):
 
 
     with fout:
-        writer = csv.writer(fout, delimiter=',', lineterminator = '\n')
+        writer = csv.writer(fout, delimiter=',', lineterminator='\n')
         writer.writerow(header)
         for row in lines_array:
             writer.writerow(row)
@@ -512,7 +510,7 @@ def save_csv_lines1(info, lines_array):
               "y1")
 
     with open(csv_outfile_name, "w") as fout:
-        writer = csv.writer(fout, delimiter=',', lineterminator = '\n')
+        writer = csv.writer(fout, delimiter=',', lineterminator='\n')
         writer.writerow(header)
         for row in lines_array:
             writer.writerow(row)
@@ -543,7 +541,7 @@ def save_csv_info(results_dir, info):
     info['results_dir'] = results_dir_final
 
     csv_outfile_name = (results_dir_final+r"/"+in_file_no_extension
-                         +r"_"+prog+r"_info.csv")
+                        +r"_"+prog+r"_info.csv")
 
     try:
         fout = open(csv_outfile_name, "w")
@@ -551,7 +549,7 @@ def save_csv_info(results_dir, info):
         print("Could not open csv info report file, with error message: ", sys.exc_info()[0])
         sys.exit("Could not create csv info report.")
 
-    writer = csv.writer(fout, delimiter=',', lineterminator = '\n')
+    writer = csv.writer(fout, delimiter=',', lineterminator='\n')
     for key, value in info.items():
         #print("key: ", key)
         #print("value: ", value)
@@ -579,9 +577,9 @@ def save_csv_info1(info):
     path = os.path.abspath(os.path.realpath(results_dir))
 
     csv_outfile_name = (path+r"/"+info["prog"]
-                          +r"_"+info["proj_name"]+r"_project_info.csv")
+                        +r"_"+info["proj_name"]+r"_project_info.csv")
 
     with open(csv_outfile_name, "w") as fout:
-        writer = csv.writer(fout, delimiter=',', lineterminator = '\n')
+        writer = csv.writer(fout, delimiter=',', lineterminator='\n')
         for key, value in info.items():
             writer.writerow([key, value])

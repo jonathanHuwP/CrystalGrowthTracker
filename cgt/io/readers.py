@@ -50,20 +50,20 @@ def read_video_frame(frame_number, filename, outpath):
             os.makedirs(outpath)
     except OSError:
         sys.exit('Fatal: output directory ' + outpath +
-                ' does not exist and cannot be created')
+                 ' does not exist and cannot be created')
 
     num = 0
     img = None
     for img in video.iter_data():
         if num == int(frame_number):
             filename_frame = overviewplots.save_grayscale_frame(outpath,
-                                                               img,
-                                                               frame_number)
+                                                                img,
+                                                                frame_number)
             filename_histogram = overviewplots.plot_histogram(outpath,
-                                                             img,
-                                                             num,
-                                                             img.mean(),
-                                                             img.std())
+                                                              img,
+                                                              num,
+                                                              img.mean(),
+                                                              img.std())
             break
 
         num = num+1
