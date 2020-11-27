@@ -31,13 +31,21 @@ class CGTAutoSave():
     ## file type identification code
     _MAGIC_CODE = "cgt-01"
 
-    def __init__(self, project):
+    def __init__(self, project=None):
         """
         set-up the object
 
             Args:
                 project (CGTProject) the project data
         """
+        ## store for the file path
+        self._file_path = None
+
+        if project is not None:
+            self.new_project(project)
+
+
+    def new_project(self, project):
         # get file, close file, save file path
         descriptor, file_path = tempfile.mkstemp(suffix='.cgtback',
                                                  prefix='.',
@@ -45,13 +53,8 @@ class CGTAutoSave():
                                                  text=False)
         os.close(descriptor)
 
-        ## store the file path
+        # store the file path
         self._file_path = file_path
-
-        ## store the project name
-        self._project_name = project["proj_name"]
-        
-        self.save_data(project)
 
     def get_file_path(self):
         """
@@ -62,22 +65,44 @@ class CGTAutoSave():
         """
         return self._file_path
 
-    def save_data(self, output):
+    def save_data(self, project):
         """
         write data to the binary file
 
             Args:
-                output (object) the data to be output
+                projcet (CGTProject) the data to be output
         """
         with open(self._file_path, 'w+b') as file:
             # delete existing contents
             file.truncate(0)
 
             # make tuple of project name and output
-            data = (self._MAGIC_CODE, self._project_name, output)
+            data = (self._MAGIC_CODE,
+                    project["proj_name"],
+                    project)
 
             # save binary
             pickle.dump(data, file)
+
+    def erase_data(self):
+        """
+        remove data from file but leave it in existance
+
+            Returns:
+                None
+        """
+        with open(self._file_path, 'w+b') as file:
+            # delete existing contents
+            file.truncate(0)
+
+    def clean_up(self):
+        """
+        delete the file
+
+            Returns:
+                None
+        """
+        os.remove(self._file_path)
 
     @staticmethod
     def list_backups(dir_path):
@@ -88,7 +113,7 @@ class CGTAutoSave():
                 dir_path (string) full path to search directory
 
             Returns:
-                list of tuples, each of which is (backup file, projcet name)
+                list of tuples, each of which is (backup file, project name)
         """
         files = []
         output = []
@@ -96,7 +121,8 @@ class CGTAutoSave():
         raw = os.listdir(dir_path)
 
         for item in raw:
-            if os.path.isfile(item) and item.endswith(".idback"):
+            item = os.path.join(dir_path, item)
+            if os.path.isfile(item) and item.endswith(".cgtback"):
                 files.append(os.path.join(dir_path, item))
 
         for file in files:
@@ -108,7 +134,7 @@ class CGTAutoSave():
             except EOFError:
                 pass
 
-            if data is not None and len(data) > 1 and data[0] == AutoSaveBinary._MAGIC_CODE:
+            if data is not None and len(data) > 1 and data[0] == CGTAutoSave._MAGIC_CODE:
                 output.append((file, data[1]))
 
         return output
@@ -129,7 +155,7 @@ class CGTAutoSave():
         except EOFError:
             return None
 
-        if tmp[0] == AutoSaveBinary._MAGIC_CODE:
+        if tmp[0] == CGTAutoSave._MAGIC_CODE:
             return tmp[2]
 
         return None
