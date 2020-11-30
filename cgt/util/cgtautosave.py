@@ -24,6 +24,8 @@ import os
 import tempfile
 import pickle
 
+import inspect
+
 class CGTAutoSave():
     """
     construct and use a binary autosave file
@@ -44,7 +46,6 @@ class CGTAutoSave():
         if project is not None:
             self.new_project(project)
 
-
     def new_project(self, project):
         # get file, close file, save file path
         descriptor, file_path = tempfile.mkstemp(suffix='.cgtback',
@@ -54,6 +55,17 @@ class CGTAutoSave():
         os.close(descriptor)
 
         # store the file path
+        self._file_path = file_path
+        
+        self.print_state()
+
+    def set_file_path(self, file_path):
+        """
+        setter for the file path
+
+            Args:
+                file_path (string)
+        """
         self._file_path = file_path
 
     def get_file_path(self):
@@ -72,6 +84,7 @@ class CGTAutoSave():
             Args:
                 projcet (CGTProject) the data to be output
         """
+        self.print_state()
         with open(self._file_path, 'w+b') as file:
             # delete existing contents
             file.truncate(0)
@@ -91,6 +104,7 @@ class CGTAutoSave():
             Returns:
                 None
         """
+        self.print_state()
         with open(self._file_path, 'w+b') as file:
             # delete existing contents
             file.truncate(0)
@@ -102,7 +116,12 @@ class CGTAutoSave():
             Returns:
                 None
         """
+        self.print_state()
         os.remove(self._file_path)
+        
+    def print_state(self):
+        caller = inspect.stack()[1].function
+        print(f">>>>> autosave: file_path = {self._file_path}, function called ={caller}")
 
     @staticmethod
     def list_backups(dir_path):
@@ -150,6 +169,7 @@ class CGTAutoSave():
             Returns:
                 (CGTProject) the project data
         """
+        print("Autosave get_backup_project")
         try:
             tmp = pickle.load(open(file_path, 'rb'))
         except EOFError:
@@ -159,3 +179,47 @@ class CGTAutoSave():
             return tmp[2]
 
         return None
+        
+    @staticmethod
+    def make_autosave_from_file(file_path):
+        """
+        make an autosave object with only a file name and path
+        
+            Args:
+                file_path (string) the file path
+                
+            Returns:
+                CGTAutosave object
+        """
+        tmp = CGTAutoSave()
+        tmp.set_file_path(file_path)
+        return tmp
+        
+    @staticmethod
+    def make_autosave_from_project(project):
+        """
+        make an empty autosave object in a project directory
+        
+            Args:
+                project (CGTProject) the project object
+                
+            Returns:
+                CGTAutosave object
+        """
+        return CGTAutoSave(project)
+
+    @staticmethod
+    def make_autosave_and_save_from_project(project):
+        """
+        make an autosave object in the project directory and save
+        the project to the file
+        
+            Args:
+                project (CGTProject) the project object
+                
+            Returns:
+                CGTAutosave object
+        """
+        tmp = CGTAutoSave(project)
+        tmp.save_data(project)
+        return tmp
