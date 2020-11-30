@@ -32,13 +32,13 @@ from cgt.model.imagelinesegment import ImageLineSegment
 def read_csv_project(results_dir, new_project):
     '''Coordinates the reading of a selection of csv reports.
     Args:
-        results_dir (str): The directory name the user has selected to save the
-                           results in i.e., the project directory.
-        new_project:       An empty project data structure.
+        results_dir (str):         The directory name the user has selected to save the
+                                   results in i.e., the project directory.
+        new_project (CGTProject):  An empty project data structure.
     Returns:
-        error_code (int):  An error code is returned a 0 (zero) values means all
-                           file were read while a 1 (one) value means 1 or more
-                           files were not read.
+        error_code (int):          An error code is returned a 0 (zero) values means all
+                                   file were read while a 1 (one) value means 1 or more
+                                   files were not read.
     '''
     print("hello from read_csv_project")
     error_code = 0
@@ -83,7 +83,6 @@ def read_csv_project(results_dir, new_project):
         storeregions(store, region_data)
         storecrystals(store, crystal_data, line_data)
         new_project["results"] = store
-        print("new_project[results]: ", new_project["results"])
 
     return error_code
 
@@ -146,10 +145,10 @@ def readcsvinfo2dict(new_project, file, dirpath):
        This means varibles are read with the header as a pair so can be searched
        by its semantic meaning.
     Args:
-        new_project ():        An empty project data structure.
-        file (str):            The file name is given to reflect the contents of the file.
-        dirpath (str):         The directory name the user has selected to save the
-                               project in.
+        new_project (CGTProject):  An empty project data structure.
+        file (str):                The file name is given to reflect the contents of the file.
+        dirpath (str):             The directory name the user has selected to save the
+                                   project in.
     Returns:
         data (list of dictionaries): A list of dictionaries where each item in the list is a row
                                      from the file read.
