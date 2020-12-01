@@ -48,6 +48,7 @@ from cgt.io import writecsvreports
 from cgt.io import readcsvreports
 
 import cgt.util.utils as utils
+from cgt.util.cgtautosave import CGTAutoSave
 
 from cgt.model.cgtproject import CGTProject
 
@@ -145,6 +146,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         # set up the title
         self.set_title()
 
+        ## pointer for an autosave file
+        self._autosave = None
+
     def add_tab(self, tab_widget, target_widget, title):
         """
         add a new tab
@@ -189,11 +193,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 None
         """
-        if self._project is not None:
+        if self.has_unsaved_data():
             mb_reply = qw.QMessageBox.question(
                 self,
                 self.tr('CrystalGrowthTracker'),
-                self.tr('You have a project that will be overwriten. Proceed?'),
+                self.tr('You have a project with unsaved data that will be lost.\nProceed?'),
                 qw.QMessageBox.Yes | qw.QMessageBox.No,
                 qw.QMessageBox.No)
 
@@ -210,13 +214,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 None
         """
-        print("CrystalGrowthTrackerMain.load_project()")
-
-        if self._project is not None:
+        if self.has_unsaved_data():
             mb_reply = qw.QMessageBox.question(
                 self,
                 self.tr('CrystalGrowthTracker'),
-                self.tr('You have a project loaded that will be lost when you load. Proceed?'),
+                self.tr('You have a project with unsaved dat that will be lost. Proceed?'),
                 qw.QMessageBox.Yes | qw.QMessageBox.No,
                 qw.QMessageBox.No)
 
@@ -238,9 +240,66 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                                        message)
                 return
 
+            backup, back_file = self.check_for_backup(dir_name, project["proj_name"])
+            
+            # check for a recent backup
+            if backup is not None:
+                message = "A more recent backup exists, do you want to recover?"
+                reply = qw.QMessageBox.question(self,
+                                                'CrystalGrowthTracker',
+                                                message,
+                                                qw.QMessageBox.Yes | qw.QMessageBox.No,
+                                                qw.QMessageBox.No)
+                if reply == qw.QMessageBox.Yes:
+                    # assign the backup
+                    self._project = backup
+                    # set the has changed flag
+                    self._project.set_changed()
+                    # ensure autosave points to the correct file
+                    self._autosave = CGTAutoSave.make_autosave_from_file(back_file)
+                    self.project_created_or_loaded()
+                    return
+
             self._project = project
+            self._autosave = CGTAutoSave.make_autosave_from_project(self._project)
             self._project.reset_changed()
             self.project_created_or_loaded()
+            
+    def check_for_backup(self, dir_name, proj_name):
+        """
+        check if directory holds autosave backup
+
+            Args:
+                dir_name (string) path to directory
+                proj_name (string) the name of the project
+
+            Returns:
+                if backup file projcet (CGTProject), else None
+        TODO check backup is more recent that project
+        """
+        if self._autosave is None:
+            self._autosave = CGTAutoSave()
+
+        files = self._autosave.list_backups(dir_name)
+        if len(files) < 1:
+            return None, None
+
+        matches = [tmp[0] for tmp in files if tmp[1] == proj_name]
+        if len(matches) < 1:
+            return None, None
+        elif len(matches) == 1:
+            return self._autosave.get_backup_project(matches[0]), matches[0]
+
+        # find most recent save
+        most_recent = matches[0]
+        r_time = os.path.getmtime(most_recent)
+        for match in matches[1:]:
+            m_time = os.path.getmtime(most_recent)
+            if m_time>r_time:
+                most_recent = match
+                r_time = m_time
+
+        return self._autosave.get_backup_project(most_recent), most_recent
 
     def project_created_or_loaded(self):
         """
@@ -293,6 +352,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         Returns:
             None
         '''
+
         if self._project is None:
             qw.QMessageBox.warning(self,
                                    "CGT Error",
@@ -307,6 +367,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             qw.QMessageBox.warning(self, "CGT File Error", message)
             return
 
+        if self._autosave is not None:
+            self._autosave.erase_data()
+            
         message = "Project saved to: {}".format(self._project["proj_full_path"])
         qw.QMessageBox.information(self, "CGT File", message)
 
@@ -322,6 +385,12 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             qw.QMessageBox.warning(self,
                                    "CGT Error",
                                    "You do not have a project to report!")
+            return
+
+        if self.has_unsaved_data():
+            qw.QMessageBox.warning(self,
+                                   "CGT Error",
+                                   "Please save the data before printing a report!")
             return
 
         if self._project["proj_full_path"] is not None:
@@ -372,8 +441,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             qw.QMessageBox.critical(self, "Project Exists!", message)
             return
 
-        self._project = CGTProject()
-        self._project.init_new_project()
+        project = CGTProject()
+        project.init_new_project()
 
         try:
             path.mkdir()
@@ -382,8 +451,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             qw.QMessageBox.critical(self, "Cannot Create Project!", message)
             return
 
-        self._project["proj_name"] = proj_name
-        self._project["proj_full_path"] = path
+        project["proj_name"] = proj_name
+        project["proj_full_path"] = path
 
         if copy_files:
             try:
@@ -394,7 +463,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             except (IOError, os.error) as why:
                 qw.QMessageBox.warning(
                     self,
-                    "Problem copying File",
+                    "Problem copying video file",
                     f"Error message: {why}")
 
             if raw_video is not None:
@@ -405,41 +474,43 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 except (IOError, os.error) as why:
                     qw.QMessageBox.warning(
                         self,
-                        "Problem copying File",
+                        "Problem copying raw video file",
                         f"Error message: {why}")
 
         else:
             # set sourec and project to their user input values
-            self._project["enhanced_video"] = enhanced_video
+            project["enhanced_video"] = enhanced_video
             if raw_video is not None:
-                self._project["raw_video"] = raw_video
+                project["raw_video"] = raw_video
 
         if notes is not None and not notes.isspace() and notes:
             notes_file_name = proj_name + "_notes.txt"
             notes_file = path.joinpath(notes_file_name)
-            self._project["notes"] = notes
+            project["notes"] = notes
 
             try:
                 with open(notes_file, 'w') as n_file:
                     n_file.write(notes)
             except IOError as error:
                 message = f"Can't open file for notes {error}"
-                qw.QMessageBox.critical(self, "Error making directory!", message)
+                qw.QMessageBox.critical(self, "Error making writing notes", message)
 
-        self._project['enhanced_video_path'] = enhanced_video.parent
-        self._project['enhanced_video_no_path'] = enhanced_video.name
-        self._project['enhanced_video_no_extension'] = enhanced_video.stem
+        project['enhanced_video_path'] = enhanced_video.parent
+        project['enhanced_video_no_path'] = enhanced_video.name
+        project['enhanced_video_no_extension'] = enhanced_video.stem
 
         if raw_video is not None:
-            self._project['raw_video_path'] = raw_video.parent
-            self._project['raw_video_no_path'] = raw_video.name
-            self._project['raw_video_no_extension'] = raw_video.stem
+            project['raw_video_path'] = raw_video.parent
+            project['raw_video_no_path'] = raw_video.name
+            project['raw_video_no_extension'] = raw_video.stem
 
-        self._project["results"] = VideoAnalysisResultsStore()
-
-        self.set_video_scale_parameters()
+        project["results"] = VideoAnalysisResultsStore()
+        
+        self._project = project
         self.save_project()
-        self.set_title()
+        self._autosave = CGTAutoSave.make_autosave_and_save_from_project(project)
+        self.set_video_scale_parameters()
+        self.project_created_or_loaded()
 
     def set_video_scale_parameters(self):
         """
@@ -517,8 +588,20 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 None
         """
+        print("Append region")
         self._project["results"].add_region(region)
         self._drawingWidget.new_region()
+        self.autosave()
+
+    @qc.pyqtSlot()
+    def autosave(self):
+        """
+        make digital copy of project, to be called on any change in the data
+
+            Reuturns:
+                None
+        """
+        self._autosave.save_data(self._project)
 
     def set_title(self):
         """
@@ -607,6 +690,15 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._selectWidget.show_video()
         self._drawingWidget.setEnabled(True)
 
+    def has_unsaved_data(self):
+        """
+        find if window is holding unsaved data
+
+            Returns:
+                True if unsaved data is held, False otherwise
+        """
+        return self._project is not None and self._project.has_been_changed()
+
     @qc.pyqtSlot()
     def closeEvent(self, event):
         """
@@ -620,11 +712,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 None
         """
-
         message = self.tr('Do you want to leave?')
         changed = self.tr('You have unsaved data.')
 
-        if self._project is not None and self._project.has_been_changed():
+        if self.has_unsaved_data():
             message = changed + "\n" + message
 
         mb_reply = qw.QMessageBox.question(self,
@@ -643,6 +734,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             # do not destroy as a pointer may survive in event-loop
             # which will trigger errors if it recieves a queued signal
             self.deleteLater()
+
+            # remove the binary backup if there is no unsaved data
+            if not self.has_unsaved_data():
+                self._autosave.clean_up()
 
         else:
             # dispose of the event in the approved way

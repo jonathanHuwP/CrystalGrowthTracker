@@ -11,3 +11,4 @@ Ui_*
 .spyproject
 .settings
 *.bak
+.vscode
