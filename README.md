@@ -10,19 +10,19 @@ Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 
-## DEVELOPED WITH: 
+## DEVELOPED WITH:
 This was developed using Python 3.7/3.8 and Anaconda, Inc. on Windows 10 systems. The software has not been executed on Linux or Mac.
 
 ## Installation, Use and Development
 This software uses Anaconda with Python 3.8, at present it will not work with 3.9. The packages required to run the software are listed in the file environment_CGT.yml.
 
-If you have installed Anaconda, you can install the software and run in two steps:, 
+If you have installed Anaconda, you can install the software and run in two steps:,
 
 ### Set-up the Enviromet and Build the Software
 
 Download or clone from gitHub.
 
-Open an Anaconda shell and navigate to the CrystalGrowthTracker directory. 
+Open an Anaconda shell and navigate to the CrystalGrowthTracker directory.
 
 Set up the conda enviroment (if you are a developer see below):
 
@@ -32,7 +32,7 @@ To activate the CGT Anaconda environment type the following:
 
 `conda activate cgt`
 
-To build the Qt widgets reqired 
+To build the Qt widgets reqired
 
 `python .\build_ui.py`
 
@@ -96,12 +96,12 @@ The code has been designed to allow translations of the user interface. The proc
     '''
 2. Run 'linguist.exe', open the 'cgt_german.ts', if there is an existing phrase book load that as well.  Carry out the translation, and save the .ts file and save it again as a phrase book, overwriting the existing if necessary.
 
-3. Save the .ts file a third time by selecting 'Release' or 'Release As' on Linguist's 'File' menu. 
+3. Save the .ts file a third time by selecting 'Release' or 'Release As' on Linguist's 'File' menu.
 
 4. Add the appropriate code to the *get_translators* function. Note if you want the buttons of Qt dialogs to be labelled you will have to load the appropriate *qtbase* file.
 
 ### IDEs (Integrated Development Environments)
-Some IDE such as Spyder use QT5 for their GUI (Graphical User Interface). This can cause complications. The conda environment created for this application does not have Spyder included in it and if it were included it would not run. You will need to start Spyder from the Start menu or from a conda shell that does not use the environment for this application. 
+Some IDE such as Spyder use QT5 for their GUI (Graphical User Interface). This can cause complications. The conda environment created for this application does not have Spyder included in it and if it were included it would not run. You will need to start Spyder from the Start menu or from a conda shell that does not use the environment for this application.
 
 
 You may like to use an IDE that does not use QT5 - some IDE that work well with Anaconda are given right at the very bottom of this web page:
@@ -124,5 +124,5 @@ To use pylint on your project through eclipe from the top menu select Window -> 
 
 The pylint results are displayed in the problems window so you need to open this. It appears in the same frame and the Console and you need to click on its tab to see the contents of it. You can also edit what and how this displays results by select options through a drop down menu that is access by clicking on the 3 vertical dots at the top left of the problem frame. Errors and warnings are displyed in the problems window but information on conventions and refactoring are visible in the editor window.
 
-As unnescessary white space is an output of pylint information you may also want to view the what spaces. Select Window -> Preferences and from the proferences window select General -> Editors -> Text Editors and here you can select a number of text display options including showing white space and configuring which caharature of those to include. 
+As unnescessary white space is an output of pylint information you may also want to view the what spaces. Select Window -> Preferences and from the proferences window select General -> Editors -> Text Editors and here you can select a number of text display options including showing white space and configuring which caharature of those to include.
 

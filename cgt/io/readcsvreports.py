@@ -31,17 +31,16 @@ from cgt.model.imagelinesegment import ImageLineSegment
 
 def read_csv_project(results_dir, new_project):
     '''Coordinates the reading of a selection of csv reports.
-
     Args:
-        results_dir (str): The directory name the user has selected to save the
-                           results in.
-
+        results_dir (str):         The directory name the user has selected to save the
+                                   results in i.e., the project directory.
+        new_project (CGTProject):  An empty project data structure.
     Returns:
-        error_code (int):  An error code is returned a 0 (zero) values means all
-                           file were read while a 1 (one) value means 1 or more
-                           files were not read.
+        error_code (int):          An error code is returned a 0 (zero) values means all
+                                   file were read while a 1 (one) value means 1 or more
+                                   files were not read.
     '''
-    print("hello from read_csv_reports")
+    print("hello from read_csv_project")
     error_code = 0
 
     files = []
@@ -59,7 +58,7 @@ def read_csv_project(results_dir, new_project):
     error_region = 0
     error_info = 0
 
-    print("Files: {}".format(files))
+    #print("Files: {}".format(files))
 
     crystal_data = []
     line_data = []
@@ -67,7 +66,6 @@ def read_csv_project(results_dir, new_project):
 
     for file in files:
         if file[-4:] == '.csv':
-            print(file)
             if "project_crystals" in file:
                 crystal_data, error_crystal = readcsv2listofdicts(file, dirpath)
             if "project_info" in file:
@@ -88,87 +86,29 @@ def read_csv_project(results_dir, new_project):
 
     return error_code
 
-def read_csv_reports(results_dir):
-    '''Coordinates the reading of a selection of csv reports.
-
-    Args:
-        results_dir (str): The directory name the user has selected to save the
-                           results in.
-
-    Returns:
-        error_code (int):  An error code is returned a 0 (zero) values means all
-                           file were read while a 1 (one) value means 1 or more
-                           files were not read.
-    '''
-    print("hello from read_csv_reports")
-    error_code = 0
-
-
-    files = []
-    dirpath = ""
-    for (dirpath, _, filenames) in os.walk(results_dir):
-        files.extend(filenames)
-        break
-
-
-    error_crystal = 0
-    error_line = 0
-    error_region = 0
-    print(files)
-    crystal_data = []
-    line_data = []
-    region_data = []
-    for file in files:
-        if file[-4:] == '.csv':
-            print(file)
-            if "CGT_crystals" in file:
-                print("Crystals!")
-                crystal_data, error_crystal = readcsv2listofdicts(file, dirpath)
-            if "CGT_info" in file:
-                print("Info!")
-            if "CGT_lines" in file:
-                print("Lines!")
-                line_data, error_line = readcsv2listofdicts(file, dirpath)
-            if "CGT_regions" in file:
-                print("Regions!")
-                region_data, error_region = readcsv2listofdicts(file, dirpath)
-
-    print("crystal_data: ", crystal_data)
-    print("line_data: ", line_data)
-    print("region_data: ", region_data)
-
-
-    if error_crystal or error_line or error_region == 1:
-        error_code = 1
-
-    if error_code == 0:
-        store = VideoAnalysisResultsStore()
-        storeregions(store, region_data)
-        storecrystals(store, crystal_data, line_data)
-
-    return error_code
 
 
 
 def readcsv2listofdicts(file, dirpath):
-    '''Reads csv reports created by the Crystal Growth Tracker as a list of dictionaries.
-       This allows means varaibles are read with the header as a pair so can be searched
+    '''Reads regions, crystals and lines csv reports created by the Crystal Growth Tracker
+       as a list of dictionaries.
+       This means varaibles are read with the header as a pair so can be for searched
        by its semantic meaning.
-
     Args:
-        results_dir (str): The directory name the user has selected to save the
-                           results in.
-
+        file (str):                  The directory name the user has selected to save the
+                                     results in.
     Returns:
-        data (list of doctionaries): A list of dictionaries where each item in the list is a row
+        data (list of dictionaries): A list of dictionaries where each item in the list is a row
                                      from the file read.
-        error_code (int):  An error code is returned a 0 (zero) values means all file were read
-                           while a 1 (one) value means 1 or more files were not read.
+        error_code (int):            An error code is returned a 0 (zero) values means all file
+                                     were read while a 1 (one) value means 1 or more files were
+                                     not read.
     '''
+    print("hello from readcsv2listofdicts")
     error_code = 0
     dir_in = Path(dirpath)
     file_to_open = dir_in / file
-    print(file_to_open)
+    print("Open file: ", file_to_open)
 
     data = []
 
@@ -191,32 +131,36 @@ def readcsv2listofdicts(file, dirpath):
         error_code = 1
     finally:
         print("Read file: ", file)
+        print("data: ", data)
 
 
     return (data, error_code)
 
 
+
+
 def readcsvinfo2dict(new_project, file, dirpath):
-    '''Reads csv reports created by the Crystal Growth Tracker as a list of dictionaries.
-       This allows means varaibles are read with the header as a pair so can be searched
+    '''Reads the csv project info report created by the Crystal Growth Tracker as a list
+       of dictionaries.
+       This means varibles are read with the header as a pair so can be searched
        by its semantic meaning.
-
     Args:
-        results_dir (str): The directory name the user has selected to save the
-                           results in.
-
+        new_project (CGTProject):  An empty project data structure.
+        file (str):                The file name is given to reflect the contents of the file.
+        dirpath (str):             The directory name the user has selected to save the
+                                   project in.
     Returns:
-        data (list of doctionaries): A list of dictionaries where each item in the list is a row
+        data (list of dictionaries): A list of dictionaries where each item in the list is a row
                                      from the file read.
         error_code (int):  An error code is returned a 0 (zero) values means all file were read
                            while a 1 (one) value means 1 or more files were not read.
     '''
+    print("hello from readcsvinfo2dict")
     error_code = 0
     dir_in = Path(dirpath)
     file_to_open = dir_in / file
-    print(file_to_open)
+    print("Open file: ", file_to_open)
 
-#    data = {}
 
     if not os.path.exists(file_to_open):
         print("ERROR; The input file does not exist.")
@@ -259,6 +203,8 @@ def storeregions(store, regions_data):
         Nothing
     '''
 
+    print("Hello from storeregions")
+
     for region in regions_data:
         #print("region: ", region)
         top = int(region["Top"])
@@ -276,7 +222,6 @@ def storeregions(store, regions_data):
 def storecrystals(store, crystal_data, line_data):
     '''
         Writes the crystal_data and line_data dictionaries to a results object.
-
         Args:
             store (VideoAnalysisResultsStore) the results object to be filled
             crystal_data (list of doctionaries): A list of dictionaries where each item in the list
@@ -287,6 +232,7 @@ def storecrystals(store, crystal_data, line_data):
         Returns:
             None
     '''
+    print("Hello from storecrystals")
     for crystal in crystal_data:
         crystal_index = int(crystal["Crystal index"])
         region_index = int(crystal["Region index"])

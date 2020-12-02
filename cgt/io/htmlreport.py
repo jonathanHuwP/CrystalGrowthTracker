@@ -24,110 +24,68 @@ from pathlib import Path
 from cgt.results_print_demo import make_test_result
 
 
-def save_html_report(results_dir, info):
-    '''Creates the html report file sop that it can manage the report writing
-    and pass the file handle to the functions that write the relevant parts.
 
-    Args:
-        results_dir (str): The directory name the user has selected to save the
-                           results in.
-        filename_in (str): The name of the video file that is being analysed.
-
-    Returns:
-       Nothing is returned.
+def save_html_report1(project, time_stamp):
     '''
-    print("hi from save_html_report")
-    print(results_dir)
-
-    #path = os.path.dirname(os.path.abspath(results_dir))
-    path = os.path.abspath(os.path.realpath(results_dir))
-
-
-    start = info["start"]
-    filename_in = info['in_file_no_path']
-    prog = info["prog"]
-
-    results_dir_final = (path+r"/CGT_"+info['in_file_no_extension']+r"_"+start)
-    info['results_dir'] = results_dir_final
-
-    try:
-        os.makedirs(results_dir_final)
-    except OSError:
-        print("Unexpected error:", sys.exc_info()[0])
-        sys.exit("Could not create directory for the results.")
-
-    html_outfile_name = (results_dir_final+r"/"+filename_in
-                         +r"_"+prog+r"_report.html")
-
-    try:
-        fout = open(html_outfile_name, "w")
-    except  OSError:
-        print("Could not open html report file, with error message: ", sys.exc_info()[0])
-        sys.exit("Could not create html report.")
-
-    results = make_test_result()
-
-    info['no_of_cystals'] = len(results.crystals)
-    info['no_of_regions'] = len(results.regions)
-#
-#     print("crystals_array: ", crystals_array)
-#
-    fout = write_html_report_start(fout, info,)
-
-    fout = write_html_overview(fout, info, results)
-
-    fout = write_html_crystals(fout, info, results)
-
-    write_html_report_end(fout)
-
-
-def save_html_report1(info, time_stamp):
-    '''
-    Creates the html report file sop that it can manage the report writing
-    and pass the file handle to the functions that write the relevant parts.
-
+    Creates and coo-ordinates the html report file creation and on the file handle to
+    other functions that write/create the relevant sections.
         Args:
-            info (dict): The dictionary subclass holding the project data and results.
-
-            time_stamp (str): The name of the video file that is being analysed.
-
+            project (CGTProject): The project we are reporting.
+            time_stamp (str):     The time the report was request to go in the reports
+                                  directory name.
         Returns:
-            None.
-
+            error_code (int):      An error code is returned a 0 (zero) values means all
+                                   file were read while a 1 (one) value means 1 or more
+                                   files were not read.
         Throws:
             Error if the report directory cannot be made, or file cannot be opened
     '''
     print("hi from save_html_report1")
 
-    results_dir = Path(info["proj_full_path"]).joinpath(time_stamp)
 
-    prog = info["prog"]
 
-    # allow exception to bubble up to main
-    os.makedirs(results_dir)
+    results_dir = Path(project["proj_full_path"]).joinpath(time_stamp)
+    path = os.path.abspath(os.path.realpath(results_dir))
+
+    try:
+        os.makedirs(path)
+    except (IOError, OSError, EOFError) as exception:
+        print(exception)
+
+    prog = project["prog"]
+
 
     report_file = "{}_report.html".format(prog)
     html_outfile = results_dir.joinpath(report_file)
 
-    with open(html_outfile, "w") as fout:
-        write_html_report_start1(fout, info,)
+    results = project["results"]
+
+    try:
+        with open(html_outfile, "w") as fout:
+            fout = write_html_report_start1(fout, project)
+            fout = write_html_overview(fout, results)
+            fout = write_html_crystals(fout, project, results)
+            write_html_report_end(fout)
+    except (IOError, OSError, EOFError) as exception:
+        print(exception)
+    finally:
+        print("Read file: ", html_outfile)
 
     return results_dir
 
-def write_html_report_start1(fout, info):
+
+
+
+def write_html_report_start1(fout, project):
     '''
     Creates the start of a generic html report.
-
         Args:
             fout (file handler): The file handler allows this function to write out.
-            info (dict): A python dictionary containing a collection of useful parameters
-                         such as the filenames and paths.
-
+            project (CGTProject): The project we are reporting.
         Returns:
             fout (file handler): The file handler is passed back so that other parts of
                                  the report can be written by different functions.
     '''
-    prog = info['prog']
 
     print("Hi from write_html_report_start1")
 
@@ -147,118 +105,46 @@ def write_html_report_start1(fout, info):
     fout.write("</style>\n")
 
     title = "<title>Report on {} Produced by the Crystal Growth Tracker ({}) Software</title>\n"
-    title = title.format(info['enhanced_video_path'], info['prog'])
+    title = title.format(project['enhanced_video_path'], project['prog'])
 
     fout.write(title)
 
     fout.write("</head>\n")
     fout.write("\n<body>\n")
 
-    title2 = "<h1 align=\"center\">Report on {} Produced by the Crystal Growth Tracker ({}) Software</h1>\n"
-    title2 = title2.format(info['enhanced_video'], info['prog'])
+    title2 = ("<h1 align=\"center\">Report on {} Produced by the"
+              " Crystal Growth Tracker ({}) Software</h1>\n")
+    title2 = title2.format(project['enhanced_video'], project['prog'])
     fout.write(title2)
 
-    program_info = '<p><i>{}</i>: {}</p>\n'.format(info['prog'], info['description'])
+    program_info = '<p><i>{}</i>: {}</p>\n'.format(project['prog'], project['description'])
     fout.write(program_info)
 
-    report_info = (r"<p>This project was started at "+info['start_datetime']+r" on the "
-                    +info['host']+r" host system with the "+info['operating_system']
-                    +" operating system. The video file, "+str(info['enhanced_video_no_path'])
-                    +r" was analysed and has a frame rate of "+str(info['frame_rate'])
-                    +" and resolution of " +str(info['resolution'])
-                    +" "+str(info['resolution_units'])+" per pixel. A note of caution "
-                    +"is needed here because sometimes the frame rate and resolution "
-                    +"are changed in the video header when the video is being "
-                    +"pre-processed so in this report we always give results in pixels "
-                    +"and frames as well as SI units where possible. This report provides "
-                    +"images and information on experimental X-ray videos created at "
-                    +"Diamond Light Source.</p>\n")
+    report_info = (r"<p>This project was started at "+project['start_datetime']+r" on the "
+                   +project['host']+r" host system with the "+project['operating_system']
+                   +" operating system. The video file, "+str(project['enhanced_video_no_path'])
+                   +r" was analysed and has a frame rate of "+str(project['frame_rate'])
+                   +" and resolution of " +str(project['resolution'])
+                   +" "+str(project['resolution_units'])+" per pixel. A note of caution "
+                   +"is needed here because sometimes the frame rate and resolution "
+                   +"are changed in the video header when the video is being "
+                   +"pre-processed so in this report we always give results in pixels "
+                   +"and frames as well as SI units where possible. This report provides "
+                   +"images and information on experimental X-ray videos created at "
+                   +"Diamond Light Source.</p>\n")
 
     fout.write(report_info)
 
     return fout
 
 
-def write_html_report_start(fout, info):
-    '''Creates the start of an html report which is generic for the PERPL
-    scripts.
-
-    Args:
-        fout (file handler): The file handler allows this function to write out.
-        info (dict): A python dictionary containing a collection of useful parameters
-            such as the filenames and paths.
-
-    Returns:
-       fout (file handler): The file handler is passed back so that other parts of
-                            the report can be written by different functions.
-    '''
-    prog = info['prog']
-    #results_dir = info['results_dir']
-    #in_file_no_extension = info['in_file_no_extension']
-    #in_file_no_path = info['in_file_no_path']
-    #html_outfile_name = (results_dir+r"/"+in_file_no_extension+r"_"+prog+r"_report.html")
-
-    #print("Hi from write_html_report_start")
-
-    fout.write("<!DOCTYPE html>\n")
-
-    fout.write("<html>\n")
-    fout.write("<head>\n")
-    fout.write("<meta charset=\"UTF-8\">\n")
-    fout.write("<style>\n")
-    fout.write("table, th, td {\n")
-    fout.write("    border: 1px solid black;\n")
-    fout.write("    border-collapse: collapse;\n")
-    fout.write("}\n")
-    fout.write("th, td {\n")
-    fout.write("    padding: 15px;\n")
-    fout.write("}\n")
-    fout.write("</style>\n")
-
-    title_line1 = ("<title>Report on *** Produced by the Crystal Growth Tracker (+++) "
-                   "Software</title>\n")
-    title = title_line1.replace("***", info['in_file_no_path'])
-    title = title.replace("+++", info['prog'])
-    fout.write(title)
-
-    fout.write("</head>\n")
-    fout.write("\n<body>\n")
-    title_line2 = ("<h1 align=\"center\">Report on *** Produced by the "
-                   "Crystal Growth Tracker (+++) Software</h1>\n")
-    title2 = title_line2.replace("***", info['in_file_no_path'])
-    title2 = title2.replace("+++", prog)
-    fout.write(title2)
-
-    program_info = '<p><i>%s</i>: %s</p>\n' % (info['prog'], info['description'])
-    fout.write(program_info)
 
 
-    report_info = (r"<p>This program ran at "+info['start_datetime']+r" on the "
-                    +info['host']+r" host system with the "+info['operating_system']
-                    +" operating system. The video file, "+info['in_file_no_path']
-                    +r" was analysed and has a frame rate of "+str(info['frame_rate'])
-                    +" and resolution of " +str(info['resolution'])
-                    +" "+str(info['resolution_units'])+" per pixel. A note of caution "
-                    +"is needed here because sometimes the frame rate and resolution "
-                    +"are changed in the video header when the video is being "
-                    +"pre-processed so in this report we always give results in pixels "
-                    +"and frames as well as SI units where possible. This report provides "
-                    +"images and information on experimental X-ray videos created at "
-                    +"Diamond Light Source.</p>\n")
-
-    fout.write(report_info)
-
-    return fout
-
-
-def write_html_overview(fout, info, results):
+def write_html_overview(fout, results):
     '''Creates the overview section of the html report.
-
     Args:
         fout (file handler): The file handler allows this function to write out.
-        info (dict): A python dictionary containing a collection of useful parameters
-            such as the filenames and paths.
-
+        results:              The project results data
     Returns:
        fout (file handler): The file handler is passed back so that other parts of
                             the report can be written by different functions.
@@ -297,15 +183,12 @@ def write_html_overview(fout, info, results):
 
 
 
-def write_html_crystals(fout, info, results):
+def write_html_crystals(fout, project, results):
     '''Creates the section for each crystal in the html report.
-
     Args:
         fout (file handler): The file handler allows this function to write out.
-        crystal_number (int): The index for the crystal that is being reported.
-        info (dict): A python dictionary containing a collection of useful parameters
-            such as the filenames and paths.
-
+        project (CGTProject): The project we are reporting.
+        results:              The project results data
     Returns:
        fout (file handler): The file handler is passed back so that other parts of
                             the report can be written by different functions.
@@ -335,10 +218,11 @@ def write_html_crystals(fout, info, results):
         fout.write(line)
 
         line = ("<p><b>Frame Rate</b>:  *** </p>\n")
-        line = line.replace("***", str(results.video.frame_rate))
+        line = line.replace("***", str(project['frame_rate']))
         fout.write(line)
 
-        write_frame_table(fout, results, i, crystal)
+       # write_frame_table(fout, results, crystal)
+        #write_table(fout, results, crystal)
 
 
 
@@ -348,6 +232,18 @@ def write_html_crystals(fout, info, results):
 
 
 def write_html_region(fout, results, i):
+    '''Creates the section for each region in the html report.
+
+    Args:
+        fout (file handler): The file handler allows this function to write out.
+        results:              The project results data
+        i (int):             The index for the crystal that is being reported.
+
+
+    Returns:
+       fout (file handler): The file handler is passed back so that other parts of
+                            the report can be written by different functions.
+    '''
 
     region, r_index = results.get_region(i)
     #print(results.get_region(i))
@@ -382,8 +278,17 @@ def write_html_region(fout, results, i):
     return fout
 
 
-def write_frame_table(fout, results, i, crystal):
+def write_frame_table(fout, results, crystal):
+    '''Creates a table for each time the faces are recorded for a region/crytal.
+    Args:
+        fout (file handler): The file handler allows this function to write out.
+        results:              The project results data
+        crystal (cgt.model.crystal.Crystal): The crystal data structure.
 
+    Returns:
+       fout (file handler): The file handler is passed back so that other parts of
+                            the report can be written by different functions.
+    '''
 
     fout.write("<table>\n")
     fout.write("<caption style=\"caption-side:bottom\"><em>The frame numbers, "
@@ -398,7 +303,7 @@ def write_frame_table(fout, results, i, crystal):
 
     last_frame_number = 0
     for frame in crystal.list_of_frame_numbers:
-        print("last_frame_number: ",last_frame_number)
+        print("last_frame_number: ", last_frame_number)
         faces = crystal.faces_in_frame(frame)
         print("faces:", len(faces))
 #         video = results.video
@@ -409,7 +314,8 @@ def write_frame_table(fout, results, i, crystal):
         print("time_difference: ", time_difference)
         last_frame_number = frame
         fout.write('   <tr> <td> %d </td> <td> %d </td> <td> %.2f </td> <td> %.2f </td> </tr>\n'
-                   %(frame, len(faces), elapsed_time, time_difference))
+                   %(50, len(faces), elapsed_time, time_difference))
+                   #%(frame, len(faces), elapsed_time, time_difference))
 #                   '</td> </tr> \n' %(frame, faces, elapsed_time, time_difference))
 
     fout.write("</table>\n")
@@ -417,6 +323,42 @@ def write_frame_table(fout, results, i, crystal):
 
     return fout
 
+
+
+def write_table(fout, results, crystal):
+    '''Creates a table for demonstration purposes.
+    Args:
+        fout (file handler): The file handler allows this function to write out.
+        results:              The project results data
+        crystal (cgt.model.crystal.Crystal): The crystal data structure.
+
+    Returns:
+       fout (file handler): The file handler is passed back so that other parts of
+                            the report can be written by different functions.
+    '''
+
+    fout.write("<table>\n")
+    fout.write("<caption style=\"caption-side:bottom\"><em>The Table "
+               "demonstrates it is possible to table data, perhaps of a moving "
+               "face</em></caption>\n")
+    fout.write("   <tr>\n")
+    fout.write("     <th>Frame Number</th>\n")
+    fout.write("     <th>Number of Recorded Faces</th>\n")
+    fout.write("     <th>Elapsed Time (s)</th>\n")
+    fout.write("     <th>Time Difference Previous (s)</th>\n")
+    fout.write("   </tr>\n")
+
+    last_frame_number = 0
+    data = [[250, 3, 31.2567, 0.00000], [[320, 4, 40.267398, 4.621]]]
+    for frame in data:
+        fout.write('   <tr> <td> %d </td> <td> %d </td> <td> %.2f </td> <td> %.2f </td> </tr>\n'
+                   %(frame[0], frame[1], frame[2], frame[3]))
+
+
+    fout.write("</table>\n")
+    fout.write("<p></p>\n")
+
+    return fout
 
 
 
