@@ -26,7 +26,6 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 
 import cgt.model.videoanalysisresultsstore as vas
 
-from cgt.model.crystal import Crystal
 from cgt.model.region import Region
 from cgt.model.imagepoint import ImagePoint
 from cgt.model.imagelinesegment import ImageLineSegment

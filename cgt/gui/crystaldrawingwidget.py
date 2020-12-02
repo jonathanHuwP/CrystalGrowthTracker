@@ -29,7 +29,6 @@ import PyQt5.QtCore as qc
 from cgt.model.linesetsandframesstore import LineSetsAndFramesStore
 
 from cgt.gui.drawinglabel import DrawingLabel
-from cgt.model.crystal import Crystal
 
 from cgt.gui.Ui_crystaldrawingwidget import Ui_CrystalDrawingWidget
 

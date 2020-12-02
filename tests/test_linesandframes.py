@@ -28,16 +28,44 @@ sys.path.insert(0, '..\\CrystalGrowthTracker')
 
 import unittest
 
-from cgt.imagepoint import ImagePoint
-from cgt.imagelinesegment import ImageLineSegment
+from cgt.model.imagepoint import ImagePoint
+from cgt.model.imagelinesegment import ImageLineSegment
+from cgt.model.line import Line
 
-## class for unit tests of the ImagePoints
-class TestImagePoints(unittest.TestCase):
+class TestLines(unittest.TestCase):
+    def make_lines(self):
+        line_seg1 = ImageLineSegment(ImagePoint(100, 200),
+                                 ImagePoint(250, 200))
+
+        line_seg2 = ImageLineSegment(ImagePoint(200, 150),
+                                 ImagePoint(200, 300))
+
+        line_seg1a = ImageLineSegment(ImagePoint(100, 225),
+                                  ImagePoint(250, 225))
+
+        line_seg2a = ImageLineSegment(ImagePoint(175, 150),
+                                  ImagePoint(175, 300))
+
+        self._lines = []
+        self._lines.append(Line("test00"))
+        self._lines.append(Line("test01"))
+        self._lines.append(Line("test02"))
+
+        self._lines[0].add_line(67, line_seg1)
+
+        self._lines[1].add_line(67, line_seg1)
+        self._lines[1].add_line(122, line_seg1a)
+
+        self._lines[2].add_line(254, line_seg2)
+        self._lines[2].add_line(123, line_seg2a)
+        self._lines[2].add_line(345, line_seg2a)
+
     def setUp(self):
-        pass
+        self._lines = None
+        self.make_lines()
 
     def tearDown(self):
-        pass
+        self._lines = None
 
     def test_vertical(self):
         """
@@ -47,13 +75,49 @@ class TestImagePoints(unittest.TestCase):
         end0 = ImagePoint(200, 300)
         end1 = ImagePoint(100, 300)
 
-        line = ImageLineSegment(start, end0, "non_vertical")
-        v_line = ImageLineSegment(start, end1, "vertical")
+        non_vert_line = ImageLineSegment(start, end0)
+        vert_line = ImageLineSegment(start, end1)
 
-        self.assertFalse(line.is_vertical,
+        self.assertFalse(non_vert_line.is_vertical,
                         "non-vertical line reports vertical")
-        self.assertTrue(v_line.is_vertical,
-                        "vertical line reports non-vertical")
+        self.assertTrue(vert_line.is_vertical,
+                        "vertical line reports non-vertical") 
+                      
+    def test_differences(self):
+        """
+        test the is_vertical function
+        """
+        diffs = self._lines[0].get_differences()    
+        self.assertEqual(len(diffs), 0,
+                         msg="line with only one time returned non-empty list of differences")
+
+        diffs = self._lines[1].get_differences()    
+        self.assertEqual(len(diffs), 1,
+                         msg="line with two times did not return one differences")
+        self.assertEqual(diffs[0].start_d, 25,
+                         msg="difference start did not return 25")
+        self.assertEqual(diffs[0].end_d, 25,
+                         msg="difference start did not return 25")
+                         
+        diffs = self._lines[2].get_differences()    
+        self.assertEqual(len(diffs), 2,
+                         msg="line with three times did not return two differences")
+        self.assertEqual(diffs[0].start_d, 25,
+                         msg="difference start did not return 25")
+        self.assertEqual(diffs[0].end_d, 25,
+                         msg="difference start did not return 25")
+        self.assertEqual(diffs[1].start_d, 25,
+                         msg="difference start did not return 25")
+        self.assertEqual(diffs[1].end_d, 25,
+                         msg="difference start did not return 25")
+                         
+## class for unit tests of the ImagePoints
+class TestImagePoints(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
 
     def test_dist_to_line(self):
         """
@@ -63,8 +127,8 @@ class TestImagePoints(unittest.TestCase):
         end0 = ImagePoint(200, 300)
         end1 = ImagePoint(100, 300)
 
-        line = ImageLineSegment(start, end0, "non_vertical")
-        v_line = ImageLineSegment(start, end1, "vertical")
+        line = ImageLineSegment(start, end0)
+        v_line = ImageLineSegment(start, end1)
 
         test_point = ImagePoint(100, 100)
 

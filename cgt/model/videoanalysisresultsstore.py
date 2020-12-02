@@ -25,7 +25,7 @@ class VideoAnalysisResultsStore:
     """
     a storage class that records the results of a video analysis
     """
-    def __init__(self, regions=None, crystals=None, region_crystal=None):
+    def __init__(self, regions=None):
         """
         initalize an object
 
@@ -33,31 +33,17 @@ class VideoAnalysisResultsStore:
                 video (video_source) description of the original video sequence
 
                 regions ([Region]) the region objects
-
-                crystals ([Crystal]) the crystal object
-
-                region_crystal ([(int, int)] a mapping (<region index>, <crystal index>)
         """
         ## storage for the regions
         self._regions = []
 
+        flag = False
         if regions is not None:
             self._regions = regions
-
-        ## storage for the crystals
-        self._crystals = []
-
-        if crystals is not None:
-            self._crystals = crystals
-
-        ## a bi-dirctional mapping of regions and crystals to each other
-        self._region_crystal = []
-
-        if region_crystal is not None:
-            self._region_crystal = region_crystal
+            flag = True
 
         ## flag to indicate store has been changed
-        self._changed = False
+        self._changed = True
 
     def has_been_changed(self):
         """
@@ -95,26 +81,6 @@ class VideoAnalysisResultsStore:
                 regions array
         """
         return self._regions
-
-    @property
-    def crystals(self):
-        """
-        getter for the crystals array
-
-            Returns:
-                crystals array
-        """
-        return self._crystals
-
-    @property
-    def region_crystal(self):
-        """
-        getter for the regions crystals mapping array
-
-            Returns:
-                regions crystals mapping array
-        """
-        return self._region_crystal
 
     def reserve_regions(self, size):
         """
@@ -161,48 +127,6 @@ class VideoAnalysisResultsStore:
 
         return index
 
-    def reserve_crystals(self, size):
-        """
-        set the size of the crystals array, will overwrite all existing enteries
-
-            Args:
-                size (int) the desired size
-
-            Returns:
-                None
-        """
-        self._crystals.extend(['']*size)
-
-    def insert_crystal(self, crystal, index):
-        """
-        insert a crystal at a specified index in the regions array, will overwrite existing
-
-            Args:
-                crystal (Crystal) the crystal to be added
-                index (int) the index at which the crystal is to be located
-
-            Returns:
-                None
-
-            Throws:
-                IndexError if index out of range
-        """
-        self._crystals[index] = crystal
-        self.set_changed()
-
-    def add_crystal(self, crystal, region_index):
-        """
-        add a crystal and the index of its associated region to the store,
-
-            Args:
-                crystal (Crystal) the crystal object to be added
-                region_index (int) the array index of the associated region
-        """
-        c_index = len(self._crystals)
-        self._crystals.append(crystal)
-        self._region_crystal.append((region_index, c_index))
-        self.set_changed()
-
     @property
     def number_of_regions(self):
         """
@@ -212,37 +136,6 @@ class VideoAnalysisResultsStore:
                 the number of regions
         """
         return len(self._regions)
-
-    @property
-    def number_of_crystals(self):
-        """
-        getter for a list crystals
-
-            Returns:
-                list crystals
-        """
-        return len(self._crystals)
-
-    def get_crystals(self, region_index):
-        """
-        getter for crystals in a region
-
-            Args:
-                region_index the array index of the region
-
-            Returns:
-                a list of the crystal belonging to the region
-
-            Throws:
-                IndexError: if out of range
-        """
-        lst = []
-
-        for i in self._region_crystal:
-            if i[0] == region_index:
-                lst.append(self.crystals[i[1]])
-
-        return lst
 
     def get_region(self, crystal_index):
         """

@@ -37,35 +37,19 @@ from cgt.model.imagepoint import ImagePoint
 ## start (ImagePoint) the start point of the segment
 ##
 ## end (ImagePoint) the end point of the segment
-##
-## label (string )the string identifying the line
-ImageLineBase = namedtuple("ImageLineBase", ["start", "end", "label"])
+ImageLineBase = namedtuple("ImageLineBase", ["start", "end"])
 
 class ImageLineSegment(ImageLineBase):
     """
     class providing a representation of a directed line segment
     """
 
-    def relabel(self, label):
+    def scale(self, zoom):
         """
-        return copy with a different label
-
-            Args:
-                label (string) the new label.
-
-            Returns:
-                copy of same line segment with new label (mageLineSegment).
-        """
-        return ImageLineSegment(self.start, self.end, label)
-
-    def scale(self, zoom, new_label=None):
-        """
-        make scaled copy of this line segment, re-labelled if required
+        make scaled copy of this line segment
 
             Args:
                 zoom (number) the scale factor.
-
-                new_label (string) a new lable (optional)
 
             Returns:
                 scaled copy of line segment (ImageLineSegment)
@@ -80,18 +64,14 @@ class ImageLineSegment(ImageLineBase):
         start = ImagePoint(start_x, start_y)
         end = ImagePoint(end_x, end_y)
 
-        if new_label is None:
-            return ImageLineSegment(start, end, self.label)
+        return ImageLineSegment(start, end)
 
-        return ImageLineSegment(start, end, new_label)
-
-    def shift(self, shift_vector, new_label=None):
+    def shift(self, shift_vector):
         """
         make shifted copy of this line segment
 
             Args:
-                zoom (ImagePoint) the shift vector.
-                new_label (string) a new lable. The default is None (optional)
+                zoom (ImagePoint) the shift vector
 
             Returns:
                 shifted copy of line segment (ImageLineSegment)
@@ -105,42 +85,31 @@ class ImageLineSegment(ImageLineBase):
         start = ImagePoint(start_x, start_y)
         end = ImagePoint(end_x, end_y)
 
-        if new_label is None:
-            return ImageLineSegment(start, end, self.label)
+        return ImageLineSegment(start, end)
 
-        return ImageLineSegment(start, end, new_label)
-
-    def new_start(self, new_s, new_label=None):
+    def new_start(self, new_s):
         """
-        make a copy with a new start position, and optionally a new label
+        make a copy with a new start position
 
             Args:
-                new_s : ImagePoint the new start positin.
-                new_label (string) a new label (optional)
+                new_s : ImagePoint the new start positin
 
             Returns:
                 altered copy of line segment (ImageLineSegment)
         """
-        if new_label is None:
-            return ImageLineSegment(new_s, self.end, self.label)
+        return ImageLineSegment(new_s, self.end)
 
-        return ImageLineSegment(new_s, self.end, new_label)
-
-    def new_end(self, new_e, new_label=None):
+    def new_end(self, new_e):
         """
-        make a copy with a new end position, and optionally a new label
+        make a copy with a new end position
 
             Args:
-                new_s : ImagePoint the new end positin.
-                new_label (string) a new label (optional)
+                new_e : ImagePoint the new end positin
 
             Returns:
                 altered copy of line segment (ImageLineSegment)
         """
-        if new_label is None:
-            return ImageLineSegment(self.start, new_e, self.label)
-
-        return ImageLineSegment(self.start, new_e, new_label)
+        return ImageLineSegment(self.start, new_e)
 
     def distance_point_to_line(self, point):
         """
@@ -208,11 +177,9 @@ class ImageLineSegment(ImageLineBase):
             Returns:
                 the normal line (ImageLineSegment)
         """
-
-        label = "{}-normal".format(self.label)
         end = ImagePoint(-self.delta_y, self.delta_x)
 
-        return ImageLineSegment(self.start, end, label)
+        return ImageLineSegment(self.start, end)
 
     @property
     def vector_direction(self):
@@ -256,33 +223,20 @@ class ImageLineSegment(ImageLineBase):
 
         return (flag, closest)
 
-    def line_label_equals(self, line):
+    def difference(self, rhs):
         """
-        test equality of line labels
+        find the difference between this line and the new line
 
             Args:
-                line (ImageLineSegment) the test line
+                rhs (ImageLineSegment) the line for comparison
 
-            Returns:
-                True if self and line have the same label, else false
+            Return:
+                the difference between the lines (ImageLineDifference)
         """
-        return self.label == line.label
+        start_distance = self.start.distance_from(rhs.start)
+        end_distance = self.end.distance_from(rhs.end)
 
-    def label_in_set(self, in_lines):
-        """
-        find the first line with a matching label, if no such return None
-
-            Args:
-                in_lines (iterable of ImageLineSegment's) a collection of lines
-
-            Returns:
-                the first line that matches selfs label, else None
-        """
-        for line in in_lines:
-            if self.line_label_equals(line):
-                return line
-
-        return None
+        return ImageLineDifference(start_distance, end_distance)
 
     def __str__(self):
         """
@@ -291,8 +245,7 @@ class ImageLineSegment(ImageLineBase):
         Returns:
             string representation of line segment (string)
         """
-        return "Line(Start: {}, End {}, {})".format(
-            self.start, self.end, self.label)
+        return f"ImageLineSegment(Start: {self.start}, End {self.end})"
 
 ## data-structure representing the differences between two line segment's, serves as a base
 ##
@@ -301,9 +254,7 @@ class ImageLineSegment(ImageLineBase):
 ## start_d (number) the distance between the start points
 ##
 ## end_d (number) the distance between the end points
-##
-## lines_label (string) a label combining the two line's own labels
-DifferenceBase = namedtuple("DifferenceBase", ["start_d", "end_d", "lines_label"])
+DifferenceBase = namedtuple("DifferenceBase", ["start_d", "end_d"])
 
 class ImageLineDifference(DifferenceBase):
     """
@@ -318,3 +269,13 @@ class ImageLineDifference(DifferenceBase):
                 the average of the start and end distances (numpy.float64)
         """
         return (self.start_d + self.end_d)/2.0
+
+    def __str__(self):
+        """
+        override Python.object user string representation.
+
+        Returns:
+            string representation of line differenc (string)
+        """
+        return f"ImageLineDifference(Start: {self.start_d}, End {self.end_d})"
+
