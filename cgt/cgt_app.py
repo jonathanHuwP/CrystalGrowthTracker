@@ -42,6 +42,10 @@ class CGTApp(qw.QApplication):
         self.setAttribute(qc.Qt.AA_EnableHighDpiScaling)
         
         translators = select_translator()
+        
+        if translators is None:
+            return
+            
         for translator in translators:
             qc.QCoreApplication.installTranslator(translator)
 

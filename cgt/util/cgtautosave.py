@@ -24,8 +24,6 @@ import os
 import tempfile
 import pickle
 
-import inspect
-
 class CGTAutoSave():
     """
     construct and use a binary autosave file
@@ -56,8 +54,6 @@ class CGTAutoSave():
 
         # store the file path
         self._file_path = file_path
-        
-        self.print_state()
 
     def set_file_path(self, file_path):
         """
@@ -84,7 +80,6 @@ class CGTAutoSave():
             Args:
                 projcet (CGTProject) the data to be output
         """
-        self.print_state()
         with open(self._file_path, 'w+b') as file:
             # delete existing contents
             file.truncate(0)
@@ -104,7 +99,6 @@ class CGTAutoSave():
             Returns:
                 None
         """
-        self.print_state()
         with open(self._file_path, 'w+b') as file:
             # delete existing contents
             file.truncate(0)
@@ -116,12 +110,7 @@ class CGTAutoSave():
             Returns:
                 None
         """
-        self.print_state()
         os.remove(self._file_path)
-        
-    def print_state(self):
-        caller = inspect.stack()[1].function
-        print(f">>>>> autosave: file_path = {self._file_path}, function called ={caller}")
 
     @staticmethod
     def list_backups(dir_path):

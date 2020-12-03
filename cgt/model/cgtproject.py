@@ -165,7 +165,6 @@ class CGTProject(dict):
                 None
         """
         self._changed = True
-        print(f"***** set changed {self._changed}")
 
     def reset_changed(self):
         """
@@ -178,7 +177,6 @@ class CGTProject(dict):
 
         if self["results"] is not None:
             self["results"].reset_changed()
-        print(f"***** reset changed {self._changed}")
 
     def has_been_changed(self):
         """
@@ -187,7 +185,6 @@ class CGTProject(dict):
             Return:
                 true if the dictionary contains new data else false
         """
-        print(f"**** has been changed {self._changed}")
         if self["results"] is None:
             return self._changed
 

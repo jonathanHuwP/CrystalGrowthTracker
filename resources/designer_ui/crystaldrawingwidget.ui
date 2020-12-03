@@ -182,9 +182,16 @@
       <enum>QLayout::SetMaximumSize</enum>
      </property>
      <item>
-      <widget class="QPushButton" name="_newCrystalButton">
+      <widget class="QPushButton" name="_newLinesButton">
        <property name="text">
-        <string>New</string>
+        <string>Save New Lines</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="_adjustLinesButton">
+       <property name="text">
+        <string>Save Moved Lines</string>
        </property>
       </widget>
      </item>
@@ -208,13 +215,6 @@
        </property>
       </spacer>
      </item>
-     <item>
-      <widget class="QPushButton" name="_addCrystalButton">
-       <property name="text">
-        <string>Add</string>
-       </property>
-      </widget>
-     </item>
     </layout>
    </item>
   </layout>
@@ -236,22 +236,6 @@
  <resources/>
  <connections>
   <connection>
-   <sender>_addCrystalButton</sender>
-   <signal>clicked()</signal>
-   <receiver>CrystalDrawingWidget</receiver>
-   <slot>add_crystal()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>754</x>
-     <y>474</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>412</x>
-     <y>252</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>_clearCrystalButton</sender>
    <signal>clicked()</signal>
    <receiver>CrystalDrawingWidget</receiver>
@@ -268,10 +252,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>_newCrystalButton</sender>
+   <sender>_newLinesButton</sender>
    <signal>clicked()</signal>
    <receiver>CrystalDrawingWidget</receiver>
-   <slot>start_new_crystal()</slot>
+   <slot>save_new_lines()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>69</x>
@@ -328,6 +312,22 @@
     <hint type="destinationlabel">
      <x>412</x>
      <y>252</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_adjustLinesButton</sender>
+   <signal>clicked()</signal>
+   <receiver>CrystalDrawingWidget</receiver>
+   <slot>save_adjusted_lines()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>190</x>
+     <y>252</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>412</x>
+     <y>141</y>
     </hint>
    </hints>
   </connection>

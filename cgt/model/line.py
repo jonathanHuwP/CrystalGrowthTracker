@@ -41,7 +41,7 @@ class Line(dict):
         ## a text string relating to the line
         self._note = note
 
-    def add_line(self, frame, line_segment):
+    def add_line_segment(self, frame, line_segment):
         """
         add a line to the store
         
@@ -55,13 +55,15 @@ class Line(dict):
     def note(self):
         return self._note
         
+    @property
     def number_of_frames(self):
         """
         the number of times the line has been defined
         """
         return len(self)
         
-    def get_frame_numbers(self):
+    @property
+    def frame_numbers(self):
         """
         get a list of the frame numbers in ascending order
         
@@ -72,6 +74,7 @@ class Line(dict):
         tmp.sort()
         return tmp
 
+    @property
     def get_lines(self):
         """
         a getter for the line segments

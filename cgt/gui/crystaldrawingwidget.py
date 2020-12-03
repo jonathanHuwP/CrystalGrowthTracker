@@ -163,25 +163,24 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         print("clear_crystal {}".format(id(self)))
 
     @qc.pyqtSlot()
-    def add_crystal(self):
+    def save_adjusted_lines(self):
         """
-        add the curren crystal to the results
-
+        update existing lines with adjusted line segments
+        
             Returns:
                 None
         """
-        print("add_crystal {}".format(id(self)))
-        self.save_crystal()
+        print("save_adjusted_lines")
 
     @qc.pyqtSlot()
-    def start_new_crystal(self):
+    def save_new_lines(self):
         """
-        start a new crystal
+        start a new set of lines
 
             Returns:
                 None
         """
-        print("start_new_crystal {}".format(id(self)))
+        print("save_new_lines")
 
     @qc.pyqtSlot()
     def frame_changed(self):
@@ -261,43 +260,6 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
 
         self._videoControl.set_range(region.start_frame, region.end_frame)
         self.display_region()
-
-    def save_crystal(self):
-        """
-        get a crystal from drawing and add it to the results in main
-
-            Returns:
-                None
-        """
-        note = qw.QInputDialog.getText(self, "Crystal Note", "If needed add note.")
-        
-        if note[1]:
-            crystal = Crystal(notes=note[0])
-            
-        lines = []
-        for line in self._drawing.lines_base:
-            print("\tadding: {}".format(line))
-            lines.append(line)
-
-        crystal.add_faces(lines, self._videoControl.get_current_frame())
-
-        results = self._data_source.get_result()
-        results.add_crystal(crystal, self._current_region)
-        self._drawing.clear_all()
-        self._treeWidget.fill_tree()
-
-    def select_crystal(self, r_index, c_index):
-        """
-        a crystal has been selected
-
-            Args:
-                r_index (int) the array index of the region
-                c_indes (int) the array index of the crystal
-
-            Returns:
-                None
-        """
-        print("CrystalDrawingWidget Region {}, Crystal {}".format(r_index, c_index))
 
     def select_frame(self, r_index, c_index, f_index):
         """

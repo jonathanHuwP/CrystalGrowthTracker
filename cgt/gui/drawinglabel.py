@@ -588,10 +588,8 @@ class DrawingLabel(qw.QLabel):
         end_y = np.float64(self._end.y())/zoom
         end_y = np.uint32(np.round(end_y))
 
-        self._current_line = ImageLineSegment(
-            ImagePoint(start_x, start_y),
-            ImagePoint(end_x, end_y),
-            "line")
+        self._current_line = ImageLineSegment(ImagePoint(start_x, start_y),
+                                              ImagePoint(end_x, end_y))
 
     def clear_current(self):
         """
@@ -614,8 +612,7 @@ class DrawingLabel(qw.QLabel):
         if self._current_line is None:
             return
 
-        self._lines_base.append(
-            self._current_line.relabel(str(len(self._lines_base))))
+        self._lines_base.append(self._current_line)
 
     def set_lines_base(self, lines):
         """
