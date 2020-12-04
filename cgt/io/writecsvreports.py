@@ -76,79 +76,26 @@ def save_csv_results(project):
         keys = line.frame_numbers
         for key in keys:
             segment = line[key]
-            line_segments_array.append([key, self.start.x, self.start.y, self.end.x, self.end.y, index])
+            line_segments_array.append([key, 
+                                        segment.start.x, 
+                                        segment.start.y, 
+                                        segment.end.x, 
+                                        segment.end.y, 
+                                        index])
 
-    save_csv_regions(project, regions_array)
-    save_csv_lines(project, lines_array)
+    title = r"_project_regions.csv"
+    header = ("Region index", "Top", "Left", "Bottom", "Right", "Start frame", "End frame")
+    save_array_cvs(project, title, header, regions_array)
     
-    title = r"_line_segments.csv"
-    header = ["Frame", "Start x", "Start y", "End x", "End y", "Line"]
+    title = r"_project_lines.csv"
+    header = ("Index", "Note", "Region Index")
+    save_array_cvs(project, title, header, lines_array)
+    
+    title = r"_line_segments.csv" In
+    header = ["Frame", "Start x", "Start y", "End x", "End y", "Line Index"]
     save_array_cvs(project, title, header, line_segments_array)
-
-def save_csv_regions(info, regions_array):
-    '''Creates the csv report file for regions.
-
-        Args:
-            info (dict): A python dictionary containing a collection of useful parameters
-                         such as the filenames and paths.
-            regions_array (array): Regions data in a format that is easy to write into a csv file.
-
-        Returns:
-            None
-
-        Throws:
-            Error if file cannot be opened
-    '''
-    results_dir = info["proj_full_path"]
-    path = os.path.abspath(os.path.realpath(results_dir))
-
-    csv_outfile_name = (path+r"/"+info["prog"]
-                        +r"_"+info["proj_name"]+r"_project_regions.csv")
-
-    header = ("Region index",
-              "Top", "Left",
-              "Bottom", "Right",
-              "Start frame", "End frame")
-
-    with open(csv_outfile_name, "w") as fout:
-        writer = csv.writer(fout, delimiter=',', lineterminator='\n')
-        writer.writerow(header)
-        for row in regions_array:
-            writer.writerow(row)
-
-def save_csv_lines(info, lines_array):
-    '''Creates the csv report file for lines.
-
-        Args:
-            info (dict): A python dictionary containing a collection of useful parameters
-                        such as the filenames and paths.
-            lines_array (array): lines data as array of arrays of output data.
-
-        Returns:
-            None
-
-        Throws:
-            Error if file cannot be opened
-    '''
-    results_dir = info["proj_full_path"]
-
-    path = os.path.abspath(os.path.realpath(results_dir))
-
-    csv_outfile_name = (path+r"/"+info["prog"]
-                        +r"_"+info["proj_name"]+r"_project_lines.csv")
-
-    header = ("Index",
-              "Note",
-              "Region")
-
-    with open(csv_outfile_name, "w") as fout:
-        writer = csv.writer(fout, delimiter=',', lineterminator='\n')
-        writer.writerow(header)
-        for row in lines_array:
-            writer.writerow(row)
             
 def save_array_cvs(info, title, header, data_array):
-    print(">>>>>>>>> save_array_cvs")
     results_dir = info["proj_full_path"]
 
     path = os.path.abspath(os.path.realpath(results_dir))

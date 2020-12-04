@@ -186,6 +186,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         start = 0
         for count, line_segment in enumerate(self._drawing.lines_base):
             note = str(self._current_region)+"-"+str(count + start)
+            note += ":"+str(self._videoControl.get_current_frame())
             line = Line(note)
             line.add_line_segment(self._videoControl.get_current_frame(), 
                                   line_segment)
@@ -193,8 +194,8 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             
         print(f">>> store ({self._current_region}, {lines})")
         self._data_source.append_lines(self._current_region, lines)
-        # TODO clear drwawin_label's new_lines
-        # TODO redraw the lines
+        self._drawing.clear_all()
+        self._drawing.redisplay()
 
     @qc.pyqtSlot()
     def clear_selected_line(self):
@@ -263,19 +264,17 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
-        print(f"CrystalDrawingWidget select >>> Region {r_index}")
-
         if r_index == self._current_region:
             return
 
         # TODO put test and save in seperate function
         # has label got unsaved lines?
         if len(self._drawing.lines_base) > 0:
-            message = "You have unsaved data do you wish to save?"
+            message = "You have unsaved data do you wish to proceeed?"
             reply = qw.QMessageBox.question(self, "Data loss?", message)
 
-            if reply == qw.QMessageBox.Yes:
-                self.save_crystal()
+            if reply == qw.QMessageBox.No:
+                return
 
         self._drawing.clear_all()
 
