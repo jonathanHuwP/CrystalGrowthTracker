@@ -194,7 +194,7 @@
      <item>
       <widget class="QPushButton" name="_newLinesButton">
        <property name="text">
-        <string>Save New Lines</string>
+        <string>Add New Lines</string>
        </property>
       </widget>
      </item>
@@ -265,7 +265,7 @@
    <sender>_newLinesButton</sender>
    <signal>clicked()</signal>
    <receiver>CrystalDrawingWidget</receiver>
-   <slot>save_new_lines()</slot>
+   <slot>store_new_lines()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>69</x>
@@ -329,7 +329,7 @@
    <sender>_adjustLinesButton</sender>
    <signal>clicked()</signal>
    <receiver>CrystalDrawingWidget</receiver>
-   <slot>save_adjusted_lines()</slot>
+   <slot>store_adjusted_lines()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>190</x>

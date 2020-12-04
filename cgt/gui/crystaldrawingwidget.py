@@ -27,6 +27,7 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
 
 from cgt.model.linesetsandframesstore import LineSetsAndFramesStore
+from cgt.model.line import Line
 
 from cgt.gui.drawinglabel import DrawingLabel
 
@@ -163,25 +164,38 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         print("clear_crystal {}".format(id(self)))
 
     @qc.pyqtSlot()
-    def save_adjusted_lines(self):
+    def store_adjusted_lines(self):
         """
         update existing lines with adjusted line segments
         
             Returns:
                 None
         """
-        print("save_adjusted_lines")
+        print("store_adjusted_lines")
 
     @qc.pyqtSlot()
-    def save_new_lines(self):
+    def store_new_lines(self):
         """
         start a new set of lines
 
             Returns:
                 None
         """
-        print("save_new_lines")
-        
+        lines = []
+        # TODO set to the number of lines already in region
+        start = 0
+        for count, line_segment in enumerate(self._drawing.lines_base):
+            note = str(self._current_region)+"-"+str(count + start)
+            line = Line(note)
+            line.add_line_segment(self._videoControl.get_current_frame(), 
+                                  line_segment)
+            lines.append(line)
+            
+        print(f">>> store ({self._current_region}, {lines})")
+        self._data_source.append_lines(self._current_region, lines)
+        # TODO clear drwawin_label's new_lines
+        # TODO redraw the lines
+
     @qc.pyqtSlot()
     def clear_selected_line(self):
         """

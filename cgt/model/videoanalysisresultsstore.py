@@ -162,7 +162,7 @@ class VideoAnalysisResultsStore:
         """
         lines = []
         line_indices = self._region_line_association.get_lines_for_region(region_index)
-
+        print(f"results get_lines: region {region_index} => lines {line_indices}")
         if len(line_indices) < 1:
             return lines
 
@@ -182,9 +182,10 @@ class VideoAnalysisResultsStore:
             Returns:
                 None
         """
-        lines.append(line)
-        line_index = len(lines)-1
-        region_line_association.append(region_index, line_index)
+        self._lines.append(line)
+        line_index = len(self._lines)-1
+        self._region_line_association.add_association(region_index, line_index)
+        self.set_changed()
 
 class RegionLineAssociation(list):
     """
@@ -237,6 +238,6 @@ class RegionLineAssociation(list):
         tmp = []
         for pair in self:
             if pair[0] == region_index:
-                return tmp.append(pair[1])
+                tmp.append(pair[1])
 
         return tmp

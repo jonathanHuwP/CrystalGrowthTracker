@@ -120,7 +120,7 @@ class ResultsTreeWidget(qw.QWidget, Ui_ResultsTreeWidget):
         l_index = item.data(1, qc.Qt.UserRole)
         print("TW selected >>>> region {r_index}, line {l_index}")
         if self.parent() is not None:
-            self.parent().parent().select_line(r_index, c_index, f_index, l_index)
+            self.parent().parent().select_line(r_index, l_index)
             
     def frame_selected(self, item):
         """
@@ -134,7 +134,7 @@ class ResultsTreeWidget(qw.QWidget, Ui_ResultsTreeWidget):
         f_index = item.data(2, qc.Qt.UserRole)
         print(f"TW selected >>>> region {r_index}, line {l_index}, frame {f_index}")
         if self.parent() is not None:
-            self.parent().parent().select_frame(r_index, c_index, f_index)
+            self.parent().parent().select_frame(r_index, l_index, f_index)
 
     def fill_tree(self):
         """
@@ -167,7 +167,7 @@ class ResultsTreeWidget(qw.QWidget, Ui_ResultsTreeWidget):
                 l_item.setData(0, qc.Qt.UserRole, r_var)
                 l_item.setData(1, qc.Qt.UserRole, l_var)
 
-                for frame_number in line.list_of_frame_numbers:
+                for frame_number in line.frame_numbers:
                     f_item = qw.QTreeWidgetItem(l_item, ["", "", str(frame_number)], ResultType.FRAME)
                     f_var = qc.QVariant(frame_number)
                     f_item.setData(0, qc.Qt.UserRole, r_var)

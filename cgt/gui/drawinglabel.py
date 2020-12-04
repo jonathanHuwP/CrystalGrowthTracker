@@ -138,6 +138,7 @@ class DrawingLabel(qw.QLabel):
         ## array for the created lines or the base from which the lines are being adjusted
         self._lines_base = []
 
+        # TODO replace with call to data_store
         ## array for the new lines resulting from adjustment
         self._lines_new = []
 

@@ -588,8 +588,27 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 None
         """
-        print("Append region")
+        print("CGTMain: Append region")
         self._project["results"].add_region(region)
+        self._drawingWidget.new_region()
+        self.autosave()
+        
+    def append_lines(self, region_index, lines):
+        """
+        add a list of lines to a region
+
+            Args:
+                region_index (int) the array index of the region
+                lines [Line] array of lines to be added
+
+            Returns:
+                None
+        """
+        print(f"CGTMain: Append Lines {lines} to {region_index}")
+        for line in lines:
+            self._project["results"].add_line(region_index, line)
+            
+        #TODO rename new_region as new_data
         self._drawingWidget.new_region()
         self.autosave()
 
