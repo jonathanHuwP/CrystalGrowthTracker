@@ -25,11 +25,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="_framLabel">
-     <property name="text">
-      <string>0</string>
-     </property>
-    </widget>
+    <widget class="QLCDNumber" name="_frameOut"/>
    </item>
    <item>
     <widget class="QPushButton" name="_lastButton">
@@ -62,7 +58,7 @@
    <sender>_firstButton</sender>
    <signal>clicked()</signal>
    <receiver>VideoControlSimple</receiver>
-   <slot>close()</slot>
+   <slot>first_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>193</x>
@@ -78,7 +74,7 @@
    <sender>_lastButton</sender>
    <signal>clicked()</signal>
    <receiver>VideoControlSimple</receiver>
-   <slot>close()</slot>
+   <slot>last_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>595</x>

@@ -35,7 +35,8 @@ ROOT_FILE_NAMES = ["crystaldrawingwidget",
                    "resultstreewidget",
                    "videocontrolwidget",
                    "VideoOverviewWindow",
-                   "videoparametersdialog"]
+                   "videoparametersdialog",
+                   "videocontrolsimple"]
 
 # relative path to the Qt .ui files
 UI_PATH = "./resources/designer_ui/"

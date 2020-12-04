@@ -39,7 +39,7 @@ class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
             Returns:
                 None
         """
-        super(VideoControlSimple, self).__init__(parent)
+        super().__init__(parent)
         self.setupUi(self)
 
         ## storage for enabled/disabled state
@@ -93,7 +93,8 @@ class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
         change = False
 
         if self._current_frame != frame:
-            self._frameLabel.setText(str(frame))
+            self._current_frame = frame
+            self._frameOut.display(self._current_frame)
             change = True
 
         if self.is_enabled() and change:
@@ -119,10 +120,8 @@ class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
                 None
         """
         #TODO replace with qt .setEnabled()
-        self._downButton.setEnabled(flag)
-        self._upButton.setEnabled(flag)
-        self._frameSlider.setEnabled(flag)
-        self._frameSpinBox.setEnabled(flag)
+        self._firstButton.setEnabled(flag)
+        self._lastButton.setEnabled(flag)
         self._enabled = flag
 
     def is_enabled(self):
@@ -149,9 +148,8 @@ class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
 
         self._frame_minimum = minimum
         self._frame_maximum = maximum
-        self._current_frame = maximum
-        self._frameLabel = maximum
-
+        self._current_frame = self._frame_maximum
+        self._frameOut.display(self._current_frame)
         self.enable(tmp)
 
     def clear(self):
@@ -179,7 +177,7 @@ def run():
 
     window = VideoControlSimple()
     window.enable()
-    window.set_range(0, 25)
+    window.set_range(5, 25)
     window.show()
     app.exec_()
 
