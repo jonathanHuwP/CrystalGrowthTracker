@@ -131,11 +131,11 @@ class VideoAnalysisResultsStore:
         self.set_changed()
 
         return index
-        
+
     @property
     def lines(self):
         return self._lines
-        
+
     @property
     def region_lines_association(self):
         return self._region_line_association
@@ -149,26 +149,26 @@ class VideoAnalysisResultsStore:
                 the number of regions
         """
         return len(self._regions)
-        
+
     def get_lines(self, region_index):
         """
         get all the lines associated with region at region_index
-        
+
             Args:
                 region_index (int) the array index of the region
-                
+
             Returns:
                 a list of lines in the region
         """
         lines = []
         line_indices = self._region_line_association.get_lines_for_region(region_index)
-        
+
         if len(line_indices) < 1:
             return lines
-            
+
         for i in line_indices:
             lines.append(self._lines[i])
-            
+
         return lines
 
     def add_line(self, region_index, line):

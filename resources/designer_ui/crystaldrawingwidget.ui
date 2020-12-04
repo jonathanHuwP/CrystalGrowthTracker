@@ -61,7 +61,7 @@
          <x>0</x>
          <y>0</y>
          <width>105</width>
-         <height>125</height>
+         <height>123</height>
         </rect>
        </property>
       </widget>
@@ -155,13 +155,6 @@
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="_labelsBox">
-       <property name="text">
-        <string>Show Labels</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <spacer name="horizontalSpacer_3">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -173,6 +166,23 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="_labelsBox">
+       <property name="text">
+        <string>Show Labels</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="_showSelectedBox">
+       <property name="text">
+        <string>Show Selected</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="_lineSelectionBox"/>
      </item>
     </layout>
    </item>
@@ -196,13 +206,6 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="_clearCrystalButton">
-       <property name="text">
-        <string>Clear</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -214,6 +217,13 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="_clearSelectedButton">
+       <property name="text">
+        <string>Clear Selected</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -236,10 +246,10 @@
  <resources/>
  <connections>
   <connection>
-   <sender>_clearCrystalButton</sender>
+   <sender>_clearSelectedButton</sender>
    <signal>clicked()</signal>
    <receiver>CrystalDrawingWidget</receiver>
-   <slot>clear_crystal()</slot>
+   <slot>clear_selected_line()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>190</x>

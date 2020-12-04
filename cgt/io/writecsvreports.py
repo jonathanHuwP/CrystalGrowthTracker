@@ -31,7 +31,6 @@ def save_csv_project(project):
         Throws:
             Error if a file cannot be opened
     """
-    print("hello form save_csv_project")
     if project is None:
         return
 
@@ -48,7 +47,6 @@ def save_csv_results(project):
         Throws:
             Error if a file cannot be opened
     '''
-    print(">>>>>>>>> save_csv_results")
     results = project["results"]
 
     if results is None:
@@ -68,6 +66,8 @@ def save_csv_results(project):
     lines_array = []
     line_segments_array = []
     line_to_region = results.region_lines_association
+    
+    print(f"Number of lines: {len(results.lines)}")
     
     for index, line in enumerate(results.lines):
         print(f"out line {line}")
@@ -99,7 +99,6 @@ def save_csv_regions(info, regions_array):
         Throws:
             Error if file cannot be opened
     '''
-    print(">>>>>>>>> save_csv_regions")
     results_dir = info["proj_full_path"]
     path = os.path.abspath(os.path.realpath(results_dir))
 
@@ -131,7 +130,6 @@ def save_csv_lines(info, lines_array):
         Throws:
             Error if file cannot be opened
     '''
-    print(">>>>>>>>> save_csv_lines")
     results_dir = info["proj_full_path"]
 
     path = os.path.abspath(os.path.realpath(results_dir))
