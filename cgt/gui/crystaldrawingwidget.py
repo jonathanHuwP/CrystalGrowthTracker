@@ -191,8 +191,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             line.add_line_segment(self._videoControl.get_current_frame(), 
                                   line_segment)
             lines.append(line)
-            
-        print(f">>> store ({self._current_region}, {lines})")
+
         self._data_source.append_lines(self._current_region, lines)
         self._drawing.clear_all()
         self._drawing.redisplay()
@@ -240,7 +239,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         if self._data_source is not None:
             if self._data_source.get_video_reader() is not None:
                 if len(self._data_source.get_result().regions) > 0:
-                    self._videoControl.enable(True)
+                    self._videoControl.setEnabled(True)
                     self.display_region()
 
     @qc.pyqtSlot()
@@ -252,7 +251,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
                 None
         """
         qw.QWidget.hideEvent(self, event)
-        self._videoControl.enable(False)
+        self._videoControl.setEnabled(False)
 
     def select_region(self, r_index):
         """

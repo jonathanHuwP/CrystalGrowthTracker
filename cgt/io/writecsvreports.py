@@ -91,7 +91,7 @@ def save_csv_results(project):
     header = ("Index", "Note", "Region Index")
     save_array_cvs(project, title, header, lines_array)
     
-    title = r"_line_segments.csv" In
+    title = r"_line_segments.csv"
     header = ["Frame", "Start x", "Start y", "End x", "End y", "Line Index"]
     save_array_cvs(project, title, header, line_segments_array)
             

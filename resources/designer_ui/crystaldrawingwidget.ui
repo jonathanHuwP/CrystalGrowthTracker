@@ -77,7 +77,7 @@
       <enum>QLayout::SetFixedSize</enum>
      </property>
      <item>
-      <widget class="VideoControlWidget" name="_videoControl" native="true"/>
+      <widget class="VideoControlSimple" name="_videoControl" native="true"/>
      </item>
      <item>
       <spacer name="horizontalSpacer_2">
@@ -231,9 +231,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>VideoControlWidget</class>
+   <class>VideoControlSimple</class>
    <extends>QWidget</extends>
-   <header>cgt.gui.videocontrolwidget</header>
+   <header>cgt.gui.videocontrolsimple</header>
    <container>1</container>
   </customwidget>
   <customwidget>
