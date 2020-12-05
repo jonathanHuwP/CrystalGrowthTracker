@@ -52,8 +52,41 @@ class RegionsLinesFramesWidget(qw.QWidget, Ui_RegionsLinesFramesWidget):
             self.display_data()
 
     def display_data(self):
-        print(id(self))
+        """
+        fill the three lists
+        """
+        result = self._data_source.get_result()
 
+        if result is None:
+            return
+
+        for i in range(result.number_of_regions):
+            item = f"region {i}"
+            l_count = len(result.get_lines(i))
+            if l_count > 0:
+                item += f" {l_count} lines"
+            else:
+                item += " no lines"
+
+            self._regionsList.addItem(item)
+
+    def set_data_source(self, data_source):
+        """
+        set a data source to
+
+            Args:
+                data_source (VideoAnalysisResultsStore) the data source
+        """
+        self._data_source = data_source
+        self.display_data()
+
+    def clear(self):
+        """
+        clear the lists
+        """
+        self._regionsList.clear()
+        self._linesList.clear()
+        self._framesList.clear()
 
 
 def run():
@@ -65,7 +98,6 @@ def run():
     """
 
     app = qw.QApplication(sys.argv)
-
     window = RegionsLinesFramesWidget()
     window.show()
     app.exec_()

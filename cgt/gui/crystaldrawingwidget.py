@@ -73,18 +73,18 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         self._videoControl.frame_changed.connect(self.frame_changed)
 
         # set data source for tree widget
-        self._treeWidget.set_data_source(data_source)
-        
+        self._rlfWidget.set_data_source(data_source)
+
     def clear(self):
         """
         clear the contents
-        
+
             Return:
                 None
         """
         self._store = LineSetsAndFramesStore()
         self._current_region = None
-        self._treeWidget.clear()
+        self._rlfWidget.clear()
         self._drawing.clear()
 
     def set_data_source(self, data_source):
@@ -123,9 +123,9 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
-        self._treeWidget.blockSignals(True)
-        self._treeWidget.fill_tree()
-        self._treeWidget.blockSignals(False)
+        self._rlfWidget.blockSignals(True)
+        self._rlfWidget.display_data()
+        self._rlfWidget.blockSignals(False)
 
     @qc.pyqtSlot()
     def state_toggle(self):
@@ -167,7 +167,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
     def store_adjusted_lines(self):
         """
         update existing lines with adjusted line segments
-        
+
             Returns:
                 None
         """
@@ -188,7 +188,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             note = str(self._current_region)+"-"+str(count + start)
             note += ":"+str(self._videoControl.get_current_frame())
             line = Line(note)
-            line.add_line_segment(self._videoControl.get_current_frame(), 
+            line.add_line_segment(self._videoControl.get_current_frame(),
                                   line_segment)
             lines.append(line)
 
@@ -200,7 +200,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
     def clear_selected_line(self):
         """
         clear a selected line or line segments
-        
+
             Returns:
                 None
         """
@@ -295,7 +295,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
                 None
         """
         print(f"CrystalDrawingWidget Select >>> Region {r_index}, Line {l_index}")
-        
+
     def select_frame(self, r_index, l_index, f_index):
         """
         a frame number has been selected
@@ -323,6 +323,6 @@ def run():
     window = CrystalDrawingWidget()
     window.show()
     app.exec_()
-        
+
 if __name__ == "__main__":
     run()

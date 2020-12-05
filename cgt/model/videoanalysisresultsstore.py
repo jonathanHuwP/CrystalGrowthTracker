@@ -162,7 +162,7 @@ class VideoAnalysisResultsStore:
         """
         lines = []
         line_indices = self._region_line_association.get_lines_for_region(region_index)
-        print(f"results get_lines: region {region_index} => lines {line_indices}")
+
         if len(line_indices) < 1:
             return lines
 

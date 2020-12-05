@@ -37,7 +37,7 @@
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <widget class="ResultsTreeWidget" name="_treeWidget" native="true">
+     <widget class="RegionsLinesFramesWidget" name="_rlfWidget" native="true">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
         <horstretch>0</horstretch>
@@ -237,9 +237,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>ResultsTreeWidget</class>
+   <class>RegionsLinesFramesWidget</class>
    <extends>QWidget</extends>
-   <header>cgt.gui.resultstreewidget</header>
+   <header>cgt.gui.regionslinesframeswidget</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
