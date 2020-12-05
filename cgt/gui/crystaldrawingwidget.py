@@ -124,7 +124,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
                 None
         """
         self._rlfWidget.blockSignals(True)
-        self._rlfWidget.display_data()
+        self._rlfWidget.display_regions()
         self._rlfWidget.blockSignals(False)
 
     @qc.pyqtSlot()

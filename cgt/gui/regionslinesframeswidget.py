@@ -49,26 +49,57 @@ class RegionsLinesFramesWidget(qw.QWidget, Ui_RegionsLinesFramesWidget):
         self._data_source = data_source
 
         if data_source is not None:
-            self.display_data()
+            self.display_regions()
 
-    def display_data(self):
+    def display_regions(self):
         """
         fill the three lists
         """
+        self.clear()
+
         result = self._data_source.get_result()
 
         if result is None:
             return
 
         for i in range(result.number_of_regions):
-            item = f"region {i}"
+            text = f"region {i}"
+
             l_count = len(result.get_lines(i))
             if l_count > 0:
-                item += f" {l_count} lines"
+                text += f" {l_count} lines"
             else:
-                item += " no lines"
+                text += " no lines"
+
+            item = qw.QListWidgetItem(self._regionsList)
+            item.setText(text)
+            item.setData(qc.Qt.UserRole, i)
 
             self._regionsList.addItem(item)
+
+    def display_lines(self, region_index):
+        """
+        fill the lines list
+        """
+        self._linesLabel.setText("Lines")
+        self._linesList.clear()
+        self._framesList.clear()
+
+        result = self._data_source.get_result()
+
+        if result is None:
+            return
+
+        self._linesLabel.setText(f"Lines (region {region_index})")
+        for i, line in enumerate(result.get_lines(region_index)):
+            text = f"Line {i}"
+
+            if line.note is not None:
+                text += f": {line.note}"
+
+            item = qw.QListWidgetItem(self._linesList)
+            item.setText(text)
+            item.setData(qc.Qt.UserRole, i)
 
     def set_data_source(self, data_source):
         """
@@ -78,7 +109,22 @@ class RegionsLinesFramesWidget(qw.QWidget, Ui_RegionsLinesFramesWidget):
                 data_source (VideoAnalysisResultsStore) the data source
         """
         self._data_source = data_source
-        self.display_data()
+        self.display_regions()
+
+    @qc.pyqtSlot(qw.QListWidgetItem)
+    def region_selected(self, item):
+        region_index = item.data(qc.Qt.UserRole)
+        print(f"Region {item.text()}, index {region_index}")
+        self.display_lines(region_index)
+
+    @qc.pyqtSlot(qw.QListWidgetItem)
+    def line_selected(self, item):
+        data = item.data(qc.Qt.UserRole)
+        print(f"Line {item.text()}, index {data}")
+
+    @qc.pyqtSlot(qw.QListWidgetItem)
+    def frame_selected(self, item):
+        print(f"Frame {item.text()}")
 
     def clear(self):
         """

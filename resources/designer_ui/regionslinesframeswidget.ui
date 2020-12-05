@@ -26,14 +26,18 @@
         </widget>
        </item>
        <item>
-        <widget class="QListWidget" name="_regionsList"/>
+        <widget class="QListWidget" name="_regionsList">
+         <property name="sortingEnabled">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="QLabel" name="label_2">
+        <widget class="QLabel" name="_linesLabel">
          <property name="text">
           <string>Lines</string>
          </property>
@@ -47,7 +51,7 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <widget class="QLabel" name="label_3">
+        <widget class="QLabel" name="_framesLabel">
          <property name="text">
           <string>Frames</string>
          </property>
@@ -63,5 +67,54 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>_regionsList</sender>
+   <signal>itemClicked(QListWidgetItem*)</signal>
+   <receiver>RegionsLinesFramesWidget</receiver>
+   <slot>region_selected()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>91</x>
+     <y>127</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>254</x>
+     <y>113</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_linesList</sender>
+   <signal>itemClicked(QListWidgetItem*)</signal>
+   <receiver>RegionsLinesFramesWidget</receiver>
+   <slot>line_selected()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>254</x>
+     <y>127</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>254</x>
+     <y>113</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_framesList</sender>
+   <signal>itemClicked(QListWidgetItem*)</signal>
+   <receiver>RegionsLinesFramesWidget</receiver>
+   <slot>frame_selected()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>418</x>
+     <y>127</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>254</x>
+     <y>113</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
