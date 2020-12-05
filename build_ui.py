@@ -36,7 +36,8 @@ ROOT_FILE_NAMES = ["crystaldrawingwidget",
                    "videocontrolwidget",
                    "VideoOverviewWindow",
                    "videoparametersdialog",
-                   "videocontrolsimple"]
+                   "videocontrolsimple",
+                   "regionslinesframeswidget"]
 
 # relative path to the Qt .ui files
 UI_PATH = "./resources/designer_ui/"
@@ -62,7 +63,7 @@ def get_args():
                         help="the file name without postfix",
                         required=False,
                         type=str)
-                        
+
     parser.add_argument("-c",
                         "--clean",
                         help="remove all the existing Ui_ files",
@@ -83,11 +84,11 @@ def build(file_name_root):
     # in the case of failure CPython will print its own error message
     if os.system(f"pyuic5 {ui_file} -o {py_file}") == 0:
         print(f"made {py_file}")
-        
+
 def clean():
     """
     remove the existing Ui_* files
-    
+
         Returns:
             None
     """
@@ -98,7 +99,7 @@ def clean():
 
 if __name__ == "__main__":
     args = get_args()
-    
+
     if args.clean:
         clean()
     elif args.file_name_root:
