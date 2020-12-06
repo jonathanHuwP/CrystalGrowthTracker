@@ -61,7 +61,7 @@
          <x>0</x>
          <y>0</y>
          <width>105</width>
-         <height>123</height>
+         <height>125</height>
         </rect>
        </property>
       </widget>
@@ -174,16 +174,6 @@
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QCheckBox" name="_showSelectedBox">
-       <property name="text">
-        <string>Show Selected</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="_lineSelectionBox"/>
-     </item>
     </layout>
    </item>
    <item>
@@ -201,7 +191,14 @@
      <item>
       <widget class="QPushButton" name="_adjustLinesButton">
        <property name="text">
-        <string>Save Moved Lines</string>
+        <string>Add Moved Lines</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="_clearSelectedButton">
+       <property name="text">
+        <string>Clear Drawing</string>
        </property>
       </widget>
      </item>
@@ -217,13 +214,6 @@
         </size>
        </property>
       </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="_clearSelectedButton">
-       <property name="text">
-        <string>Clear Selected</string>
-       </property>
-      </widget>
      </item>
     </layout>
    </item>
@@ -249,7 +239,7 @@
    <sender>_clearSelectedButton</sender>
    <signal>clicked()</signal>
    <receiver>CrystalDrawingWidget</receiver>
-   <slot>clear_selected_line()</slot>
+   <slot>clear_drawing()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>190</x>

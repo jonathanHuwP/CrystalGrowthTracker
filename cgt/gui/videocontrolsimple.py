@@ -137,7 +137,6 @@ class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
         """
         tmp = self.isEnabled()
         self.setEnabled(False)
-
         self._frame_minimum = minimum
         self._frame_maximum = maximum
         self._current_frame = self._frame_maximum

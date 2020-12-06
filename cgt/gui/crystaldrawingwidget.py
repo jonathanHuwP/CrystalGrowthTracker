@@ -153,16 +153,6 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             self._drawing.show_labels(False)
 
     @qc.pyqtSlot()
-    def clear_crystal(self):
-        """
-        clear the current crystal
-
-            Returns:
-                None
-        """
-        print("clear_crystal {}".format(id(self)))
-
-    @qc.pyqtSlot()
     def store_adjusted_lines(self):
         """
         update existing lines with adjusted line segments
@@ -197,14 +187,14 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         self._drawing.redisplay()
 
     @qc.pyqtSlot()
-    def clear_selected_line(self):
+    def clear_drawing(self):
         """
         clear a selected line or line segments
 
             Returns:
                 None
         """
-        print("clear_selected_line")
+        self._drawing.clear_all()
 
     @qc.pyqtSlot()
     def frame_changed(self):
@@ -282,6 +272,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         region = self._data_source.get_result().regions[r_index]
 
         self._videoControl.set_range(region.start_frame, region.end_frame)
+        self._videoControl.setEnabled(True)
         self.display_region()
 
     def select_line(self, r_index, l_index):

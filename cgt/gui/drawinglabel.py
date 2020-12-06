@@ -94,9 +94,7 @@ class DrawingLabel(qw.QLabel):
             Args:
                 parent (QObject) the parent Object
         """
-        super(qw.QLabel, self).__init__()
-        ## pointer to the parent object
-        self._parent = parent
+        super().__init__(parent)
 
         ## the class name as in translation, used in dialogs
         self._translated_name = self.tr("DrawingLabel")
@@ -290,6 +288,9 @@ class DrawingLabel(qw.QLabel):
             Returns:
                 None
         """
+        if self._background_pixmap is None:
+            return
+
         if self._state == WidgetState.DRAWING:
             if event.button() == qc.Qt.LeftButton:
                 self._start = event.pos()
@@ -449,6 +450,9 @@ class DrawingLabel(qw.QLabel):
             Returns:
                 None
         """
+        if self._background_pixmap is None:
+            return
+
         if self._state == WidgetState.DRAWING and self._mouse_left_down:
             self._end = event.pos()
             self.make_line()
@@ -518,6 +522,8 @@ class DrawingLabel(qw.QLabel):
             Returns:
                 None
         """
+        if self._background_pixmap is None:
+            return
 
         # ignore anything other than the left mouse button
         if not event.button() == qc.Qt.LeftButton:
