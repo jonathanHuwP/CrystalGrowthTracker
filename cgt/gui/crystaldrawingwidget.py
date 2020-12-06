@@ -181,8 +181,9 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
                 None
         """
         lines = []
-        # TODO set to the number of lines already in region
-        start = 0
+        results = self._data_source.get_result()
+        start = len(results.get_lines(self._current_region))
+
         for count, line_segment in enumerate(self._drawing.lines_base):
             note = str(self._current_region)+"-"+str(count + start)
             note += ":"+str(self._videoControl.get_current_frame())
