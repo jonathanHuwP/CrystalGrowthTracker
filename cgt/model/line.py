@@ -34,7 +34,7 @@ class Line(dict):
     def __init__(self, note=None):
         """
         initalize the object
-        
+
             Args:
                 note (string) a label or note
         """
@@ -44,29 +44,29 @@ class Line(dict):
     def add_line_segment(self, frame, line_segment):
         """
         add a line to the store
-        
+
             Args:
                 frame (int) the frame number
-                line_segment (ImageLineSegment) the line segment 
+                line_segment (ImageLineSegment) the line segment
         """
         self[frame] = line_segment
-        
+
     @property
     def note(self):
         return self._note
-        
+
     @property
     def number_of_frames(self):
         """
         the number of times the line has been defined
         """
         return len(self)
-        
+
     @property
     def frame_numbers(self):
         """
         get a list of the frame numbers in ascending order
-        
+
             Returns:
                 the frame numbers (list(int))
         """
@@ -75,34 +75,34 @@ class Line(dict):
         return tmp
 
     @property
-    def get_lines(self):
+    def get_line_segments(self):
         """
         a getter for the line segments
-        
+
             Returns:
                 the line segments (list(ImageLineSegment))
         """
         return list(self.values())
-        
+
     def get_differences(self):
         """
-        getter for the motion of the line, will return empty list 
+        getter for the motion of the line, will return empty list
         if the object has less than two lines
-        
+
             Returns:
                 the motion of the line in pixels (list(ImageLineDifference))
         """
         differences = []
         if len(self) < 2:
             return differences
-            
-        keys = self.get_frame_numbers()
-        
+
+        keys = self.frame_numbers
+
         # index starts at zero key start at one
         for index, key in enumerate(keys[1:]):
             start = self[keys[index]]
             end = self[key]
-            
+
             differences.append(start.difference(end))
-            
+
         return differences

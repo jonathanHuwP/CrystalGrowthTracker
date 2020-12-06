@@ -34,6 +34,9 @@ class RegionsLinesFramesWidget(qw.QWidget, Ui_RegionsLinesFramesWidget):
     and a means to navigate the data
     """
 
+    ## signal to indicate change of frame
+    user_region_selection = qc.pyqtSignal(int)
+
     def __init__(self, parent=None, data_source=None):
         """
         initialize an object
@@ -101,6 +104,30 @@ class RegionsLinesFramesWidget(qw.QWidget, Ui_RegionsLinesFramesWidget):
             item.setText(text)
             item.setData(qc.Qt.UserRole, i)
 
+    def display_frames(self, line_index):
+        """
+        fill the frames list
+
+            Args:
+                line_index (int) the index of the line in the results
+        """
+        self._framesLabel.setText("Frames")
+        self._framesList.clear()
+
+        result = self._data_source.get_result()
+
+        if result is None:
+            return
+
+        line = result.lines[line_index]
+        self._framesLabel.setText(f"Frames (line {line.note})")
+        for frame in line.frame_numbers:
+            text = f"Frame {frame}"
+
+            item = qw.QListWidgetItem(self._framesList)
+            item.setText(text)
+            item.setData(qc.Qt.UserRole, frame)
+
     def set_data_source(self, data_source):
         """
         set a data source to
@@ -116,15 +143,18 @@ class RegionsLinesFramesWidget(qw.QWidget, Ui_RegionsLinesFramesWidget):
         region_index = item.data(qc.Qt.UserRole)
         print(f"Region {item.text()}, index {region_index}")
         self.display_lines(region_index)
+        self.user_region_selection.emit(region_index)
 
     @qc.pyqtSlot(qw.QListWidgetItem)
     def line_selected(self, item):
         data = item.data(qc.Qt.UserRole)
         print(f"Line {item.text()}, index {data}")
+        self.display_frames(data)
 
     @qc.pyqtSlot(qw.QListWidgetItem)
     def frame_selected(self, item):
-        print(f"Frame {item.text()}")
+        data = item.data(qc.Qt.UserRole)
+        print(f"Frame {item.text()}, index {data}")
 
     def clear(self):
         """

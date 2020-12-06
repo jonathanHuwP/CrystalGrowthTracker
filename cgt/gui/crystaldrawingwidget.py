@@ -58,10 +58,6 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         self._translated_name = self.tr("CrystalDrawingWidget")
         self.setupUi(self)
 
-
-        ## an ArtifctStore for testing
-        self._store = LineSetsAndFramesStore()
-
         ## store the the region being viewed
         self._current_region = None
 
@@ -74,6 +70,9 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
 
         # set data source for tree widget
         self._rlfWidget.set_data_source(data_source)
+
+        # connect the signal for the user selecting a region
+        self._rlfWidget.user_region_selection.connect(self.select_region)
 
     def clear(self):
         """
@@ -253,6 +252,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         qw.QWidget.hideEvent(self, event)
         self._videoControl.setEnabled(False)
 
+    @qc.pyqtSlot(int)
     def select_region(self, r_index):
         """
         a region has been selected
@@ -305,24 +305,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
                 l_indes (int) the array index of the line
                 f_indes (int) the array index of the frame number
 
-
             Returns:
                 None
         """
         print(f"CrystalDrawingWidget Select >>> Region {r_index}, Line {l_index}, Frame {f_index}")
-
-def run():
-    """
-    use a local function to make an isolated the QApplication object
-
-        Returns:
-            None
-    """
-    app = qw.QApplication(sys.argv)
-
-    window = CrystalDrawingWidget()
-    window.show()
-    app.exec_()
-
-if __name__ == "__main__":
-    run()
