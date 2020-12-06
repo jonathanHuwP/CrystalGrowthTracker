@@ -61,6 +61,9 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         ## store the the region being viewed
         self._current_region = None
 
+        ## store the line being viewed
+        self._current_line = None
+
         ## the drawing label
         self._drawing = DrawingLabel(self._scrollArea)
         self._scrollArea.setWidget(self._drawing)
@@ -71,8 +74,10 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         # set data source for tree widget
         self._rlfWidget.set_data_source(data_source)
 
-        # connect the signal for the user selecting a region
+        # connect the signals for the user selecting a region
         self._rlfWidget.user_region_selection.connect(self.select_region)
+        self._rlfWidget.user_line_selection.connect(self.select_line)
+        self._rlfWidget.user_frame_selection.connect(self.select_frame)
 
     def clear(self):
         """
@@ -113,6 +118,12 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         pixmap = self._data_source.make_pixmap(self._current_region, frame)
 
         self._drawing.set_backgroud_pixmap(pixmap)
+        if self._current_line is not None:
+            line = self._data_source.get_result().lines[self._current_line]
+            self._drawing.set_display_line(line)
+        else:
+            self._drawing.set_display_line(None)
+
         self._drawing.redisplay()
 
     def new_region(self):
@@ -269,35 +280,38 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         self._drawing.clear_all()
 
         self._current_region = r_index
+        self._current_line = None
+
         region = self._data_source.get_result().regions[r_index]
 
         self._videoControl.set_range(region.start_frame, region.end_frame)
         self._videoControl.setEnabled(True)
         self.display_region()
 
-    def select_line(self, r_index, l_index):
+    def select_line(self, l_index):
         """
         a line has been selected
 
             Args:
                 r_index (int) the array index of the region
-                l_index (int) the array index of the line
 
             Returns:
                 None
         """
-        print(f"CrystalDrawingWidget Select >>> Region {r_index}, Line {l_index}")
+        if self._current_line == l_index:
+            return
 
-    def select_frame(self, r_index, l_index, f_index):
+        self._current_line = l_index
+        print(f"CrystalDrawingWidget Select >>> Region: {self._current_region}, Line {l_index}")
+
+    def select_frame(self, f_index):
         """
         a frame number has been selected
 
             Args:
                 r_index (int) the array index of the region
-                l_indes (int) the array index of the line
-                f_indes (int) the array index of the frame number
 
             Returns:
                 None
         """
-        print(f"CrystalDrawingWidget Select >>> Region {r_index}, Line {l_index}, Frame {f_index}")
+        print(f"CrystalDrawingWidget Select >>> Frame {f_index}")

@@ -34,8 +34,14 @@ class RegionsLinesFramesWidget(qw.QWidget, Ui_RegionsLinesFramesWidget):
     and a means to navigate the data
     """
 
-    ## signal to indicate change of frame
+    ## signal to indicate change of region
     user_region_selection = qc.pyqtSignal(int)
+
+    ## signal to indicate change of line
+    user_line_selection = qc.pyqtSignal(int)
+
+    ## signal to indicate change of frame
+    user_frame_selection = qc.pyqtSignal(int)
 
     def __init__(self, parent=None, data_source=None):
         """
@@ -147,14 +153,16 @@ class RegionsLinesFramesWidget(qw.QWidget, Ui_RegionsLinesFramesWidget):
 
     @qc.pyqtSlot(qw.QListWidgetItem)
     def line_selected(self, item):
-        data = item.data(qc.Qt.UserRole)
-        print(f"Line {item.text()}, index {data}")
-        self.display_frames(data)
+        line_index = item.data(qc.Qt.UserRole)
+        print(f"Line {item.text()}, index {line_index}")
+        self.display_frames(line_index)
+        self.user_line_selection.emit(line_index)
 
     @qc.pyqtSlot(qw.QListWidgetItem)
     def frame_selected(self, item):
-        data = item.data(qc.Qt.UserRole)
-        print(f"Frame {item.text()}, index {data}")
+        frame = item.data(qc.Qt.UserRole)
+        print(f"Frame {item.text()}, index {frame}")
+        self.user_line_selection.emit(frame)
 
     def clear(self):
         """

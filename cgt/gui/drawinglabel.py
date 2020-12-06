@@ -146,6 +146,9 @@ class DrawingLabel(qw.QLabel):
         ## the pixmap on which we are to draw
         self._background_pixmap = None
 
+        ## the line in the results to be displayed
+        self._display_line = None
+
         self.setAlignment(
             qc.Qt.AlignTop | qc.Qt.AlignLeft)
         self.setSizePolicy(
@@ -681,6 +684,9 @@ class DrawingLabel(qw.QLabel):
         font.setPointSize(font.pointSize() * 2)
         painter.setFont(font)
 
+        # TODO display self._current_line
+        # TODO make self._current_line the source for adjustments
+
         if self._storage_state == StorageState.COPYING_LINES:
             painter.setPen(old_pen)
             for line in self._lines_base:
@@ -767,6 +773,15 @@ class DrawingLabel(qw.QLabel):
         self._lines_base.clear()
         self._lines_new.clear()
         self.redisplay()
+
+    def set_display_line(self, line_index):
+        """
+        display the chosen lines, if None no display
+
+            Args:
+                line_index (int) the array index of the line
+        """
+        self._display_line = line_index
 
     def save(self, file):
         """
