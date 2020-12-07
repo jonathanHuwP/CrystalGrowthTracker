@@ -70,7 +70,7 @@
  <connections>
   <connection>
    <sender>_regionsList</sender>
-   <signal>itemClicked(QListWidgetItem*)</signal>
+   <signal>currentRowChanged(int)</signal>
    <receiver>RegionsLinesFramesWidget</receiver>
    <slot>region_selected()</slot>
    <hints>
@@ -86,7 +86,7 @@
   </connection>
   <connection>
    <sender>_linesList</sender>
-   <signal>itemClicked(QListWidgetItem*)</signal>
+   <signal>currentRowChanged(int)</signal>
    <receiver>RegionsLinesFramesWidget</receiver>
    <slot>line_selected()</slot>
    <hints>
@@ -102,7 +102,7 @@
   </connection>
   <connection>
    <sender>_framesList</sender>
-   <signal>itemClicked(QListWidgetItem*)</signal>
+   <signal>currentRowChanged(int)</signal>
    <receiver>RegionsLinesFramesWidget</receiver>
    <slot>frame_selected()</slot>
    <hints>

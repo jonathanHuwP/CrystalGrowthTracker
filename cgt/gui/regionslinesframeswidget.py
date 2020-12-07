@@ -144,24 +144,66 @@ class RegionsLinesFramesWidget(qw.QWidget, Ui_RegionsLinesFramesWidget):
         self._data_source = data_source
         self.display_regions()
 
-    @qc.pyqtSlot(qw.QListWidgetItem)
-    def region_selected(self, item):
-        region_index = item.data(qc.Qt.UserRole)
-        print(f"Region {item.text()}, index {region_index}")
+    def get_selected_region(self):
+        """
+        getter for the currently selected region, if any
+
+            Returns:
+                the index of the currently selected region, None in no slection
+        """
+        tmp = self._regionsList.currentRow()
+
+        if tmp < 0:
+            return None
+
+        return tmp
+
+    def get_selected_line(self):
+        """
+        getter for the currently selected line, if any
+
+            Returns:
+                the index of the currently selected region, None in no slection
+        """
+        tmp = self._linesList.currentRow()
+
+        if tmp < 0:
+            return None
+
+        return tmp
+
+    def get_selected_frame(self):
+        """
+        getter for the currently selected frame, if any
+
+            Returns:
+                the index of the currently selected region, None in no slection
+        """
+        tmp = self._framesList.currentRow()
+
+        if tmp < 0:
+            return None
+
+        return tmp
+
+    @qc.pyqtSlot(int)
+    def region_selected(self, region_index):
+        #region_index = item.data(qc.Qt.UserRole)
+        print(f"Region index {region_index}")
         self.display_lines(region_index)
         self.user_region_selection.emit(region_index)
 
-    @qc.pyqtSlot(qw.QListWidgetItem)
-    def line_selected(self, item):
-        line_index = item.data(qc.Qt.UserRole)
-        print(f"Line {item.text()}, index {line_index}")
+    @qc.pyqtSlot(int)
+    def line_selected(self, line_index):
+        #line_index = item.data(qc.Qt.UserRole)
+        print(f"Line index {line_index}")
         self.display_frames(line_index)
         self.user_line_selection.emit(line_index)
 
-    @qc.pyqtSlot(qw.QListWidgetItem)
-    def frame_selected(self, item):
-        frame = item.data(qc.Qt.UserRole)
-        print(f"Frame {item.text()}, index {frame}")
+    @qc.pyqtSlot(int)
+    def frame_selected(self, frame):
+        #frame = item.data(qc.Qt.UserRole)
+        print(f"Frame index {frame}")
         self.user_line_selection.emit(frame)
 
     def clear(self):

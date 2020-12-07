@@ -279,9 +279,6 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
 
         self._drawing.clear_all()
 
-        self._current_region = r_index
-        self._current_line = None
-
         region = self._data_source.get_result().regions[r_index]
 
         self._videoControl.set_range(region.start_frame, region.end_frame)
@@ -298,11 +295,9 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
-        if self._current_line == l_index:
-            return
-
-        self._current_line = l_index
-        print(f"CrystalDrawingWidget Select >>> Region: {self._current_region}, Line {l_index}")
+        # TODO send l_index to self._drawing
+        region = self._rlfWidget.get_selected_region()
+        print(f"CrystalDrawingWidget Select >>> Region: {region}, Line {l_index}")
 
     def select_frame(self, f_index):
         """

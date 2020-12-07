@@ -540,7 +540,7 @@ class DrawingLabel(qw.QLabel):
             reply = qw.QMessageBox.question(
                 self,
                 self.tr("Create Line"),
-                self.tr("Do you wish to save the line?"))
+                self.tr("Do you wish to store the line?"))
 
             if reply == qw.QMessageBox.Yes:
                 self.add_line()
@@ -566,7 +566,7 @@ class DrawingLabel(qw.QLabel):
         reply = qw.QMessageBox.question(
             self,
             self.tr("Adjust Line"),
-            self.tr("Do you wish to save adjusted line?"))
+            self.tr("Do you wish to store the adjusted line?"))
 
         if reply == qw.QMessageBox.Yes:
             if self._storage_state == StorageState.CREATING_LINES:
