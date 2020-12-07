@@ -28,7 +28,7 @@
        <item>
         <widget class="QListWidget" name="_regionsList">
          <property name="sortingEnabled">
-          <bool>true</bool>
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -69,26 +69,10 @@
  <resources/>
  <connections>
   <connection>
-   <sender>_regionsList</sender>
-   <signal>currentRowChanged(int)</signal>
-   <receiver>RegionsLinesFramesWidget</receiver>
-   <slot>region_selected()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>91</x>
-     <y>127</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>254</x>
-     <y>113</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>_linesList</sender>
    <signal>currentRowChanged(int)</signal>
    <receiver>RegionsLinesFramesWidget</receiver>
-   <slot>line_selected()</slot>
+   <slot>line_selected(int)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>254</x>
@@ -104,10 +88,26 @@
    <sender>_framesList</sender>
    <signal>currentRowChanged(int)</signal>
    <receiver>RegionsLinesFramesWidget</receiver>
-   <slot>frame_selected()</slot>
+   <slot>frame_selected(int)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>418</x>
+     <y>127</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>254</x>
+     <y>113</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_regionsList</sender>
+   <signal>itemClicked(QListWidgetItem*)</signal>
+   <receiver>RegionsLinesFramesWidget</receiver>
+   <slot>region_selected(QListWidgetItem*)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>91</x>
      <y>127</y>
     </hint>
     <hint type="destinationlabel">

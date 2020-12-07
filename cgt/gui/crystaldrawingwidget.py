@@ -58,12 +58,6 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         self._translated_name = self.tr("CrystalDrawingWidget")
         self.setupUi(self)
 
-        ## store the the region being viewed
-        self._current_region = None
-
-        ## store the line being viewed
-        self._current_line = None
-
         ## the drawing label
         self._drawing = DrawingLabel(self._scrollArea)
         self._scrollArea.setWidget(self._drawing)
@@ -87,7 +81,6 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
                 None
         """
         self._store = LineSetsAndFramesStore()
-        self._current_region = None
         self._rlfWidget.clear()
         self._drawing.clear()
 
@@ -110,16 +103,18 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
-        if self._current_region is None:
+        region_index = self._rlfWidget.get_selected_region()
+        if region_index is None:
             return
 
         frame = self._videoControl.get_current_frame()
+        line_index = self._rlfWidget.get_selected_line()
 
-        pixmap = self._data_source.make_pixmap(self._current_region, frame)
+        pixmap = self._data_source.make_pixmap(region_index, frame)
 
         self._drawing.set_backgroud_pixmap(pixmap)
-        if self._current_line is not None:
-            line = self._data_source.get_result().lines[self._current_line]
+        if line_index is not None:
+            line = self._data_source.get_result().lines[line_index]
             self._drawing.set_display_line(line)
         else:
             self._drawing.set_display_line(None)
@@ -265,9 +260,6 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
-        if r_index == self._current_region:
-            return
-
         # TODO put test and save in seperate function
         # has label got unsaved lines?
         if len(self._drawing.lines_base) > 0:
@@ -285,6 +277,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         self._videoControl.setEnabled(True)
         self.display_region()
 
+    @qc.pyqtSlot(int)
     def select_line(self, l_index):
         """
         a line has been selected
@@ -298,6 +291,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         # TODO send l_index to self._drawing
         region = self._rlfWidget.get_selected_region()
         print(f"CrystalDrawingWidget Select >>> Region: {region}, Line {l_index}")
+        self.display_region()
 
     def select_frame(self, f_index):
         """

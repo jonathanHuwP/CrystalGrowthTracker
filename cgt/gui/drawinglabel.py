@@ -684,8 +684,13 @@ class DrawingLabel(qw.QLabel):
         font.setPointSize(font.pointSize() * 2)
         painter.setFont(font)
 
-        # TODO display self._current_line
+        # TODO display self._display_line
         # TODO make self._current_line the source for adjustments
+
+        if self._display_line is not None:
+            painter.setPen(old_pen)
+            for line_segment in self._display_line.get_line_segments:
+                self.draw_single_line(line_segment, painter)
 
         if self._storage_state == StorageState.COPYING_LINES:
             painter.setPen(old_pen)
@@ -774,14 +779,14 @@ class DrawingLabel(qw.QLabel):
         self._lines_new.clear()
         self.redisplay()
 
-    def set_display_line(self, line_index):
+    def set_display_line(self, line):
         """
         display the chosen lines, if None no display
 
             Args:
-                line_index (int) the array index of the line
+                line (Line) the line to be displayed
         """
-        self._display_line = line_index
+        self._display_line = line
 
     def save(self, file):
         """
