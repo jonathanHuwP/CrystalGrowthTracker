@@ -758,7 +758,7 @@ class DrawingLabel(qw.QLabel):
             bounding_box = painter.boundingRect(
                 bounding_box,
                 qc.Qt.AlignCenter,
-                zoomed.label)
+                "text")
 
             point = zoomed.start
             location = qc.QPoint(point.x, point.y)
@@ -766,7 +766,7 @@ class DrawingLabel(qw.QLabel):
             painter.drawText(
                 bounding_box,
                 qc.Qt.AlignHorizontal_Mask | qc.Qt.AlignVertical_Mask,
-                zoomed.label)
+                "Text")
 
     def clear_all(self):
         """
