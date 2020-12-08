@@ -96,7 +96,6 @@ class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
 
         if self._current_frame != frame:
             self._current_frame = frame
-            print(f">>>>>\t{self._current_frame}")
             self._frameOut.display(self._current_frame)
             change = True
 

@@ -67,10 +67,7 @@ def save_csv_results(project):
     line_segments_array = []
     line_to_region = results.region_lines_association
 
-    print(f"Number of lines: {len(results.lines)}")
-
     for index, line in enumerate(results.lines):
-        print(f"out line {line}")
         region_index = line_to_region.get_region(index)
         lines_array.append([index, line.note, region_index])
         keys = line.frame_numbers

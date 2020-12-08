@@ -159,7 +159,6 @@ class CGTAutoSave():
             Returns:
                 (CGTProject) the project data
         """
-        print("Autosave get_backup_project")
         try:
             tmp = pickle.load(open(file_path, 'rb'))
         except EOFError:

@@ -123,7 +123,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
 
     def new_region(self):
         """
-        called by data_source to indicate a new region has been added, index added to spin box
+        called by data_source to indicate a new region has been added
 
             Returns:
                 None
@@ -292,14 +292,14 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         #region = self._rlfWidget.get_selected_region()
         self.display_region()
 
-    def select_frame(self, f_index):
+    def select_frame(self, frame):
         """
         a frame number has been selected
 
             Args:
-                r_index (int) the array index of the region
+                frame (int) the frame number
 
             Returns:
                 None
         """
-        print(f"CrystalDrawingWidget Select >>> Frame {f_index}")
+        print(f"CrystalDrawingWidget select_frame {frame}")
