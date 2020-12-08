@@ -173,7 +173,7 @@ class RegionsLinesFramesWidget(qw.QWidget, Ui_RegionsLinesFramesWidget):
         # convert to results index
         item = self._linesList.item(tmp)
         line_index = item.data(qc.Qt.UserRole)
-        print(f"rlf: line_index {line_index}")
+
         return line_index
 
     def get_selected_frame(self):
