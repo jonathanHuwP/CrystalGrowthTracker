@@ -669,7 +669,6 @@ class DrawingLabel(qw.QLabel):
             Returns:
                 None
         """
-        print("\n========")
         new_pen = qg.QPen(qg.QColor(qc.Qt.red), 3, qc.Qt.SolidLine)
         adj_pen = qg.QPen(qg.QColor(qc.Qt.red), 3, qc.Qt.DashLine)
         old_pen = qg.QPen(qg.QColor.fromRgb(0, 200, 255), 3, qc.Qt.SolidLine)
@@ -689,27 +688,20 @@ class DrawingLabel(qw.QLabel):
 
         if self._display_line is not None:
             painter.setPen(old_pen)
-            print("DL:draw_lines: 1")
             for line_segment in self._display_line.get_line_segments:
-                print(f"DL:draw_lines: 1.1 = {line_segment}")
                 self.draw_single_line(line_segment, painter)
 
         if self._storage_state == StorageState.COPYING_LINES:
             painter.setPen(old_pen)
-            print("DL:draw_lines: 2")
             for line in self._lines_base:
-                print("DL:draw_lines: 2.1")
                 self.draw_single_line(line, painter, False)
 
             painter.setPen(new_pen)
             for line in self._lines_new:
-                print("DL:draw_lines: 2.2")
                 self.draw_single_line(line, painter)
         else:
             painter.setPen(new_pen)
-            print("DL:draw_lines: 3")
             for line in self._lines_base:
-                print(f"DL:draw_lines: 3.1 {line}")
                 self.draw_single_line(line, painter)
 
         if self._current_line is not None:
@@ -718,12 +710,11 @@ class DrawingLabel(qw.QLabel):
             qt_line = qc.QLine(
                 qc.QPoint(int(zoomed.start.x), int(zoomed.start.y)),
                 qc.QPoint(int(zoomed.end.x), int(zoomed.end.y)))
-            print("DL:draw_lines: 4")
             painter.drawLine(qt_line)
         painter.end()
 
         self.setPixmap(pix)
-        print(">>>>>>\n")
+
 
     def draw_single_line(self, line, painter, allow_label=True):
         """

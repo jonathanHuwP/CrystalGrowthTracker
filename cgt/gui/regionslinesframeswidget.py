@@ -189,20 +189,18 @@ class RegionsLinesFramesWidget(qw.QWidget, Ui_RegionsLinesFramesWidget):
     @qc.pyqtSlot(qw.QListWidgetItem)
     def region_selected(self, item):
         region_index = item.data(qc.Qt.UserRole)
-        print(f"Region index {region_index}")
         self.display_lines(region_index)
         self.user_region_selection.emit(region_index)
 
     @qc.pyqtSlot(int)
     def line_selected(self, line_index):
-        print(f"Line index {line_index}")
         self.display_frames(line_index)
         self.user_line_selection.emit(line_index)
 
-    @qc.pyqtSlot(int)
-    def frame_selected(self, frame):
-        print(f"Frame index {frame}")
-        self.user_line_selection.emit(frame)
+    @qc.pyqtSlot(qw.QListWidgetItem)
+    def frame_selected(self, item):
+        frame = item.data(qc.Qt.UserRole)
+        self.user_frame_selection.emit(frame)
 
     def clear(self):
         """

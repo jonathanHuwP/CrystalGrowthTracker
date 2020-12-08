@@ -289,8 +289,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
                 None
         """
         # TODO send l_index to self._drawing
-        region = self._rlfWidget.get_selected_region()
-        print(f"CrystalDrawingWidget Select >>> Region: {region}, Line {l_index}")
+        #region = self._rlfWidget.get_selected_region()
         self.display_region()
 
     def select_frame(self, f_index):

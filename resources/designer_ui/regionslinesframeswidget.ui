@@ -44,7 +44,11 @@
         </widget>
        </item>
        <item>
-        <widget class="QListWidget" name="_linesList"/>
+        <widget class="QListWidget" name="_linesList">
+         <property name="sortingEnabled">
+          <bool>false</bool>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
@@ -58,7 +62,11 @@
         </widget>
        </item>
        <item>
-        <widget class="QListWidget" name="_framesList"/>
+        <widget class="QListWidget" name="_framesList">
+         <property name="sortingEnabled">
+          <bool>false</bool>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
@@ -86,9 +94,9 @@
   </connection>
   <connection>
    <sender>_framesList</sender>
-   <signal>currentRowChanged(int)</signal>
+   <signal>itemClicked(QListWidgetItem*)</signal>
    <receiver>RegionsLinesFramesWidget</receiver>
-   <slot>frame_selected(int)</slot>
+   <slot>frame_selected(QListWidgetItem*)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>418</x>
