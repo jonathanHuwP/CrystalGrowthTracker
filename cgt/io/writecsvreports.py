@@ -66,9 +66,9 @@ def save_csv_results(project):
     lines_array = []
     line_segments_array = []
     line_to_region = results.region_lines_association
-    
+
     print(f"Number of lines: {len(results.lines)}")
-    
+
     for index, line in enumerate(results.lines):
         print(f"out line {line}")
         region_index = line_to_region.get_region(index)
@@ -76,25 +76,25 @@ def save_csv_results(project):
         keys = line.frame_numbers
         for key in keys:
             segment = line[key]
-            line_segments_array.append([key, 
-                                        segment.start.x, 
-                                        segment.start.y, 
-                                        segment.end.x, 
-                                        segment.end.y, 
+            line_segments_array.append([key,
+                                        segment.start.x,
+                                        segment.start.y,
+                                        segment.end.x,
+                                        segment.end.y,
                                         index])
 
     title = r"_project_regions.csv"
     header = ("Region index", "Top", "Left", "Bottom", "Right", "Start frame", "End frame")
     save_array_cvs(project, title, header, regions_array)
-    
+
     title = r"_project_lines.csv"
     header = ("Index", "Note", "Region Index")
     save_array_cvs(project, title, header, lines_array)
-    
-    title = r"_line_segments.csv"
+
+    title = r"_project_line_segments.csv"
     header = ["Frame", "Start x", "Start y", "End x", "End y", "Line Index"]
     save_array_cvs(project, title, header, line_segments_array)
-            
+
 def save_array_cvs(info, title, header, data_array):
     results_dir = info["proj_full_path"]
 
@@ -107,7 +107,7 @@ def save_array_cvs(info, title, header, data_array):
         writer = csv.writer(fout, delimiter=',', lineterminator='\n')
         writer.writerow(header)
         for row in data_array:
-            writer.writerow(row)    
+            writer.writerow(row)
 
 def save_csv_info(info):
     '''Creates the csv report file for info.

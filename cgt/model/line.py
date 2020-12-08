@@ -106,3 +106,11 @@ class Line(dict):
             differences.append(start.difference(end))
 
         return differences
+
+    def __str__(self):
+        """
+        over ride dict defalutl to strings
+            Returns:
+                (string) describing object
+        """
+        return f"<Line {self._note}: Number of segments = {len(self)}>"
