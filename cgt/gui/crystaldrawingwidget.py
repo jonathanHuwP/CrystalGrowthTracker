@@ -184,8 +184,8 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         for count, line_segment in enumerate(self._drawing.lines_base):
             note = str(current_region)+"-"+str(count + start)
             line = Line(note)
-            line.add_line_segment(self._videoControl.get_current_frame(),
-                                  line_segment)
+            frame = self._videoControl.get_current_frame()
+            line.add_line_segment(frame, line_segment)
             lines.append(line)
 
         self._data_source.append_lines(current_region, lines)

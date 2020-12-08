@@ -78,9 +78,9 @@
  <connections>
   <connection>
    <sender>_linesList</sender>
-   <signal>currentRowChanged(int)</signal>
+   <signal>itemClicked(QListWidgetItem*)</signal>
    <receiver>RegionsLinesFramesWidget</receiver>
-   <slot>line_selected(int)</slot>
+   <slot>line_selected(QListWidgetItem*)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>254</x>

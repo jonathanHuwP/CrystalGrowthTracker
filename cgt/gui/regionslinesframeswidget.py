@@ -62,7 +62,7 @@ class RegionsLinesFramesWidget(qw.QWidget, Ui_RegionsLinesFramesWidget):
 
     def display_regions(self):
         """
-        fill the three lists
+        fill the regions list
         """
         self.clear()
 
@@ -192,8 +192,9 @@ class RegionsLinesFramesWidget(qw.QWidget, Ui_RegionsLinesFramesWidget):
         self.display_lines(region_index)
         self.user_region_selection.emit(region_index)
 
-    @qc.pyqtSlot(int)
-    def line_selected(self, line_index):
+    @qc.pyqtSlot(qw.QListWidgetItem)
+    def line_selected(self, item):
+        line_index = item.data(qc.Qt.UserRole)
         self.display_frames(line_index)
         self.user_line_selection.emit(line_index)
 

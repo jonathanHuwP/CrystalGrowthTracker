@@ -96,6 +96,7 @@ class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
 
         if self._current_frame != frame:
             self._current_frame = frame
+            print(f">>>>>\t{self._current_frame}")
             self._frameOut.display(self._current_frame)
             change = True
 
@@ -139,7 +140,7 @@ class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
         self.setEnabled(False)
         self._frame_minimum = minimum
         self._frame_maximum = maximum
-        self._current_frame = self._frame_maximum
+        self.set_frame(self._frame_maximum)
         self._frameOut.display(self._current_frame)
         self.setEnabled(tmp)
 
@@ -153,6 +154,7 @@ class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
         tmp = self.isEnabled()
         self.setEnabled(False)
 
+        self.set_frame(0)
         self.set_range(0, 0)
 
         self.setEnabled(tmp)
