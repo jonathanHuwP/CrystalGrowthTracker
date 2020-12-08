@@ -110,7 +110,8 @@ class CGTAutoSave():
             Returns:
                 None
         """
-        os.remove(self._file_path)
+        if self._file_path is not None and os.path.isfile(self._file_path):
+            os.remove(self._file_path)
 
     @staticmethod
     def list_backups(dir_path):
@@ -168,30 +169,30 @@ class CGTAutoSave():
             return tmp[2]
 
         return None
-        
+
     @staticmethod
     def make_autosave_from_file(file_path):
         """
         make an autosave object with only a file name and path
-        
+
             Args:
                 file_path (string) the file path
-                
+
             Returns:
                 CGTAutosave object
         """
         tmp = CGTAutoSave()
         tmp.set_file_path(file_path)
         return tmp
-        
+
     @staticmethod
     def make_autosave_from_project(project):
         """
         make an empty autosave object in a project directory
-        
+
             Args:
                 project (CGTProject) the project object
-                
+
             Returns:
                 CGTAutosave object
         """
@@ -202,10 +203,10 @@ class CGTAutoSave():
         """
         make an autosave object in the project directory and save
         the project to the file
-        
+
             Args:
                 project (CGTProject) the project object
-                
+
             Returns:
                 CGTAutosave object
         """

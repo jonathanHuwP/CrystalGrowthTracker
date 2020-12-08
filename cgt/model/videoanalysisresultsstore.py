@@ -171,6 +171,27 @@ class VideoAnalysisResultsStore:
 
         return lines
 
+    def get_lines_and_indices(self, region_index):
+        """
+        get all the lines, and their list indices, associated with region at region_index
+
+            Args:
+                region_index (int) the array index of the region
+
+            Returns:
+                a list of (line_index, line) of lines in the region
+        """
+        tmp = []
+        line_indices = self._region_line_association.get_lines_for_region(region_index)
+
+        if len(line_indices) < 1:
+            return tmp
+
+        for i in line_indices:
+            tmp.append((i, self._lines[i]))
+
+        return tmp
+
     def add_line(self, region_index, line):
         """
         add a line

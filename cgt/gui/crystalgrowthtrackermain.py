@@ -230,40 +230,47 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self.tr("Select the Project Directory."),
             os.path.expanduser('~'))
 
-        if dir_name != '':
-            project = CGTProject()
-            error_code = readcsvreports.read_csv_project(dir_name, project)
-            if error_code != 0:
-                message = "The project could not be loaded"
-                qw.QMessageBox.warning(self,
-                                       "CGT Error Loading Projcet",
-                                       message)
+        if dir_name == '':
+            return
+
+        print(f"Loading {dir_name}")
+
+        project = CGTProject()
+
+        try:
+            readcsvreports.read_csv_project(dir_name, project)
+            print("read reports")
+        except (IOError, OSError, EOFError) as exp:
+            message = f"Could not load project: {exp}"
+            qw.QMessageBox.warning(self,
+                                   "CGT Error Loading Projcet",
+                                   message)
+            return
+
+        backup, back_file = self.check_for_backup(dir_name, project["proj_name"])
+
+        # check for a recent backup
+        if backup is not None:
+            message = "A more recent backup exists, do you want to recover?"
+            reply = qw.QMessageBox.question(self,
+                                            'CrystalGrowthTracker',
+                                            message,
+                                            qw.QMessageBox.Yes | qw.QMessageBox.No,
+                                            qw.QMessageBox.No)
+            if reply == qw.QMessageBox.Yes:
+                # assign the backup
+                self._project = backup
+                # set the has changed flag
+                self._project.set_changed()
+                # ensure autosave points to the correct file
+                self._autosave = CGTAutoSave.make_autosave_from_file(back_file)
+                self.project_created_or_loaded()
                 return
 
-            backup, back_file = self.check_for_backup(dir_name, project["proj_name"])
-
-            # check for a recent backup
-            if backup is not None:
-                message = "A more recent backup exists, do you want to recover?"
-                reply = qw.QMessageBox.question(self,
-                                                'CrystalGrowthTracker',
-                                                message,
-                                                qw.QMessageBox.Yes | qw.QMessageBox.No,
-                                                qw.QMessageBox.No)
-                if reply == qw.QMessageBox.Yes:
-                    # assign the backup
-                    self._project = backup
-                    # set the has changed flag
-                    self._project.set_changed()
-                    # ensure autosave points to the correct file
-                    self._autosave = CGTAutoSave.make_autosave_from_file(back_file)
-                    self.project_created_or_loaded()
-                    return
-
-            self._project = project
-            self._autosave = CGTAutoSave.make_autosave_from_project(self._project)
-            self._project.reset_changed()
-            self.project_created_or_loaded()
+        self._project = project
+        self._autosave = CGTAutoSave.make_autosave_from_project(self._project)
+        self._project.reset_changed()
+        self.project_created_or_loaded()
 
     def check_for_backup(self, dir_name, proj_name):
         """

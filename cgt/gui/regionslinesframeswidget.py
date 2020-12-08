@@ -100,12 +100,8 @@ class RegionsLinesFramesWidget(qw.QWidget, Ui_RegionsLinesFramesWidget):
             return
 
         self._linesLabel.setText(f"Lines (region {region_index})")
-        for i, line in enumerate(result.get_lines(region_index)):
-            text = f"Line {i}"
-
-            if line.note is not None:
-                text += f": {line.note}"
-
+        for (i, line) in result.get_lines_and_indices(region_index):
+            text = f"Line {line.note}"
             item = qw.QListWidgetItem(self._linesList)
             item.setText(text)
             item.setData(qc.Qt.UserRole, i)
