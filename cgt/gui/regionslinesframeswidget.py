@@ -72,7 +72,7 @@ class RegionsLinesFramesWidget(qw.QWidget, Ui_RegionsLinesFramesWidget):
             return
 
         for i in range(result.number_of_regions):
-            text = f"region {i}"
+            text = f"region {i}:"
 
             l_count = len(result.get_lines(i))
             if l_count > 0:
@@ -170,7 +170,11 @@ class RegionsLinesFramesWidget(qw.QWidget, Ui_RegionsLinesFramesWidget):
         if tmp < 0:
             return None
 
-        return tmp
+        # convert to results index
+        item = self._linesList.item(tmp)
+        line_index = item.data(qc.Qt.UserRole)
+        print(f"rlf: line_index {line_index}")
+        return line_index
 
     def get_selected_frame(self):
         """

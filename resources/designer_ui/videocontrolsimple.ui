@@ -20,12 +20,9 @@
       <bool>false</bool>
      </property>
      <property name="text">
-      <string>First</string>
+      <string>First Frame</string>
      </property>
     </widget>
-   </item>
-   <item>
-    <widget class="QLCDNumber" name="_frameOut"/>
    </item>
    <item>
     <widget class="QPushButton" name="_lastButton">
@@ -33,9 +30,19 @@
       <bool>false</bool>
      </property>
      <property name="text">
-      <string>Last</string>
+      <string>Last Frame</string>
      </property>
     </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Frame Number:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLCDNumber" name="_frameOut"/>
    </item>
    <item>
     <spacer name="horizontalSpacer">

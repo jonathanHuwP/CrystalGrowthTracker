@@ -241,7 +241,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 return
 
             backup, back_file = self.check_for_backup(dir_name, project["proj_name"])
-            
+
             # check for a recent backup
             if backup is not None:
                 message = "A more recent backup exists, do you want to recover?"
@@ -264,7 +264,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self._autosave = CGTAutoSave.make_autosave_from_project(self._project)
             self._project.reset_changed()
             self.project_created_or_loaded()
-            
+
     def check_for_backup(self, dir_name, proj_name):
         """
         check if directory holds autosave backup
@@ -369,7 +369,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         if self._autosave is not None:
             self._autosave.erase_data()
-            
+
         message = "Project saved to: {}".format(self._project["proj_full_path"])
         qw.QMessageBox.information(self, "CGT File", message)
 
@@ -505,7 +505,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             project['raw_video_no_extension'] = raw_video.stem
 
         project["results"] = VideoAnalysisResultsStore()
-        
+
         self._project = project
         self.save_project()
         self._autosave = CGTAutoSave.make_autosave_and_save_from_project(project)
@@ -592,7 +592,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._project["results"].add_region(region)
         self._drawingWidget.new_region()
         self.autosave()
-        
+
     def append_lines(self, region_index, lines):
         """
         add a list of lines to a region
@@ -607,7 +607,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         print(f"CGTMain: Append Lines {lines} to {region_index}")
         for line in lines:
             self._project["results"].add_line(region_index, line)
-            
+
         #TODO rename new_region as new_data
         self._drawingWidget.new_region()
         self.autosave()
@@ -755,7 +755,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self.deleteLater()
 
             # remove the binary backup if there is no unsaved data
-            if not self.has_unsaved_data():
+            if not self.has_unsaved_data() and self._autosave is not None:
                 self._autosave.clean_up()
 
         else:

@@ -178,17 +178,18 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         """
         lines = []
         results = self._data_source.get_result()
-        start = len(results.get_lines(self._current_region))
+        current_region = self._rlfWidget.get_selected_region()
+        start = len(results.get_lines(current_region))
 
         for count, line_segment in enumerate(self._drawing.lines_base):
-            note = str(self._current_region)+"-"+str(count + start)
+            note = str(current_region)+"-"+str(count + start)
             note += ":"+str(self._videoControl.get_current_frame())
             line = Line(note)
             line.add_line_segment(self._videoControl.get_current_frame(),
                                   line_segment)
             lines.append(line)
 
-        self._data_source.append_lines(self._current_region, lines)
+        self._data_source.append_lines(current_region, lines)
         self._drawing.clear_all()
         self._drawing.redisplay()
 

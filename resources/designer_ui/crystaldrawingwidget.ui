@@ -170,7 +170,7 @@
      <item>
       <widget class="QCheckBox" name="_labelsBox">
        <property name="text">
-        <string>Show Labels</string>
+        <string>Show Frames</string>
        </property>
       </widget>
      </item>
