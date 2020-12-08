@@ -145,9 +145,19 @@
       </widget>
      </item>
      <item>
-      <widget class="QRadioButton" name="_adjustButton">
+      <widget class="QRadioButton" name="_adjustNewButton">
        <property name="text">
-        <string>Adjust</string>
+        <string>Adjust New</string>
+       </property>
+       <attribute name="buttonGroup">
+        <string notr="true">_stateButtonGroup</string>
+       </attribute>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="_moveButton">
+       <property name="text">
+        <string>Move</string>
        </property>
        <attribute name="buttonGroup">
         <string notr="true">_stateButtonGroup</string>

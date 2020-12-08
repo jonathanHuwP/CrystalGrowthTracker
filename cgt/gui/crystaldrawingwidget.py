@@ -142,8 +142,10 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         """
         if self._createButton.isChecked():
             self._drawing.set_drawing()
-        elif self._adjustButton.isChecked():
+        elif self._adjustNewButton.isChecked():
             self._drawing.set_adjusting()
+        elif self._moveButton.isChecked():
+            self._drawing.set_moving()
 
     @qc.pyqtSlot()
     def labels_toggled(self):

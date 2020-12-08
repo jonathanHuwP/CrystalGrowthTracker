@@ -38,29 +38,32 @@ class WidgetState(IntEnum):
     """
     the state of the users interaction
     """
-
     ## the user will create a new line by downclick and drag
     DRAWING = 10
 
-    ## the user will select a line and adjust the whole line or an endpoint
+    ## the user will select a drawn, but not committed, line and adjust the whole line or an endpoint
     ADJUSTING = 20
+
+    ## the will select a line committed to  the results and move it
+    MOVING = 30
 
 class StorageState(IntEnum):
     """
     the state of the line storage
     """
-
     ## new lines are added to the current set
     CREATING_LINES = 10
 
     ## the adjusted lines are copyed to a new set
     COPYING_LINES = 20
 
+    ## the adjusted lines are copyed to back to the source line in data source
+    MOVING_LINES = 30
+
 class AdjustingState(IntEnum):
     """
     records what part of a line the user is adjusting
     """
-
     ## the whole line should move
     LINE = 10
 
@@ -227,6 +230,16 @@ class DrawingLabel(qw.QLabel):
         """
         self._state = WidgetState.DRAWING
 
+    def set_moving(self):
+        """
+        set the Drawing/Adjusting state to Adjusting
+
+            Returns:
+                None
+        """
+        self._state = WidgetState.MOVING
+        print("State MOVING")
+
     def set_adjusting(self):
         """
         set the Drawing/Adjusting state to Adjusting
@@ -301,7 +314,7 @@ class DrawingLabel(qw.QLabel):
             else:
                 pass
             self.redisplay()
-        else:
+        elif self._state == WidgetState.ADJUSTING:
             if event.button() == qc.Qt.LeftButton:
                 pick = self.pick_artifact(event.pos())
 
@@ -318,8 +331,21 @@ class DrawingLabel(qw.QLabel):
                     else:
                         self._start = None
                         self._adjust_line = AdjustingState.END
+        elif self._state == WidgetState.MOVING:
+            if event.button() == qc.Qt.LeftButton:
+                pick = self.pick_line_segment(event.pos())
+                print(f"Found segment {pick}")
 
-            self.redisplay()
+        self.redisplay()
+
+    def pick_line_segment(self, position, radius=5):
+        print("pick line segment")
+
+        line = self.test_lines_moving(position, radius)
+        if line is not None:
+            return line
+
+        return None
 
     def pick_artifact(self, position, radius=5):
         """
@@ -438,6 +464,40 @@ class DrawingLabel(qw.QLabel):
 
         if len(lines) > 1:
             return (lines[np.argmin(distances)], None)
+
+        return None
+
+    def test_lines_moving(self, position, radius):
+        """
+        find if a line segment lies within radius of the a given point
+
+            Args:
+            position (QPoint) the target point
+
+            radius (int) the distance in pixels around the selected pixel that is significant
+
+            Returns
+                if line found a tuple (<line array index>, None) else None
+        """
+        frames = []
+        distances = []
+
+        for key in self._display_line.keys():
+            line_seg = self._display_line[key].scale(self._current_zoom)
+            dist_to_line = line_seg.distance_point_to_line(position)
+            if dist_to_line < radius:
+                point = ImagePoint(position.x(), position.y())
+                close_points = line_seg.is_closest_point_on_segment(point)
+                if close_points[0]:
+                    frames.append(key)
+                    distances.append(dist_to_line)
+
+        if len(frames) == 1:
+            return (self._display_line[frames[0]], None)
+
+        if len(frames) > 1:
+            key = frames[np.argmin(distances)]
+            return (self._display_line[key], None)
 
         return None
 
