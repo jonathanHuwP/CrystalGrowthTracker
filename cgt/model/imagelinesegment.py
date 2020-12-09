@@ -76,11 +76,11 @@ class ImageLineSegment(ImageLineBase):
             Returns:
                 shifted copy of line segment (ImageLineSegment)
         """
-        start_x = self.start.x + shift_vector.x
-        start_y = self.start.y + shift_vector.y
+        start_x = np.uint32(self.start.x + shift_vector.x)
+        start_y = np.uint32(self.start.y + shift_vector.y)
 
-        end_x = self.end.x + shift_vector.x
-        end_y = self.end.y + shift_vector.y
+        end_x = np.uint32(self.end.x + shift_vector.x)
+        end_y = np.uint32(self.end.y + shift_vector.y)
 
         start = ImagePoint(start_x, start_y)
         end = ImagePoint(end_x, end_y)
