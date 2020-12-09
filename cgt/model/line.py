@@ -90,7 +90,8 @@ class Line(dict):
         if the object has less than two lines
 
             Returns:
-                the motion of the line in pixels (list(ImageLineDifference))
+                a list holding, for each time step, a tuple
+                consisting of (<time interval in frames>, ImageLineDifference)
         """
         differences = []
         if len(self) < 2:

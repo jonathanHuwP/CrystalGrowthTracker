@@ -151,7 +151,6 @@ class CGTProject(dict):
         self["resolution"] = np.float64(float(self["resolution"]))
         self["frame_rate"] = np.float64(float(self["frame_rate"]))
 
-
     def __setitem__(self, item, value):
         """
         override setitem to allow changs flag to be set on any data change
