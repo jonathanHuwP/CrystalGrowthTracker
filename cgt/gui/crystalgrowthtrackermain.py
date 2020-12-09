@@ -721,6 +721,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 print(line)
                 differences = line.get_differences()
                 for diff in differences:
+                    print(f"av: {type(diff[1].average)}; time: {type(diff[0])}, scale: {type(scale)}, fps: {type(fps)}")
                     distance = diff[1].average*scale
                     time = diff[0]/fps
                     print(f"\t{distance/time}")

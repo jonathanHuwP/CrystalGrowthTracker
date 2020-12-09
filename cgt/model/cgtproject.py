@@ -148,8 +148,16 @@ class CGTProject(dict):
         """
         ensure that numeric data is converted from string on load from file
         """
+        tr = type(self["resolution"])
+        tf = type(self["frame_rate"])
+        print(f"numeric res: {tr} fr: {tf}")
+
         self["resolution"] = np.float64(float(self["resolution"]))
         self["frame_rate"] = np.float64(float(self["frame_rate"]))
+
+        tr2 = type(self["resolution"])
+        tf2 = type(self["frame_rate"])
+        print(f"numeric res: {tr2} fr: {tf2}")
 
     def __setitem__(self, item, value):
         """
