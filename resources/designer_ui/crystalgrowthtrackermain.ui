@@ -78,6 +78,8 @@
     <addaction name="_actionSaveReport"/>
     <addaction name="_actionSaveProject"/>
     <addaction name="separator"/>
+    <addaction name="_actionPrintResults"/>
+    <addaction name="separator"/>
     <addaction name="_actionExit"/>
    </widget>
    <addaction name="menuOpen"/>
@@ -106,6 +108,11 @@
   <action name="_actionSaveReport">
    <property name="text">
     <string>Save Report</string>
+   </property>
+  </action>
+  <action name="_actionPrintResults">
+   <property name="text">
+    <string>Print Results</string>
    </property>
   </action>
  </widget>
@@ -200,6 +207,22 @@
     <hint type="sourcelabel">
      <x>871</x>
      <y>522</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>470</x>
+     <y>291</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_actionPrintResults</sender>
+   <signal>triggered()</signal>
+   <receiver>CrystalGrowthTrackerMain</receiver>
+   <slot>print_results()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
     </hint>
     <hint type="destinationlabel">
      <x>470</x>

@@ -25,7 +25,7 @@ class VideoAnalysisResultsStore:
     """
     a storage class that records the results of a video analysis
     """
-    def __init__(self, regions=None, crystals=None, region_crystal=None):
+    def __init__(self, regions=None):
         """
         initalize an object
 
@@ -33,31 +33,22 @@ class VideoAnalysisResultsStore:
                 video (video_source) description of the original video sequence
 
                 regions ([Region]) the region objects
-
-                crystals ([Crystal]) the crystal object
-
-                region_crystal ([(int, int)] a mapping (<region index>, <crystal index>)
         """
         ## storage for the regions
         self._regions = []
 
-        if regions is not None:
-            self._regions = regions
-
-        ## storage for the crystals
-        self._crystals = []
-
-        if crystals is not None:
-            self._crystals = crystals
-
-        ## a bi-dirctional mapping of regions and crystals to each other
-        self._region_crystal = []
-
-        if region_crystal is not None:
-            self._region_crystal = region_crystal
+        ## storage for the lines
+        self._lines = []
 
         ## flag to indicate store has been changed
         self._changed = False
+
+        ## association of regions to lines
+        self._region_line_association = RegionLineAssociation()
+
+        if regions is not None:
+            self._regions = regions
+            self._changed = True
 
     def has_been_changed(self):
         """
@@ -95,26 +86,6 @@ class VideoAnalysisResultsStore:
                 regions array
         """
         return self._regions
-
-    @property
-    def crystals(self):
-        """
-        getter for the crystals array
-
-            Returns:
-                crystals array
-        """
-        return self._crystals
-
-    @property
-    def region_crystal(self):
-        """
-        getter for the regions crystals mapping array
-
-            Returns:
-                regions crystals mapping array
-        """
-        return self._region_crystal
 
     def reserve_regions(self, size):
         """
@@ -161,47 +132,13 @@ class VideoAnalysisResultsStore:
 
         return index
 
-    def reserve_crystals(self, size):
-        """
-        set the size of the crystals array, will overwrite all existing enteries
+    @property
+    def lines(self):
+        return self._lines
 
-            Args:
-                size (int) the desired size
-
-            Returns:
-                None
-        """
-        self._crystals.extend(['']*size)
-
-    def insert_crystal(self, crystal, index):
-        """
-        insert a crystal at a specified index in the regions array, will overwrite existing
-
-            Args:
-                crystal (Crystal) the crystal to be added
-                index (int) the index at which the crystal is to be located
-
-            Returns:
-                None
-
-            Throws:
-                IndexError if index out of range
-        """
-        self._crystals[index] = crystal
-        self.set_changed()
-
-    def add_crystal(self, crystal, region_index):
-        """
-        add a crystal and the index of its associated region to the store,
-
-            Args:
-                crystal (Crystal) the crystal object to be added
-                region_index (int) the array index of the associated region
-        """
-        c_index = len(self._crystals)
-        self._crystals.append(crystal)
-        self._region_crystal.append((region_index, c_index))
-        self.set_changed()
+    @property
+    def region_lines_association(self):
+        return self._region_line_association
 
     @property
     def number_of_regions(self):
@@ -213,49 +150,115 @@ class VideoAnalysisResultsStore:
         """
         return len(self._regions)
 
-    @property
-    def number_of_crystals(self):
+    def get_lines(self, region_index):
         """
-        getter for a list crystals
-
-            Returns:
-                list crystals
-        """
-        return len(self._crystals)
-
-    def get_crystals(self, region_index):
-        """
-        getter for crystals in a region
+        get all the lines associated with region at region_index
 
             Args:
-                region_index the array index of the region
+                region_index (int) the array index of the region
 
             Returns:
-                a list of the crystal belonging to the region
-
-            Throws:
-                IndexError: if out of range
+                a list of lines in the region
         """
-        lst = []
+        lines = []
+        line_indices = self._region_line_association.get_lines_for_region(region_index)
 
-        for i in self._region_crystal:
-            if i[0] == region_index:
-                lst.append(self.crystals[i[1]])
+        if len(line_indices) < 1:
+            return lines
 
-        return lst
+        for i in line_indices:
+            lines.append(self._lines[i])
 
-    def get_region(self, crystal_index):
+        return lines
+
+    def get_lines_and_indices(self, region_index):
         """
-        getter for the region holding a crystal, and its array index
+        get all the lines, and their list indices, associated with region at region_index
 
             Args:
-                crystal_index (int) the array index of the crystal
+                region_index (int) the array index of the region
 
             Returns:
-                the region holding the crystal, the array index of the region
+                a list of (line_index, line) of lines in the region
         """
-        for i in self._region_crystal:
-            if i[1] == crystal_index:
-                return self._regions[i[0]], i[0]
+        tmp = []
+        line_indices = self._region_line_association.get_lines_for_region(region_index)
 
-        return None, None
+        if len(line_indices) < 1:
+            return tmp
+
+        for i in line_indices:
+            tmp.append((i, self._lines[i]))
+
+        return tmp
+
+    def add_line(self, region_index, line):
+        """
+        add a line
+
+            Args:
+                region_index (int) the array index of the line
+                line (Line) the line to be added
+
+            Returns:
+                None
+        """
+        self._lines.append(line)
+        line_index = len(self._lines)-1
+        self._region_line_association.add_association(region_index, line_index)
+        self.set_changed()
+
+class RegionLineAssociation(list):
+    """
+    array of pairs associating regions, with lines, each line
+    must appear only once, it the the users respocibility to
+    enforce this
+    """
+    def __init__(self):
+        pass
+
+    def add_association(self, region_index, line_index):
+        """
+        add a region line association
+
+            Args:
+                region_index (int) the array index of the region
+                line_index (int) the array index of the region
+
+            Returns:
+                None
+        """
+        self.append((region_index, line_index))
+
+    def get_region(self, line_index):
+        """
+        get a region given the index of the line
+
+            Args:
+                line_index (int) the array index of the line
+
+            Returns:
+                the array index of the region, or None if line is unknown
+        """
+        for tmp in self:
+            if tmp[1] == line_index:
+                return tmp[0]
+
+        return None
+
+    def get_lines_for_region(self, region_index):
+        """
+        get the lines in a region
+
+            Args:
+                region_index (int) the array index of the region
+
+            Returns:
+                a list of the the array indecies of the lines in the region
+        """
+        tmp = []
+        for pair in self:
+            if pair[0] == region_index:
+                tmp.append(pair[1])
+
+        return tmp

@@ -27,9 +27,9 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
 
 from cgt.model.linesetsandframesstore import LineSetsAndFramesStore
+from cgt.model.line import Line
 
 from cgt.gui.drawinglabel import DrawingLabel
-from cgt.model.crystal import Crystal
 
 from cgt.gui.Ui_crystaldrawingwidget import Ui_CrystalDrawingWidget
 
@@ -58,13 +58,6 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         self._translated_name = self.tr("CrystalDrawingWidget")
         self.setupUi(self)
 
-
-        ## an ArtifctStore for testing
-        self._store = LineSetsAndFramesStore()
-
-        ## store the the region being viewed
-        self._current_region = None
-
         ## the drawing label
         self._drawing = DrawingLabel(self._scrollArea)
         self._scrollArea.setWidget(self._drawing)
@@ -73,18 +66,22 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         self._videoControl.frame_changed.connect(self.frame_changed)
 
         # set data source for tree widget
-        self._treeWidget.set_data_source(data_source)
-        
+        self._rlfWidget.set_data_source(data_source)
+
+        # connect the signals for the user selecting a region
+        self._rlfWidget.user_region_selection.connect(self.select_region)
+        self._rlfWidget.user_line_selection.connect(self.select_line)
+        self._rlfWidget.user_frame_selection.connect(self.select_frame)
+
     def clear(self):
         """
         clear the contents
-        
+
             Return:
                 None
         """
         self._store = LineSetsAndFramesStore()
-        self._current_region = None
-        self._treeWidget.clear()
+        self._rlfWidget.clear()
         self._drawing.clear()
 
     def set_data_source(self, data_source):
@@ -106,26 +103,34 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
-        if self._current_region is None:
+        region_index = self._rlfWidget.get_selected_region()
+        if region_index is None:
             return
 
         frame = self._videoControl.get_current_frame()
+        line_index = self._rlfWidget.get_selected_line()
 
-        pixmap = self._data_source.make_pixmap(self._current_region, frame)
+        pixmap = self._data_source.make_pixmap(region_index, frame)
 
-        self._drawing.set_backgroud_pixmap(pixmap)
+        self._drawing.set_backgroud_pixmap(pixmap, frame)
+        if line_index is not None:
+            line = self._data_source.get_result().lines[line_index]
+            self._drawing.set_display_line(line)
+        else:
+            self._drawing.set_display_line(None)
+
         self._drawing.redisplay()
 
     def new_region(self):
         """
-        called by data_source to indicate a new region has been added, index added to spin box
+        called by data_source to indicate a new region has been added
 
             Returns:
                 None
         """
-        self._treeWidget.blockSignals(True)
-        self._treeWidget.fill_tree()
-        self._treeWidget.blockSignals(False)
+        self._rlfWidget.blockSignals(True)
+        self._rlfWidget.display_regions()
+        self._rlfWidget.blockSignals(False)
 
     @qc.pyqtSlot()
     def state_toggle(self):
@@ -137,8 +142,10 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         """
         if self._createButton.isChecked():
             self._drawing.set_drawing()
-        elif self._adjustButton.isChecked():
+        elif self._adjustNewButton.isChecked():
             self._drawing.set_adjusting()
+        elif self._moveButton.isChecked():
+            self._drawing.set_moving()
 
     @qc.pyqtSlot()
     def labels_toggled(self):
@@ -154,35 +161,38 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             self._drawing.show_labels(False)
 
     @qc.pyqtSlot()
-    def clear_crystal(self):
+    def store_new_lines(self):
         """
-        clear the current crystal
+        start a new set of lines
 
             Returns:
                 None
         """
-        print("clear_crystal {}".format(id(self)))
+        lines = []
+        results = self._data_source.get_result()
+        current_region = self._rlfWidget.get_selected_region()
+        start = len(results.get_lines(current_region))
+
+        for count, line_segment in enumerate(self._drawing.lines_base):
+            note = str(current_region)+"-"+str(count + start)
+            line = Line(note)
+            frame = self._videoControl.get_current_frame()
+            line.add_line_segment(frame, line_segment)
+            lines.append(line)
+
+        self._data_source.append_lines(current_region, lines)
+        self._drawing.clear_all()
+        self._drawing.redisplay()
 
     @qc.pyqtSlot()
-    def add_crystal(self):
+    def clear_drawing(self):
         """
-        add the curren crystal to the results
+        clear a selected line or line segments
 
             Returns:
                 None
         """
-        print("add_crystal {}".format(id(self)))
-        self.save_crystal()
-
-    @qc.pyqtSlot()
-    def start_new_crystal(self):
-        """
-        start a new crystal
-
-            Returns:
-                None
-        """
-        print("start_new_crystal {}".format(id(self)))
+        self._drawing.clear_all()
 
     @qc.pyqtSlot()
     def frame_changed(self):
@@ -217,7 +227,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         if self._data_source is not None:
             if self._data_source.get_video_reader() is not None:
                 if len(self._data_source.get_result().regions) > 0:
-                    self._videoControl.enable(True)
+                    self._videoControl.setEnabled(True)
                     self.display_region()
 
     @qc.pyqtSlot()
@@ -229,8 +239,9 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
                 None
         """
         qw.QWidget.hideEvent(self, event)
-        self._videoControl.enable(False)
+        self._videoControl.setEnabled(False)
 
+    @qc.pyqtSlot(int)
     def select_region(self, r_index):
         """
         a region has been selected
@@ -241,122 +252,46 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
-        print("CrystalDrawingWidget Region {}".format(r_index))
-
-        if r_index == self._current_region:
-            return
-
         # TODO put test and save in seperate function
         # has label got unsaved lines?
         if len(self._drawing.lines_base) > 0:
-            message = "You have unsaved data do you wish to save?"
+            message = "You have unsaved data do you wish to proceeed?"
             reply = qw.QMessageBox.question(self, "Data loss?", message)
 
-            if reply == qw.QMessageBox.Yes:
-                self.save_crystal()
+            if reply == qw.QMessageBox.No:
+                return
 
         self._drawing.clear_all()
 
-        self._current_region = r_index
         region = self._data_source.get_result().regions[r_index]
 
         self._videoControl.set_range(region.start_frame, region.end_frame)
+        self._videoControl.setEnabled(True)
         self.display_region()
 
-    def save_crystal(self):
-        """
-        get a crystal from drawing and add it to the results in main
-
-            Returns:
-                None
-        """
-        note = qw.QInputDialog.getText(self, "Crystal Note", "If needed add note.")
-        
-        if note[1]:
-            crystal = Crystal(notes=note[0])
-            
-        lines = []
-        for line in self._drawing.lines_base:
-            print("\tadding: {}".format(line))
-            lines.append(line)
-
-        crystal.add_faces(lines, self._videoControl.get_current_frame())
-
-        results = self._data_source.get_result()
-        results.add_crystal(crystal, self._current_region)
-        self._drawing.clear_all()
-        self._treeWidget.fill_tree()
-
-    def select_crystal(self, r_index, c_index):
-        """
-        a crystal has been selected
-
-            Args:
-                r_index (int) the array index of the region
-                c_indes (int) the array index of the crystal
-
-            Returns:
-                None
-        """
-        print("CrystalDrawingWidget Region {}, Crystal {}".format(r_index, c_index))
-
-    def select_frame(self, r_index, c_index, f_index):
-        """
-        a frame number has been selected
-
-            Args:
-                r_index (int) the array index of the region
-                c_indes (int) the array index of the crystal
-                f_indes (int) the array index of the frame number
-
-
-            Returns:
-                None
-        """
-        print("CrystalDrawingWidget.select_frame Region {}, Crystal {}, Frame {}".format(r_index, c_index, f_index))
-        if self._current_region != r_index:
-            self.select_region(r_index)
-            print("changed region")
-        else:
-            # TODO add test and save function
-            self._drawing.clear_all()
-            print("clear all")
-
-        results = self._data_source.get_result()
-        crystals = results.get_crystals(r_index)
-        crystal = crystals[c_index]
-        lines = crystal.faces_in_frame(f_index)
-        self._videoControl.set_frame(f_index)
-        self._drawing.set_lines_base(lines)
-
-    def select_line(self, r_index, c_index, f_index, l_index):
+    @qc.pyqtSlot(int)
+    def select_line(self, l_index):
         """
         a line has been selected
 
             Args:
                 r_index (int) the array index of the region
-                c_indes (int) the array index of the crystal
-                f_indes (int) the array index of the frame number
-                l_index (int) the array index of the line
 
             Returns:
                 None
         """
-        print("CrystalDrawingWidget Region {}, Crystal {}, Frame {}, Line {}".format(r_index, c_index, f_index, l_index))
+        # TODO send l_index to self._drawing
+        #region = self._rlfWidget.get_selected_region()
+        self.display_region()
 
+    def select_frame(self, frame):
+        """
+        a frame number has been selected
 
-def run():
-    """
-    use a local function to make an isolated the QApplication object
+            Args:
+                frame (int) the frame number
 
-        Returns:
-            None
-    """
-    app = qw.QApplication(sys.argv)
-
-    window = CrystalDrawingWidget()
-    window.show()
-    app.exec_()
-        
-if __name__ == "__main__":
-    run()
+            Returns:
+                None
+        """
+        print(f"CrystalDrawingWidget select_frame {frame}")

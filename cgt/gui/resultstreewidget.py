@@ -34,14 +34,11 @@ class ResultType(IntEnum):
     ## the item represents a region
     REGION = 0
 
-    ## the item represents a crystal
-    CRYSTAL = 10
-
-    ## the set of lines at a given time
-    FRAME_NUMBER = 20
-
     ## the item represents a line
-    LINE = 30
+    LINE = 8
+
+    ## the item represents a frame
+    FRAME = 16
 
 class ResultsTreeWidget(qw.QWidget, Ui_ResultsTreeWidget):
     """
@@ -65,7 +62,7 @@ class ResultsTreeWidget(qw.QWidget, Ui_ResultsTreeWidget):
         self._data_source = data_source
 
         # set up the tree and display
-        h_list = ["Region", "Crystal", "Time", "Line"]
+        h_list = ["Region", "Line", "Frame"]
         self._tree.setColumnCount(len(h_list))
         self._tree.setHeaderLabels(h_list)
 
@@ -95,67 +92,49 @@ class ResultsTreeWidget(qw.QWidget, Ui_ResultsTreeWidget):
 
         if item_type == ResultType.REGION:
             self.region_selected(item)
-        elif item_type == ResultType.CRYSTAL:
-            self.crystal_selected(item)
-        elif item_type == ResultType.FRAME_NUMBER:
+        elif item_type == ResultType.FRAME:
             self.frame_selected(item)
         elif item_type == ResultType.LINE:
             self.line_selected(item)
 
     def region_selected(self, item):
         """
-        a line has been selected
+        the user has selected a region
 
             Returns:
                 None
         """
         r_index = item.data(0, qc.Qt.UserRole)
-        print("region {}".format(r_index))
+        print(f"TW selected >>>> region {r_index}")
         if self.parent() is not None:
             self.parent().parent().select_region(r_index)
-
-    def crystal_selected(self, item):
-        """
-        a line has been selected
-
-            Returns:
-                None
-        """
-        r_index = item.data(0, qc.Qt.UserRole)
-        c_index = item.data(1, qc.Qt.UserRole)
-        print("region {}, crystal {}".format(r_index, c_index))
-        if self.parent() is not None:
-            self.parent().parent().select_crystal(r_index, c_index)
-
-    def frame_selected(self, item):
-        """
-        a line has been selected
-
-            Returns:
-                None
-        """
-        r_index = item.data(0, qc.Qt.UserRole)
-        c_index = item.data(1, qc.Qt.UserRole)
-        f_index = item.data(2, qc.Qt.UserRole)
-        print("region {}, crystal {}, frame {}".format(r_index, c_index, f_index))
-        if self.parent() is not None:
-            self.parent().parent().select_frame(r_index, c_index, f_index)
-
+            
     def line_selected(self, item):
         """
-        a line has been selected
+        the user has selected a line
 
             Returns:
                 None
         """
         r_index = item.data(0, qc.Qt.UserRole)
-        c_index = item.data(1, qc.Qt.UserRole)
-        f_index = item.data(2, qc.Qt.UserRole)
-        l_index = item.data(3, qc.Qt.UserRole)
-        print("region {}, crystal {}, frame, {}, line {}".format(
-            r_index, c_index, f_index, l_index))
+        l_index = item.data(1, qc.Qt.UserRole)
+        print("TW selected >>>> region {r_index}, line {l_index}")
         if self.parent() is not None:
-            self.parent().parent().select_line(r_index, c_index, f_index, l_index)
+            self.parent().parent().select_line(r_index, l_index)
+            
+    def frame_selected(self, item):
+        """
+        the user has selected a frame
+
+            Returns:
+                None
+        """
+        r_index = item.data(0, qc.Qt.UserRole)
+        l_index = item.data(1, qc.Qt.UserRole)
+        f_index = item.data(2, qc.Qt.UserRole)
+        print(f"TW selected >>>> region {r_index}, line {l_index}, frame {f_index}")
+        if self.parent() is not None:
+            self.parent().parent().select_frame(r_index, l_index, f_index)
 
     def fill_tree(self):
         """
@@ -182,26 +161,18 @@ class ResultsTreeWidget(qw.QWidget, Ui_ResultsTreeWidget):
             r_item.setData(0, qc.Qt.UserRole, r_var)
             items.append(r_item)
 
-            for c_index, crystal in enumerate(result.get_crystals(r_index)):
-                c_item = qw.QTreeWidgetItem(r_item, ["", str(c_index)], ResultType.CRYSTAL)
-                c_var = qc.QVariant(c_index)
-                c_item.setData(0, qc.Qt.UserRole, r_var)
-                c_item.setData(1, qc.Qt.UserRole, c_var)
+            for l_index, line in enumerate(result.get_lines(r_index)):
+                l_item = qw.QTreeWidgetItem(r_item, ["", str(l_index)], ResultType.LINE)
+                l_var = qc.QVariant(l_index)
+                l_item.setData(0, qc.Qt.UserRole, r_var)
+                l_item.setData(1, qc.Qt.UserRole, l_var)
 
-                for frame_number in crystal.list_of_frame_numbers:
-                    f_item = qw.QTreeWidgetItem(c_item, ["", "", str(frame_number)], ResultType.FRAME_NUMBER)
+                for frame_number in line.frame_numbers:
+                    f_item = qw.QTreeWidgetItem(l_item, ["", "", str(frame_number)], ResultType.FRAME)
                     f_var = qc.QVariant(frame_number)
                     f_item.setData(0, qc.Qt.UserRole, r_var)
-                    f_item.setData(1, qc.Qt.UserRole, c_var)
+                    f_item.setData(1, qc.Qt.UserRole, l_var)
                     f_item.setData(2, qc.Qt.UserRole, f_var)
-
-                    for l_index, line in enumerate(crystal.faces_in_frame(frame_number)):
-                        l_item = qw.QTreeWidgetItem(c_item, ["", "", "", str(l_index)], ResultType.LINE)
-                        l_var = qc.QVariant(l_index)
-                        l_item.setData(0, qc.Qt.UserRole, r_var)
-                        l_item.setData(1, qc.Qt.UserRole, c_var)
-                        l_item.setData(2, qc.Qt.UserRole, f_var)
-                        l_item.setData(3, qc.Qt.UserRole, l_var)
 
         self._tree.addTopLevelItems(items)
 

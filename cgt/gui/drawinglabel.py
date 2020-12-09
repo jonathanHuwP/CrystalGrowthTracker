@@ -38,29 +38,32 @@ class WidgetState(IntEnum):
     """
     the state of the users interaction
     """
-
     ## the user will create a new line by downclick and drag
     DRAWING = 10
 
-    ## the user will select a line and adjust the whole line or an endpoint
+    ## the user will select a drawn, but not committed, line and adjust the whole line or an endpoint
     ADJUSTING = 20
+
+    ## the will select a line committed to  the results and move it
+    MOVING = 30
 
 class StorageState(IntEnum):
     """
     the state of the line storage
     """
-
     ## new lines are added to the current set
     CREATING_LINES = 10
 
     ## the adjusted lines are copyed to a new set
     COPYING_LINES = 20
 
+    ## the adjusted lines are copyed to back to the source line in data source
+    MOVING_LINES = 30
+
 class AdjustingState(IntEnum):
     """
     records what part of a line the user is adjusting
     """
-
     ## the whole line should move
     LINE = 10
 
@@ -94,9 +97,7 @@ class DrawingLabel(qw.QLabel):
             Args:
                 parent (QObject) the parent Object
         """
-        super(qw.QLabel, self).__init__()
-        ## pointer to the parent object
-        self._parent = parent
+        super().__init__(parent)
 
         ## the class name as in translation, used in dialogs
         self._translated_name = self.tr("DrawingLabel")
@@ -138,14 +139,24 @@ class DrawingLabel(qw.QLabel):
         ## array for the created lines or the base from which the lines are being adjusted
         self._lines_base = []
 
+        # TODO replace with call to data_store
         ## array for the new lines resulting from adjustment
         self._lines_new = []
 
         ## the line being worked on, is created by mouse move or mouse release events
         self._current_line = None
 
+        ## the original line segment when moving
+        self._moving_line_segment = None
+
         ## the pixmap on which we are to draw
         self._background_pixmap = None
+
+        ## the frame number of the pixmap
+        self._current_frame = 0
+
+        ## the line in the results to be displayed
+        self._display_line = None
 
         self.setAlignment(
             qc.Qt.AlignTop | qc.Qt.AlignLeft)
@@ -154,7 +165,7 @@ class DrawingLabel(qw.QLabel):
         self.setSizePolicy(
             qw.QSizePolicy.Minimum, qw.QSizePolicy.Minimum)
 
-    def set_backgroud_pixmap(self, pix):
+    def set_backgroud_pixmap(self, pix, frame):
         """
         set the pixmap to be displayed
 
@@ -165,6 +176,7 @@ class DrawingLabel(qw.QLabel):
                 None
         """
         self._background_pixmap = pix
+        self._current_frame = frame
 
     @property
     def state(self):
@@ -223,7 +235,24 @@ class DrawingLabel(qw.QLabel):
             Returns:
                 None
         """
+        if self._state == WidgetState.MOVING:
+            self._current_line = None
+            self._moving_line_segment = None
+
         self._state = WidgetState.DRAWING
+        self.redisplay()
+
+    def set_moving(self):
+        """
+        set the Drawing/Adjusting state to Adjusting
+
+            Returns:
+                None
+        """
+        self._state = WidgetState.MOVING
+        self._current_line = None
+        self._moving_line_segment = None
+        self.redisplay()
 
     def set_adjusting(self):
         """
@@ -232,7 +261,11 @@ class DrawingLabel(qw.QLabel):
             Returns:
                 None
         """
+        if self._state == WidgetState.MOVING:
+            self._current_line = None
+            self._moving_line_segment = None
         self._state = WidgetState.ADJUSTING
+        self.redisplay()
 
     def set_creating(self):
         """
@@ -289,6 +322,9 @@ class DrawingLabel(qw.QLabel):
             Returns:
                 None
         """
+        if self._background_pixmap is None:
+            return
+
         if self._state == WidgetState.DRAWING:
             if event.button() == qc.Qt.LeftButton:
                 self._start = event.pos()
@@ -296,7 +332,7 @@ class DrawingLabel(qw.QLabel):
             else:
                 pass
             self.redisplay()
-        else:
+        elif self._state == WidgetState.ADJUSTING:
             if event.button() == qc.Qt.LeftButton:
                 pick = self.pick_artifact(event.pos())
 
@@ -313,8 +349,36 @@ class DrawingLabel(qw.QLabel):
                     else:
                         self._start = None
                         self._adjust_line = AdjustingState.END
+        elif self._state == WidgetState.MOVING:
+            if event.button() == qc.Qt.LeftButton:
+                pick = self.pick_line_segment(event.pos())
+                if pick is not None:
+                    print(f"Found segment {pick}")
+                    self._current_line = pick[0]
+                    self._moving_line_segment = pick[0]
+                    self._start = event.pos()
+                    self._mouse_left_down = True
+                else:
+                    self._start = None
 
-            self.redisplay()
+        self.redisplay()
+
+    def pick_line_segment(self, position, radius=5):
+        """
+        find if the event is picking a line segment from the displayed line
+
+            Args:
+                position (QPosition) the event position
+                radius (int) the distance from the line for a pick to apply
+
+            Returns:
+                pointer to the line or None
+        """
+        line = self.test_lines_moving(position, radius)
+        if line is not None:
+            return line
+
+        return None
 
     def pick_artifact(self, position, radius=5):
         """
@@ -436,6 +500,40 @@ class DrawingLabel(qw.QLabel):
 
         return None
 
+    def test_lines_moving(self, position, radius):
+        """
+        find if a line segment lies within radius of the a given point
+
+            Args:
+            position (QPoint) the target point
+
+            radius (int) the distance in pixels around the selected pixel that is significant
+
+            Returns
+                if line found a tuple (LineSegment, None) else None
+        """
+        frames = []
+        distances = []
+
+        for key in self._display_line.keys():
+            line_seg = self._display_line[key].scale(self._current_zoom)
+            dist_to_line = line_seg.distance_point_to_line(position)
+            if dist_to_line < radius:
+                point = ImagePoint(position.x(), position.y())
+                close_points = line_seg.is_closest_point_on_segment(point)
+                if close_points[0]:
+                    frames.append(key)
+                    distances.append(dist_to_line)
+
+        if len(frames) == 1:
+            return (self._display_line[frames[0]], None)
+
+        if len(frames) > 1:
+            key = frames[np.argmin(distances)]
+            return (self._display_line[key], None)
+
+        return None
+
     @qc.pyqtSlot()
     def mouseMoveEvent(self, event):
         """
@@ -448,13 +546,35 @@ class DrawingLabel(qw.QLabel):
             Returns:
                 None
         """
-        if self._state == WidgetState.DRAWING and self._mouse_left_down:
+        if self._background_pixmap is None or not self._mouse_left_down:
+            return
+
+        if self._state == WidgetState.DRAWING:
             self._end = event.pos()
             self.make_line()
             self.redisplay()
 
-        elif self._state == WidgetState.ADJUSTING and self._mouse_left_down:
+        elif self._state == WidgetState.ADJUSTING:
             self.alter_chosen_line(event)
+
+        elif self._state == WidgetState.MOVING:
+            self.shift_line_segment(event)
+
+    def shift_line_segment(self, event):
+        """
+        move the the currently chosen line
+
+            Args:
+                event (QEvent) the event holding coordinates and source data
+
+            Returns:
+                None
+        """
+        shift_qt = event.pos() - self._start
+        shift_vec = ImagePoint(shift_qt.x(), shift_qt.y()).scale(1.0/self._current_zoom)
+        self._current_line = self._moving_line_segment.shift(shift_vec)
+
+        self.redisplay()
 
     def alter_chosen_line(self, event):
         """
@@ -517,7 +637,10 @@ class DrawingLabel(qw.QLabel):
             Returns:
                 None
         """
+        if self._background_pixmap is None:
+            return
 
+        # TODO replace with self._left_mouse_button_down
         # ignore anything other than the left mouse button
         if not event.button() == qc.Qt.LeftButton:
             return
@@ -530,7 +653,7 @@ class DrawingLabel(qw.QLabel):
             reply = qw.QMessageBox.question(
                 self,
                 self.tr("Create Line"),
-                self.tr("Do you wish to save the line?"))
+                self.tr("Do you wish to store the line?"))
 
             if reply == qw.QMessageBox.Yes:
                 self.add_line()
@@ -542,7 +665,33 @@ class DrawingLabel(qw.QLabel):
         elif self._state == WidgetState.ADJUSTING and self._current_line is not None:
             self.adjusting_release()
 
+        elif self._state == WidgetState.MOVING and self._current_line is not None:
+            self.moving_release()
+
         self._mouse_left_down = False
+
+    def moving_release(self):
+        reply = qw.QMessageBox.question(
+            self,
+            self.tr("Move Line"),
+            self.tr("Add moved line to results?"))
+
+        if reply == qw.QMessageBox.Yes:
+            print(f"Add ({self._current_frame}, {self._current_line}) to results")
+            keys = self._display_line.keys()
+            if self._current_frame in keys:
+                qw.QMessageBox.critical(self,
+                                        self.tr("Change Frame"),
+                                        self.tr("The line is already defined for this frame."))
+                self.clear_current()
+                self.redisplay()
+                return
+
+            self._display_line.add_line_segment(self._current_frame,
+                                                self._current_line)
+
+        self.clear_current()
+        self.redisplay()
 
     def adjusting_release(self):
         """
@@ -556,7 +705,7 @@ class DrawingLabel(qw.QLabel):
         reply = qw.QMessageBox.question(
             self,
             self.tr("Adjust Line"),
-            self.tr("Do you wish to save adjusted line?"))
+            self.tr("Do you wish to store the adjusted line?"))
 
         if reply == qw.QMessageBox.Yes:
             if self._storage_state == StorageState.CREATING_LINES:
@@ -588,10 +737,8 @@ class DrawingLabel(qw.QLabel):
         end_y = np.float64(self._end.y())/zoom
         end_y = np.uint32(np.round(end_y))
 
-        self._current_line = ImageLineSegment(
-            ImagePoint(start_x, start_y),
-            ImagePoint(end_x, end_y),
-            "line")
+        self._current_line = ImageLineSegment(ImagePoint(start_x, start_y),
+                                              ImagePoint(end_x, end_y))
 
     def clear_current(self):
         """
@@ -603,6 +750,7 @@ class DrawingLabel(qw.QLabel):
         self._start = None
         self._end = None
         self._current_line = None
+        self._moving_line_segment = None
 
     def add_line(self):
         """
@@ -614,8 +762,7 @@ class DrawingLabel(qw.QLabel):
         if self._current_line is None:
             return
 
-        self._lines_base.append(
-            self._current_line.relabel(str(len(self._lines_base))))
+        self._lines_base.append(self._current_line)
 
     def set_lines_base(self, lines):
         """
@@ -662,9 +809,9 @@ class DrawingLabel(qw.QLabel):
             Returns:
                 None
         """
-        pen = qg.QPen(qg.QColor(qc.Qt.yellow), 3, qc.Qt.SolidLine)
-        red_pen = qg.QPen(qg.QColor(qc.Qt.red), 3, qc.Qt.DashLine)
         new_pen = qg.QPen(qg.QColor(qc.Qt.red), 3, qc.Qt.SolidLine)
+        adj_pen = qg.QPen(qg.QColor(qc.Qt.red), 3, qc.Qt.DashLine)
+        old_pen = qg.QPen(qg.QColor.fromRgb(0, 200, 255), 3, qc.Qt.SolidLine)
         painter = qg.QPainter()
 
         height = self._background_pixmap.height()*self._current_zoom
@@ -677,8 +824,15 @@ class DrawingLabel(qw.QLabel):
         font.setPointSize(font.pointSize() * 2)
         painter.setFont(font)
 
+        # TODO make self._current_line the source for adjustments
+
+        if self._display_line is not None:
+            painter.setPen(old_pen)
+            for line_segment in self._display_line.get_line_segments:
+                self.draw_single_line(line_segment, painter)
+
         if self._storage_state == StorageState.COPYING_LINES:
-            painter.setPen(pen)
+            painter.setPen(old_pen)
             for line in self._lines_base:
                 self.draw_single_line(line, painter, False)
 
@@ -686,12 +840,12 @@ class DrawingLabel(qw.QLabel):
             for line in self._lines_new:
                 self.draw_single_line(line, painter)
         else:
-            painter.setPen(pen)
+            painter.setPen(new_pen)
             for line in self._lines_base:
                 self.draw_single_line(line, painter)
 
         if self._current_line is not None:
-            painter.setPen(red_pen)
+            painter.setPen(adj_pen)
             zoomed = self._current_line.scale(self._current_zoom)
             qt_line = qc.QLine(
                 qc.QPoint(int(zoomed.start.x), int(zoomed.start.y)),
@@ -700,6 +854,7 @@ class DrawingLabel(qw.QLabel):
         painter.end()
 
         self.setPixmap(pix)
+
 
     def draw_single_line(self, line, painter, allow_label=True):
         """
@@ -743,7 +898,7 @@ class DrawingLabel(qw.QLabel):
             bounding_box = painter.boundingRect(
                 bounding_box,
                 qc.Qt.AlignCenter,
-                zoomed.label)
+                "text")
 
             point = zoomed.start
             location = qc.QPoint(point.x, point.y)
@@ -751,7 +906,7 @@ class DrawingLabel(qw.QLabel):
             painter.drawText(
                 bounding_box,
                 qc.Qt.AlignHorizontal_Mask | qc.Qt.AlignVertical_Mask,
-                zoomed.label)
+                "Text")
 
     def clear_all(self):
         """
@@ -763,6 +918,15 @@ class DrawingLabel(qw.QLabel):
         self._lines_base.clear()
         self._lines_new.clear()
         self.redisplay()
+
+    def set_display_line(self, line):
+        """
+        display the chosen lines, if None no display
+
+            Args:
+                line (Line) the line to be displayed
+        """
+        self._display_line = line
 
     def save(self, file):
         """

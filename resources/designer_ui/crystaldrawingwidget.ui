@@ -37,7 +37,7 @@
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <widget class="ResultsTreeWidget" name="_treeWidget" native="true">
+     <widget class="RegionsLinesFramesWidget" name="_rlfWidget" native="true">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
         <horstretch>0</horstretch>
@@ -77,7 +77,7 @@
       <enum>QLayout::SetFixedSize</enum>
      </property>
      <item>
-      <widget class="VideoControlWidget" name="_videoControl" native="true"/>
+      <widget class="VideoControlSimple" name="_videoControl" native="true"/>
      </item>
      <item>
       <spacer name="horizontalSpacer_2">
@@ -145,9 +145,9 @@
       </widget>
      </item>
      <item>
-      <widget class="QRadioButton" name="_adjustButton">
+      <widget class="QRadioButton" name="_adjustNewButton">
        <property name="text">
-        <string>Adjust</string>
+        <string>Adjust New</string>
        </property>
        <attribute name="buttonGroup">
         <string notr="true">_stateButtonGroup</string>
@@ -155,10 +155,13 @@
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="_labelsBox">
+      <widget class="QRadioButton" name="_moveButton">
        <property name="text">
-        <string>Show Labels</string>
+        <string>Move</string>
        </property>
+       <attribute name="buttonGroup">
+        <string notr="true">_stateButtonGroup</string>
+       </attribute>
       </widget>
      </item>
      <item>
@@ -174,6 +177,13 @@
        </property>
       </spacer>
      </item>
+     <item>
+      <widget class="QCheckBox" name="_labelsBox">
+       <property name="text">
+        <string>Show Frames</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
@@ -182,16 +192,16 @@
       <enum>QLayout::SetMaximumSize</enum>
      </property>
      <item>
-      <widget class="QPushButton" name="_newCrystalButton">
+      <widget class="QPushButton" name="_newLinesButton">
        <property name="text">
-        <string>New</string>
+        <string>Add New Lines</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="_clearCrystalButton">
+      <widget class="QPushButton" name="_clearSelectedButton">
        <property name="text">
-        <string>Clear</string>
+        <string>Clear Drawing</string>
        </property>
       </widget>
      </item>
@@ -208,54 +218,31 @@
        </property>
       </spacer>
      </item>
-     <item>
-      <widget class="QPushButton" name="_addCrystalButton">
-       <property name="text">
-        <string>Add</string>
-       </property>
-      </widget>
-     </item>
     </layout>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>VideoControlWidget</class>
+   <class>VideoControlSimple</class>
    <extends>QWidget</extends>
-   <header>cgt.gui.videocontrolwidget</header>
+   <header>cgt.gui.videocontrolsimple</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>ResultsTreeWidget</class>
+   <class>RegionsLinesFramesWidget</class>
    <extends>QWidget</extends>
-   <header>cgt.gui.resultstreewidget</header>
+   <header>cgt.gui.regionslinesframeswidget</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>
  <connections>
   <connection>
-   <sender>_addCrystalButton</sender>
+   <sender>_clearSelectedButton</sender>
    <signal>clicked()</signal>
    <receiver>CrystalDrawingWidget</receiver>
-   <slot>add_crystal()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>754</x>
-     <y>474</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>412</x>
-     <y>252</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>_clearCrystalButton</sender>
-   <signal>clicked()</signal>
-   <receiver>CrystalDrawingWidget</receiver>
-   <slot>clear_crystal()</slot>
+   <slot>clear_drawing()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>190</x>
@@ -268,10 +255,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>_newCrystalButton</sender>
+   <sender>_newLinesButton</sender>
    <signal>clicked()</signal>
    <receiver>CrystalDrawingWidget</receiver>
-   <slot>start_new_crystal()</slot>
+   <slot>store_new_lines()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>69</x>

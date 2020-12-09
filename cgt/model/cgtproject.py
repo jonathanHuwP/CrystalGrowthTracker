@@ -22,6 +22,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # set up linting conditions
 
 import getpass
+import numpy as np
 
 from cgt.util.utils import timestamp, find_hostname_and_ip
 
@@ -94,9 +95,6 @@ class CGTProject(dict):
         # the users notes
         self["notes"] = None
 
-        # the video frame rate
-        self["frame_rate"] = None
-
         # the results
         self["results"] = None
 
@@ -146,6 +144,13 @@ class CGTProject(dict):
         self['host'], self['ip_address'], self['operating_system'] = find_hostname_and_ip()
         self["start_user"] = getpass.getuser()
 
+    def ensure_numeric(self):
+        """
+        ensure that numeric data is converted from string on load from file
+        """
+        self["resolution"] = np.float64(float(self["resolution"]))
+        self["frame_rate"] = np.float64(float(self["frame_rate"]))
+
     def __setitem__(self, item, value):
         """
         override setitem to allow changs flag to be set on any data change
@@ -155,17 +160,16 @@ class CGTProject(dict):
         """
         super().__setitem__(item, value)
         self._changed = True
-        
+
     def set_changed(self):
         """
         set the changed flag, for use if loaded from backup file,
         or other irregular source
-        
+
             Returns:
                 None
         """
         self._changed = True
-        print(f"***** set changed {self._changed}")
 
     def reset_changed(self):
         """
@@ -178,7 +182,6 @@ class CGTProject(dict):
 
         if self["results"] is not None:
             self["results"].reset_changed()
-        print(f"***** reset changed {self._changed}")
 
     def has_been_changed(self):
         """
@@ -187,7 +190,6 @@ class CGTProject(dict):
             Return:
                 true if the dictionary contains new data else false
         """
-        print(f"**** has been changed {self._changed}")
         if self["results"] is None:
             return self._changed
 

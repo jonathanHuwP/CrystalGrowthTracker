@@ -29,6 +29,7 @@ import os
 import array as arr
 from shutil import copy2
 from imageio import get_reader as imio_get_reader
+import numpy as np
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
@@ -230,41 +231,44 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self.tr("Select the Project Directory."),
             os.path.expanduser('~'))
 
-        if dir_name != '':
-            project = CGTProject()
-            error_code = readcsvreports.read_csv_project(dir_name, project)
-            if error_code != 0:
-                message = "The project could not be loaded"
-                qw.QMessageBox.warning(self,
-                                       "CGT Error Loading Projcet",
-                                       message)
+        if dir_name == '':
+            return
+
+        project = CGTProject()
+        try:
+            readcsvreports.read_csv_project(dir_name, project)
+        except (IOError, OSError, EOFError) as exp:
+            message = f"Could not load project: {exp}"
+            qw.QMessageBox.warning(self,
+                                   "CGT Error Loading Projcet",
+                                   message)
+            return
+
+        backup, back_file = self.check_for_backup(dir_name, project["proj_name"])
+
+        # check for a recent backup
+        if backup is not None:
+            message = "A more recent backup exists, do you want to recover?"
+            reply = qw.QMessageBox.question(self,
+                                            'CrystalGrowthTracker',
+                                            message,
+                                            qw.QMessageBox.Yes | qw.QMessageBox.No,
+                                            qw.QMessageBox.No)
+            if reply == qw.QMessageBox.Yes:
+                # assign the backup
+                self._project = backup
+                # set the has changed flag
+                self._project.set_changed()
+                # ensure autosave points to the correct file
+                self._autosave = CGTAutoSave.make_autosave_from_file(back_file)
+                self.project_created_or_loaded()
                 return
 
-            backup, back_file = self.check_for_backup(dir_name, project["proj_name"])
-            
-            # check for a recent backup
-            if backup is not None:
-                message = "A more recent backup exists, do you want to recover?"
-                reply = qw.QMessageBox.question(self,
-                                                'CrystalGrowthTracker',
-                                                message,
-                                                qw.QMessageBox.Yes | qw.QMessageBox.No,
-                                                qw.QMessageBox.No)
-                if reply == qw.QMessageBox.Yes:
-                    # assign the backup
-                    self._project = backup
-                    # set the has changed flag
-                    self._project.set_changed()
-                    # ensure autosave points to the correct file
-                    self._autosave = CGTAutoSave.make_autosave_from_file(back_file)
-                    self.project_created_or_loaded()
-                    return
+        self._project = project
+        self._autosave = CGTAutoSave.make_autosave_from_project(self._project)
+        self._project.reset_changed()
+        self.project_created_or_loaded()
 
-            self._project = project
-            self._autosave = CGTAutoSave.make_autosave_from_project(self._project)
-            self._project.reset_changed()
-            self.project_created_or_loaded()
-            
     def check_for_backup(self, dir_name, proj_name):
         """
         check if directory holds autosave backup
@@ -369,7 +373,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         if self._autosave is not None:
             self._autosave.erase_data()
-            
+
         message = "Project saved to: {}".format(self._project["proj_full_path"])
         qw.QMessageBox.information(self, "CGT File", message)
 
@@ -505,7 +509,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             project['raw_video_no_extension'] = raw_video.stem
 
         project["results"] = VideoAnalysisResultsStore()
-        
+
         self._project = project
         self.save_project()
         self._autosave = CGTAutoSave.make_autosave_and_save_from_project(project)
@@ -588,8 +592,24 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 None
         """
-        print("Append region")
         self._project["results"].add_region(region)
+        self._drawingWidget.new_region()
+        self.autosave()
+
+    def append_lines(self, region_index, lines):
+        """
+        add a list of lines to a region
+
+            Args:
+                region_index (int) the array index of the region
+                lines [Line] array of lines to be added
+
+            Returns:
+                None
+        """
+        for line in lines:
+            self._project["results"].add_line(region_index, line)
+
         self._drawingWidget.new_region()
         self.autosave()
 
@@ -690,6 +710,21 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._selectWidget.show_video()
         self._drawingWidget.setEnabled(True)
 
+    qc.pyqtSlot()
+    def print_results(self):
+        scale = self._project["resolution"]
+        fps = self._project["frame_rate"]
+
+        print("Results\n=======")
+        for line in self._project["results"].lines:
+            if line.number_of_frames > 1:
+                print(line)
+                differences = line.get_differences()
+                for diff in differences:
+                    distance = diff[1].average*scale
+                    time = diff[0]/fps
+                    print(f"\t{distance/time}")
+
     def has_unsaved_data(self):
         """
         find if window is holding unsaved data
@@ -736,7 +771,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self.deleteLater()
 
             # remove the binary backup if there is no unsaved data
-            if not self.has_unsaved_data():
+            if not self.has_unsaved_data() and self._autosave is not None:
                 self._autosave.clean_up()
 
         else:

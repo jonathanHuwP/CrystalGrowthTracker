@@ -24,14 +24,12 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 import sys
 
 import PyQt5.QtWidgets as qw
+import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
-from cgt.gui.Ui_videocontrolwidget import Ui_VideoControlWidget
+from cgt.gui.Ui_videocontrolsimple import Ui_VideoControlSimple
 
-class VideoControlWidget(qw.QWidget, Ui_VideoControlWidget):
-    """
-    a widget providing a basic forward backward control for a video
-    """
+class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
 
     ## signal to indicate change of frame
     frame_changed = qc.pyqtSignal()
@@ -49,53 +47,37 @@ class VideoControlWidget(qw.QWidget, Ui_VideoControlWidget):
         super().__init__(parent)
         self.setupUi(self)
 
-        ## storage for enabled/disabled state
-        self._enabled = False
+        ## storage for the current frame
+        self._current_frame = 0
+
+        ## the maximum
+        self._frame_maximum = 0
+
+        ## the minimum
+        self._frame_minimum = 0
 
         # set disabled
-        self.enable(self._enabled)
+        self.setEnabled(False)
 
     @qc.pyqtSlot()
-    def up_clicked(self):
+    def last_clicked(self):
         """
-        callback for a click of the up button
+        callback for a click of the last frame button
 
             Returns:
                 None
         """
-        if self._frameSpinBox.value() < self._frameSpinBox.maximum():
-            self.set_frame(self._frameSpinBox.value()+1)
+        self.set_frame(self._frame_maximum)
 
     @qc.pyqtSlot()
-    def down_clicked(self):
+    def first_clicked(self):
         """
-        callback for a click of the down button
+        callback for a click of the first frame button
 
             Returns:
                 None
         """
-        if self._frameSpinBox.value() > self._frameSpinBox.minimum():
-            self.set_frame(self._frameSpinBox.value()-1)
-
-    @qc.pyqtSlot()
-    def slider_moved(self):
-        """
-        callback for motion of the slider
-
-            Returns:
-                None
-        """
-        self.set_frame(self._frameSlider.sliderPosition())
-
-    @qc.pyqtSlot()
-    def spin_box_changed(self):
-        """
-        callback for a change in the frame count slider
-
-            Returns:
-                None
-        """
-        self.set_frame(self._frameSpinBox.value())
+        self.set_frame(self._frame_minimum)
 
     def set_frame(self, frame):
         """
@@ -111,15 +93,13 @@ class VideoControlWidget(qw.QWidget, Ui_VideoControlWidget):
                 frame_changed if a change has occured
         """
         change = False
-        if self._frameSpinBox.value() != frame:
-            self._frameSpinBox.setValue(frame)
+
+        if self._current_frame != frame:
+            self._current_frame = frame
+            self._frameOut.display(self._current_frame)
             change = True
 
-        if self._frameSlider.sliderPosition() != frame:
-            self._frameSlider.setSliderPosition(frame)
-            change = True
-
-        if self.is_enabled() and change:
+        if self.isEnabled() and change:
             self.frame_changed.emit()
 
     def get_current_frame(self):
@@ -129,9 +109,9 @@ class VideoControlWidget(qw.QWidget, Ui_VideoControlWidget):
             Returns:
                 the current frame number
         """
-        return self._frameSpinBox.value()
+        return self._current_frame
 
-    def enable(self, flag = True):
+    def setEnabled(self, flag = True):
         """
         enable/disable the component widgets
 
@@ -141,20 +121,9 @@ class VideoControlWidget(qw.QWidget, Ui_VideoControlWidget):
             Returns:
                 None
         """
-        self._downButton.setEnabled(flag)
-        self._upButton.setEnabled(flag)
-        self._frameSlider.setEnabled(flag)
-        self._frameSpinBox.setEnabled(flag)
-        self._enabled = flag
-
-    def is_enabled(self):
-        """
-        getter for the enabled/disabled state
-
-            Returns:
-                (bool) enabled/disabled state
-        """
-        return self._enabled
+        super().setEnabled(flag)
+        self._firstButton.setEnabled(flag)
+        self._lastButton.setEnabled(flag)
 
     def set_range(self, minimum, maximum):
         """
@@ -166,13 +135,13 @@ class VideoControlWidget(qw.QWidget, Ui_VideoControlWidget):
             Returns:
                 None
         """
-        tmp = self.is_enabled()
-        self.enable(False)
-
-        self._frameSlider.setRange(minimum, maximum)
-        self._frameSpinBox.setRange(minimum, maximum)
-
-        self.enable(tmp)
+        tmp = self.isEnabled()
+        self.setEnabled(False)
+        self._frame_minimum = minimum
+        self._frame_maximum = maximum
+        self.set_frame(self._frame_maximum)
+        self._frameOut.display(self._current_frame)
+        self.setEnabled(tmp)
 
     def clear(self):
         """
@@ -181,14 +150,13 @@ class VideoControlWidget(qw.QWidget, Ui_VideoControlWidget):
             Returns:
                 None
         """
-        tmp = self.is_enabled()
-        self.enable(False)
+        tmp = self.isEnabled()
+        self.setEnabled(False)
 
         self.set_frame(0)
         self.set_range(0, 0)
 
-        self.enable(tmp)
-
+        self.setEnabled(tmp)
 
 def run():
     """
@@ -199,9 +167,9 @@ def run():
     """
     app = qw.QApplication(sys.argv)
 
-    window = VideoControlWidget()
+    window = VideoControlSimple()
     window.enable()
-    window.set_range(0, 25)
+    window.set_range(5, 25)
     window.show()
     app.exec_()
 
