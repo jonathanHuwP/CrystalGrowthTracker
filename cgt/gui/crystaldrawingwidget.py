@@ -112,7 +112,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
 
         pixmap = self._data_source.make_pixmap(region_index, frame)
 
-        self._drawing.set_backgroud_pixmap(pixmap)
+        self._drawing.set_backgroud_pixmap(pixmap, frame)
         if line_index is not None:
             line = self._data_source.get_result().lines[line_index]
             self._drawing.set_display_line(line)

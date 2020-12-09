@@ -146,8 +146,14 @@ class DrawingLabel(qw.QLabel):
         ## the line being worked on, is created by mouse move or mouse release events
         self._current_line = None
 
+        ## the original line segment when moving
+        self._moving_line_segment = None
+
         ## the pixmap on which we are to draw
         self._background_pixmap = None
+
+        ## the frame number of the pixmap
+        self._current_frame = 0
 
         ## the line in the results to be displayed
         self._display_line = None
@@ -159,7 +165,7 @@ class DrawingLabel(qw.QLabel):
         self.setSizePolicy(
             qw.QSizePolicy.Minimum, qw.QSizePolicy.Minimum)
 
-    def set_backgroud_pixmap(self, pix):
+    def set_backgroud_pixmap(self, pix, frame):
         """
         set the pixmap to be displayed
 
@@ -170,6 +176,7 @@ class DrawingLabel(qw.QLabel):
                 None
         """
         self._background_pixmap = pix
+        self._current_frame = frame
 
     @property
     def state(self):
@@ -228,7 +235,12 @@ class DrawingLabel(qw.QLabel):
             Returns:
                 None
         """
+        if self._state == WidgetState.MOVING:
+            self._current_line = None
+            self._moving_line_segment = None
+
         self._state = WidgetState.DRAWING
+        self.redisplay()
 
     def set_moving(self):
         """
@@ -238,7 +250,9 @@ class DrawingLabel(qw.QLabel):
                 None
         """
         self._state = WidgetState.MOVING
-        print("State MOVING")
+        self._current_line = None
+        self._moving_line_segment = None
+        self.redisplay()
 
     def set_adjusting(self):
         """
@@ -247,7 +261,11 @@ class DrawingLabel(qw.QLabel):
             Returns:
                 None
         """
+        if self._state == WidgetState.MOVING:
+            self._current_line = None
+            self._moving_line_segment = None
         self._state = WidgetState.ADJUSTING
+        self.redisplay()
 
     def set_creating(self):
         """
@@ -334,13 +352,28 @@ class DrawingLabel(qw.QLabel):
         elif self._state == WidgetState.MOVING:
             if event.button() == qc.Qt.LeftButton:
                 pick = self.pick_line_segment(event.pos())
-                print(f"Found segment {pick}")
+                if pick is not None:
+                    print(f"Found segment {pick}")
+                    self._current_line = pick[0]
+                    self._moving_line_segment = pick[0]
+                    self._start = event.pos()
+                    self._mouse_left_down = True
+                else:
+                    self._start = None
 
         self.redisplay()
 
     def pick_line_segment(self, position, radius=5):
-        print("pick line segment")
+        """
+        find if the event is picking a line segment from the displayed line
 
+            Args:
+                position (QPosition) the event position
+                radius (int) the distance from the line for a pick to apply
+
+            Returns:
+                pointer to the line or None
+        """
         line = self.test_lines_moving(position, radius)
         if line is not None:
             return line
@@ -477,7 +510,7 @@ class DrawingLabel(qw.QLabel):
             radius (int) the distance in pixels around the selected pixel that is significant
 
             Returns
-                if line found a tuple (<line array index>, None) else None
+                if line found a tuple (LineSegment, None) else None
         """
         frames = []
         distances = []
@@ -513,16 +546,35 @@ class DrawingLabel(qw.QLabel):
             Returns:
                 None
         """
-        if self._background_pixmap is None:
+        if self._background_pixmap is None or not self._mouse_left_down:
             return
 
-        if self._state == WidgetState.DRAWING and self._mouse_left_down:
+        if self._state == WidgetState.DRAWING:
             self._end = event.pos()
             self.make_line()
             self.redisplay()
 
-        elif self._state == WidgetState.ADJUSTING and self._mouse_left_down:
+        elif self._state == WidgetState.ADJUSTING:
             self.alter_chosen_line(event)
+
+        elif self._state == WidgetState.MOVING:
+            self.shift_line_segment(event)
+
+    def shift_line_segment(self, event):
+        """
+        move the the currently chosen line
+
+            Args:
+                event (QEvent) the event holding coordinates and source data
+
+            Returns:
+                None
+        """
+        shift_qt = event.pos() - self._start
+        shift_vec = ImagePoint(shift_qt.x(), shift_qt.y()).scale(1.0/self._current_zoom)
+        self._current_line = self._moving_line_segment.shift(shift_vec)
+
+        self.redisplay()
 
     def alter_chosen_line(self, event):
         """
@@ -588,6 +640,7 @@ class DrawingLabel(qw.QLabel):
         if self._background_pixmap is None:
             return
 
+        # TODO replace with self._left_mouse_button_down
         # ignore anything other than the left mouse button
         if not event.button() == qc.Qt.LeftButton:
             return
@@ -612,7 +665,33 @@ class DrawingLabel(qw.QLabel):
         elif self._state == WidgetState.ADJUSTING and self._current_line is not None:
             self.adjusting_release()
 
+        elif self._state == WidgetState.MOVING and self._current_line is not None:
+            self.moving_release()
+
         self._mouse_left_down = False
+
+    def moving_release(self):
+        reply = qw.QMessageBox.question(
+            self,
+            self.tr("Move Line"),
+            self.tr("Add moved line to results?"))
+
+        if reply == qw.QMessageBox.Yes:
+            print(f"Add ({self._current_frame}, {self._current_line}) to results")
+            keys = self._display_line.keys()
+            if self._current_frame in keys:
+                qw.QMessageBox.critical(self,
+                                        self.tr("Change Frame"),
+                                        self.tr("The line is already defined for this frame."))
+                self.clear_current()
+                self.redisplay()
+                return
+
+            self._display_line.add_line_segment(self._current_frame,
+                                                self._current_line)
+
+        self.clear_current()
+        self.redisplay()
 
     def adjusting_release(self):
         """
@@ -671,6 +750,7 @@ class DrawingLabel(qw.QLabel):
         self._start = None
         self._end = None
         self._current_line = None
+        self._moving_line_segment = None
 
     def add_line(self):
         """
