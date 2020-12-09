@@ -82,6 +82,7 @@ def read_csv_project(results_dir, new_project):
     store_regions(store, region_data)
     store_lines(store, line_data, line_seg_data)
     new_project["results"] = store
+    new_project.ensure_numeric()
 
 def readcsv2listofdicts(file, dirpath):
     '''Reads regions, crystals and lines csv reports created by the Crystal Growth Tracker

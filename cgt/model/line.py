@@ -103,7 +103,8 @@ class Line(dict):
             start = self[keys[index]]
             end = self[key]
 
-            differences.append(start.difference(end))
+            tmp = (keys[index]-key, start.difference(end))
+            differences.append(tmp)
 
         return differences
 

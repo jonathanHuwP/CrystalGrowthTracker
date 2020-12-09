@@ -199,13 +199,6 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="_adjustLinesButton">
-       <property name="text">
-        <string>Add Moved Lines</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="_clearSelectedButton">
        <property name="text">
         <string>Clear Drawing</string>
@@ -322,22 +315,6 @@
     <hint type="destinationlabel">
      <x>412</x>
      <y>252</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>_adjustLinesButton</sender>
-   <signal>clicked()</signal>
-   <receiver>CrystalDrawingWidget</receiver>
-   <slot>store_adjusted_lines()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>190</x>
-     <y>252</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>412</x>
-     <y>141</y>
     </hint>
    </hints>
   </connection>

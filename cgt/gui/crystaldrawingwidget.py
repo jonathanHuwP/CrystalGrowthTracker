@@ -161,16 +161,6 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             self._drawing.show_labels(False)
 
     @qc.pyqtSlot()
-    def store_adjusted_lines(self):
-        """
-        update existing lines with adjusted line segments
-
-            Returns:
-                None
-        """
-        print("store_adjusted_lines")
-
-    @qc.pyqtSlot()
     def store_new_lines(self):
         """
         start a new set of lines

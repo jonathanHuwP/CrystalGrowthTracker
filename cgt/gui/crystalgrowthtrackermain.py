@@ -29,6 +29,7 @@ import os
 import array as arr
 from shutil import copy2
 from imageio import get_reader as imio_get_reader
+import numpy as np
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
@@ -708,6 +709,21 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._selectWidget.setEnabled(True)
         self._selectWidget.show_video()
         self._drawingWidget.setEnabled(True)
+
+    qc.pyqtSlot()
+    def print_results(self):
+        scale = self._project["resolution"]
+        fps = self._project["frame_rate"]
+
+        print("Results\n=======")
+        for line in self._project["results"].lines:
+            if line.number_of_frames > 1:
+                print(line)
+                differences = line.get_differences()
+                for diff in differences:
+                    distance = diff[1].average*scale
+                    time = diff[0]/fps
+                    print(f"\t{distance/time}")
 
     def has_unsaved_data(self):
         """
