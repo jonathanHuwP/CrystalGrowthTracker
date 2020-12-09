@@ -715,13 +715,16 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         scale = self._project["resolution"]
         fps = self._project["frame_rate"]
 
+        if isinstance(scale, (str)) or isinstance(fps, (str)):
+            print("Error scale or fps still string")
+            return
+
         print("Results\n=======")
         for line in self._project["results"].lines:
             if line.number_of_frames > 1:
                 print(line)
                 differences = line.get_differences()
                 for diff in differences:
-                    print(f"av: {type(diff[1].average)}; time: {type(diff[0])}, scale: {type(scale)}, fps: {type(fps)}")
                     distance = diff[1].average*scale
                     time = diff[0]/fps
                     print(f"\t{distance/time}")
