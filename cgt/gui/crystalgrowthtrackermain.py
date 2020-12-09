@@ -715,6 +715,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         scale = self._project["resolution"]
         fps = self._project["frame_rate"]
 
+        if isinstance(scale, (str)) or isinstance(fps, (str)):
+            print("Error scale or fps still string")
+            return
+
         print("Results\n=======")
         for line in self._project["results"].lines:
             if line.number_of_frames > 1:
