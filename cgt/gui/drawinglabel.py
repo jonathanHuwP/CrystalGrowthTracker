@@ -828,21 +828,23 @@ class DrawingLabel(qw.QLabel):
 
         if self._display_line is not None:
             painter.setPen(old_pen)
-            for line_segment in self._display_line.get_line_segments:
-                self.draw_single_line(line_segment, painter)
+            frames = self._display_line.frame_numbers
+            for frame in frames:
+                line_segment = self._display_line[frame]
+                self.draw_single_line(line_segment, painter, str(frame))
 
         if self._storage_state == StorageState.COPYING_LINES:
             painter.setPen(old_pen)
             for line in self._lines_base:
-                self.draw_single_line(line, painter, False)
+                self.draw_single_line(line, painter)
 
             painter.setPen(new_pen)
             for line in self._lines_new:
-                self.draw_single_line(line, painter)
+                self.draw_single_line(line, painter, str(self._current_frame))
         else:
             painter.setPen(new_pen)
             for line in self._lines_base:
-                self.draw_single_line(line, painter)
+                self.draw_single_line(line, painter, str(self._current_frame))
 
         if self._current_line is not None:
             painter.setPen(adj_pen)
@@ -856,7 +858,7 @@ class DrawingLabel(qw.QLabel):
         self.setPixmap(pix)
 
 
-    def draw_single_line(self, line, painter, allow_label=True):
+    def draw_single_line(self, line, painter, label=None):
         """
         draw a single line segment
 
@@ -865,7 +867,7 @@ class DrawingLabel(qw.QLabel):
 
                 painter (QPainter) the painter to be used for the drawing, with pen set
 
-                allow_label (Boolean) if False the user labelling option is ignored and no label added
+                label (string) a label for the line, default is None
 
             Returns:
                 None
@@ -876,37 +878,35 @@ class DrawingLabel(qw.QLabel):
             qc.QPoint(int(zoomed.end.x), int(zoomed.end.y)))
         painter.drawLine(qt_line)
 
-        if allow_label:
-            self.draw_line_label(painter, zoomed)
+        if self._show_labels and label is not None:
+            self.draw_line_label(painter, zoomed, label)
 
-    def draw_line_label(self, painter, zoomed):
+    def draw_line_label(self, painter, zoomed, label):
         """
         add the label to a single line segment
 
             Args:
-
                 painter (QPainter) the painter to be used for the drawing, with pen set
-
                 zoomed (ImageLineSegment) the line that needs labelling, with current zoom applied
+                label (string) a label for the line
 
             Returns:
                 None
         """
-        if self._show_labels:
-            # find the bounding box for the text
-            bounding_box = qc.QRect(1, 1, 1, 1)
-            bounding_box = painter.boundingRect(
-                bounding_box,
-                qc.Qt.AlignCenter,
-                "text")
+        # find the bounding box for the text
+        bounding_box = qc.QRect(1, 1, 1, 1)
+        bounding_box = painter.boundingRect(
+            bounding_box,
+            qc.Qt.AlignCenter,
+            label)
 
-            point = zoomed.start
-            location = qc.QPoint(point.x, point.y)
-            bounding_box = qc.QRect(location, bounding_box.size())
-            painter.drawText(
-                bounding_box,
-                qc.Qt.AlignHorizontal_Mask | qc.Qt.AlignVertical_Mask,
-                "Text")
+        point = zoomed.start
+        location = qc.QPoint(point.x, point.y)
+        bounding_box = qc.QRect(location, bounding_box.size())
+        painter.drawText(
+            bounding_box,
+            qc.Qt.AlignHorizontal_Mask | qc.Qt.AlignVertical_Mask,
+            label)
 
     def clear_all(self):
         """
