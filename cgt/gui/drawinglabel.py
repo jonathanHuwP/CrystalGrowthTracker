@@ -811,7 +811,7 @@ class DrawingLabel(qw.QLabel):
         """
         new_pen = qg.QPen(qg.QColor(qc.Qt.red), 3, qc.Qt.SolidLine)
         adj_pen = qg.QPen(qg.QColor(qc.Qt.red), 3, qc.Qt.DashLine)
-        old_pen = qg.QPen(qg.QColor.fromRgb(0, 200, 255), 3, qc.Qt.SolidLine)
+        old_pen = qg.QPen(qg.QColor.fromRgb(0, 230, 255), 3, qc.Qt.SolidLine)
         painter = qg.QPainter()
 
         height = self._background_pixmap.height()*self._current_zoom
