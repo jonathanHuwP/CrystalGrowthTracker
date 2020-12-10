@@ -194,7 +194,7 @@
      <item>
       <widget class="QPushButton" name="_newLinesButton">
        <property name="text">
-        <string>Add New Lines</string>
+        <string>Store New Lines</string>
        </property>
       </widget>
      </item>

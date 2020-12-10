@@ -630,10 +630,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 None
         """
-        name = "No project"
+        name = self._translated_name
 
         if self._project is not None and self._project["proj_name"] is not None:
-            name = self._project["proj_name"]
+            proj_name = self._project["proj_name"]
+            name += f": {proj_name}"
 
         self.setWindowTitle(name)
 
