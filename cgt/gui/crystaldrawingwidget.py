@@ -295,3 +295,16 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
                 None
         """
         print(f"CrystalDrawingWidget select_frame {frame}")
+
+    def get_pixmap(self):
+        """
+        get a pixmap of the current image, if there is one
+
+            Returns:
+                QPixmap of image or None if no image has been set
+        """
+        pixmap = self._drawing.pixmap()
+        if pixmap is None:
+            return None
+
+        return self._drawing.grab(pixmap.rect())

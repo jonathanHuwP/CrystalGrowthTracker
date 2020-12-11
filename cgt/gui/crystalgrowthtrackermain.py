@@ -348,6 +348,49 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         #self._resultsWidget.clear()
 
     @qc.pyqtSlot()
+    def save_image(self):
+        # if no project, or video loaded error
+        if self._project is None or self._video_reader is None:
+            message = self.tr("To save you must have a project and load a video.")
+            qw.QMessageBox.information(self, self.tr("Save Image"), message)
+            return
+
+        # find if a tab holding image is in use
+        current_tab_widget=self._tabWidget.currentWidget()
+        widget = None
+
+        if current_tab_widget == self._selectTab:
+            widget = self._selectWidget
+        elif current_tab_widget == self._drawingTab:
+            widget = self._drawingWidget
+        else:
+            message = self.tr("You must be using either the Select Regions or the Draw Crystals tabs.")
+            qw.QMessageBox.information(self, self.tr("Save Image"), message)
+            return
+
+        # grab tab image
+        pixmap = widget.get_pixmap()
+        if pixmap is None:
+            message = self.tr("You do not appear to be displaying an image.")
+            qw.QMessageBox.information(self, self.tr("Save Image"), message)
+            return
+
+        file_types = "Portable Network Graphics (*.png)"
+        file_path, _ = qw.QFileDialog.getSaveFileName(self,
+                                                     "Enter/select file for save",
+                                                     os.path.expanduser('~'),
+                                                     file_types)
+
+        if file_path is None or file_path == '':
+            return
+
+        pixmap.save(file_path)
+
+        message = f"Image saved to {file_path}"
+        qw.QMessageBox.information(self, self.tr("Save Image"), message)
+
+
+    @qc.pyqtSlot()
     def save_project(self):
         '''
         Function to write all the csv files needed to define a project.
@@ -356,7 +399,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         Returns:
             None
         '''
-
         if self._project is None:
             qw.QMessageBox.warning(self,
                                    "CGT Error",
