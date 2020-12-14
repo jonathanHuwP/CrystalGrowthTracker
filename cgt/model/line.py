@@ -19,6 +19,8 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 @author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 """
 
+# TODO seperate the line from a temp float representation, used in calculations
+
 # set up linting conditions
 #
 

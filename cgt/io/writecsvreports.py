@@ -74,10 +74,10 @@ def save_csv_results(project):
         for key in keys:
             segment = line[key]
             line_segments_array.append([key,
-                                        segment.start.x,
-                                        segment.start.y,
-                                        segment.end.x,
-                                        segment.end.y,
+                                        int(segment.start.x),
+                                        int(segment.start.y),
+                                        int(segment.end.x),
+                                        int(segment.end.y),
                                         index])
 
     title = r"_project_regions.csv"
