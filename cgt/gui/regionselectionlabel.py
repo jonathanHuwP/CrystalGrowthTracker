@@ -166,11 +166,13 @@ class RegionSelectionLabel(qw.QLabel):
         """
         if event.button() == qc.Qt.LeftButton:
             if self._state ==  SelectionState.ADD_NEW_REGION:
-                self._start = event.pos()
+                pix_rect = self.pixmap().rect()
+                point = event.pos()
+                if pix_rect.contains(point):
+                    self._start = point
 
     def mouseMoveEvent(self, event):
-        """
-        If selecting draw rectangle
+        """ting draw rectangle
 
             Args:
                 event (QEvent) the event data
@@ -179,8 +181,11 @@ class RegionSelectionLabel(qw.QLabel):
                 None
         """
         if self._start is not None:
-            self._end = event.pos()
-            self.repaint()
+            pix_rect = self.pixmap().rect()
+            point = event.pos()
+            if pix_rect.contains(point):
+                self._end = point
+                self.repaint()
 
     def mouseReleaseEvent(self, event):
         """
@@ -193,8 +198,13 @@ class RegionSelectionLabel(qw.QLabel):
                 None
         """
         if event.button() == qc.Qt.LeftButton and self._state ==  SelectionState.ADD_NEW_REGION:
+            pix_rect = self.pixmap().rect()
+            point = event.pos()
 
-            self._end = event.pos()
+            # only make point end if within pixmap
+            if pix_rect.contains(point):
+                self._end = point
+
             self.repaint()
             reply = qw.QMessageBox.question(
                 self,
