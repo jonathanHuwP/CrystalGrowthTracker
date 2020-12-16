@@ -43,6 +43,7 @@ from cgt.gui.regionselectionwidget import RegionSelectionWidget
 from cgt.gui.crystaldrawingwidget import CrystalDrawingWidget
 from cgt.gui.videoparametersdialog import VideoParametersDialog
 from cgt.gui.reportviewwidget import ReportViewWidget
+from cgt.gui.linevalueswidget import LineValuesWidget
 
 from cgt.io import htmlreport
 from cgt.io import writecsvreports
@@ -125,7 +126,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._resultsTab = qw.QWidget(self)
 
         ## the results widget
-        self._resultsWidget = None #ResultsDisplayWidget(self._selectTab, self)
+        self._resultsWidget = LineValuesWidget(self._selectTab, self)
 
         # set up tab
         self.add_tab(self._resultsTab, self._resultsWidget, "Results Overview")
