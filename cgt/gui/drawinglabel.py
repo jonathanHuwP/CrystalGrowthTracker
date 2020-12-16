@@ -325,6 +325,13 @@ class DrawingLabel(qw.QLabel):
         if self._background_pixmap is None:
             return
 
+        pix_rect = self.pixmap().rect()
+        point = event.pos()
+
+        # only make point end if within pixmap
+        if not pix_rect.contains(point):
+            return
+
         if self._state == WidgetState.DRAWING:
             if event.button() == qc.Qt.LeftButton:
                 self._start = event.pos()
@@ -549,6 +556,13 @@ class DrawingLabel(qw.QLabel):
         if self._background_pixmap is None or not self._mouse_left_down:
             return
 
+        pix_rect = self.pixmap().rect()
+        point = event.pos()
+
+        # only make point end if within pixmap
+        if not pix_rect.contains(point):
+            return
+
         if self._state == WidgetState.DRAWING:
             self._end = event.pos()
             self.make_line()
@@ -647,7 +661,11 @@ class DrawingLabel(qw.QLabel):
 
         # if mode drawing ask the user if the line is wanted
         if self._state == WidgetState.DRAWING:
-            self._end = event.pos()
+            pix_rect = self.pixmap().rect()
+            point = event.pos()
+            if pix_rect.contains(point):
+                self._end = point
+
             self.make_line()
             self.redisplay()
             reply = qw.QMessageBox.question(
