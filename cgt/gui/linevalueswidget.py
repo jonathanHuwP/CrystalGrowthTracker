@@ -48,14 +48,14 @@ class LineValuesWidget(qw.QWidget, Ui_LineValuesWidget):
         if data_source is not None:
             self._data_source = data_source
 
-    def set_data(self, data):
+    def set_data(self, data_source):
         """
         set the results that are to be displayed
 
             Args:
                 data (VideoAnalysisResultsStore) the results to be displayed.
         """
-        self._data_source = data
+        self._data_source = data_source
 
     def display_data(self):
         """
@@ -68,7 +68,9 @@ class LineValuesWidget(qw.QWidget, Ui_LineValuesWidget):
         """
         initialize the line segments display
         """
-        for region_index in range(len(self._data_source.regions)):
+        results = self._data_source.get_result()
+
+        for region_index in range(len(results.regions)):
             self._regionComboBox.addItem(str(region_index))
 
         self.region_chosen(self._regionComboBox.currentIndex())
@@ -77,8 +79,10 @@ class LineValuesWidget(qw.QWidget, Ui_LineValuesWidget):
         """
         display the lines table
         """
-        size = len(self._data_source.lines)
-        association = self._data_source.region_lines_association
+        results = self._data_source.get_result()
+
+        size = len(results.lines)
+        association = results.region_lines_association
 
         self._regionsTableWidget.clearContents()
 
@@ -88,7 +92,7 @@ class LineValuesWidget(qw.QWidget, Ui_LineValuesWidget):
         count = 0
         row = 0
 
-        for row, line in enumerate(self._data_source.lines):
+        for row, line in enumerate(results.lines):
             differences = [x[1].average for x in line.get_differences()]
             average = None
 
@@ -133,8 +137,10 @@ class LineValuesWidget(qw.QWidget, Ui_LineValuesWidget):
             Args:
                 region_index (int) the index of the index in the results
         """
+        results = self._data_source.get_result()
+
         self._linesComboBox.clear()
-        for line_index, _ in enumerate(self._data_source.get_lines(region_index)):
+        for line_index, _ in enumerate(results.get_lines(region_index)):
             self._linesComboBox.addItem(str(line_index))
 
         self.line_chosen(self._linesComboBox.currentIndex())
@@ -147,7 +153,12 @@ class LineValuesWidget(qw.QWidget, Ui_LineValuesWidget):
             Args:
                 line_index (int) the index of the line in the current region
         """
-        lines = self._data_source.get_lines(self._regionComboBox.currentIndex())
+        if line_index < 0:
+            return
+
+        results = self._data_source.get_result()
+
+        lines = results.get_lines(self._regionComboBox.currentIndex())
         line = lines[line_index]
 
         self._lineTableWidget.clearContents()
@@ -193,3 +204,12 @@ class LineValuesWidget(qw.QWidget, Ui_LineValuesWidget):
             line_average = sum(differences)/len(differences)
             item = qw.QTableWidgetItem(str(line_average))
             self._lineTableWidget.setItem(row+1, 5, item)
+
+    def clear(self):
+        """
+        clear the current contents
+        """
+        self._lineTableWidget.clearContents()
+        self._regionsTableWidget.clearContents()
+        self._regionComboBox.clear()
+        self._linesComboBox.clear()

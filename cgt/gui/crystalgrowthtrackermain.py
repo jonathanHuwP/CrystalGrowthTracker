@@ -330,6 +330,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self._selectWidget.setEnabled(False)
         self._drawingWidget.setEnabled(False)
+        self._resultsWidget.display_data()
 
         if self._project["latest_report"] is not None:
             if self._project["latest_report"] != "":
@@ -346,7 +347,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._selectWidget.clear()
         self._propertiesWidget.clear()
         self._reportWidget.clear()
-        #self._resultsWidget.clear()
+        self._resultsWidget.clear()
 
     @qc.pyqtSlot()
     def save_image(self):
@@ -637,6 +638,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         self._project["results"].add_region(region)
         self._drawingWidget.new_region()
+        self._resultsWidget.display_data()
         self.autosave()
 
     def append_lines(self, region_index, lines):
@@ -654,6 +656,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self._project["results"].add_line(region_index, line)
 
         self._drawingWidget.new_region()
+        self._resultsWidget.display_data()
         self.autosave()
 
     @qc.pyqtSlot()
