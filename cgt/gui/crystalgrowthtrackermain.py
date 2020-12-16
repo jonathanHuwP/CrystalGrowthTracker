@@ -555,9 +555,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         project["results"] = VideoAnalysisResultsStore()
 
         self._project = project
+        self.set_video_scale_parameters()
         self.save_project()
         self._autosave = CGTAutoSave.make_autosave_and_save_from_project(project)
-        self.set_video_scale_parameters()
         self.project_created_or_loaded()
 
     def set_video_scale_parameters(self):
