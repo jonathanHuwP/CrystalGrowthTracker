@@ -47,59 +47,8 @@
       <attribute name="verticalHeaderVisible">
        <bool>false</bool>
       </attribute>
-      <column>
-       <property name="text">
-        <string>Frame</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>Start x</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>Start y</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>End x</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>End y</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>Difference</string>
-       </property>
-      </column>
      </widget>
-     <widget class="QTableWidget" name="_regionsTableWidget">
-      <column>
-       <property name="text">
-        <string>Region</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>Line</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>Segments</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>Av. Difference</string>
-       </property>
-      </column>
-     </widget>
+     <widget class="QTableWidget" name="_regionsTableWidget"/>
     </widget>
    </item>
   </layout>

@@ -48,6 +48,15 @@ class LineValuesWidget(qw.QWidget, Ui_LineValuesWidget):
         if data_source is not None:
             self._data_source = data_source
 
+        line_segments_headings = ["Frame", "Start ", "Start ", "End ", "End ", "Difference"]
+        line_headings = ["Frame", "Line", "Time Steps", "Av Difference"]
+
+        for heading in line_segments_headings:
+            print(heading)
+
+        for heading in line_headings:
+            print(heading)
+
     def set_data(self, data_source):
         """
         set the results that are to be displayed
