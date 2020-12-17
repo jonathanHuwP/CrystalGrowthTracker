@@ -31,6 +31,16 @@ class LineValuesWidget(qw.QWidget, Ui_LineValuesWidget):
     """
     an application class that will run the widget
     """
+    ## the line segments table headings
+    line_segments_headings = ["Frame",
+                              "Start x",
+                              "Start y",
+                              "End x",
+                              "End y",
+                              "Difference"]
+
+    ## the lines in regions table headings
+    line_headings = ["Frame", "Line", "Time Steps", "Av Difference"]
 
     def __init__(self, parent=None, data_source=None):
         """
@@ -42,20 +52,24 @@ class LineValuesWidget(qw.QWidget, Ui_LineValuesWidget):
         super().__init__(parent)
         self.setupUi(self)
 
+        bold_font = qg.QFont()
+        bold_font.setBold(True)
+
+        for column, label in enumerate(self.line_segments_headings):
+            item =  qw.QTableWidgetItem(label)
+            item.setFont(bold_font)
+            self._lineTableWidget.setHorizontalHeaderItem(column, item)
+
+        for column, label in enumerate(self.line_headings):
+                item = qw.QTableWidgetItem(label)
+                item.setFont(bold_font)
+                self._regionsTableWidget.setHorizontalHeaderItem(column, item)
+
         ## store of data
         self._data_source = None
 
         if data_source is not None:
             self._data_source = data_source
-
-        line_segments_headings = ["Frame", "Start ", "Start ", "End ", "End ", "Difference"]
-        line_headings = ["Frame", "Line", "Time Steps", "Av Difference"]
-
-        for heading in line_segments_headings:
-            print(heading)
-
-        for heading in line_headings:
-            print(heading)
 
     def set_data(self, data_source):
         """
@@ -177,7 +191,7 @@ class LineValuesWidget(qw.QWidget, Ui_LineValuesWidget):
         else:
             self._lineTableWidget.setRowCount(line.number_of_frames)
 
-        self._lineTableWidget.setColumnCount(6)
+        #self._lineTableWidget.setColumnCount(6)
 
         frames = sorted(line.keys())
 
