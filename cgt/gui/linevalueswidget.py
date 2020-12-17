@@ -69,7 +69,7 @@ class LineValuesWidget(qw.QWidget, Ui_LineValuesWidget):
         initialize the line segments display
         """
         results = self._data_source.get_result()
-
+        self._regionComboBox.clear()
         for region_index in range(len(results.regions)):
             self._regionComboBox.addItem(str(region_index))
 
