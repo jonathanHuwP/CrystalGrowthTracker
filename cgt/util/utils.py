@@ -80,3 +80,42 @@ def timestamp():
             timestamp (str):  In the format of year_month_day_hour_minute_second.
     '''
     return datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+
+def difference_to_distance(difference, scale):
+    """
+    convert a difference object to distance to
+
+        Args:
+            difference (ImageLineDifference) the difference
+            scale (float) the pixel size
+
+        Returns:
+            the average seperation as a distance
+    """
+    print(f"av {difference.average}, scale {scale}")
+    return difference.average * scale
+
+def difference_list_to_velocities(diff_list, scale, fps):
+    """
+    converts a list of (frame interval, difference) tuples to a list of velocities
+
+        Args:
+            diff_list (tuple(int, ImageLineDifference)) the list of inputs
+            scale (float) the size of a pixel
+            fps (int) the number of frames per second
+
+        Returns:
+            a list of velocities
+    """
+    velocities = []
+    for frames, diff in diff_list:
+        distance = difference_to_distance(diff, scale)
+        time = frames/fps
+        velocity = distance/time
+        print(f"dist {distance}, time {time}, velocity {velocity}")
+        if velocity < 0.0:
+            velocities.append(-velocity)
+        else:
+            velocities.append(velocity)
+
+    return velocities

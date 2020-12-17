@@ -25,6 +25,8 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
 import PyQt5.QtGui as qg
 
+from cgt.util.utils import difference_to_distance, difference_list_to_velocities
+
 from cgt.gui.Ui_linevalueswidget import Ui_LineValuesWidget
 
 class LineValuesWidget(qw.QWidget, Ui_LineValuesWidget):
@@ -181,6 +183,7 @@ class LineValuesWidget(qw.QWidget, Ui_LineValuesWidget):
             return
 
         results = self._data_source.get_result()
+        fps, scale = self._data_source.get_fps_and_resolution()
 
         lines = results.get_lines(self._regionComboBox.currentIndex())
         line = lines[line_index]
@@ -191,13 +194,13 @@ class LineValuesWidget(qw.QWidget, Ui_LineValuesWidget):
         else:
             self._lineTableWidget.setRowCount(line.number_of_frames)
 
-        #self._lineTableWidget.setColumnCount(6)
-
         frames = sorted(line.keys())
 
         differences = None
         if len(frames) > 1:
-            differences = [x[1].average for x in line.get_differences()]
+            differences = difference_list_to_velocities(line.get_differences(),
+                                                        scale,
+                                                        fps)
 
         row = 0
         for row, frame in enumerate(frames):
