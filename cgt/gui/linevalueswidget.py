@@ -140,6 +140,7 @@ class LineValuesWidget(qw.QWidget, Ui_LineValuesWidget):
         results = self._data_source.get_result()
 
         self._linesComboBox.clear()
+        self._lineTableWidget.clearContents()
         for line_index, _ in enumerate(results.get_lines(region_index)):
             self._linesComboBox.addItem(str(line_index))
 
