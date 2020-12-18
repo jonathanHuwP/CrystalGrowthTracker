@@ -64,7 +64,8 @@ def save_html_report1(project, time_stamp):
         with open(html_outfile, "w") as fout:
             fout = write_html_report_start1(fout, project)
             fout = write_html_overview(fout, results)
-            fout = write_html_crystals(fout, project, results)
+            # removed to fix report JHP
+            # fout = write_html_crystals(fout, project, results)
             write_html_report_end(fout)
     except (IOError, OSError, EOFError) as exception:
         print(exception)
@@ -153,9 +154,10 @@ def write_html_overview(fout, results):
     header2_line = ("<h2 align=\"left\">Overview</h2>\n")
     fout.write(header2_line)
 
-    line = ("<p>The number of crystals analyzed:  *** </p>\n")
-    line = line.replace("***", str(len(results.crystals)))
-    fout.write(line)
+    # removed to fix report JPH
+    # line = ("<p>The number of crystals analyzed:  *** </p>\n")
+    # line = line.replace("***", str(len(results.crystals)))
+    # fout.write(line)
 
     line = ("<p>The number of crystals that formed closed polygons:  *** </p>\n")
     line = line.replace("***", str("TO BE ADDED!"))
