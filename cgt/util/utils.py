@@ -92,7 +92,6 @@ def difference_to_distance(difference, scale):
         Returns:
             the average seperation as a distance
     """
-    print(f"av {difference.average}, scale {scale}")
     return difference.average * scale
 
 def difference_list_to_velocities(diff_list, scale, fps):
@@ -112,7 +111,7 @@ def difference_list_to_velocities(diff_list, scale, fps):
         distance = difference_to_distance(diff, scale)
         time = frames/fps
         velocity = distance/time
-        print(f"dist {distance}, time {time}, velocity {velocity}")
+
         if velocity < 0.0:
             velocities.append(-velocity)
         else:
