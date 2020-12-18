@@ -41,10 +41,10 @@ class LineValuesWidget(qw.QWidget, Ui_LineValuesWidget):
                               "Start y",
                               "End x",
                               "End y",
-                              "Difference"]
+                              "Velocity"]
 
     ## the lines in regions table headings
-    line_headings = ["Frame", "Line", "Time Steps", "Av Difference"]
+    line_headings = ["Frame", "Line", "Time Steps", "Av. Velocity"]
 
     def __init__(self, parent=None, data_source=None):
         """
