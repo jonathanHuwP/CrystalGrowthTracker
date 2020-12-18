@@ -25,6 +25,8 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
 import PyQt5.QtGui as qg
 
+import csv
+
 from cgt.util.utils import difference_to_distance, difference_list_to_velocities
 
 from cgt.gui.Ui_linevalueswidget import Ui_LineValuesWidget
@@ -140,7 +142,7 @@ class LineValuesWidget(qw.QWidget, Ui_LineValuesWidget):
 
             self._regionsTableWidget.setItem(row, 3, item)
 
-        item = qw.QTableWidgetItem("Overall Averge")
+        item = qw.QTableWidgetItem("Overall Average")
         font = qg.QFont()
         font.setBold(True)
         item.setFont(font)
@@ -222,7 +224,7 @@ class LineValuesWidget(qw.QWidget, Ui_LineValuesWidget):
             self._lineTableWidget.setItem(row, 5, item)
 
         if line.number_of_frames > 1:
-            item = qw.QTableWidgetItem("Overall Averge")
+            item = qw.QTableWidgetItem("Overall Average")
             font = qg.QFont()
             font.setBold(True)
             item.setFont(font)
@@ -231,6 +233,33 @@ class LineValuesWidget(qw.QWidget, Ui_LineValuesWidget):
             line_average = sum(differences)/len(differences)
             item = qw.QTableWidgetItem(str(line_average))
             self._lineTableWidget.setItem(row+1, 5, item)
+
+    def save(self, file_name):
+        """
+        write the contents of the lines table to csv files
+
+            Args:
+                file_name (string) the ouput file path and name
+        """
+        with open(file_name, "w") as fout:
+            writer = csv.writer(fout, delimiter=',', lineterminator='\n')
+            writer.writerow(self.line_headings)
+
+            for row in range(self._regionsTableWidget.rowCount()):
+                item = self._regionsTableWidget.item(row, 2)
+                # don't write the average row
+                if item is not None and not item.text() == "Overall Average":
+                    contents = []
+                    for column in range(self._regionsTableWidget.columnCount()):
+                        item = self._regionsTableWidget.item(row, column)
+                        if item.text() == "NA":
+                            contents.append("0.0")
+                        else:
+                            contents.append(item.text())
+                    writer.writerow(contents)
+
+        message = self.tr(f"Lines table written to {file_name}")
+        qw.QMessageBox.information(self, self.tr("Printing"), message)
 
     def clear(self):
         """

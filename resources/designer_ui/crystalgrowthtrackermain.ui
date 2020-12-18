@@ -78,6 +78,7 @@
     <addaction name="_actionSaveProject"/>
     <addaction name="_actionSaveReport"/>
     <addaction name="_actionSaveImage"/>
+    <addaction name="_actionSaveReults"/>
     <addaction name="separator"/>
     <addaction name="_actionPrintResults"/>
     <addaction name="separator"/>
@@ -119,6 +120,11 @@
   <action name="_actionSaveImage">
    <property name="text">
     <string>Save Image</string>
+   </property>
+  </action>
+  <action name="_actionSaveReults">
+   <property name="text">
+    <string>Save Results</string>
    </property>
   </action>
  </widget>
@@ -241,6 +247,22 @@
    <signal>triggered()</signal>
    <receiver>CrystalGrowthTrackerMain</receiver>
    <slot>save_image()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>470</x>
+     <y>291</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_actionSaveReults</sender>
+   <signal>triggered()</signal>
+   <receiver>CrystalGrowthTrackerMain</receiver>
+   <slot>save_results_widget()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
