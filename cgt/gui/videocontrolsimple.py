@@ -56,8 +56,16 @@ class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
         ## the minimum
         self._frame_minimum = 0
 
+        ## flag to indicate is the first button is the one highlighted
+        self._highlight_first = None
+        self.highlight_first()
+
         # set disabled
         self.setEnabled(False)
+
+        style = qw.QCommonStyle()
+        self._firstButton.setIcon(style.standardIcon(style.SP_ArrowBack))
+        self._lastButton.setIcon(style.standardIcon(style.SP_ArrowForward))
 
     @qc.pyqtSlot()
     def last_clicked(self):
@@ -101,6 +109,7 @@ class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
 
         if self.isEnabled() and change:
             self.frame_changed.emit()
+            self.flip_highlights()
 
     def get_current_frame(self):
         """
@@ -157,6 +166,31 @@ class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
         self.set_range(0, 0)
 
         self.setEnabled(tmp)
+
+    def flip_highlights(self):
+        """
+        switch over the highlights of the first and last buttons
+        """
+        if self._highlight_first:
+            self.highlight_last()
+        else:
+            self.highlight_first()
+
+    def highlight_first(self):
+        """
+        colourize the up button and blur the down
+        """
+        self._firstButton.setGraphicsEffect(qw.QGraphicsColorizeEffect())
+        self._lastButton.setGraphicsEffect(qw.QGraphicsBlurEffect())
+        self._highlight_first = True
+
+    def highlight_last(self):
+        """
+        colourize the up button and blur the down
+        """
+        self._lastButton.setGraphicsEffect(qw.QGraphicsColorizeEffect())
+        self._firstButton.setGraphicsEffect(qw.QGraphicsBlurEffect())
+        self._highlight_first = False
 
 def run():
     """

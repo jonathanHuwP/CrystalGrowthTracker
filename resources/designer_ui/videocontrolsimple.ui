@@ -20,7 +20,7 @@
       <bool>false</bool>
      </property>
      <property name="text">
-      <string>First Frame</string>
+      <string/>
      </property>
     </widget>
    </item>
@@ -30,7 +30,7 @@
       <bool>false</bool>
      </property>
      <property name="text">
-      <string>Last Frame</string>
+      <string/>
      </property>
     </widget>
    </item>
