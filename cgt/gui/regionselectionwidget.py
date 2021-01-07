@@ -386,6 +386,7 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         self.display_pixmap()
         self._videoControls.set_range(0, self._video_frame_count)
         self._videoControls.enable(True)
+        self._videoControls.highlight_up()
 
     def display_pixmap(self):
         """

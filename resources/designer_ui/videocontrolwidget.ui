@@ -40,7 +40,7 @@
       <bool>false</bool>
      </property>
      <property name="text">
-      <string>Down</string>
+      <string/>
      </property>
     </widget>
    </item>
@@ -55,6 +55,9 @@
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
+     <property name="tickPosition">
+      <enum>QSlider::TicksBothSides</enum>
+     </property>
     </widget>
    </item>
    <item>
@@ -63,7 +66,7 @@
       <bool>false</bool>
      </property>
      <property name="text">
-      <string>Up</string>
+      <string/>
      </property>
     </widget>
    </item>
@@ -85,42 +88,10 @@
  <resources/>
  <connections>
   <connection>
-   <sender>_frameSpinBox</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>VideoControlWidget</receiver>
-   <slot>spin_box_changed()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>97</x>
-     <y>29</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>472</x>
-     <y>29</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>_downButton</sender>
-   <signal>clicked()</signal>
-   <receiver>VideoControlWidget</receiver>
-   <slot>down_clicked()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>193</x>
-     <y>29</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>472</x>
-     <y>29</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>_frameSlider</sender>
    <signal>sliderMoved(int)</signal>
    <receiver>VideoControlWidget</receiver>
-   <slot>slider_moved()</slot>
+   <slot>slider_moved(int)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>394</x>
@@ -140,6 +111,54 @@
    <hints>
     <hint type="sourcelabel">
      <x>595</x>
+     <y>29</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>472</x>
+     <y>29</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_frameSpinBox</sender>
+   <signal>editingFinished()</signal>
+   <receiver>VideoControlWidget</receiver>
+   <slot>frame_sbox_edited()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>83</x>
+     <y>29</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>383</x>
+     <y>29</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_frameSlider</sender>
+   <signal>sliderReleased()</signal>
+   <receiver>VideoControlWidget</receiver>
+   <slot>slider_released()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>330</x>
+     <y>29</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>383</x>
+     <y>29</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_downButton</sender>
+   <signal>clicked()</signal>
+   <receiver>VideoControlWidget</receiver>
+   <slot>down_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>193</x>
      <y>29</y>
     </hint>
     <hint type="destinationlabel">
