@@ -32,7 +32,7 @@ from cgt.gui.Ui_videocontrolsimple import Ui_VideoControlSimple
 class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
 
     ## signal to indicate change of frame
-    frame_changed = qc.pyqtSignal()
+    frame_changed = qc.pyqtSignal(int)
 
     def __init__(self, parent=None):
         """
@@ -108,7 +108,7 @@ class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
             change = True
 
         if self.isEnabled() and change:
-            self.frame_changed.emit()
+            self.frame_changed.emit(self._current_frame)
             self.flip_highlights()
 
     def get_current_frame(self):
