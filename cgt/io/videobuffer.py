@@ -85,7 +85,7 @@ class VideoBuffer:
                 if not self._parent.video_queue().empty():
                     self.make_frame()
             elif self._parent.active_tab() == 1:
-                if not self._parent.regions_queue().empty():
+                if not self._parent.drawing_queue().empty():
                     self.make_region()
 
     def make_region(self):
