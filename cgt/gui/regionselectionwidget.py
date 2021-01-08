@@ -27,10 +27,8 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 
 import sys
 from collections import namedtuple
-import array as arr
 
 import PyQt5.QtWidgets as qw
-import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
 from cgt.gui.regionselectionlabel import RegionSelectionLabel
@@ -62,7 +60,7 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             Returns:
                 None
         """
-        super(RegionSelectionWidget, self).__init__(parent)
+        super().__init__(parent)
         ## the object that owns the widget and holds the data
         self._data_source = data_source
 
@@ -131,6 +129,12 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
 
     @qc.pyqtSlot()
     def load_video(self):
+        """
+        callback for a load video instruction
+
+            Returns:
+                None
+        """
         if self._data_source.get_video_reader() is None:
             self._data_source.load_video()
 
@@ -286,6 +290,12 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             self._regionComboBox.addItem(str(index))
 
     def get_selected_region(self):
+        """
+        get a region from results to dates
+
+            Returns:
+                the region corresponding to the value of the _regionComboBox
+        """
         index = self._regionComboBox.currentIndex()
 
         return self._data_source.get_result().regions[index]
@@ -375,6 +385,12 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         self.display_current_pixmap()
 
     def display_current_pixmap(self):
+        """
+        dispaly the current pixmap held by the widget.
+
+            Returns:
+                None
+        """
         size = self._pixmap.size() * self._zoomSpinBox.value()
         pixmap = self._pixmap.scaled(size,
                                      qc.Qt.KeepAspectRatio,

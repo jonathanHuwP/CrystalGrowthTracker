@@ -1,0 +1,7 @@
+************* Module regionselectionwidget
+cgt\gui\regionselectionwidget.py:30:0: W0611: Unused array imported as arr (unused-import)
+cgt\gui\regionselectionwidget.py:33:0: W0611: Unused PyQt5.QtGui imported as qg (unused-import)
+
+------------------------------------------------------------------
+Your code has been rated at 9.88/10 (previous run: 9.09/10, +0.79)
+
