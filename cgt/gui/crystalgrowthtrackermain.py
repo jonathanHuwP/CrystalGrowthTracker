@@ -23,6 +23,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = too-many-public-methods
 # pylint: disable = too-many-instance-attributes
 # pylint: disable = c-extension-no-member
+# pylint: disable = c-extension-no-member
 
 import sys
 import os
@@ -877,7 +878,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self._resultsWidget.save(file_path)
 
-    @qc.pyqtSlot()
+    @qc.pyqtSlot(qg.QCloseEvent)
     def closeEvent(self, event):
         """
         Overrides QWidget.closeEvent
