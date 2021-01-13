@@ -95,9 +95,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         ## queue for the selection widget, holds frame numbers
         self._video_queue = Queue(256)
 
-        ## queue for the drawing widget, holds (fram number, region)
-        self._regions_queue = Queue(256)
-
 
         ## base widget for properties tab
         self._propertiesTab = qw.QWidget(self)
@@ -158,6 +155,21 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         ## pointer for an autosave file
         self._autosave = None
 
+        ## cache of start/end images of regions
+        self._region_images = []
+
+    def get_region_image(self, index):
+        """
+        getter for start end pairs of region images
+
+            Args:
+                index (int) the array index of the region
+
+            Returns:
+                at tuple (np.array, np.array) order (start, end)
+        """
+        return self._region_images[index]
+
     def request_video_frame(self, frame_number):
         """
         add frame number to video Queue
@@ -170,20 +182,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         self._video_queue.put(frame_number)
 
-    def request_drawing_frame(self, frame_number, region):
-        """
-        add frame number to drawing Queue
-
-            Args:
-                frame_number (int) the frame number to
-                region (Region) the region that is requested
-
-            Returns:
-                None
-        """
-        print(f"request_drawing_frame({frame_number})")
-        self._regions_queue.put((frame_number, region))
-
     def video_queue(self):
         """
         getter for the queue of frame requests from the region selection widget
@@ -192,15 +190,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 the regions selection widget frame queue
         """
         return self._video_queue
-
-    def drawing_queue(self):
-        """
-        getter for the queue of (frame, region) requests from the drawing widget
-
-            Returns:
-                the drawing widget's queue
-        """
-        return self._drawing_queue
 
     def add_tab(self, tab_widget, target_widget, title):
         """
@@ -691,17 +680,19 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         return None
 
-    def append_region(self, region):
+    def append_region(self, region, start_end):
         """
         add a region to the results and notify the crystal drawing widget
 
             Args:
                 region (Region) the region
+                start_end (tupel(np.array, np.array)) images of start and end of region
 
             Returns:
                 None
         """
         self._project["results"].add_region(region)
+        self._region_images.append(start_end)
         self._drawingWidget.new_region()
         self._resultsWidget.display_data()
         self.autosave()
@@ -804,12 +795,12 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         message_box = qw.QMessageBox()
         message_box.setText("Loading Video.")
         message_box.setInformativeText("Loading video may take some time.")
+
         try:
             message_box.show()
             self._video_reader = VideoBuffer(self._project["enhanced_video"],
                                              self,
-                                             self._selectWidget,
-                                             self._drawingWidget)
+                                             self._selectWidget)
             self._video_reader.start()
 
         except (FileNotFoundError, IOError) as ex:

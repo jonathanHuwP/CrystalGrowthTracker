@@ -148,6 +148,7 @@ class RegionsLinesFramesWidget(qw.QWidget, Ui_RegionsLinesFramesWidget):
                 the index of the currently selected region, None in no slection
         """
         tmp = self._regionsList.currentRow()
+        print(f"rlf: {type(tmp)}")
 
         if tmp < 0:
             return None
@@ -188,6 +189,7 @@ class RegionsLinesFramesWidget(qw.QWidget, Ui_RegionsLinesFramesWidget):
 
     @qc.pyqtSlot(qw.QListWidgetItem)
     def region_selected(self, item):
+        print("rlf: region selected")
         region_index = item.data(qc.Qt.UserRole)
         self.display_lines(region_index)
         self.user_region_selection.emit(region_index)

@@ -22,6 +22,52 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 import socket
 from sys import platform as _platform
 import datetime
+import PyQt5.QtGui as qg
+import numpy as np
+
+def qpixmap_to_nparray(pixmap):
+    """
+    convert a QPixmap to an np array of based on :
+    https://stackoverflow.com/questions/45020672/convert-pyqt5-qpixmap-to-numpy-ndarray
+
+        Args:
+            pixmap (QPixmap) the pixmap to be transformed
+
+        Returns:
+            np array (uint8) the array
+    """
+    size = pixmap.size()
+    width = size.width()
+    height = size.height()
+
+    # convert to QImage then to a byte string
+    qimg = pixmap.toImage()
+    bit_str = qimg.bits()
+    bit_str.setsize(width*height*4)
+
+    # np.frombuffer used to convert the byte string into an np array
+    img = np.frombuffer(bit_str, dtype=np.uint8).reshape((width, height ,4))
+
+    return img
+
+def nparray_to_qpixmap(img, brg=True):
+    """
+    convert an image in numpy array format to a QPixmap
+
+        Args:
+            img (np.array uint=8) the numpy array in Red/Green/Blue format
+
+        Returns:
+            a QPixmap
+    """
+    image = qg.QImage(
+        img.data,
+        img.shape[1],
+        img.shape[0],
+        3*img.shape[1],
+        qg.QImage.Format_RGB888)
+
+    return qg.QPixmap.fromImage(image)
 
 def find_hostname_and_ip():
     """Finds the hostname and IP address to go in the log file.

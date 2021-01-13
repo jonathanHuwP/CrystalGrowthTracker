@@ -21,16 +21,18 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 
 from threading import Thread
 import PyQt5.QtGui as qg
+import PyQt5.QtCore as qc
 import cv2 as cv
 
 from cgt.model.region import Region
+from cgt.util.utils import nparray_to_qpixmap
 
 class VideoBuffer:
     """
     a video reader that is designed to run as a seperate thread
     from the display object, allowing smoother animation
     """
-    def __init__(self, path, parent, region_view, drawing_view):
+    def __init__(self, path, parent, region_view):
         """
         initalize by usng opencv opening the video file
 
@@ -41,16 +43,13 @@ class VideoBuffer:
                 drawing_view (qwidget) the viewer for the crystals
         """
         ## initiaize the file video stream
-        self._video_reader = cv.VideoCapture(path)
+        self._video_reader = cv.VideoCapture(str(path))
 
         ## pointr to the parent
         self._parent = parent
 
         ## pointer to the region view
         self._region_view = region_view
-
-        ## pointer to the drawing view
-        self._drawing_view = drawing_view
 
     def length(self):
         """
@@ -81,44 +80,8 @@ class VideoBuffer:
                 None
         """
         while True:
-            if self._parent.active_tab() == 1:
-                if not self._parent.video_queue().empty():
-                    self.make_frame()
-            elif self._parent.active_tab() == 1:
-                if not self._parent.drawing_queue().empty():
-                    self.make_region()
-
-    def make_region(self):
-        """
-        pop the regions queue, get the frame and region, convert them
-        to a qpixmap and call the display_pixmap function of drawing view
-
-            Returns:
-                None
-        """
-        tmp = self._parent.drawing_queue().get()
-        frame = tmp[0]
-        region = tmp[1]
-
-        self._video_reader.set(cv.CAP_PROP_POS_FRAMES, frame)
-        flag, img = self._video_reader.read()
-
-        if not flag:
-            message = f"failed to read image for frame {frame}"
-            raise ValueError(message)
-
-        img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
-        # TODO add region crop
-        image = qg.QImage(
-            img.data,
-            img.shape[1],
-            img.shape[0],
-            3*img.shape[1],
-            qg.QImage.Format_RGB888)
-
-        pixmap = qg.QPixmap.fromImage(image)
-
-        self._region_view.display_pixmap(pixmap)
+            if not self._parent.video_queue().empty():
+                self.make_frame()
 
     def make_frame(self):
         """
@@ -139,13 +102,6 @@ class VideoBuffer:
 
         img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
 
-        image = qg.QImage(
-            img.data,
-            img.shape[1],
-            img.shape[0],
-            3*img.shape[1],
-            qg.QImage.Format_RGB888)
-
-        pixmap = qg.QPixmap.fromImage(image)
+        pixmap = nparray_to_qpixmap(img)
 
         self._region_view.display_pixmap(pixmap, frame)

@@ -30,9 +30,11 @@ from collections import namedtuple
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
+import PyQt5.QtGui as qg
 
 from cgt.gui.regionselectionlabel import RegionSelectionLabel
 from cgt.model.region import Region
+from cgt.util.utils import qpixmap_to_nparray
 
 # import UI
 from cgt.gui.Ui_regionselectionwidget import Ui_RegionSelectionWidget
@@ -223,10 +225,11 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
                 numpy.array the pixels of the selected subimage
         """
         rect = self._source_label.rectangle
-        subpixmap = self._pixmap.copy(qc.QRect(rect.top,
-                                               rect.left,
-                                               rect.width,
-                                               rect.height))
+        qrect = qc.QRect(rect.top, rect.left,
+                         rect.width, rect.height)
+
+        print(f"widget found {rect} => {qrect}")
+        subpixmap = self._pixmap.copy(qrect)
 
         return subpixmap, rect
 
@@ -272,7 +275,10 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             start_frame=first_frame,
             end_frame=final_frame)
 
-        self._data_source.append_region(region)
+        start = qpixmap_to_nparray(self._startImageLabel.pixmap())
+        end = qpixmap_to_nparray(self._endImageLabel.pixmap())
+        self._data_source.append_region(region, (start, end))
+
         results = self._data_source.get_result()
         self._regionComboBox.addItem(str(len(results.regions)-1))
         self.reset_enter_region()
@@ -380,6 +386,7 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         if pixmap is None:
             return
 
+        print("new pixmap")
         self._pixmap = pixmap
         self._current_image = frame_number
         self.display_current_pixmap()

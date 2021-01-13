@@ -170,7 +170,7 @@ class DrawingLabel(qw.QLabel):
         set the pixmap to be displayed
 
             Args:
-                pix (QPixmap) the pixmap to be displayed
+                pix (np.array uint8) the pixmap to be displayed
 
             Returns:
                 None
@@ -360,7 +360,6 @@ class DrawingLabel(qw.QLabel):
             if event.button() == qc.Qt.LeftButton:
                 pick = self.pick_line_segment(event.pos())
                 if pick is not None:
-                    print(f"Found segment {pick}")
                     self._current_line = pick[0]
                     self._moving_line_segment = pick[0]
                     self._start = event.pos()
@@ -695,7 +694,6 @@ class DrawingLabel(qw.QLabel):
             self.tr("Add moved line to results?"))
 
         if reply == qw.QMessageBox.Yes:
-            print(f"Add ({self._current_frame}, {self._current_line}) to results")
             keys = self._display_line.keys()
             if self._current_frame in keys:
                 qw.QMessageBox.critical(self,
@@ -835,7 +833,7 @@ class DrawingLabel(qw.QLabel):
         height = self._background_pixmap.height()*self._current_zoom
         width = self._background_pixmap.width()*self._current_zoom
         pix = self._background_pixmap.scaled(width, height)
-
+        print("pixmap scalled")
         painter.begin(pix) # make copy
 
         font = painter.font()
@@ -843,7 +841,6 @@ class DrawingLabel(qw.QLabel):
         painter.setFont(font)
 
         # TODO make self._current_line the source for adjustments
-
         if self._display_line is not None:
             painter.setPen(old_pen)
             frames = self._display_line.frame_numbers

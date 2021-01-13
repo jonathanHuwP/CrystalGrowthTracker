@@ -122,6 +122,7 @@ class VideoAnalysisResultsStore:
 
             Args:
                 region (Region) the region to be added
+                start_end (tupel(QPixmap, QPixmap)) images of start and end of region
 
             Reterns:
                 index of the new region
