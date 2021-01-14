@@ -28,13 +28,13 @@ import sys
 import os
 import array as arr
 from shutil import copy2
-from queue import Queue
+from imageio import get_reader as imio_get_reader
+import numpy as np
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
-from cgt.io.videobuffer import VideoBuffer
 from cgt.model.videoanalysisresultsstore import VideoAnalysisResultsStore
 
 from cgt.gui.projectstartdialog import ProjectStartDialog
@@ -90,12 +90,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         ## the project data structure
         self._project = None
-
-        ## queue for the selection widget, holds frame numbers
-        self._video_queue = Queue(256)
-
-        ## queue for the drawing widget, holds (fram number, region)
-        self._regions_queue = Queue(256)
 
 
         ## base widget for properties tab
@@ -157,50 +151,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         ## pointer for an autosave file
         self._autosave = None
 
-    def request_video_frame(self, frame_number):
-        """
-        add frame number to video Queue
-
-            Args:
-                frame_number (int) the frame number to
-
-            Returns:
-                None
-        """
-        self._video_queue.put(frame_number)
-
-    def request_drawing_frame(self, frame_number, region):
-        """
-        add frame number to drawing Queue
-
-            Args:
-                frame_number (int) the frame number to
-                region (Region) the region that is requested
-
-            Returns:
-                None
-        """
-        print(f"request_drawing_frame({frame_number})")
-        self._regions_queue.put((frame_number, region))
-
-    def video_queue(self):
-        """
-        getter for the queue of frame requests from the region selection widget
-
-            Returns:
-                the regions selection widget frame queue
-        """
-        return self._video_queue
-
-    def drawing_queue(self):
-        """
-        getter for the queue of (frame, region) requests from the drawing widget
-
-            Returns:
-                the drawing widget's queue
-        """
-        return self._drawing_queue
-
     def add_tab(self, tab_widget, target_widget, title):
         """
         add a new tab
@@ -236,20 +186,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._propertiesWidget.show_top_text()
 
         self._tabWidget.setCurrentWidget(self._propertiesTab)
-
-    def active_tab(self):
-        """
-        determin which tab is running
-
-            Returns
-                (int) 1, region selection; 2, drawing; 0 else
-        """
-        if self._tabWidget.currentWidget() == self._selectTab:
-            return 1
-        elif self._tabWidget.currentWidget() == self._drawingTab:
-            return 2
-
-        return 0
 
     @qc.pyqtSlot()
     def new_project(self):
@@ -761,7 +697,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         region = self._project["results"].regions[index]
 
-        # TODO replace with new
         raw = self._video_reader.get_data(frame)
         tmp = raw[region.top:region.bottom, region.left:region.right]
         img = arr.array('B', tmp.reshape(tmp.size))
@@ -784,7 +719,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 None
         """
-        print(f"active tab {self.active_tab()}")
         error_title = self.tr("CGT Video File Error")
         if self._project is None:
             message = self.tr("You must load/create a project before loading video")
@@ -805,12 +739,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         message_box.setInformativeText("Loading video may take some time.")
         try:
             message_box.show()
-            self._video_reader = VideoBuffer(self._project["enhanced_video"],
-                                             self,
-                                             self._selectWidget,
-                                             self._drawingWidget)
-            self._video_reader.start()
-
+            self._video_reader = imio_get_reader(self._project["enhanced_video"], 'ffmpeg')
         except (FileNotFoundError, IOError) as ex:
             message_box.close()
             message = self.tr("Unexpected error reading {}: {} => {}")

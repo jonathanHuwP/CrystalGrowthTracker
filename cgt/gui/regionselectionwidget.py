@@ -27,8 +27,11 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 
 import sys
 from collections import namedtuple
+import array as arr
+from imageio import get_reader as imio_get_reader
 
 import PyQt5.QtWidgets as qw
+import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
 from cgt.gui.regionselectionlabel import RegionSelectionLabel
@@ -43,6 +46,31 @@ from cgt.gui.Ui_regionselectionwidget import Ui_RegionSelectionWidget
 ## rectangle the subimage in screen pixel coordinates
 ## frame the number of the frame
 RegionEnd = namedtuple("RegionEnd", ["rectangle", "frame"])
+
+def memview_3b_to_qpixmap(pixels, width, height):
+    """
+    convert a CPython array pixels (RGB unsingned char) to QPixmap
+
+        Args:
+            pixels (CPython array) the imput pixel array
+            width (int) the width of the image in pixels
+            height (int) the height of the image in pixels
+
+        Returns:
+            a QPixmap of the image
+    """
+    tmp = arr.array('B', pixels.reshape(pixels.size))
+
+    im_format = qg.QImage.Format_RGB888
+
+    image = qg.QImage(
+        tmp,
+        width,
+        height,
+        3*width,
+        im_format)
+
+    return qg.QPixmap.fromImage(image)
 
 class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
     """
@@ -60,7 +88,7 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             Returns:
                 None
         """
-        super().__init__(parent)
+        super(RegionSelectionWidget, self).__init__(parent)
         ## the object that owns the widget and holds the data
         self._data_source = data_source
 
@@ -87,9 +115,6 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
 
         ## a user set frame rate to override video header
         self._user_frame_rate = None
-
-        ## a pointer to the current pixmap
-        self._pixmap = None
 
         # put the label in the scroll
         self._scrollArea.setWidget(self._source_label)
@@ -129,12 +154,6 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
 
     @qc.pyqtSlot()
     def load_video(self):
-        """
-        callback for a load video instruction
-
-            Returns:
-                None
-        """
         if self._data_source.get_video_reader() is None:
             self._data_source.load_video()
 
@@ -169,7 +188,14 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
                 None
         """
         if self._current_image != number:
-            self._data_source.request_video_frame(number)
+            self._current_image = number
+
+            message = "Frame {:d} of {:d}, approx {:.2f} seconds"
+            time, _ = self.get_current_video_time()
+            message = message.format(number, self._video_frame_count+1, time)
+            self._timeStatusLabel.setText(message)
+
+            self.display_pixmap()
 
     def start_new_region(self):
         """
@@ -180,9 +206,11 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         """
         time, frame = self.get_current_video_time()
 
-        pixmap, rect = self.get_current_subimage()
+        img, rect = self.get_current_subimage()
 
         self._region_end = RegionEnd(rect, frame)
+
+        pixmap = memview_3b_to_qpixmap(img, rect.width, rect.height)
 
         self._startImageLabel.setPixmap(pixmap)
         self._startImageLabel.setScaledContents(True)
@@ -202,7 +230,9 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             Returns:
                 None
         """
-        pixmap, _ = self.get_current_subimage()
+        img, rect = self.get_current_subimage()
+
+        pixmap = memview_3b_to_qpixmap(img, rect.width, rect.height)
 
         self._endImageLabel.setPixmap(pixmap)
 
@@ -223,12 +253,9 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
                 numpy.array the pixels of the selected subimage
         """
         rect = self._source_label.rectangle
-        subpixmap = self._pixmap.copy(qc.QRect(rect.top,
-                                               rect.left,
-                                               rect.width,
-                                               rect.height))
+        raw = self._data_source.get_video_reader().get_data(self._current_image)
 
-        return subpixmap, rect
+        return raw[rect.top:rect.bottom, rect.left:rect.right], rect
 
     @qc.pyqtSlot()
     def region_combobox_changed(self):
@@ -290,12 +317,6 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             self._regionComboBox.addItem(str(index))
 
     def get_selected_region(self):
-        """
-        get a region from results to dates
-
-            Returns:
-                the region corresponding to the value of the _regionComboBox
-        """
         index = self._regionComboBox.currentIndex()
 
         return self._data_source.get_result().regions[index]
@@ -324,7 +345,7 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             Returns:
                 None
         """
-        self.display_current_pixmap()
+        self.display_pixmap()
 
     def enable_select_buttons(self, flag):
         """
@@ -359,51 +380,42 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             Returns:
                 None
         """
-        self._video_frame_count = self._data_source.get_video_reader().length()
+
+        self._video_frame_count = self._data_source.get_video_reader().count_frames()
         self._current_image = 0
+        self.display_pixmap()
         self._videoControls.set_range(0, self._video_frame_count)
         self._videoControls.enable(True)
-        self._videoControls.highlight_up()
-        self._data_source.request_video_frame(self._current_image)
 
-    def display_pixmap(self, pixmap, frame_number):
+    def display_pixmap(self):
         """
         diplay pixmap with new current zoom
 
-            Args:
-                pixmap (qpixmap) the video image
-                frame_number (int) the frame number
-
             Returns:
                 None
         """
-        if pixmap is None:
+        reader = self._data_source.get_video_reader()
+
+        if reader is None:
             return
 
-        self._pixmap = pixmap
-        self._current_image = frame_number
-        self.display_current_pixmap()
+        img = reader.get_data(self._current_image)
 
-    def display_current_pixmap(self):
-        """
-        dispaly the current pixmap held by the widget.
+        im_format = qg.QImage.Format_RGB888
+        image = qg.QImage(
+            img.data,
+            img.shape[1],
+            img.shape[0],
+            3*img.shape[1],
+            im_format)
 
-            Returns:
-                None
-        """
-        size = self._pixmap.size() * self._zoomSpinBox.value()
-        pixmap = self._pixmap.scaled(size,
-                                     qc.Qt.KeepAspectRatio,
-                                     qc.Qt.SmoothTransformation)
+        pixmap = qg.QPixmap.fromImage(image)
+        size = pixmap.size() * self._zoomSpinBox.value()
+        pixmap = pixmap.scaled(size,
+                               qc.Qt.KeepAspectRatio,
+                               qc.Qt.SmoothTransformation)
 
         self._source_label.setPixmap(pixmap)
-
-        message = "Frame {:d} of {:d}, approx {:.2f} seconds"
-        time, _ = self.get_current_video_time()
-        message = message.format(self._current_image,
-                                 self._video_frame_count+1,
-                                 time)
-        self._timeStatusLabel.setText(message)
 
         if self._region_end is not None:
             self.display_final_region()
