@@ -35,8 +35,8 @@ class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
     first and last frames of a video sequence
     """
 
-    ## signal to indicate change of true if first frame of the sequene
-    frame_changed = qc.pyqtSignal(bool, int)
+    ## signal to indicate change of frame
+    frame_changed = qc.pyqtSignal()
 
     def __init__(self, parent=None):
         """
@@ -69,6 +69,9 @@ class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
         # set disabled
         self.setEnabled(False)
 
+        # set disabled
+        self.setEnabled(False)
+
     @qc.pyqtSlot()
     def last_clicked(self):
         """
@@ -77,8 +80,9 @@ class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
             Returns:
                 None
         """
-        self._first_frame = False
-        self.frame_changed(False, self._frame_maximum)
+        self.highlight_first()
+        self.set_frame(self._frame_maximum)
+
 
     @qc.pyqtSlot()
     def first_clicked(self):
@@ -88,8 +92,8 @@ class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
             Returns:
                 None
         """
-        self._first_frame = True
-        self.frame_changed(False, self._frame_minimum)
+        self.highlight_last()
+        self.set_frame(self._frame_minimum)
 
     def set_state(self, state):
         """
@@ -110,8 +114,8 @@ class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
     def get_minimum(self):
         return self._frame_minimum
 
-    def get_maximum(self):
-        return self._frame_maximum
+        if self.isEnabled() and change:
+            self.frame_changed.emit()
 
     def get_current_frame(self):
         """
@@ -153,7 +157,9 @@ class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
         self.setEnabled(False)
         self._frame_minimum = minimum
         self._frame_maximum = maximum
-        self._first_frame = False
+        self.set_frame(self._frame_maximum)
+        self._frameOut.display(self._current_frame)
+        self.highlight_first()
         self.setEnabled(tmp)
 
     def clear(self):
@@ -171,18 +177,9 @@ class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
 
         self.setEnabled(tmp)
 
-    def flip_highlights(self):
-        """
-        switch over the highlights of the first and last buttons
-        """
-        if self._first_frame:
-            self.highlight_last()
-        else:
-            self.highlight_first()
-
     def highlight_first(self):
         """
-        colourize the up button and blur the down
+        colourize the first button and blur the down
         """
         self._firstButton.setGraphicsEffect(qw.QGraphicsColorizeEffect())
         self._lastButton.setGraphicsEffect(qw.QGraphicsBlurEffect())
