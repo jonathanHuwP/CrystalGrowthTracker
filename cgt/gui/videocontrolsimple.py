@@ -30,9 +30,13 @@ import PyQt5.QtCore as qc
 from cgt.gui.Ui_videocontrolsimple import Ui_VideoControlSimple
 
 class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
+    """
+    a video control that allows the user to navigate between the
+    first and last frames of a video sequence
+    """
 
-    ## signal to indicate change of frame
-    frame_changed = qc.pyqtSignal()
+    ## state change: true if first frame
+    frame_changed = qc.pyqtSignal(bool)
 
     def __init__(self, parent=None):
         """
@@ -47,8 +51,8 @@ class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
         super().__init__(parent)
         self.setupUi(self)
 
-        ## storage for the current frame
-        self._current_frame = 0
+        ## the state if true first frame selected
+        self._first_frame = True
 
         ## the maximum
         self._frame_maximum = 0
@@ -60,6 +64,7 @@ class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
         style = qw.QCommonStyle()
         self._firstButton.setIcon(style.standardIcon(style.SP_ArrowBack))
         self._lastButton.setIcon(style.standardIcon(style.SP_ArrowForward))
+        self.set_display()
 
         # set disabled
         self.setEnabled(False)
@@ -72,9 +77,9 @@ class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
             Returns:
                 None
         """
-        self.highlight_first()
-        self.set_frame(self._frame_maximum)
-
+        self._first_frame = False
+        self.frame_changed.emit(False)
+        self.set_display()
 
     @qc.pyqtSlot()
     def first_clicked(self):
@@ -84,40 +89,34 @@ class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
             Returns:
                 None
         """
-        self.highlight_last()
-        self.set_frame(self._frame_minimum)
+        self._first_frame = True
+        self.frame_changed.emit(True)
+        self.set_display()
 
-    def set_frame(self, frame):
+    def set_state(self, state):
         """
-        set a new value of the frame
+        set a new state and update display
+        """
+        self._first_frame = state
+        self.set_display()
 
-            Args:
-                frame (int) the new frame number
+    def get_state(self):
+        """
+        getter for the state
 
             Returns:
-                None
-
-            Emits:
-                frame_changed if a change has occured
+                true if first was last button clicked else False + frame number
         """
-        change = False
+        if self._first_frame:
+            return True, self._frame_minimum
 
-        if self._current_frame != frame:
-            self._current_frame = frame
-            self._frameOut.display(self._current_frame)
-            change = True
+        return False, self._frame_maximum
 
-        if self.isEnabled() and change:
-            self.frame_changed.emit()
+    def get_minimum(self):
+        return self._frame_minimum
 
-    def get_current_frame(self):
-        """
-        getter for the current frame number
-
-            Returns:
-                the current frame number
-        """
-        return self._current_frame
+    def get_maximum(self):
+        return self._frame_maximum
 
     def setEnabled(self, flag = True):
         """
@@ -147,9 +146,8 @@ class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
         self.setEnabled(False)
         self._frame_minimum = minimum
         self._frame_maximum = maximum
-        self.set_frame(self._frame_maximum)
-        self._frameOut.display(self._current_frame)
-        self.highlight_first()
+        self._first_frame = False
+        self.set_display()
         self.setEnabled(tmp)
 
     def clear(self):
@@ -167,9 +165,20 @@ class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
 
         self.setEnabled(tmp)
 
+    def set_display(self):
+        """
+        switch over the highlights of the first and last buttons
+        """
+        if self._first_frame:
+            self.highlight_last()
+            self._frameOut.display(self._frame_minimum)
+        else:
+            self.highlight_first()
+            self._frameOut.display(self._frame_maximum)
+
     def highlight_first(self):
         """
-        colourize the first button and blur the down
+        colourize the up button and blur the down
         """
         self._firstButton.setGraphicsEffect(qw.QGraphicsColorizeEffect())
         self._lastButton.setGraphicsEffect(qw.QGraphicsBlurEffect())

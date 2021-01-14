@@ -36,6 +36,7 @@ import PyQt5.QtCore as qc
 
 from cgt.gui.regionselectionlabel import RegionSelectionLabel
 from cgt.model.region import Region
+from cgt.util.utils import nparray_to_qpixmap, qpixmap_to_nparray
 
 # import UI
 from cgt.gui.Ui_regionselectionwidget import Ui_RegionSelectionWidget
@@ -299,7 +300,12 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             start_frame=first_frame,
             end_frame=final_frame)
 
-        self._data_source.append_region(region)
+        start_image = qpixmap_to_nparray(self._startImageLabel.pixmap())
+        end_image = qpixmap_to_nparray(self._endImageLabel.pixmap())
+
+        images = (start_image, end_image)
+        print(type(images))
+        self._data_source.append_region(region, images)
         results = self._data_source.get_result()
         self._regionComboBox.addItem(str(len(results.regions)-1))
         self.reset_enter_region()

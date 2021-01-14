@@ -626,17 +626,18 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         return None
 
-    def append_region(self, region):
+    def append_region(self, region, region_images):
         """
         add a region to the results and notify the crystal drawing widget
 
             Args:
                 region (Region) the region
+                region_images ((numpy.array. numpy.array)) start, end images of region
 
             Returns:
                 None
         """
-        self._project["results"].add_region(region)
+        self._project["results"].add_region(region, region_images)
         self._drawingWidget.new_region()
         self._resultsWidget.display_data()
         self.autosave()
