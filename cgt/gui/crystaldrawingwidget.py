@@ -30,7 +30,6 @@ from cgt.model.linesetsandframesstore import LineSetsAndFramesStore
 from cgt.model.line import Line
 
 from cgt.gui.drawinglabel import DrawingLabel
-from cgt.util.utils import nparray_to_qpixmap
 
 from cgt.gui.Ui_crystaldrawingwidget import Ui_CrystalDrawingWidget
 
@@ -50,7 +49,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
-        super().__init__(parent)
+        super(CrystalDrawingWidget, self).__init__(parent)
 
         ## the widget holding the project data
         self._data_source = data_source
@@ -72,7 +71,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         # connect the signals for the user selecting a region
         self._rlfWidget.user_region_selection.connect(self.select_region)
         self._rlfWidget.user_line_selection.connect(self.select_line)
-        #self._rlfWidget.user_frame_selection.connect(self.select_frame)
+        self._rlfWidget.user_frame_selection.connect(self.select_frame)
 
     def clear(self):
         """
@@ -97,54 +96,30 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         """
         self._data_source = data_source
 
-    def display_region(self, region_index, first_frame):
+    def display_region(self):
         """
         the display function
 
-            Args:
-                pixmap (QPixmap) the pixmap to be displayed
-                region_index (int) the index of the region to be displayed
-                first_frame (bool) true if the index is the first frame
             Returns:
                 None
         """
-        print(f"in display region index {region_index} first_frame {first_frame}")
-        #line_index = self._rlfWidget.get_selected_line()
-        region_images = self._data_source.get_region_image(region_index)
-        print(">>>>> type ", type(region_images))
-        region = self._data_source.get_result().regions[region_index]
-        print("have image and region")
-        frame = 0
-        pixmap = None
-        if first_frame:
-            frame = region.start_frame
-            pixmap = region_images[0]
-        else:
-            print(f"frame {region.end_frame}")
-            print(f"images {region_images}")
-            frame = region.end_frame
-            pixmap = region_images[1]
+        region_index = self._rlfWidget.get_selected_region()
+        if region_index is None:
+            return
 
-        print(f"frame {pixmap}, pixmap{pixmap}")
-        pixmap = nparray_to_qpixmap(pixmap)
-        print("make pixmap")
+        frame = self._videoControl.get_current_frame()
+        line_index = self._rlfWidget.get_selected_line()
+
+        pixmap = self._data_source.make_pixmap(region_index, frame)
+
         self._drawing.set_backgroud_pixmap(pixmap, frame)
-
-        """
-        line = None
         if line_index is not None:
             line = self._data_source.get_result().lines[line_index]
+            self._drawing.set_display_line(line)
+        else:
+            self._drawing.set_display_line(None)
 
-        self._drawing.set_display_line(line)
-        """
-        self._drawing.set_display_line(None)
-        print("set display line")
-        self._videoControl.set_range(region.start_frame, region.end_frame)
-        self._videoControl.set_state(first_frame)
-        self._videoControl.setEnabled(True)
-        print("stuff enables")
         self._drawing.redisplay()
-        print("finished")
 
     def new_region(self):
         """
@@ -219,27 +194,15 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         """
         self._drawing.clear_all()
 
-    @qc.pyqtSlot(bool)
-    def frame_changed(self, first_frame):
+    @qc.pyqtSlot()
+    def frame_changed(self):
         """
         callback for a change of frame
-
-            Args:
-                first_frame (bool) True if first frame else False
 
             Returns:
                 None
         """
-        region_index = self._rlfWidget.get_selected_region()
-
-        frame_number = 0
-        if first_frame:
-            frame_number = self._videoControl.get_minimum()
-        else:
-            frame_number = self._videoControl.get_maximum()
-
-        region_index = self._rlfWidget.get_selected_region()
-        self._data_source.get_region_image(region_index)
+        self.display_region()
 
     @qc.pyqtSlot()
     def zoom_changed(self):
@@ -265,6 +228,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             if self._data_source.get_video_reader() is not None:
                 if len(self._data_source.get_result().regions) > 0:
                     self._videoControl.setEnabled(True)
+                    self.display_region()
 
     @qc.pyqtSlot()
     def hideEvent(self, event):
@@ -288,6 +252,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
+        # TODO put test and save in seperate function
         # has label got unsaved lines?
         if len(self._drawing.lines_base) > 0:
             message = "You have unsaved data do you wish to proceeed?"
@@ -297,9 +262,12 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
                 return
 
         self._drawing.clear_all()
-        print("dw: select region")
 
-        self.display_region(r_index, False)
+        region = self._data_source.get_result().regions[r_index]
+
+        self._videoControl.set_range(region.start_frame, region.end_frame)
+        self._videoControl.setEnabled(True)
+        self.display_region()
 
     @qc.pyqtSlot(int)
     def select_line(self, l_index):
@@ -314,8 +282,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         """
         # TODO send l_index to self._drawing
         #region = self._rlfWidget.get_selected_region()
-        #self.display_region()
-        pass
+        self.display_region()
 
     def select_frame(self, frame):
         """

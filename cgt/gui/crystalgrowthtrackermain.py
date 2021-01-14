@@ -23,7 +23,6 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = too-many-public-methods
 # pylint: disable = too-many-instance-attributes
 # pylint: disable = c-extension-no-member
-# pylint: disable = c-extension-no-member
 
 import sys
 import os
@@ -627,19 +626,17 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         return None
 
-    def append_region(self, region, start_end):
+    def append_region(self, region):
         """
         add a region to the results and notify the crystal drawing widget
 
             Args:
                 region (Region) the region
-                start_end (tupel(np.array, np.array)) images of start and end of region
 
             Returns:
                 None
         """
         self._project["results"].add_region(region)
-        self._region_images.append(start_end)
         self._drawingWidget.new_region()
         self._resultsWidget.display_data()
         self.autosave()
@@ -740,7 +737,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         message_box = qw.QMessageBox()
         message_box.setText("Loading Video.")
         message_box.setInformativeText("Loading video may take some time.")
-
         try:
             message_box.show()
             self._video_reader = imio_get_reader(self._project["enhanced_video"], 'ffmpeg')
@@ -810,7 +806,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self._resultsWidget.save(file_path)
 
-    @qc.pyqtSlot(qg.QCloseEvent)
+    @qc.pyqtSlot()
     def closeEvent(self, event):
         """
         Overrides QWidget.closeEvent

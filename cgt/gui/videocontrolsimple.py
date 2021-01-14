@@ -30,10 +30,6 @@ import PyQt5.QtCore as qc
 from cgt.gui.Ui_videocontrolsimple import Ui_VideoControlSimple
 
 class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
-    """
-    a video control that allows the user to navigate between the
-    first and last frames of a video sequence
-    """
 
     ## signal to indicate change of frame
     frame_changed = qc.pyqtSignal()
@@ -51,8 +47,8 @@ class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
         super().__init__(parent)
         self.setupUi(self)
 
-        ## the state if true first frame selected
-        self._first_frame = True
+        ## storage for the current frame
+        self._current_frame = 0
 
         ## the maximum
         self._frame_maximum = 0
@@ -64,10 +60,6 @@ class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
         style = qw.QCommonStyle()
         self._firstButton.setIcon(style.standardIcon(style.SP_ArrowBack))
         self._lastButton.setIcon(style.standardIcon(style.SP_ArrowForward))
-        self.flip_highlights()
-
-        # set disabled
-        self.setEnabled(False)
 
         # set disabled
         self.setEnabled(False)
@@ -95,24 +87,25 @@ class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
         self.highlight_last()
         self.set_frame(self._frame_minimum)
 
-    def set_state(self, state):
+    def set_frame(self, frame):
         """
-        set a new state and update display
-        """
-        self._first_frame = state
-        self.flip_highlights()
+        set a new value of the frame
 
-    def get_state(self):
-        """
-        getter for the state
+            Args:
+                frame (int) the new frame number
 
             Returns:
-                true if first was last button clicked else False + frame number
-        """
-        return self._first_frame
+                None
 
-    def get_minimum(self):
-        return self._frame_minimum
+            Emits:
+                frame_changed if a change has occured
+        """
+        change = False
+
+        if self._current_frame != frame:
+            self._current_frame = frame
+            self._frameOut.display(self._current_frame)
+            change = True
 
         if self.isEnabled() and change:
             self.frame_changed.emit()
@@ -124,10 +117,7 @@ class VideoControlSimple(qw.QWidget, Ui_VideoControlSimple):
             Returns:
                 the current frame number
         """
-        if self._first_frame:
-            return self._frame_minimum
-
-        return self._frame_maximum
+        return self._current_frame
 
     def setEnabled(self, flag = True):
         """

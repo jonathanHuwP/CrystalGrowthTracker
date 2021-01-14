@@ -50,11 +50,11 @@ class ProjectPropertiesWidget(qw.QWidget, Ui_ProjectPropertiesWidget):
 
         ## the class holding the data
         self._data_source = data_source
-
+        
     def clear(self):
         """
         clear the contents
-
+        
             Return:
                 None
         """
@@ -85,9 +85,10 @@ class ProjectPropertiesWidget(qw.QWidget, Ui_ProjectPropertiesWidget):
                 None
         """
         self._propertiesBrowser.append(text)
-
+        
     def show_top_text(self):
         self._propertiesBrowser.verticalScrollBar().setValue(0)
+
 
     @qc.pyqtSlot()
     def set_video_scale_parameters(self):

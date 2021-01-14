@@ -257,7 +257,6 @@ class RegionSelectionLabel(qw.QLabel):
         self._start = None
         self._end = None
 
-        print(f"label sent {self._rectangle}")
         self.new_selection.emit()
 
     def paintEvent(self, event):

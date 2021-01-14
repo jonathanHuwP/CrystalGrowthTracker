@@ -33,11 +33,9 @@ from imageio import get_reader as imio_get_reader
 import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
-import PyQt5.QtGui as qg
 
 from cgt.gui.regionselectionlabel import RegionSelectionLabel
 from cgt.model.region import Region
-from cgt.util.utils import qpixmap_to_nparray
 
 # import UI
 from cgt.gui.Ui_regionselectionwidget import Ui_RegionSelectionWidget
@@ -301,10 +299,7 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             start_frame=first_frame,
             end_frame=final_frame)
 
-        start = qpixmap_to_nparray(self._startImageLabel.pixmap())
-        end = qpixmap_to_nparray(self._endImageLabel.pixmap())
-        self._data_source.append_region(region, (start, end))
-
+        self._data_source.append_region(region)
         results = self._data_source.get_result()
         self._regionComboBox.addItem(str(len(results.regions)-1))
         self.reset_enter_region()
