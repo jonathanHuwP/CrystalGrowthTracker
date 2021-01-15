@@ -46,7 +46,7 @@ def qpixmap_to_nparray(pixmap):
     bit_str.setsize(width*height*4)
 
     # np.frombuffer used to convert the byte string into an np array
-    img = np.frombuffer(bit_str, dtype=np.uint8).reshape((width, height ,4))
+    img = np.frombuffer(bit_str, dtype=np.uint8).reshape((width, height, 4))
 
     return img
 
@@ -62,9 +62,9 @@ def nparray_to_qpixmap(img, brg=True):
     """
     image = qg.QImage(
         img.data,
-        img.shape[1],
         img.shape[0],
-        3*img.shape[1],
+        img.shape[1],
+        4*img.shape[1],
         qg.QImage.Format_RGB888)
 
     return qg.QPixmap.fromImage(image)
