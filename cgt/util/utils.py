@@ -24,6 +24,32 @@ from sys import platform as _platform
 import datetime
 import PyQt5.QtGui as qg
 import numpy as np
+import array as arr
+
+def memview_3b_to_qpixmap(pixels, width, height):
+    """
+    convert a CPython array pixels (RGB unsingned char) to QPixmap
+
+        Args:
+            pixels (CPython array) the imput pixel array
+            width (int) the width of the image in pixels
+            height (int) the height of the image in pixels
+
+        Returns:
+            a QPixmap of the image
+    """
+    tmp = arr.array('B', pixels.reshape(pixels.size))
+
+    im_format = qg.QImage.Format_RGB888
+
+    image = qg.QImage(
+        tmp,
+        width,
+        height,
+        3*width,
+        im_format)
+
+    return qg.QPixmap.fromImage(image)
 
 def qpixmap_to_nparray(pixmap):
     """
