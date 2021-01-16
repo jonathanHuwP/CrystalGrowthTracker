@@ -185,9 +185,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         self.display_image(first_frame, region_index)
 
     def display_image(self, first_frame, region_index):
-        print(f"CDW: dispaly_image {first_frame} {region_index}")
         images = self._data_source.get_result().region_images[region_index]
-        print(f"CDW: images {images[0].shape} {images[1].shape}")
 
         frame_number = 0
         image = None

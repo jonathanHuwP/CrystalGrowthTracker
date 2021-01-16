@@ -66,10 +66,11 @@ def nparray_to_qimage(array, brg=False):
     #    array = cv2.cvtColor(array, COLOR_BGR2RGB)
 
     image = None
+    # set for Red/Green/Blue 8 bits each
     image_format = qg.QImage.Format_RGB888
 
     if array.shape[2] == 4:
-        print("did 4")
+        # Alpha/Red/Green/Blue 8 bits each
         image_format = qg.QImage.Format_ARGB32
 
     image = qg.QImage(
@@ -95,13 +96,13 @@ def qimage_to_nparray(image):
         raise ValueError("QImage not in Format_RGB32")
 
     if image.depth() != 32:
-        raise ValueError(f"unexpected image depth: {img.depth()}")
+        raise ValueError(f"Unexpected image depth: {image.depth()}")
 
-    print(f"\t>> to Array: size {image.size()}")
     size = image.size()
     width = size.width()
     height = size.height()
 
+    # get pointer to pixels and set size in bits
     bits = image.bits()
     bits.setsize(width*height*32)
 
@@ -110,9 +111,7 @@ def qimage_to_nparray(image):
                        dtype=np.uint8,
                        buffer=bits)
 
-    print(f"\t>> to Array: size {array.shape}")
-
-    # make a deep copy so the array will survive if image deleted
+    # make a deep copy so the array will survive when image deleted
     return array.copy()
 
 def find_hostname_and_ip():

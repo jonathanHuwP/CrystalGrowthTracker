@@ -282,7 +282,6 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
 
         images = (start_image, end_image)
 
-        print(f"RSW: images {images[0].shape} {images[1].shape}")
         self._data_source.append_region(region, images)
         results = self._data_source.get_result()
         self._regionComboBox.addItem(str(len(results.regions)-1))
@@ -417,22 +416,18 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
 
         if button == "_newButton":
             # set state for entering new regions
-            print("new")
             self._source_label.set_adding()
 
         elif button == "_allButton":
             # set display all regions
-            print("All")
             self._source_label.set_display_all()
 
         elif button == "_allNoTimeButton":
             # set display all regions independant of time
-            print("All No Time")
             self._source_label.set_display_all_no_time()
 
         elif button == "_selectedButton":
             # only disply the selected region
-            print("selected {}".format(self._regionComboBox.currentText()))
             self._source_label.set_display_selected()
 
     def get_pixmap(self):
