@@ -25,11 +25,12 @@ import sys
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
+import PyQt5.QtGui as qg
 
 from cgt.model.linesetsandframesstore import LineSetsAndFramesStore
 from cgt.model.line import Line
 from cgt.gui.drawinglabel import DrawingLabel
-from cgt.util.utils import nparray_to_qpixmap
+from cgt.util.utils import nparray_to_qimage
 
 from cgt.gui.Ui_crystaldrawingwidget import Ui_CrystalDrawingWidget
 
@@ -49,7 +50,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
-        super(CrystalDrawingWidget, self).__init__(parent)
+        super().__init__(parent)
 
         ## the widget holding the project data
         self._data_source = data_source
@@ -184,18 +185,20 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         self.display_image(first_frame, region_index)
 
     def display_image(self, first_frame, region_index):
+        print(f"CDW: dispaly_image {first_frame} {region_index}")
         images = self._data_source.get_result().region_images[region_index]
+        print(f"CDW: images {images[0].shape} {images[1].shape}")
 
         frame_number = 0
-        pixmap = None
+        image = None
         if first_frame:
-            pixmap = nparray_to_qpixmap(images[0])
+            image = nparray_to_qimage(images[0])
             frame_number = self._videoControl.get_minimum()
         else:
-            pixmap = nparray_to_qpixmap(images[1])
+            image = nparray_to_qimage(images[1])
             frame_number = self._videoControl.get_maximum()
 
-        self._drawing.set_backgroud_pixmap(pixmap, frame_number)
+        self._drawing.set_backgroud_pixmap(qg.QPixmap(image), frame_number)
 
         line = None
         line_index = self._rlfWidget.get_selected_line()

@@ -51,49 +51,69 @@ def memview_3b_to_qpixmap(pixels, width, height):
 
     return qg.QPixmap.fromImage(image)
 
-def qpixmap_to_nparray(pixmap):
+def nparray_to_qimage(array, brg=False):
     """
-    convert a QPixmap to an np array of based on :
-    https://stackoverflow.com/questions/45020672/convert-pyqt5-qpixmap-to-numpy-ndarray
+    convert an image in numpy array format to a QImage (Qt editing type)
 
         Args:
-            pixmap (QPixmap) the pixmap to be transformed
+            array (np.array uint=8) the numpy array
+            brg (bool) if True is blue/red/green format, else RGB
+
+        Returns:
+            a QImage Qt image manipulation format
+    """
+    #if brg:
+    #    array = cv2.cvtColor(array, COLOR_BGR2RGB)
+
+    image = None
+    image_format = qg.QImage.Format_RGB888
+
+    if array.shape[2] == 4:
+        print("did 4")
+        image_format = qg.QImage.Format_ARGB32
+
+    image = qg.QImage(
+        array.data,
+        array.shape[0],
+        array.shape[1],
+        array.shape[2]*array.shape[0],
+        image_format)
+
+    return image
+
+def qimage_to_nparray(image):
+    """
+    convert a QImage (Qt editing type) to an np array
+
+        Args:
+            image (QImage) the image, assumed to be RGB
 
         Returns:
             np array (uint8) the array
     """
-    size = pixmap.size()
+    if image.format() != qg.QImage.Format.Format_RGB32:
+        raise ValueError("QImage not in Format_RGB32")
+
+    if image.depth() != 32:
+        raise ValueError(f"unexpected image depth: {img.depth()}")
+
+    print(f"\t>> to Array: size {image.size()}")
+    size = image.size()
     width = size.width()
     height = size.height()
 
-    # convert to QImage then to a byte string
-    qimg = pixmap.toImage()
-    bit_str = qimg.bits()
-    bit_str.setsize(width*height*4)
+    bits = image.bits()
+    bits.setsize(width*height*32)
 
-    # np.frombuffer used to convert the byte string into an np array
-    img = np.frombuffer(bit_str, dtype=np.uint8).reshape((width, height, 4))
+    # this array will actually point to the data in image
+    array = np.ndarray(shape=(width, height, image.depth()//8),
+                       dtype=np.uint8,
+                       buffer=bits)
 
-    return img
+    print(f"\t>> to Array: size {array.shape}")
 
-def nparray_to_qpixmap(img, brg=True):
-    """
-    convert an image in numpy array format to a QPixmap
-
-        Args:
-            img (np.array uint=8) the numpy array in Red/Green/Blue format
-
-        Returns:
-            a QPixmap
-    """
-    image = qg.QImage(
-        img.data,
-        img.shape[0],
-        img.shape[1],
-        4*img.shape[1],
-        qg.QImage.Format_RGB888)
-
-    return qg.QPixmap.fromImage(image)
+    # make a deep copy so the array will survive if image deleted
+    return array.copy()
 
 def find_hostname_and_ip():
     """Finds the hostname and IP address to go in the log file.

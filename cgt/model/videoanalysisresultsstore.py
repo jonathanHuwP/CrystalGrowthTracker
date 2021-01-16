@@ -129,7 +129,7 @@ class VideoAnalysisResultsStore:
                 IndexError if index out of range
         """
         self._regions[index] = region
-        self._region_images = region_images
+        self._region_images[index] = region_images
         self.set_changed()
 
     def add_region(self, region, region_images):
@@ -147,7 +147,7 @@ class VideoAnalysisResultsStore:
         self._regions.append(region)
         self._region_images.append(region_images)
         self.set_changed()
-
+        print(f"results: image added: {len(self._region_images)}")
         return index
 
     @property
