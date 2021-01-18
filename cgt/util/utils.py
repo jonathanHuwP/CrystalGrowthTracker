@@ -96,7 +96,7 @@ def qimage_to_nparray(image):
         raise ValueError("QImage not in Format_RGB32")
 
     if image.depth() != 32:
-        raise ValueError(f"Unexpected image depth: {image.depth()}")
+        raise ValueError(f"Image depth not 32, actual: {image.depth()}")
 
     size = image.size()
     width = size.width()
