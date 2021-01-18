@@ -480,7 +480,6 @@ class DrawingLabel(qw.QLabel):
 
             Args:
             position (QPoint) the target point
-
             radius (int) the distance in pixels around the selected pixel that is significant
 
             Returns
@@ -510,10 +509,10 @@ class DrawingLabel(qw.QLabel):
     def test_lines_moving(self, position, radius):
         """
         find if a line segment lies within radius of the a given point
+        when the moving existing lines selecte
 
             Args:
             position (QPoint) the target point
-
             radius (int) the distance in pixels around the selected pixel that is significant
 
             Returns
