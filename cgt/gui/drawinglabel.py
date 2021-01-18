@@ -22,6 +22,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 """
 # set up linting conditions
 # pylint: disable = too-many-public-methods
+# pylint: disable = too-many-instance-attributes
 # pylint: disable = c-extension-no-member
 
 from enum import IntEnum
@@ -41,7 +42,7 @@ class WidgetState(IntEnum):
     ## the user will create a new line by downclick and drag
     DRAWING = 10
 
-    ## the user will select a drawn, but not committed, line and adjust the whole line or an endpoint
+    ## select a drawn, but not committed, for adjustment
     ADJUSTING = 20
 
     ## the will select a line committed to  the results and move it
@@ -688,6 +689,12 @@ class DrawingLabel(qw.QLabel):
         self._mouse_left_down = False
 
     def moving_release(self):
+        """
+        respond to the release of a mouse button.
+
+            Returns:
+                None
+        """
         reply = qw.QMessageBox.question(
             self,
             self.tr("Move Line"),
