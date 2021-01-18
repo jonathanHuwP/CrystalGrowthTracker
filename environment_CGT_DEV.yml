@@ -7,5 +7,6 @@ dependencies:
   - pyqt
   - imageio
   - imageio-ffmpeg
+  - opencv
   - doxygen
   - pylint

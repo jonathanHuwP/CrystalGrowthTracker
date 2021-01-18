@@ -20,6 +20,8 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 '''
 import os
 import csv
+import numpy as np
+import cv2
 
 def save_csv_project(project):
     """
@@ -91,6 +93,38 @@ def save_csv_results(project):
     title = r"_project_line_segments.csv"
     header = ["Frame", "Start x", "Start y", "End x", "End y", "Line Index"]
     save_array_cvs(project, title, header, line_segments_array)
+
+    save_region_images(project)
+
+def save_region_images(project):
+    """
+    save the images of the start and end frames of each region.
+
+        Args:
+            project (CGTProject): the project holding the results, must not be None
+        Returns:
+            None
+        Throws:
+            Error if a file cannot be opened
+    """
+    results = project["results"]
+
+    if results is None or len(results.region_images) < 1:
+        return
+
+    regions = results.regions
+    images = results.region_images
+
+    # TODO write to proper directory
+    for i, start_end in enumerate(images):
+        name_root = f"regon_{str(i)}_"
+        name = name_root + str(regions[i].start_frame)
+        np.save(name, start_end[0])
+        cv2.imwrite(name+".png", start_end[0])
+        name = name_root + str(regions[i].end_frame)
+        np.save(name, start_end[1])
+        cv2.imwrite(name, start_end[1])
+
 
 def save_array_cvs(info, title, header, data_array):
     results_dir = info["proj_full_path"]

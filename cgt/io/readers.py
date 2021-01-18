@@ -26,7 +26,7 @@ from datetime import timedelta
 from imageio import get_reader
 from cgt.util import overviewplots
 
-
+# TODO add read in for images
 
 def read_video_frame(frame_number, filename, outpath):
     '''
