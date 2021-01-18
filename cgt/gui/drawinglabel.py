@@ -888,9 +888,7 @@ class DrawingLabel(qw.QLabel):
 
             Args:
                 line (int) the array index of the line
-
                 painter (QPainter) the painter to be used for the drawing, with pen set
-
                 label (string) a label for the line, default is None
 
             Returns:
