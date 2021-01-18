@@ -5,4 +5,5 @@ channels:
 dependencies:
   - python=3.8
   - pyqt
-  - opencv
+  - imageio
+  - imageio-ffmpeg
