@@ -414,6 +414,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._resultsWidget.clear()
 
     @qc.pyqtSlot()
+    # Jo look here - have visible the tabs that show and image and the image is visible
     def save_image(self):
         # if no project, or video loaded error
         if self._project is None or self._video_reader is None:
