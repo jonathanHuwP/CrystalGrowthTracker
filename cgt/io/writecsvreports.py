@@ -18,10 +18,11 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 @copyright 2020
 @author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 '''
-import os
+import pathlib
 import csv
 import numpy as np
-import cv2
+
+from cgt.util.utils import nparray_to_qimage
 
 def save_csv_project(project):
     """
@@ -112,29 +113,38 @@ def save_region_images(project):
     if results is None or len(results.region_images) < 1:
         return
 
+    path = pathlib.Path(project["proj_full_path"])
+    path = path.joinpath("images")
+    path.mkdir(parents=True, exist_ok=True)
+
     regions = results.regions
     images = results.region_images
 
-    # TODO write to proper directory
     for i, start_end in enumerate(images):
-        name_root = f"regon_{str(i)}_"
-        name = name_root + str(regions[i].start_frame)
-        np.save(name, start_end[0])
-        cv2.imwrite(name+".png", start_end[0])
-        name = name_root + str(regions[i].end_frame)
-        np.save(name, start_end[1])
-        cv2.imwrite(name, start_end[1])
+        name_root = f"Region_{str(i)}"
+        np.savez_compressed(path.joinpath(name_root), start=start_end[0], end=start_end[1])
 
+        name = name_root + "_" + str(regions[i].start_frame) + ".png"
+        image = nparray_to_qimage(start_end[0])
+        image.save(str(path.joinpath(name)))
+
+        name = name_root + "_" + str(regions[i].end_frame) + ".png"
+        image = nparray_to_qimage(start_end[1])
+        image.save(str(path.joinpath(name+".png")))
 
 def save_array_cvs(info, title, header, data_array):
-    results_dir = info["proj_full_path"]
+    """
+    writes an array into a commer seperated values files
+        Args:
+            info (CGTProject) the project object holding the paths
+            title (string) the end of the file name
+            header (array(string)) array of column headers
+            data_array (array) the array to be written
+    """
+    path = pathlib.Path(info["proj_full_path"])
+    csv_outfile_name = info["prog"] + r"_" + info["proj_name"] + title
 
-    path = os.path.abspath(os.path.realpath(results_dir))
-
-    csv_outfile_name = (path+r"/"+info["prog"]
-                        +r"_"+info["proj_name"]+title)
-
-    with open(csv_outfile_name, "w") as fout:
+    with open(path.joinpath(csv_outfile_name), "w") as fout:
         writer = csv.writer(fout, delimiter=',', lineterminator='\n')
         writer.writerow(header)
         for row in data_array:
@@ -152,14 +162,10 @@ def save_csv_info(info):
         Throws:
             Error if file cannot be opened
     '''
-    results_dir = info["proj_full_path"]
+    path = pathlib.Path(info["proj_full_path"])
+    csv_outfile_name = info["prog"] + r"_" + info["proj_name"] + r"_project_info.csv"
 
-    path = os.path.abspath(os.path.realpath(results_dir))
-
-    csv_outfile_name = (path+r"/"+info["prog"]
-                        +r"_"+info["proj_name"]+r"_project_info.csv")
-
-    with open(csv_outfile_name, "w") as fout:
+    with open(path.joinpath(csv_outfile_name), "w") as fout:
         writer = csv.writer(fout, delimiter=',', lineterminator='\n')
         for key, value in info.items():
             writer.writerow([key, value])
