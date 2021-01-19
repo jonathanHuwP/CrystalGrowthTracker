@@ -26,8 +26,6 @@ from datetime import timedelta
 from imageio import get_reader
 from cgt.util import overviewplots
 
-
-
 def read_video_frame(frame_number, filename, outpath):
     '''
     Opens an avi input file and parses it to get a frame.

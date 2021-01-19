@@ -22,6 +22,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 """
 # set up linting conditions
 # pylint: disable = too-many-public-methods
+# pylint: disable = too-many-instance-attributes
 # pylint: disable = c-extension-no-member
 
 from enum import IntEnum
@@ -41,7 +42,7 @@ class WidgetState(IntEnum):
     ## the user will create a new line by downclick and drag
     DRAWING = 10
 
-    ## the user will select a drawn, but not committed, line and adjust the whole line or an endpoint
+    ## select a drawn, but not committed, for adjustment
     ADJUSTING = 20
 
     ## the will select a line committed to  the results and move it
@@ -480,7 +481,6 @@ class DrawingLabel(qw.QLabel):
 
             Args:
             position (QPoint) the target point
-
             radius (int) the distance in pixels around the selected pixel that is significant
 
             Returns
@@ -510,10 +510,10 @@ class DrawingLabel(qw.QLabel):
     def test_lines_moving(self, position, radius):
         """
         find if a line segment lies within radius of the a given point
+        when the moving existing lines selecte
 
             Args:
             position (QPoint) the target point
-
             radius (int) the distance in pixels around the selected pixel that is significant
 
             Returns
@@ -689,6 +689,12 @@ class DrawingLabel(qw.QLabel):
         self._mouse_left_down = False
 
     def moving_release(self):
+        """
+        respond to the release of a mouse button.
+
+            Returns:
+                None
+        """
         reply = qw.QMessageBox.question(
             self,
             self.tr("Move Line"),
@@ -882,9 +888,7 @@ class DrawingLabel(qw.QLabel):
 
             Args:
                 line (int) the array index of the line
-
                 painter (QPainter) the painter to be used for the drawing, with pen set
-
                 label (string) a label for the line, default is None
 
             Returns:

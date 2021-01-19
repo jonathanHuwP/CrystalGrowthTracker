@@ -25,11 +25,12 @@ import sys
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
+import PyQt5.QtGui as qg
 
 from cgt.model.linesetsandframesstore import LineSetsAndFramesStore
 from cgt.model.line import Line
-
 from cgt.gui.drawinglabel import DrawingLabel
+from cgt.util.utils import nparray_to_qimage
 
 from cgt.gui.Ui_crystaldrawingwidget import Ui_CrystalDrawingWidget
 
@@ -49,7 +50,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
-        super(CrystalDrawingWidget, self).__init__(parent)
+        super().__init__(parent)
 
         ## the widget holding the project data
         self._data_source = data_source
@@ -69,9 +70,8 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         self._rlfWidget.set_data_source(data_source)
 
         # connect the signals for the user selecting a region
-        self._rlfWidget.user_region_selection.connect(self.select_region)
-        self._rlfWidget.user_line_selection.connect(self.select_line)
-        self._rlfWidget.user_frame_selection.connect(self.select_frame)
+        self._rlfWidget.user_region_selection.connect(self.region_selected)
+        self._rlfWidget.user_line_selection.connect(self.line_selected)
 
     def clear(self):
         """
@@ -95,31 +95,6 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
                 None
         """
         self._data_source = data_source
-
-    def display_region(self):
-        """
-        the display function
-
-            Returns:
-                None
-        """
-        region_index = self._rlfWidget.get_selected_region()
-        if region_index is None:
-            return
-
-        frame = self._videoControl.get_current_frame()
-        line_index = self._rlfWidget.get_selected_line()
-
-        pixmap = self._data_source.make_pixmap(region_index, frame)
-
-        self._drawing.set_backgroud_pixmap(pixmap, frame)
-        if line_index is not None:
-            line = self._data_source.get_result().lines[line_index]
-            self._drawing.set_display_line(line)
-        else:
-            self._drawing.set_display_line(None)
-
-        self._drawing.redisplay()
 
     def new_region(self):
         """
@@ -176,7 +151,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         for count, line_segment in enumerate(self._drawing.lines_base):
             note = str(current_region)+"-"+str(count + start)
             line = Line(note)
-            frame = self._videoControl.get_current_frame()
+            _, frame = self._videoControl.get_state()
             line.add_line_segment(frame, line_segment)
             lines.append(line)
 
@@ -194,15 +169,43 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         """
         self._drawing.clear_all()
 
-    @qc.pyqtSlot()
-    def frame_changed(self):
+    @qc.pyqtSlot(bool)
+    def frame_changed(self, first_frame):
         """
         callback for a change of frame
+
+            Args:
+                first_frame (bool) true if first frame chosen
 
             Returns:
                 None
         """
-        self.display_region()
+        region_index = self._rlfWidget.get_selected_region()
+
+        self.display_image(first_frame, region_index)
+
+    def display_image(self, first_frame, region_index):
+        images = self._data_source.get_result().region_images[region_index]
+
+        frame_number = 0
+        image = None
+        if first_frame:
+            image = nparray_to_qimage(images[0])
+            frame_number = self._videoControl.get_minimum()
+        else:
+            image = nparray_to_qimage(images[1])
+            frame_number = self._videoControl.get_maximum()
+
+        self._drawing.set_backgroud_pixmap(qg.QPixmap(image), frame_number)
+
+        line = None
+        line_index = self._rlfWidget.get_selected_line()
+        if line_index is not None:
+            line = self._data_source.get_result().lines[line_index]
+
+        self._drawing.set_display_line(line)
+
+        self._drawing.redisplay()
 
     @qc.pyqtSlot()
     def zoom_changed(self):
@@ -228,7 +231,6 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             if self._data_source.get_video_reader() is not None:
                 if len(self._data_source.get_result().regions) > 0:
                     self._videoControl.setEnabled(True)
-                    self.display_region()
 
     @qc.pyqtSlot()
     def hideEvent(self, event):
@@ -242,7 +244,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         self._videoControl.setEnabled(False)
 
     @qc.pyqtSlot(int)
-    def select_region(self, r_index):
+    def region_selected(self, r_index):
         """
         a region has been selected
 
@@ -252,7 +254,6 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
-        # TODO put test and save in seperate function
         # has label got unsaved lines?
         if len(self._drawing.lines_base) > 0:
             message = "You have unsaved data do you wish to proceeed?"
@@ -267,24 +268,25 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
 
         self._videoControl.set_range(region.start_frame, region.end_frame)
         self._videoControl.setEnabled(True)
-        self.display_region()
+        self.display_image(False, r_index)
 
     @qc.pyqtSlot(int)
-    def select_line(self, l_index):
+    def line_selected(self, l_index):
         """
         a line has been selected
 
             Args:
-                r_index (int) the array index of the region
+                l_index (int) the array index of the line
 
             Returns:
                 None
         """
-        # TODO send l_index to self._drawing
-        #region = self._rlfWidget.get_selected_region()
-        self.display_region()
+        r_index = self._rlfWidget.get_selected_region()
+        first, _ = self._videoControl.get_state()
 
-    def select_frame(self, frame):
+        self.display_image(first, r_index)
+
+    def frame_selected(self, frame):
         """
         a frame number has been selected
 

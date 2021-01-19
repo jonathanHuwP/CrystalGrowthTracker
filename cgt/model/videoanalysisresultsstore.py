@@ -37,6 +37,9 @@ class VideoAnalysisResultsStore:
         ## storage for the regions
         self._regions = []
 
+        ## store for the first and last images of each region (tuple)
+        self._region_images = []
+
         ## storage for the lines
         self._lines = []
 
@@ -87,6 +90,16 @@ class VideoAnalysisResultsStore:
         """
         return self._regions
 
+    @property
+    def region_images(self):
+        """
+        getter for the array of image tuples
+
+            Returns:
+                region images array (numpy.array, numpy.array)
+        """
+        return self._region_images
+
     def reserve_regions(self, size):
         """
         set the size of the regions array, will overwrite all existing enteries
@@ -98,13 +111,15 @@ class VideoAnalysisResultsStore:
                 None
         """
         self._regions.extend(['']*size)
+        self._region_images.extend(['']*size)
 
-    def insert_region(self, region, index):
+    def insert_region(self, region, region_images, index):
         """
         insert a region at a specified index in the regions array, will overwrite existing
 
             Args:
                 region (Region) the region to be added
+                region_images ((numpy.array, numpy.array)) the start/end images
                 index (int) the index at which the region is to be located
 
             Returns:
@@ -114,22 +129,25 @@ class VideoAnalysisResultsStore:
                 IndexError if index out of range
         """
         self._regions[index] = region
+        self._region_images[index] = region_images
         self.set_changed()
 
-    def add_region(self, region):
+    def add_region(self, region, region_images):
         """
         add a crystal to the results
 
             Args:
                 region (Region) the region to be added
+                region_images ((numpy.array, numpy.array)) the start/end images
 
             Reterns:
                 index of the new region
         """
         index = len(self._regions)
         self._regions.append(region)
+        self._region_images.append(region_images)
         self.set_changed()
-
+        print(f"results: image added: {len(self._region_images)}")
         return index
 
     @property

@@ -27,7 +27,6 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 
 import sys
 from collections import namedtuple
-import array as arr
 from imageio import get_reader as imio_get_reader
 
 import PyQt5.QtWidgets as qw
@@ -36,6 +35,7 @@ import PyQt5.QtCore as qc
 
 from cgt.gui.regionselectionlabel import RegionSelectionLabel
 from cgt.model.region import Region
+from cgt.util.utils import nparray_to_qimage, qimage_to_nparray, memview_3b_to_qpixmap
 
 # import UI
 from cgt.gui.Ui_regionselectionwidget import Ui_RegionSelectionWidget
@@ -46,31 +46,6 @@ from cgt.gui.Ui_regionselectionwidget import Ui_RegionSelectionWidget
 ## rectangle the subimage in screen pixel coordinates
 ## frame the number of the frame
 RegionEnd = namedtuple("RegionEnd", ["rectangle", "frame"])
-
-def memview_3b_to_qpixmap(pixels, width, height):
-    """
-    convert a CPython array pixels (RGB unsingned char) to QPixmap
-
-        Args:
-            pixels (CPython array) the imput pixel array
-            width (int) the width of the image in pixels
-            height (int) the height of the image in pixels
-
-        Returns:
-            a QPixmap of the image
-    """
-    tmp = arr.array('B', pixels.reshape(pixels.size))
-
-    im_format = qg.QImage.Format_RGB888
-
-    image = qg.QImage(
-        tmp,
-        width,
-        height,
-        3*width,
-        im_format)
-
-    return qg.QPixmap.fromImage(image)
 
 class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
     """
@@ -299,7 +274,15 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             start_frame=first_frame,
             end_frame=final_frame)
 
-        self._data_source.append_region(region)
+        image = qg.QImage(self._startImageLabel.pixmap())
+        start_image = qimage_to_nparray(image)
+
+        image = qg.QImage(self._endImageLabel.pixmap())
+        end_image = qimage_to_nparray(image)
+
+        images = (start_image, end_image)
+
+        self._data_source.append_region(region, images)
         results = self._data_source.get_result()
         self._regionComboBox.addItem(str(len(results.regions)-1))
         self.reset_enter_region()
@@ -433,22 +416,18 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
 
         if button == "_newButton":
             # set state for entering new regions
-            print("new")
             self._source_label.set_adding()
 
         elif button == "_allButton":
             # set display all regions
-            print("All")
             self._source_label.set_display_all()
 
         elif button == "_allNoTimeButton":
             # set display all regions independant of time
-            print("All No Time")
             self._source_label.set_display_all_no_time()
 
         elif button == "_selectedButton":
             # only disply the selected region
-            print("selected {}".format(self._regionComboBox.currentText()))
             self._source_label.set_display_selected()
 
     def get_pixmap(self):
