@@ -121,7 +121,7 @@ class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
     @qc.pyqtSlot()
     def make_project(self):
         """
-        callback for finished, validates data and calls the new_project
+        callback for finished, validates data and calls the start_project
         method of the parent
 
             Returns:
