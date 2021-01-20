@@ -30,6 +30,7 @@ import array as arr
 from shutil import copy2
 from imageio import get_reader as imio_get_reader
 import numpy as np
+from queue import Queue
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
@@ -74,6 +75,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 None
         """
         super().__init__(parent)
+
         ## the parent object
         self._parent = parent
 
@@ -101,6 +103,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         # set up tab
         self.add_tab(self._propertiesTab, self._propertiesWidget, "Project Properties")
 
+        ## the queue of video frames to be displayed
+        self._frame_queue = Queue(256)
 
         ## base widget for region selection tab
         self._selectTab = qw.QWidget(self)
@@ -350,6 +354,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._resultsWidget.clear()
 
     @qc.pyqtSlot()
+    # Jo look here - have visible the tabs that show and image and the image is visible
     def save_image(self):
         # if no project, or video loaded error
         if self._project is None or self._video_reader is None:
