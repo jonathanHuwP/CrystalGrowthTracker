@@ -34,7 +34,7 @@ class VideoControlWidget(qw.QWidget, Ui_VideoControlWidget):
     """
 
     ## signal to indicate change of frame
-    frame_changed = qc.pyqtSignal()
+    frame_changed = qc.pyqtSignal(int)
 
     def __init__(self, parent=None):
         """
@@ -138,7 +138,7 @@ class VideoControlWidget(qw.QWidget, Ui_VideoControlWidget):
             change = True
 
         if self.is_enabled() and change:
-            self.frame_changed.emit()
+            self.frame_changed.emit(frame)
 
     def get_current_frame(self):
         """

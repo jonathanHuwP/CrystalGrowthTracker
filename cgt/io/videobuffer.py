@@ -82,7 +82,7 @@ class VideoBuffer:
                 None
         """
         while True:
-            if not self._parent.video_queue().empty():
+            if not self._parent.get_frame_queue().empty():
                 self.make_frame()
 
     def make_frame(self):
@@ -93,7 +93,7 @@ class VideoBuffer:
             Returns:
                 None
         """
-        frame = self._parent.video_queue().get()
+        frame = self._parent.get_frame_queue().get()
 
         self._video_reader.set(cv2.CAP_PROP_POS_FRAMES, frame)
         flag, img = self._video_reader.read()
@@ -103,7 +103,7 @@ class VideoBuffer:
             raise ValueError(message)
 
         # convert to Qt cv2 produces image in green/red/blue
-        pimage = nparray_to_qimage(img, True)
+        image = nparray_to_qimage(img, True)
 
         # call the region viewing object with the image and frame
-        self._region_view.display_pixmap(pimage, frame)
+        self._region_view.display_image(image, frame)

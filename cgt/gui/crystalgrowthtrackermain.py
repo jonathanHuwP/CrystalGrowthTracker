@@ -28,7 +28,6 @@ import sys
 import os
 import array as arr
 from shutil import copy2
-from imageio import get_reader as imio_get_reader
 import numpy as np
 from queue import Queue
 
@@ -37,7 +36,7 @@ import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
 from cgt.model.videoanalysisresultsstore import VideoAnalysisResultsStore
-
+from cgt.io.videobuffer import VideoBuffer
 from cgt.gui.projectstartdialog import ProjectStartDialog
 from cgt.gui.projectpropertieswidget import ProjectPropertiesWidget
 from cgt.gui.regionselectionwidget import RegionSelectionWidget
@@ -87,7 +86,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         ## the name of the project
         self._project_name = None
 
-        ## a pointer for the video file reader
+        ## a pointer for the video buffered reader
         self._video_reader = None
 
         ## the project data structure
@@ -102,6 +101,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         # set up tab
         self.add_tab(self._propertiesTab, self._propertiesWidget, "Project Properties")
+
 
         ## the queue of video frames to be displayed
         self._frame_queue = Queue(256)
@@ -190,6 +190,17 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._propertiesWidget.show_top_text()
 
         self._tabWidget.setCurrentWidget(self._propertiesTab)
+
+    def video_frame_count(self):
+        """
+        returns the number of frames in the current video
+            Returns:
+                (int) the number of frame in current video
+        """
+        if self._video_reader is None:
+            return 0
+
+        return self._video_reader.length()
 
     @qc.pyqtSlot()
     def new_project(self):
@@ -600,15 +611,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self.display_properties()
 
-    def get_video_reader(self):
-        """
-        getter for the video reader object
-
-            Returns:
-                (imageio.reader) video reader
-        """
-        return self._video_reader
-
     def get_fps_and_resolution(self):
         """
         getter for the frames per second and the resolution of the video
@@ -620,6 +622,24 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             return int(self._project["frame_rate"]), float(self._project["resolution"])
 
         return None, None
+
+    def request_video_frame(self, frame_number):
+        """
+        put a frame number onto the queue of number that
+        the VideoBuffer is working through the
+
+            Args:
+                frame_number (int) the frame to be displayed
+        """
+        self._frame_queue.put(frame_number)
+
+    def get_frame_queue(self):
+        """
+        getter for the queue of frames to be displayed
+            Returns:
+                the queue of requested frame numbers
+        """
+        return self._frame_queue
 
     def get_result(self):
         """
@@ -692,33 +712,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self.setWindowTitle(name)
 
-    def make_pixmap(self, index, frame):
-        """
-        make a pixmap of a given region in a given frame
-
-            Args:
-                index (int) the index of the region
-                frame (int) the frame in the video
-
-            Returns:
-                QPixmap of the region
-        """
-        region = self._project["results"].regions[index]
-
-        raw = self._video_reader.get_data(frame)
-        tmp = raw[region.top:region.bottom, region.left:region.right]
-        img = arr.array('B', tmp.reshape(tmp.size))
-
-        im_format = qg.QImage.Format_RGB888
-        image = qg.QImage(
-            img,
-            region.width,
-            region.height,
-            3*region.width,
-            im_format)
-
-        return qg.QPixmap.fromImage(image)
-
     @qc.pyqtSlot()
     def load_video(self):
         """
@@ -747,7 +740,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         message_box.setInformativeText("Loading video may take some time.")
         try:
             message_box.show()
-            self._video_reader = imio_get_reader(self._project["enhanced_video"], 'ffmpeg')
+            self._video_reader = VideoBuffer(self._project["enhanced_video"],
+                                             self,
+                                             self._selectWidget)
+            self._video_reader.start()
+
         except (FileNotFoundError, IOError) as ex:
             message_box.close()
             message = self.tr("Unexpected error reading {}: {} => {}")

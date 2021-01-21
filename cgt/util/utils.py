@@ -22,6 +22,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 import socket
 from sys import platform as _platform
 import datetime
+import cv2
 import PyQt5.QtGui as qg
 import numpy as np
 import array as arr
@@ -62,10 +63,9 @@ def nparray_to_qimage(array, brg=False):
         Returns:
             a QImage Qt image manipulation format
     """
-    #if brg:
-    #    array = cv2.cvtColor(array, COLOR_BGR2RGB)
-
-    image = None
+    if brg:
+        array = cv2.cvtColor(array, cv2.COLOR_BGR2RGB)
+    print(f"VB: {array.shape}")
     # set for Red/Green/Blue 8 bits each
     image_format = qg.QImage.Format_RGB888
 
@@ -75,9 +75,9 @@ def nparray_to_qimage(array, brg=False):
 
     image = qg.QImage(
         array.data,
-        array.shape[0],
         array.shape[1],
-        array.shape[2]*array.shape[0],
+        array.shape[0],
+        array.shape[2]*array.shape[1],
         image_format)
 
     return image

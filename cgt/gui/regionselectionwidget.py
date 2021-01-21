@@ -116,16 +116,16 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         self._startLabel.clear()
         self._source_label.clear()
 
-    @qc.pyqtSlot()
-    def frame_changed(self):
+    @qc.pyqtSlot(int)
+    def frame_changed(self, frame_number):
         """
         callback for a change of frame
 
             Returns:
                 None
         """
-        frame = self._videoControls.get_current_frame()
-        self.set_frame(frame)
+        print(f"request frame {frame_number}")
+        self.set_frame(frame_number)
 
     @qc.pyqtSlot()
     def load_video(self):
@@ -155,22 +155,16 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         frame_rate, _ = self._data_source.get_fps_and_resolution()
         return float(self._current_image) / float(frame_rate), self._current_image
 
-    def set_frame(self, number):
+    def set_frame(self, frame_number):
         """
         set the frame to be displayed and display it
 
             Returns:
                 None
         """
-        if self._current_image != number:
-            self._current_image = number
-
-            message = "Frame {:d} of {:d}, approx {:.2f} seconds"
-            time, _ = self.get_current_video_time()
-            message = message.format(number, self._video_frame_count+1, time)
-            self._timeStatusLabel.setText(message)
-
-            self.display_pixmap()
+        if self._current_image != frame_number:
+            self._current_image = frame_number
+            self._data_source.request_video_frame(frame_number)
 
     def start_new_region(self):
         """
@@ -328,7 +322,7 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             Returns:
                 None
         """
-        self.display_pixmap()
+        self.redisplay_pixmap()
 
     def enable_select_buttons(self, flag):
         """
@@ -364,41 +358,28 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
                 None
         """
 
-        self._video_frame_count = self._data_source.get_video_reader().count_frames()
+        self._video_frame_count = self._data_source.video_frame_count()
         self._current_image = 0
-        self.display_pixmap()
+        self._data_source.request_video_frame(self._current_image)
         self._videoControls.set_range(0, self._video_frame_count)
         self._videoControls.enable(True)
 
-    def display_pixmap(self):
+    def display_image(self, image, frame_number):
         """
-        diplay pixmap with new current zoom
-
+        diplay pimage with new current zoom
+            Args:
+                image (QImage) the image to be displayed
+                frame_number (int) the frame number in the video
             Returns:
                 None
         """
-        reader = self._data_source.get_video_reader()
+        self._source_label.setPixmap(qg.QPixmap(image))
+        self._current_image = frame_number
 
-        if reader is None:
-            return
-
-        img = reader.get_data(self._current_image)
-
-        im_format = qg.QImage.Format_RGB888
-        image = qg.QImage(
-            img.data,
-            img.shape[1],
-            img.shape[0],
-            3*img.shape[1],
-            im_format)
-
-        pixmap = qg.QPixmap.fromImage(image)
-        size = pixmap.size() * self._zoomSpinBox.value()
-        pixmap = pixmap.scaled(size,
-                               qc.Qt.KeepAspectRatio,
-                               qc.Qt.SmoothTransformation)
-
-        self._source_label.setPixmap(pixmap)
+        message = "Frame {:d} of {:d}, approx {:.2f} seconds"
+        time, _ = self.get_current_video_time()
+        message = message.format(frame_number, self._video_frame_count+1, time)
+        self._timeStatusLabel.setText(message)
 
         if self._region_end is not None:
             self.display_final_region()
