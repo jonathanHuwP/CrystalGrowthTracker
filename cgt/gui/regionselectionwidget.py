@@ -83,7 +83,10 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         self._video_frame_count = 0
 
         ## the image that is being viewed
-        self._current_image = -1
+        self._current_image = None
+
+        ## the frame number of the current image
+        self._current_frame = -1
 
         ## storage for one end of a region in the process of being created
         self._region_end = None
@@ -105,7 +108,7 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
                 None
         """
         self._video_frame_count = 0
-        self._current_image = -1
+        self._current_frame = -1
         self._region_end = None
         self._user_frame_rate = None
         self._regionComboBox.clear()
@@ -124,7 +127,6 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             Returns:
                 None
         """
-        print(f"request frame {frame_number}")
         self.set_frame(frame_number)
 
     @qc.pyqtSlot()
@@ -133,14 +135,14 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             self._data_source.load_video()
 
     @property
-    def current_image(self):
+    def current_frame(self):
         """
         get the image currently being displayed
 
             Returns:
                 the image being displayed (numpy.ndarray)
         """
-        return self._current_image
+        return self._current_frame
 
     def get_current_video_time(self):
         """
@@ -153,7 +155,7 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
                 the frame number (int)
         """
         frame_rate, _ = self._data_source.get_fps_and_resolution()
-        return float(self._current_image) / float(frame_rate), self._current_image
+        return float(self._current_frame) / float(frame_rate), self._current_frame
 
     def set_frame(self, frame_number):
         """
@@ -162,8 +164,8 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             Returns:
                 None
         """
-        if self._current_image != frame_number:
-            self._current_image = frame_number
+        if self._current_frame != frame_number:
+            self._current_frame = frame_number
             self._data_source.request_video_frame(frame_number)
 
     def start_new_region(self):
@@ -174,14 +176,12 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
                 None
         """
         time, frame = self.get_current_video_time()
-
         img, rect = self.get_current_subimage()
-
         self._region_end = RegionEnd(rect, frame)
 
-        pixmap = memview_3b_to_qpixmap(img, rect.width, rect.height)
+        image = nparray_to_qimage(img)
 
-        self._startImageLabel.setPixmap(pixmap)
+        self._startImageLabel.setPixmap(qg.QPixmap(image))
         self._startImageLabel.setScaledContents(True)
         self._startImageLabel.setSizePolicy(
             qw.QSizePolicy.Fixed, qw.QSizePolicy.Fixed)
@@ -199,11 +199,11 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             Returns:
                 None
         """
-        img, rect = self.get_current_subimage()
+        npimage, _ = self.get_current_subimage()
 
-        pixmap = memview_3b_to_qpixmap(img, rect.width, rect.height)
+        qimage = nparray_to_qimage(npimage)
 
-        self._endImageLabel.setPixmap(pixmap)
+        self._endImageLabel.setPixmap(qg.QPixmap(qimage))
 
         self._endImageLabel.setScaledContents(True)
         self._endImageLabel.setSizePolicy(
@@ -221,10 +221,14 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             Returns:
                 numpy.array the pixels of the selected subimage
         """
+        print("get subimage")
         rect = self._source_label.rectangle
-        raw = self._data_source.get_video_reader().get_data(self._current_image)
+        #TODO scale rectangle
+        image = qg.QImage(self._source_label.pixmap())
+        raw = qimage_to_nparray(image)
+        print(f"\t raw is {type(raw)}")
 
-        return raw[rect.top:rect.bottom, rect.left:rect.right], rect
+        return raw[rect.top:rect.bottom, rect.left:rect.right].copy(), rect
 
     @qc.pyqtSlot()
     def region_combobox_changed(self):
@@ -322,7 +326,7 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             Returns:
                 None
         """
-        self.redisplay_pixmap()
+        self.display()
 
     def enable_select_buttons(self, flag):
         """
@@ -359,8 +363,8 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         """
 
         self._video_frame_count = self._data_source.video_frame_count()
-        self._current_image = 0
-        self._data_source.request_video_frame(self._current_image)
+        self._current_frame = 0
+        self._data_source.request_video_frame(self._current_frame)
         self._videoControls.set_range(0, self._video_frame_count)
         self._videoControls.enable(True)
 
@@ -373,12 +377,29 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             Returns:
                 None
         """
-        self._source_label.setPixmap(qg.QPixmap(image))
-        self._current_image = frame_number
+        self._current_image = image
+        self._current_frame = frame_number
+        self.display()
 
+    def display(self):
+        """
+        display the current image
+            Returns:
+                None
+        """
+        if self._current_image is None:
+            return
+
+        height = self._current_image.height()*self.get_zoom()
+        width = self._current_image.width()*self.get_zoom()
+        tmp = self._current_image.scaled(width, height)
+
+        self._source_label.setPixmap(qg.QPixmap(tmp))
         message = "Frame {:d} of {:d}, approx {:.2f} seconds"
         time, _ = self.get_current_video_time()
-        message = message.format(frame_number, self._video_frame_count+1, time)
+        message = message.format(self._current_frame,
+                                 self._video_frame_count+1,
+                                 time)
         self._timeStatusLabel.setText(message)
 
         if self._region_end is not None:

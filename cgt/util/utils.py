@@ -65,7 +65,7 @@ def nparray_to_qimage(array, brg=False):
     """
     if brg:
         array = cv2.cvtColor(array, cv2.COLOR_BGR2RGB)
-    print(f"VB: {array.shape}")
+
     # set for Red/Green/Blue 8 bits each
     image_format = qg.QImage.Format_RGB888
 
@@ -74,7 +74,7 @@ def nparray_to_qimage(array, brg=False):
         image_format = qg.QImage.Format_ARGB32
 
     image = qg.QImage(
-        array.data,
+        array,
         array.shape[1],
         array.shape[0],
         array.shape[2]*array.shape[1],
@@ -104,10 +104,10 @@ def qimage_to_nparray(image):
 
     # get pointer to pixels and set size in bits
     bits = image.bits()
-    bits.setsize(width*height*32)
+    bits.setsize(width*height*image.depth())
 
     # this array will actually point to the data in image
-    array = np.ndarray(shape=(width, height, image.depth()//8),
+    array = np.ndarray(shape=(height, width, image.depth()//8),
                        dtype=np.uint8,
                        buffer=bits)
 

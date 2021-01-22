@@ -228,7 +228,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         qw.QWidget.showEvent(self, event)
 
         if self._data_source is not None:
-            if self._data_source.get_video_reader() is not None:
+            if self._data_source.get_result() is not None:
                 if len(self._data_source.get_result().regions) > 0:
                     self._videoControl.setEnabled(True)
 
