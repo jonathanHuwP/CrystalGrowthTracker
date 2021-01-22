@@ -27,7 +27,6 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 
 import sys
 from collections import namedtuple
-from imageio import get_reader as imio_get_reader
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
@@ -35,7 +34,7 @@ import PyQt5.QtCore as qc
 
 from cgt.gui.regionselectionlabel import RegionSelectionLabel
 from cgt.model.region import Region
-from cgt.util.utils import nparray_to_qimage, qimage_to_nparray, memview_3b_to_qpixmap
+from cgt.util.utils import nparray_to_qimage, qimage_to_nparray
 
 # import UI
 from cgt.gui.Ui_regionselectionwidget import Ui_RegionSelectionWidget
@@ -63,7 +62,7 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             Returns:
                 None
         """
-        super(RegionSelectionWidget, self).__init__(parent)
+        super().__init__(parent)
         ## the object that owns the widget and holds the data
         self._data_source = data_source
 
@@ -109,6 +108,7 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         """
         self._video_frame_count = 0
         self._current_frame = -1
+        self._current_image = None
         self._region_end = None
         self._user_frame_rate = None
         self._regionComboBox.clear()
@@ -131,6 +131,11 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
 
     @qc.pyqtSlot()
     def load_video(self):
+        """
+        get data source t load the video
+            Returns:
+                None
+        """
         if self._data_source.get_video_reader() is None:
             self._data_source.load_video()
 
@@ -223,7 +228,7 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         """
         print("get subimage")
         rect = self._source_label.rectangle
-        #TODO scale rectangle
+
         image = qg.QImage(self._source_label.pixmap())
         raw = qimage_to_nparray(image)
         print(f"\t raw is {type(raw)}")
@@ -298,6 +303,11 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             self._regionComboBox.addItem(str(index))
 
     def get_selected_region(self):
+        """
+        get the region selected by the user
+            Returns:
+                the region
+        """
         index = self._regionComboBox.currentIndex()
 
         return self._data_source.get_result().regions[index]
@@ -363,8 +373,7 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         """
 
         self._video_frame_count = self._data_source.video_frame_count()
-        self._current_frame = 0
-        self._data_source.request_video_frame(self._current_frame)
+        self._data_source.request_video_frame(0)
         self._videoControls.set_range(0, self._video_frame_count)
         self._videoControls.enable(True)
 
