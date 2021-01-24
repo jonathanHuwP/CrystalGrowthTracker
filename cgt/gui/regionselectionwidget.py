@@ -129,16 +129,6 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         """
         self.set_frame(frame_number)
 
-    @qc.pyqtSlot()
-    def load_video(self):
-        """
-        get data source t load the video
-            Returns:
-                None
-        """
-        if self._data_source.get_video_reader() is None:
-            self._data_source.load_video()
-
     @property
     def current_frame(self):
         """
