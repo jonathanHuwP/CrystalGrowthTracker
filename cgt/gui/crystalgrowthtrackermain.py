@@ -284,6 +284,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self._selectWidget.setEnabled(False)
         self._drawingWidget.setEnabled(False)
+        self.load_video()
         self._resultsWidget.display_data()
 
         if self._project["latest_report"] is not None:
@@ -340,12 +341,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         if file_path is None or file_path == '':
             return
-
         pixmap.save(file_path)
 
         message = f"Image saved to {file_path}"
         qw.QMessageBox.information(self, self.tr("Save Image"), message)
-
 
     @qc.pyqtSlot()
     def save_project(self):
