@@ -216,12 +216,10 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             Returns:
                 numpy.array the pixels of the selected subimage
         """
-        print("get subimage")
         rect = self._source_label.rectangle
 
         image = qg.QImage(self._source_label.pixmap())
         raw = qimage_to_nparray(image)
-        print(f"\t raw is {type(raw)}")
 
         return raw[rect.top:rect.bottom, rect.left:rect.right].copy(), rect
 
@@ -244,8 +242,14 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             Returns:
                 None
         """
-        _, frame = self.get_current_video_time()
+        if self._endImageLabel.pixmap() is None:
+            message = self.tr("You must select an ending for the region.")
+            qw.QMessageBox.warning(self,
+                                   "Warning",
+                                   message)
+            return
 
+        _, frame = self.get_current_video_time()
         self.add_new_region(frame)
 
     def add_new_region(self, last_frame):
@@ -271,6 +275,7 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         start_image = qimage_to_nparray(image)
 
         image = qg.QImage(self._endImageLabel.pixmap())
+
         end_image = qimage_to_nparray(image)
 
         images = (start_image, end_image)

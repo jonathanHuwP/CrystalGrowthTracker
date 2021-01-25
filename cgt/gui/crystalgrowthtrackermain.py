@@ -600,7 +600,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._project["results"].add_region(region, region_images)
         self._drawingWidget.new_region()
         self._resultsWidget.display_data()
-        self.autosave()
 
     def append_lines(self, region_index, lines):
         """
