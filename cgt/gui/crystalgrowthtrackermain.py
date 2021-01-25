@@ -28,15 +28,15 @@ import sys
 import os
 import array as arr
 from shutil import copy2
-from imageio import get_reader as imio_get_reader
 import numpy as np
+from queue import Queue
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
 from cgt.model.videoanalysisresultsstore import VideoAnalysisResultsStore
-
+from cgt.io.videobuffer import VideoBuffer
 from cgt.gui.projectstartdialog import ProjectStartDialog
 from cgt.gui.projectpropertieswidget import ProjectPropertiesWidget
 from cgt.gui.regionselectionwidget import RegionSelectionWidget
@@ -50,7 +50,6 @@ from cgt.io import writecsvreports
 from cgt.io import readcsvreports
 
 import cgt.util.utils as utils
-from cgt.util.cgtautosave import CGTAutoSave
 
 from cgt.model.cgtproject import CGTProject
 
@@ -74,6 +73,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 None
         """
         super().__init__(parent)
+
         ## the parent object
         self._parent = parent
 
@@ -85,7 +85,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         ## the name of the project
         self._project_name = None
 
-        ## a pointer for the video file reader
+        ## a pointer for the video buffered reader
         self._video_reader = None
 
         ## the project data structure
@@ -101,6 +101,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         # set up tab
         self.add_tab(self._propertiesTab, self._propertiesWidget, "Project Properties")
 
+
+        ## the queue of video frames to be displayed
+        self._frame_queue = Queue(256)
 
         ## base widget for region selection tab
         self._selectTab = qw.QWidget(self)
@@ -144,12 +147,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         # set up tab
         self.add_tab(self._reportTab, self._reportWidget, "Current Report")
 
-
         # set up the title
         self.set_title()
-
-        ## pointer for an autosave file
-        self._autosave = None
 
     def add_tab(self, tab_widget, target_widget, title):
         """
@@ -186,6 +185,17 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._propertiesWidget.show_top_text()
 
         self._tabWidget.setCurrentWidget(self._propertiesTab)
+
+    def video_frame_count(self):
+        """
+        returns the number of frames in the current video
+            Returns:
+                (int) the number of frame in current video
+        """
+        if self._video_reader is None:
+            return 0
+
+        return self._video_reader.length()
 
     @qc.pyqtSlot()
     def new_project(self):
@@ -245,66 +255,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                                    message)
             return
 
-        backup, back_file = self.check_for_backup(dir_name, project["proj_name"])
-
-        # check for a recent backup
-        if backup is not None:
-            message = "A more recent backup exists, do you want to recover?"
-            reply = qw.QMessageBox.question(self,
-                                            'CrystalGrowthTracker',
-                                            message,
-                                            qw.QMessageBox.Yes | qw.QMessageBox.No,
-                                            qw.QMessageBox.No)
-            if reply == qw.QMessageBox.Yes:
-                # assign the backup
-                self._project = backup
-                # set the has changed flag
-                self._project.set_changed()
-                # ensure autosave points to the correct file
-                self._autosave = CGTAutoSave.make_autosave_from_file(back_file)
-                self.project_created_or_loaded()
-                return
-
         self._project = project
-        self._autosave = CGTAutoSave.make_autosave_from_project(self._project)
+        self._frame_queue = Queue(256)
         self._project.reset_changed()
         self.project_created_or_loaded()
-
-    def check_for_backup(self, dir_name, proj_name):
-        """
-        check if directory holds autosave backup
-
-            Args:
-                dir_name (string) path to directory
-                proj_name (string) the name of the project
-
-            Returns:
-                if backup file projcet (CGTProject), else None
-        TODO check backup is more recent that project
-        """
-        if self._autosave is None:
-            self._autosave = CGTAutoSave()
-
-        files = self._autosave.list_backups(dir_name)
-        if len(files) < 1:
-            return None, None
-
-        matches = [tmp[0] for tmp in files if tmp[1] == proj_name]
-        if len(matches) < 1:
-            return None, None
-        elif len(matches) == 1:
-            return self._autosave.get_backup_project(matches[0]), matches[0]
-
-        # find most recent save
-        most_recent = matches[0]
-        r_time = os.path.getmtime(most_recent)
-        for match in matches[1:]:
-            m_time = os.path.getmtime(most_recent)
-            if m_time>r_time:
-                most_recent = match
-                r_time = m_time
-
-        return self._autosave.get_backup_project(most_recent), most_recent
 
     def project_created_or_loaded(self):
         """
@@ -330,6 +284,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self._selectWidget.setEnabled(False)
         self._drawingWidget.setEnabled(False)
+        self.load_video()
         self._resultsWidget.display_data()
 
         if self._project["latest_report"] is not None:
@@ -386,12 +341,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         if file_path is None or file_path == '':
             return
-
         pixmap.save(file_path)
 
         message = f"Image saved to {file_path}"
         qw.QMessageBox.information(self, self.tr("Save Image"), message)
-
 
     @qc.pyqtSlot()
     def save_project(self):
@@ -415,9 +368,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             message = f"Error opening writing file: {err}"
             qw.QMessageBox.warning(self, "CGT File Error", message)
             return
-
-        if self._autosave is not None:
-            self._autosave.erase_data()
 
         message = "Project saved to: {}".format(self._project["proj_full_path"])
         qw.QMessageBox.information(self, "CGT File", message)
@@ -557,8 +507,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self._project = project
         self.set_video_scale_parameters()
+        self._frame_queue = Queue(256)
         self.save_project()
-        self._autosave = CGTAutoSave.make_autosave_and_save_from_project(project)
         self.project_created_or_loaded()
 
     def set_video_scale_parameters(self):
@@ -594,15 +544,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self.display_properties()
 
-    def get_video_reader(self):
-        """
-        getter for the video reader object
-
-            Returns:
-                (imageio.reader) video reader
-        """
-        return self._video_reader
-
     def get_fps_and_resolution(self):
         """
         getter for the frames per second and the resolution of the video
@@ -614,6 +555,24 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             return int(self._project["frame_rate"]), float(self._project["resolution"])
 
         return None, None
+
+    def request_video_frame(self, frame_number):
+        """
+        put a frame number onto the queue of number that
+        the VideoBuffer is working through the
+
+            Args:
+                frame_number (int) the frame to be displayed
+        """
+        self._frame_queue.put(frame_number)
+
+    def get_frame_queue(self):
+        """
+        getter for the queue of frames to be displayed
+            Returns:
+                the queue of requested frame numbers
+        """
+        return self._frame_queue
 
     def get_result(self):
         """
@@ -659,17 +618,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self._drawingWidget.new_region()
         self._resultsWidget.display_data()
-        self.autosave()
-
-    @qc.pyqtSlot()
-    def autosave(self):
-        """
-        make digital copy of project, to be called on any change in the data
-
-            Reuturns:
-                None
-        """
-        self._autosave.save_data(self._project)
 
     def set_title(self):
         """
@@ -685,33 +633,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             name += f": {proj_name}"
 
         self.setWindowTitle(name)
-
-    def make_pixmap(self, index, frame):
-        """
-        make a pixmap of a given region in a given frame
-
-            Args:
-                index (int) the index of the region
-                frame (int) the frame in the video
-
-            Returns:
-                QPixmap of the region
-        """
-        region = self._project["results"].regions[index]
-
-        raw = self._video_reader.get_data(frame)
-        tmp = raw[region.top:region.bottom, region.left:region.right]
-        img = arr.array('B', tmp.reshape(tmp.size))
-
-        im_format = qg.QImage.Format_RGB888
-        image = qg.QImage(
-            img,
-            region.width,
-            region.height,
-            3*region.width,
-            im_format)
-
-        return qg.QPixmap.fromImage(image)
 
     @qc.pyqtSlot()
     def load_video(self):
@@ -741,7 +662,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         message_box.setInformativeText("Loading video may take some time.")
         try:
             message_box.show()
-            self._video_reader = imio_get_reader(self._project["enhanced_video"], 'ffmpeg')
+            self._video_reader = VideoBuffer(self._project["enhanced_video"],
+                                             self,
+                                             self._selectWidget)
+            self._video_reader.start()
+
         except (FileNotFoundError, IOError) as ex:
             message_box.close()
             message = self.tr("Unexpected error reading {}: {} => {}")
@@ -843,10 +768,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             # do not destroy as a pointer may survive in event-loop
             # which will trigger errors if it recieves a queued signal
             self.deleteLater()
-
-            # remove the binary backup if there is no unsaved data
-            if not self.has_unsaved_data() and self._autosave is not None:
-                self._autosave.clean_up()
 
         else:
             # dispose of the event in the approved way

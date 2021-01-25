@@ -25,8 +25,11 @@
      </item>
      <item>
       <widget class="QLineEdit" name="_enhancedVideo">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The video on which CrystalGrowthTracker will run.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
-        <string>Required</string>
+        <string>The Video File</string>
        </property>
       </widget>
      </item>
@@ -62,7 +65,14 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="_rawVideo"/>
+      <widget class="QLineEdit" name="_rawVideo">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If required the original non-enhanced video.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>Optional</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="_rawVidPushButton">
@@ -127,7 +137,11 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="_projName"/>
+      <widget class="QLineEdit" name="_projName">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Project name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
      </item>
      <item>
       <spacer name="horizontalSpacer_2">
@@ -155,6 +169,9 @@
      </item>
      <item>
       <widget class="QLineEdit" name="_projDir">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The location in which the project directory, holding the results, will be created.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Required</string>
        </property>

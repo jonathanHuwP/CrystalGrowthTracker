@@ -22,6 +22,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 import socket
 from sys import platform as _platform
 import datetime
+import cv2
 import PyQt5.QtGui as qg
 import numpy as np
 import array as arr
@@ -62,10 +63,9 @@ def nparray_to_qimage(array, brg=False):
         Returns:
             a QImage Qt image manipulation format
     """
-    #if brg:
-    #    array = cv2.cvtColor(array, COLOR_BGR2RGB)
+    if brg:
+        array = cv2.cvtColor(array, cv2.COLOR_BGR2RGB)
 
-    image = None
     # set for Red/Green/Blue 8 bits each
     image_format = qg.QImage.Format_RGB888
 
@@ -74,10 +74,10 @@ def nparray_to_qimage(array, brg=False):
         image_format = qg.QImage.Format_ARGB32
 
     image = qg.QImage(
-        array.data,
-        array.shape[0],
+        array,
         array.shape[1],
-        array.shape[2]*array.shape[0],
+        array.shape[0],
+        array.shape[2]*array.shape[1],
         image_format)
 
     return image
@@ -104,10 +104,10 @@ def qimage_to_nparray(image):
 
     # get pointer to pixels and set size in bits
     bits = image.bits()
-    bits.setsize(width*height*32)
+    bits.setsize(width*height*image.depth())
 
     # this array will actually point to the data in image
-    array = np.ndarray(shape=(width, height, image.depth()//8),
+    array = np.ndarray(shape=(height, width, image.depth()//8),
                        dtype=np.uint8,
                        buffer=bits)
 

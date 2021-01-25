@@ -27,7 +27,6 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 
 import sys
 from collections import namedtuple
-from imageio import get_reader as imio_get_reader
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
@@ -35,7 +34,7 @@ import PyQt5.QtCore as qc
 
 from cgt.gui.regionselectionlabel import RegionSelectionLabel
 from cgt.model.region import Region
-from cgt.util.utils import nparray_to_qimage, qimage_to_nparray, memview_3b_to_qpixmap
+from cgt.util.utils import nparray_to_qimage, qimage_to_nparray
 
 # import UI
 from cgt.gui.Ui_regionselectionwidget import Ui_RegionSelectionWidget
@@ -63,7 +62,7 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             Returns:
                 None
         """
-        super(RegionSelectionWidget, self).__init__(parent)
+        super().__init__(parent)
         ## the object that owns the widget and holds the data
         self._data_source = data_source
 
@@ -83,7 +82,10 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         self._video_frame_count = 0
 
         ## the image that is being viewed
-        self._current_image = -1
+        self._current_image = None
+
+        ## the frame number of the current image
+        self._current_frame = -1
 
         ## storage for one end of a region in the process of being created
         self._region_end = None
@@ -105,7 +107,8 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
                 None
         """
         self._video_frame_count = 0
-        self._current_image = -1
+        self._current_frame = -1
+        self._current_image = None
         self._region_end = None
         self._user_frame_rate = None
         self._regionComboBox.clear()
@@ -116,31 +119,25 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
         self._startLabel.clear()
         self._source_label.clear()
 
-    @qc.pyqtSlot()
-    def frame_changed(self):
+    @qc.pyqtSlot(int)
+    def frame_changed(self, frame_number):
         """
         callback for a change of frame
 
             Returns:
                 None
         """
-        frame = self._videoControls.get_current_frame()
-        self.set_frame(frame)
-
-    @qc.pyqtSlot()
-    def load_video(self):
-        if self._data_source.get_video_reader() is None:
-            self._data_source.load_video()
+        self.set_frame(frame_number)
 
     @property
-    def current_image(self):
+    def current_frame(self):
         """
         get the image currently being displayed
 
             Returns:
                 the image being displayed (numpy.ndarray)
         """
-        return self._current_image
+        return self._current_frame
 
     def get_current_video_time(self):
         """
@@ -153,24 +150,18 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
                 the frame number (int)
         """
         frame_rate, _ = self._data_source.get_fps_and_resolution()
-        return float(self._current_image) / float(frame_rate), self._current_image
+        return float(self._current_frame) / float(frame_rate), self._current_frame
 
-    def set_frame(self, number):
+    def set_frame(self, frame_number):
         """
         set the frame to be displayed and display it
 
             Returns:
                 None
         """
-        if self._current_image != number:
-            self._current_image = number
-
-            message = "Frame {:d} of {:d}, approx {:.2f} seconds"
-            time, _ = self.get_current_video_time()
-            message = message.format(number, self._video_frame_count+1, time)
-            self._timeStatusLabel.setText(message)
-
-            self.display_pixmap()
+        if self._current_frame != frame_number:
+            self._current_frame = frame_number
+            self._data_source.request_video_frame(frame_number)
 
     def start_new_region(self):
         """
@@ -180,14 +171,12 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
                 None
         """
         time, frame = self.get_current_video_time()
-
         img, rect = self.get_current_subimage()
-
         self._region_end = RegionEnd(rect, frame)
 
-        pixmap = memview_3b_to_qpixmap(img, rect.width, rect.height)
+        image = nparray_to_qimage(img)
 
-        self._startImageLabel.setPixmap(pixmap)
+        self._startImageLabel.setPixmap(qg.QPixmap(image))
         self._startImageLabel.setScaledContents(True)
         self._startImageLabel.setSizePolicy(
             qw.QSizePolicy.Fixed, qw.QSizePolicy.Fixed)
@@ -205,11 +194,11 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             Returns:
                 None
         """
-        img, rect = self.get_current_subimage()
+        npimage, _ = self.get_current_subimage()
 
-        pixmap = memview_3b_to_qpixmap(img, rect.width, rect.height)
+        qimage = nparray_to_qimage(npimage)
 
-        self._endImageLabel.setPixmap(pixmap)
+        self._endImageLabel.setPixmap(qg.QPixmap(qimage))
 
         self._endImageLabel.setScaledContents(True)
         self._endImageLabel.setSizePolicy(
@@ -227,10 +216,14 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             Returns:
                 numpy.array the pixels of the selected subimage
         """
+        print("get subimage")
         rect = self._source_label.rectangle
-        raw = self._data_source.get_video_reader().get_data(self._current_image)
 
-        return raw[rect.top:rect.bottom, rect.left:rect.right], rect
+        image = qg.QImage(self._source_label.pixmap())
+        raw = qimage_to_nparray(image)
+        print(f"\t raw is {type(raw)}")
+
+        return raw[rect.top:rect.bottom, rect.left:rect.right].copy(), rect
 
     @qc.pyqtSlot()
     def region_combobox_changed(self):
@@ -300,6 +293,11 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             self._regionComboBox.addItem(str(index))
 
     def get_selected_region(self):
+        """
+        get the region selected by the user
+            Returns:
+                the region
+        """
         index = self._regionComboBox.currentIndex()
 
         return self._data_source.get_result().regions[index]
@@ -328,7 +326,7 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             Returns:
                 None
         """
-        self.display_pixmap()
+        self.display()
 
     def enable_select_buttons(self, flag):
         """
@@ -364,41 +362,44 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
                 None
         """
 
-        self._video_frame_count = self._data_source.get_video_reader().count_frames()
-        self._current_image = 0
-        self.display_pixmap()
+        self._video_frame_count = self._data_source.video_frame_count()
+        self._data_source.request_video_frame(0)
         self._videoControls.set_range(0, self._video_frame_count)
         self._videoControls.enable(True)
 
-    def display_pixmap(self):
+    def display_image(self, image, frame_number):
         """
-        diplay pixmap with new current zoom
-
+        diplay pimage with new current zoom
+            Args:
+                image (QImage) the image to be displayed
+                frame_number (int) the frame number in the video
             Returns:
                 None
         """
-        reader = self._data_source.get_video_reader()
+        self._current_image = image
+        self._current_frame = frame_number
+        self.display()
 
-        if reader is None:
+    def display(self):
+        """
+        display the current image
+            Returns:
+                None
+        """
+        if self._current_image is None or self.isHidden():
             return
 
-        img = reader.get_data(self._current_image)
+        height = self._current_image.height()*self.get_zoom()
+        width = self._current_image.width()*self.get_zoom()
+        tmp = self._current_image.scaled(width, height)
 
-        im_format = qg.QImage.Format_RGB888
-        image = qg.QImage(
-            img.data,
-            img.shape[1],
-            img.shape[0],
-            3*img.shape[1],
-            im_format)
-
-        pixmap = qg.QPixmap.fromImage(image)
-        size = pixmap.size() * self._zoomSpinBox.value()
-        pixmap = pixmap.scaled(size,
-                               qc.Qt.KeepAspectRatio,
-                               qc.Qt.SmoothTransformation)
-
-        self._source_label.setPixmap(pixmap)
+        self._source_label.setPixmap(qg.QPixmap(tmp))
+        message = "Frame {:d} of {:d}, approx {:.2f} seconds"
+        time, _ = self.get_current_video_time()
+        message = message.format(self._current_frame,
+                                 self._video_frame_count+1,
+                                 time)
+        self._timeStatusLabel.setText(message)
 
         if self._region_end is not None:
             self.display_final_region()
@@ -441,6 +442,19 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             return None
 
         return self._source_label.grab()
+
+    @qc.pyqtSlot()
+    def showEvent(self, event):
+        """
+        override qwidget and ensure a safe display
+
+            Returns:
+                None
+        """
+        print("RSW: showEvent")
+        qw.QWidget.showEvent(self, event)
+
+        self.display()
 
 # the main
 ######################
