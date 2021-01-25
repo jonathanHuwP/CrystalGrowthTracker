@@ -29,7 +29,10 @@
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The video on which CrystalGrowthTracker will run.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
-        <string>The Video File</string>
+        <string/>
+       </property>
+       <property name="placeholderText">
+        <string>Working Video (Required)</string>
        </property>
       </widget>
      </item>
@@ -70,7 +73,10 @@
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If required the original non-enhanced video.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
-        <string>Optional</string>
+        <string/>
+       </property>
+       <property name="placeholderText">
+        <string>Original Video (Optional)</string>
        </property>
       </widget>
      </item>
@@ -173,7 +179,10 @@
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The location in which the project directory, holding the results, will be created.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
-        <string>Required</string>
+        <string/>
+       </property>
+       <property name="placeholderText">
+        <string/>
        </property>
       </widget>
      </item>

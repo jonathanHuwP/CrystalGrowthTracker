@@ -143,16 +143,6 @@ class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
         text = self._rawVideo.text().strip()
         if text:
             raw_video = Path(text)
-            if not raw_video.exists():
-                message = self.tr("Processed file {} does not exist!")
-                message = message.format(raw_video)
-                qw.QMessageBox.critical(self, "Error", message)
-                return
-
-            if raw_video.resolve() == enhanced_video.resolve():
-                message = self.tr("The enhanced_video and raw_video files are the same!")
-                qw.QMessageBox.critical(self, "Error", message)
-                return
         else:
             raw_video = None
 
