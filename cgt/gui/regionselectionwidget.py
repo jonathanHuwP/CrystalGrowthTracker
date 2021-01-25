@@ -194,6 +194,14 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             Returns:
                 None
         """
+        time, frame = self.get_current_video_time()
+
+        # ensure that frame has changed
+        if self._region_end.frame == frame:
+            self._endImageLabel.clear()
+            self._endLabel.setText("End")
+            return
+
         npimage, _ = self.get_current_subimage()
 
         qimage = nparray_to_qimage(npimage)
@@ -205,7 +213,6 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             qw.QSizePolicy.Fixed, qw.QSizePolicy.Fixed)
         self._endImageLabel.setMargin(0)
 
-        time, _ = self.get_current_video_time()
         message = "End Time {:.2f}".format(time)
         self._endLabel.setText(message)
 
