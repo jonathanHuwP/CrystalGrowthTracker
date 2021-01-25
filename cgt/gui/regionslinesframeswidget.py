@@ -203,6 +203,18 @@ class RegionsLinesFramesWidget(qw.QWidget, Ui_RegionsLinesFramesWidget):
         frame = item.data(qc.Qt.UserRole)
         self.user_frame_selection.emit(frame)
 
+    def set_selected_region(self, region_index):
+        """
+        programmatically set the currently selected region to
+            Args:
+                region_index (int) the array index of the region to
+            Returns:
+                None
+        """
+        if region_index is not None:
+            self._regionsList.setCurrentRow(region_index)
+            self.display_lines(region_index)
+
     def clear(self):
         """
         clear the lists

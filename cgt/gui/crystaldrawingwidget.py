@@ -108,7 +108,9 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         """
         print("CDW: new_region")
         self._rlfWidget.blockSignals(True)
+        region = self._rlfWidget.get_selected_region()
         self._rlfWidget.display_regions()
+        self._rlfWidget.set_selected_region(region)
         self._rlfWidget.blockSignals(False)
 
     @qc.pyqtSlot()
@@ -191,6 +193,23 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         print("CDW: frame_changed")
         region_index = self._rlfWidget.get_selected_region()
 
+        #TODO if unsaved lines warn than clear
+        print(f"CDW: drawing size {self._drawing.size}")
+        if self._drawing.size[0] > 0:
+            message = "You have unsaved lines, which will be lost if you change frame. Continue?"
+            mb_reply = qw.QMessageBox.question(self,
+                                               'CrystalGrowthTracker',
+                                               message,
+                                               qw.QMessageBox.Yes | qw.QMessageBox.No,
+                                               qw.QMessageBox.No)
+            if mb_reply == qw.QMessageBox.Yes:
+                self._drawing.clear_all()
+            else:
+                # reset the control widget
+                self._videoControl.set_state(not first_frame)
+                return
+
+        print(f"CDW: region index {region_index}")
         self.display_image(first_frame, region_index)
 
     def display_image(self, first_frame, region_index):
@@ -287,6 +306,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         self._drawing.clear_all()
 
         region = self._data_source.get_result().regions[r_index]
+
 
         self._videoControl.set_range(region.start_frame, region.end_frame)
         self._videoControl.setEnabled(True)

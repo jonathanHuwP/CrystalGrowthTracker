@@ -140,7 +140,6 @@ class DrawingLabel(qw.QLabel):
         ## array for the created lines or the base from which the lines are being adjusted
         self._lines_base = []
 
-        # TODO replace with call to data_store
         ## array for the new lines resulting from adjustment
         self._lines_new = []
 
@@ -358,7 +357,7 @@ class DrawingLabel(qw.QLabel):
                         self._start = None
                         self._adjust_line = AdjustingState.END
         elif self._state == WidgetState.MOVING:
-            if event.button() == qc.Qt.LeftButton:
+            if event.button() == qc.Qt.LeftButton and self._display_line is not None:
                 pick = self.pick_line_segment(event.pos())
                 if pick is not None:
                     print(f"Found segment {pick}")
