@@ -50,6 +50,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
+        print("CDW: init")
         super().__init__(parent)
 
         ## the widget holding the project data
@@ -80,6 +81,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Return:
                 None
         """
+        print("CDW: clear")
         self._store = LineSetsAndFramesStore()
         self._rlfWidget.clear()
         self._drawing.clear()
@@ -94,6 +96,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
+        print("CDW: set_data_source")
         self._data_source = data_source
 
     def new_region(self):
@@ -103,6 +106,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
+        print("CDW: new_region")
         self._rlfWidget.blockSignals(True)
         self._rlfWidget.display_regions()
         self._rlfWidget.blockSignals(False)
@@ -115,6 +119,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
+        print("CDW: state_toggle")
         if self._createButton.isChecked():
             self._drawing.set_drawing()
         elif self._adjustNewButton.isChecked():
@@ -130,6 +135,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
+        print("CDW: labels_toggled")
         if self._labelsBox.isChecked():
             self._drawing.show_labels(True)
         else:
@@ -143,6 +149,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
+        print("CDW: store_new_lines")
         lines = []
         results = self._data_source.get_result()
         current_region = self._rlfWidget.get_selected_region()
@@ -167,6 +174,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
+        print("CDW: clear_drawing")
         self._drawing.clear_all()
 
     @qc.pyqtSlot(bool)
@@ -180,11 +188,21 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
+        print("CDW: frame_changed")
         region_index = self._rlfWidget.get_selected_region()
 
         self.display_image(first_frame, region_index)
 
     def display_image(self, first_frame, region_index):
+        """
+        display a selected image
+            Args:
+                first_frame (bool) if true display the first frame of the region
+                region_index (int) the array index of the region
+            Returns:
+                None
+        """
+        print("CDW: display_image")
         images = self._data_source.get_result().region_images[region_index]
 
         frame_number = 0
@@ -215,6 +233,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
+        print("CDW: zoom_changed")
         self._drawing.set_zoom(self._zoomSpinBox.value())
 
     @qc.pyqtSlot()
@@ -225,6 +244,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
+        print("CDW: showEvent")
         qw.QWidget.showEvent(self, event)
 
         if self._data_source is not None:
@@ -240,6 +260,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
+        print("CDW: hideEvent")
         qw.QWidget.hideEvent(self, event)
         self._videoControl.setEnabled(False)
 
@@ -254,6 +275,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
+        print("CDW: region_selected")
         # has label got unsaved lines?
         if len(self._drawing.lines_base) > 0:
             message = "You have unsaved data do you wish to proceeed?"
@@ -281,6 +303,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
+        print("CDW: line_selected")
         r_index = self._rlfWidget.get_selected_region()
         first, _ = self._videoControl.get_state()
 
@@ -296,7 +319,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 None
         """
-        print(f"CrystalDrawingWidget select_frame {frame}")
+        print(f"CDW select_frame {frame}")
 
     def get_pixmap(self):
         """
@@ -305,6 +328,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             Returns:
                 QPixmap of image or None if no image has been set
         """
+        print("CDW: get_pixmap")
         pixmap = self._drawing.pixmap()
         if pixmap is None:
             return None

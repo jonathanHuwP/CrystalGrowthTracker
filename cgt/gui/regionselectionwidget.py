@@ -386,7 +386,7 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             Returns:
                 None
         """
-        if self._current_image is None:
+        if self._current_image is None or self.isHidden():
             return
 
         height = self._current_image.height()*self.get_zoom()
@@ -442,6 +442,19 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             return None
 
         return self._source_label.grab()
+
+    @qc.pyqtSlot()
+    def showEvent(self, event):
+        """
+        override qwidget and ensure a safe display
+
+            Returns:
+                None
+        """
+        print("RSW: showEvent")
+        qw.QWidget.showEvent(self, event)
+
+        self.display()
 
 # the main
 ######################
