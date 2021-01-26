@@ -37,11 +37,11 @@ class LineValuesWidget(qw.QWidget, Ui_LineValuesWidget):
     """
     ## the line segments table headings
     line_segments_headings = ["Frame",
-                              "Start x",
-                              "Start y",
-                              "End x",
-                              "End y",
-                              "Velocity"]
+                              "Start x (pixels)",
+                              "Start y (pixels)",
+                              "End x (pixels)",
+                              "End y (pixels)",
+                              "Velocity (pixels s^-1)"]
 
     ## the lines in regions table headings
     line_headings = ["Frame", "Line", "Time Steps", "Av. Velocity"]
@@ -69,6 +69,11 @@ class LineValuesWidget(qw.QWidget, Ui_LineValuesWidget):
                 item.setFont(bold_font)
                 self._regionsTableWidget.setHorizontalHeaderItem(column, item)
 
+        header = self._lineTableWidget.horizontalHeader()
+        header.setSectionResizeMode(qw.QHeaderView.ResizeToContents)
+        header = self._regionsTableWidget.horizontalHeader()
+        header.setSectionResizeMode(qw.QHeaderView.ResizeToContents)
+
         ## store of data
         self._data_source = None
 
@@ -88,8 +93,13 @@ class LineValuesWidget(qw.QWidget, Ui_LineValuesWidget):
         """
         initalize the display
         """
+        project = self._data_source.get_project()
+        units = project['resolution_units']
+        resolution = project['resolution']
+
+        self._unitsLabel.setText(f"Scale {resolution} {units} per Pixel")
         self.display_segments()
-        self.display_regions()
+        self.display_regions(units)
 
     def display_segments(self):
         """
@@ -102,9 +112,11 @@ class LineValuesWidget(qw.QWidget, Ui_LineValuesWidget):
 
         self.region_chosen(self._regionComboBox.currentIndex())
 
-    def display_regions(self):
+    def display_regions(self, units):
         """
         display the lines table
+            Args:
+                units (string) the distance units of the scale
         """
         results = self._data_source.get_result()
 
@@ -134,7 +146,7 @@ class LineValuesWidget(qw.QWidget, Ui_LineValuesWidget):
                 average = sum(differences)/len(differences)
 
             if average is not None:
-                item = qw.QTableWidgetItem(str(average))
+                item = qw.QTableWidgetItem(f"{average:.2f}")
                 total += average
                 count += 1
             else:
@@ -150,11 +162,15 @@ class LineValuesWidget(qw.QWidget, Ui_LineValuesWidget):
 
         if count > 0:
             average_total = total/count
-            item = qw.QTableWidgetItem(str(average_total))
+            item = qw.QTableWidgetItem(f"{average_total:.2f}")
         else:
             item = qw.QTableWidgetItem("NA")
         self._regionsTableWidget.setItem(row+1, 3, item)
 
+
+        header = qw.QTableWidgetItem(f"Av. Velocity ({units} s^-1)")
+        header.setFont(font)
+        self._regionsTableWidget.setHorizontalHeaderItem(3, header)
 
     @qc.pyqtSlot(int)
     def region_chosen(self, region_index):
@@ -218,7 +234,7 @@ class LineValuesWidget(qw.QWidget, Ui_LineValuesWidget):
             item = qw.QTableWidgetItem(str(segment.end.y))
             self._lineTableWidget.setItem(row, 4, item)
             if row > 0:
-                item = qw.QTableWidgetItem(str(differences[row-1]))
+                item = qw.QTableWidgetItem(f"{differences[row-1]:.2f}")
             else:
                 item = qw.QTableWidgetItem("NA")
             self._lineTableWidget.setItem(row, 5, item)
@@ -231,7 +247,7 @@ class LineValuesWidget(qw.QWidget, Ui_LineValuesWidget):
             self._lineTableWidget.setItem(row+1, 4, item)
 
             line_average = sum(differences)/len(differences)
-            item = qw.QTableWidgetItem(str(line_average))
+            item = qw.QTableWidgetItem(f"{line_average:.2f}")
             self._lineTableWidget.setItem(row+1, 5, item)
 
     def save(self, file_name):

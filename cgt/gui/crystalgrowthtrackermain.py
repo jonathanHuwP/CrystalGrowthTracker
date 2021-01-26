@@ -586,6 +586,14 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         return None
 
+    def get_project(self):
+        """
+        getter for the project
+            Returns:
+                (CGTProjcet) the current project
+        """
+        return self._project
+
     def append_region(self, region, region_images):
         """
         add a region to the results and notify the crystal drawing widget
