@@ -73,6 +73,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         # connect the signals for the user selecting a region
         self._rlfWidget.user_region_selection.connect(self.region_selected)
         self._rlfWidget.user_line_selection.connect(self.line_selected)
+        self._drawing.line_saved.connect(self.store_moved_lines)
 
     def clear(self):
         """
@@ -142,6 +143,17 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
             self._drawing.show_labels(True)
         else:
             self._drawing.show_labels(False)
+
+    @qc.pyqtSlot()
+    def store_moved_lines(self):
+        """
+        callback for storage of lines triggers storage if the state is moving
+            Returns:
+                None
+        """
+        print("CDW: store_moved_lines")
+        if self._moveButton.isChecked():
+            self.store_new_lines()
 
     @qc.pyqtSlot()
     def store_new_lines(self):

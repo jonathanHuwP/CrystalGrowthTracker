@@ -91,6 +91,10 @@ class DrawingLabel(qw.QLabel):
     user can select existing lines and move them (whole line or just end points); in
     copying mode existing lines can be adjusted and are then copied to new set.
     """
+
+    ## signal to indicate saving
+    line_saved = qc.pyqtSignal()
+
     def __init__(self, parent=None):
         """
         Set up the objeect
@@ -360,7 +364,6 @@ class DrawingLabel(qw.QLabel):
             if event.button() == qc.Qt.LeftButton and self._display_line is not None:
                 pick = self.pick_line_segment(event.pos())
                 if pick is not None:
-                    print(f"Found segment {pick}")
                     self._current_line = pick[0]
                     self._moving_line_segment = pick[0]
                     self._start = event.pos()
@@ -690,9 +693,10 @@ class DrawingLabel(qw.QLabel):
     def moving_release(self):
         """
         respond to the release of a mouse button.
-
             Returns:
                 None
+            Emits:
+                line_saved if the user saves a line
         """
         reply = qw.QMessageBox.question(
             self,
@@ -700,7 +704,6 @@ class DrawingLabel(qw.QLabel):
             self.tr("Add moved line to results?"))
 
         if reply == qw.QMessageBox.Yes:
-            print(f"Add ({self._current_frame}, {self._current_line}) to results")
             keys = self._display_line.keys()
             if self._current_frame in keys:
                 qw.QMessageBox.critical(self,
@@ -712,6 +715,7 @@ class DrawingLabel(qw.QLabel):
 
             self._display_line.add_line_segment(self._current_frame,
                                                 self._current_line)
+            self.line_saved.emit()
 
         self.clear_current()
         self.redisplay()
