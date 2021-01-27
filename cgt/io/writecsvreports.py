@@ -126,11 +126,11 @@ def save_region_images(project):
 
         name = name_root + "_" + str(regions[i].start_frame) + ".png"
         image = nparray_to_qimage(start_end[0])
-        image.save(str(path.joinpath(name)))
+        image.save(str(path.joinpath(name)), quality=100)
 
         name = name_root + "_" + str(regions[i].end_frame) + ".png"
         image = nparray_to_qimage(start_end[1])
-        image.save(str(path.joinpath(name+".png")))
+        image.save(str(path.joinpath(name+".png")), quality=100)
 
 def save_array_cvs(info, title, header, data_array):
     """

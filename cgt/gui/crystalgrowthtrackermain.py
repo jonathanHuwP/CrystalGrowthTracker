@@ -341,7 +341,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         if file_path is None or file_path == '':
             return
-        pixmap.save(file_path)
+        pixmap.save(file_path, quality=100)
 
         message = f"Image saved to {file_path}"
         qw.QMessageBox.information(self, self.tr("Save Image"), message)

@@ -964,4 +964,4 @@ class DrawingLabel(qw.QLabel):
                 None.
         """
         file.open(qc.QIODevice.WriteOnly)
-        self.pixmap().save(file, "PNG")
+        self.pixmap().save(file, "PNG", quality=100)
