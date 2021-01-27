@@ -333,7 +333,7 @@ class RegionSelectionLabel(qw.QLabel):
         if region is None:
             return
 
-        if region.time_in_region(self._parent.current_image):
+        if region.time_in_region(self._parent.get_current_frame()):
             self.draw_region(painter, region)
 
     def draw_region(self, painter, region):
@@ -361,7 +361,7 @@ class RegionSelectionLabel(qw.QLabel):
         """
         for region in self._regions_store.get_result().regions:
             if time:
-                if region.time_in_region(self._parent.current_image):
+                if region.time_in_region(self._parent.get_current_frame()):
                     self.draw_region(painter, region)
             else:
                 self.draw_region(painter, region)

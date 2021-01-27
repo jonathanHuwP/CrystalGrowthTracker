@@ -468,6 +468,14 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
 
         self.display()
 
+    def get_current_frame(self):
+        """
+        getter for the current frame
+            Returns:
+                (int) the frame numer of the image currently being shown
+        """
+        return self._current_frame
+
 # the main
 ######################
 
