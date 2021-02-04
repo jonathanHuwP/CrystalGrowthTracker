@@ -24,9 +24,11 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = import-error
 
 import PyQt5.QtWidgets as qw
+import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
+from queue import Queue
 
-#from cgt.util.utils import nparray_to_qimage, qimage_to_nparray
+from cgt.io.videobuffer import VideoBuffer
 
 # import UI
 from cgt.gui.Ui_videoregionselectionwidget import Ui_VideoRegionSelectionWidget
@@ -49,11 +51,22 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
                 None
         """
         super().__init__(parent)
-
         self.setupUi(self)
+        
+        ## the frame queue
+        self._frame_queue = Queue(256)
+        
+        ## the current image
+        self._current_image = None
+        
+        ## the currently displayed frame
+        self._current_frame = None
+        
+        ## the current value of the zoom
+        self._current_zoom = 1.0
 
-        ## the video
-        self._video_file = video_file
+        ## the player 
+        self._source = VideoBuffer(video_file, self, self)
 
         ## label for displaying the video
         self._source_label = qw.QLabel()
@@ -63,9 +76,11 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
                                          qw.QSizePolicy.Fixed)
         self._source_label.setMargin(0)
 
-        self._scrollArea.setWidget(self._source_label)
+        self._videoScrollArea.setWidget(self._source_label)
         
         self.connect_controls()
+        self.request_frame(0)
+        self._source.start()
         
     def connect_controls(self):
         """
@@ -80,14 +95,61 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         #forward = qc.pyqtSignal()
         #reverse = qc.pyqtSignal()
         
+    def get_frame_queue(self):
+        """
+        getter for the frame queue
+            Returns:
+                pointer to the frame queue
+        """
+        return self._frame_queue
+        
+    def display_image(self, image, frame_number):
+        """
+        display an image
+            Args:
+                image (QImage) the image 
+                frame_number
+        """
+        print(f"VRW: diplay {type(image)} {frame_number}")
+        self._current_image = image
+        self._current_frame = frame_number
+        
+        self.display()
+        
+    def display(self):
+        """
+        display the current image
+            Returns:
+                None
+        """
+        if self._current_image is None or self.isHidden():
+            return
+
+        height = self._current_image.height()*self._current_zoom
+        width = self._current_image.width()*self._current_zoom
+        tmp = self._current_image.scaled(width, height)
+
+        self._source_label.setPixmap(qg.QPixmap(tmp))
+        
+        message = "Frame {:d} of {:d}, approx {:.2f} seconds"
+        #time, _ = self.get_current_video_time()
+        message = message.format(self._current_frame+1,
+                                 self._source.length(),
+                                 0.0)                         
+        self._frameLabel.setText(message)
+
     @qc.pyqtSlot(bool)
-    def start_end(self, start):
+    def start_end(self, end):
         """
         jump to the start or end of the video
             Args:
-                start (bool) if true jump to start else end
+                end (bool) if true jump to end else start
         """
-        print(f"VRW start_end start={start}")
+        print(f"VRW start_end start={end}")
+        if end:
+            self.request_frame(self._source.length()-1)
+        else:
+            self.request_frame(0)
         
     @qc.pyqtSlot(bool)
     def frame_step(self, forward):
@@ -98,12 +160,20 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         print(f"VRW frame_step forward={forward}")
         
+        if forward:
+            if self._current_frame <self._source.length():
+                self.request_frame(self._current_frame+1)
+        else:
+            if self._current_frame > 0:
+                self.request_frame(self._current_frame-1)
+        
     @qc.pyqtSlot(int)
     def request_frame(self, frame_number):
         """
         a specific frame should be displayed
         """
         print(f"VRW request frame {frame_number}")
+        self._frame_queue.put(frame_number)
         
     @qc.pyqtSlot(float)
     def zoom_value(self, value):
@@ -111,3 +181,5 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         a new value for the zoom has been entered
         """
         print(f"VRW zoom_value {value}")
+        self._current_zoom = value
+        self.display()

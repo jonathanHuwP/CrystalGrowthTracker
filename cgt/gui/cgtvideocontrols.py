@@ -41,7 +41,7 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
     ## signal to indicate a one step move, forward if parameter = true
     frame_step = qc.pyqtSignal(bool)
 
-    ## signal for start/end of video, start if parameter = true
+    ## signal for start/end of video, end if parameter = true
     start_end = qc.pyqtSignal(bool)
 
     ## signal to stop video play
@@ -118,7 +118,7 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         jump to first frame
         """
         print(f"VidControls: first_frame")
-        self.start_end.emit(True)
+        self.start_end.emit(False)
 
     @qc.pyqtSlot()
     def last_frame(self):
@@ -126,7 +126,7 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         jump to last frame
         """
         print(f"VidControls: last_frame")
-        self.start_end.emit(False)
+        self.start_end.emit(True)
 
     @qc.pyqtSlot()
     def play_forward(self):
