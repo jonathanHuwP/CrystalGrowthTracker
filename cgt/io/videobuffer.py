@@ -21,10 +21,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 
 from threading import Thread
 import cv2
-import PyQt5.QtGui as qg
-import PyQt5.QtCore as qc
 
-from cgt.model.region import Region
 from cgt.util.utils import nparray_to_qimage
 
 class VideoBuffer:
@@ -52,7 +49,11 @@ class VideoBuffer:
 
         ## pointer to the region view
         self._region_view = region_view
+        
+        ## flag for stopping the thread
+        self._running = False
 
+    @property
     def length(self):
         """
         get the numer of frames in the video file, the maximum 
@@ -62,7 +63,11 @@ class VideoBuffer:
                 the number of frames (int)
         """
         return int(self._video_reader.get(cv2.CAP_PROP_FRAME_COUNT))
-
+        
+    @property
+    def running(self):
+        return self._running
+        
     def start(self):
         """
         start the thread
@@ -70,9 +75,16 @@ class VideoBuffer:
             Returns:
                 None
         """
+        self._running = True
         thread = Thread(target=self.make_frames, args=())
         thread.daemon = True
         thread.start()
+        
+    def stop(self):
+        """
+        stop the thread
+        """
+        self._running = False
 
     def make_frames(self):
         """
@@ -82,7 +94,7 @@ class VideoBuffer:
             Returns:
                 None
         """
-        while True:
+        while self._running:
             if not self._parent.get_frame_queue().empty():
                 self.make_frame()
 

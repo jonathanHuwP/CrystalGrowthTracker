@@ -7,13 +7,73 @@
     <x>0</x>
     <y>0</y>
     <width>725</width>
-    <height>160</height>
+    <height>161</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>CGTVideoControls</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="_backwardButton">
+       <property name="toolTip">
+        <string>Play video backwards.</string>
+       </property>
+       <property name="text">
+        <string>Play Backward</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="_pauseButton">
+       <property name="toolTip">
+        <string>Pause play back.</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="_forwardButton">
+       <property name="toolTip">
+        <string>Play video forwards.</string>
+       </property>
+       <property name="text">
+        <string>Play Forward</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_6">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
@@ -30,6 +90,16 @@
       </spacer>
      </item>
      <item>
+      <widget class="QPushButton" name="_firstFrameButton">
+       <property name="toolTip">
+        <string>Jump to first frame of video.</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="_stepDownButton">
        <property name="toolTip">
         <string>Reverse one frame.</string>
@@ -38,7 +108,7 @@
         <string/>
        </property>
        <property name="autoRepeat">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -67,80 +137,10 @@
         <string/>
        </property>
        <property name="autoRepeat">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
        <property name="autoRepeatInterval">
         <number>100</number>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_5">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <spacer name="horizontalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="_firstFrameButton">
-       <property name="toolTip">
-        <string>Jump to first frame of video.</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="_reverseButton">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="_startStopButton">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="_forwardButton">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string/>
        </property>
       </widget>
      </item>
@@ -155,7 +155,7 @@
       </widget>
      </item>
      <item>
-      <spacer name="horizontalSpacer_3">
+      <spacer name="horizontalSpacer_5">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -191,6 +191,49 @@
        </property>
        <property name="value">
         <double>1.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>GoTo Frame</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="_gotoSpinBox">
+       <property name="toolTip">
+        <string>Frame number for jump.</string>
+       </property>
+       <property name="buttonSymbols">
+        <enum>QAbstractSpinBox::NoButtons</enum>
+       </property>
+       <property name="minimum">
+        <number>1</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="_goToButton">
+       <property name="toolTip">
+        <string>Jump to frame nuber.</string>
+       </property>
+       <property name="text">
+        <string>GO</string>
        </property>
       </widget>
      </item>
@@ -323,18 +366,34 @@
    </hints>
   </connection>
   <connection>
-   <sender>_reverseButton</sender>
+   <sender>_goToButton</sender>
    <signal>clicked()</signal>
    <receiver>CGTVideoControls</receiver>
-   <slot>play_backward()</slot>
+   <slot>go_to_frame()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>306</x>
+     <x>501</x>
      <y>75</y>
     </hint>
     <hint type="destinationlabel">
      <x>362</x>
-     <y>76</y>
+     <y>79</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_backwardButton</sender>
+   <signal>clicked()</signal>
+   <receiver>CGTVideoControls</receiver>
+   <slot>play_backwards()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>273</x>
+     <y>30</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>362</x>
+     <y>80</y>
     </hint>
    </hints>
   </connection>
@@ -342,31 +401,31 @@
    <sender>_forwardButton</sender>
    <signal>clicked()</signal>
    <receiver>CGTVideoControls</receiver>
-   <slot>play_forward()</slot>
+   <slot>play_forwards()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>418</x>
-     <y>75</y>
+     <x>450</x>
+     <y>30</y>
     </hint>
     <hint type="destinationlabel">
      <x>362</x>
-     <y>76</y>
+     <y>80</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>_startStopButton</sender>
+   <sender>_pauseButton</sender>
    <signal>clicked()</signal>
    <receiver>CGTVideoControls</receiver>
-   <slot>stop_video()</slot>
+   <slot>play_pause()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>362</x>
-     <y>75</y>
+     <y>30</y>
     </hint>
     <hint type="destinationlabel">
      <x>362</x>
-     <y>76</y>
+     <y>80</y>
     </hint>
    </hints>
   </connection>

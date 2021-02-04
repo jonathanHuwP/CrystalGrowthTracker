@@ -57,6 +57,9 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         ## the frame queue
         self._frame_queue = Queue(256)
         
+        ## state variable determines if video is playing
+        self._playing = False
+        
         ## the current image
         self._current_image = None
         
@@ -84,11 +87,11 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._source.start()
         
     def set_up_controls(self):
-        self.init_slider_range()
+        """
+        initalize the controls
+        """
+        self._videoControl.set_range(self._source.length)
         self.connect_controls()
-        
-    def init_slider_range(self):
-        self._videoControl.set_slider_range(self._source.length()-1)
         
     def connect_controls(self):
         """
@@ -97,10 +100,11 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._videoControl.zoom_value.connect(self.zoom_value)
         self._videoControl.frame_changed.connect(self.request_frame)
         self._videoControl.start_end.connect(self.start_end)
-
-        #stop = qc.pyqtSignal()
-        #forward = qc.pyqtSignal()
-        #reverse = qc.pyqtSignal()
+        self._videoControl.one_frame_forward.connect(self.step_forward)
+        self._videoControl.one_frame_backward.connect(self.step_backward)
+        self._videoControl.pause .connect(self.play_pause)
+        self._videoControl.forwards.connect(self.play_forward)
+        self._videoControl.backwards.connect(self.play_backward)
         
     def get_frame_queue(self):
         """
@@ -141,10 +145,20 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         message = "Frame {:d} of {:d}, approx {:.2f} seconds"
         #time, _ = self.get_current_video_time()
         message = message.format(self._current_frame+1,
-                                 self._source.length(),
+                                 self._source.length,
                                  0.0)                         
         self._frameLabel.setText(message)
         self._videoControl.set_slider_value(self._current_frame)
+        
+        if self._playing:
+            next_frame = (self._current_frame + 1)
+            self.request_frame(next_frame%self._source.length)
+        
+    def clear_queue(self):
+        """
+        clear the video buffer queue
+        """
+        self._frame_queue = Queue(256)
 
     @qc.pyqtSlot(bool)
     def start_end(self, end):
@@ -155,7 +169,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         print(f"VRW start_end start={end}")
         if end:
-            self.request_frame(self._source.length()-1)
+            self.request_frame(self._source.length-1)
         else:
             self.request_frame(0)
         
@@ -175,3 +189,53 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         print(f"VRW zoom_value {value}")
         self._current_zoom = value
         self.display()
+
+    @qc.pyqtSlot()
+    def step_forward(self):
+        """
+        advance by one frame
+        """
+        print(f"VRW step_forward")
+        frame = self._current_frame + 1
+        if frame < self._source.length:
+            self.request_frame(frame)
+        
+    @qc.pyqtSlot()
+    def step_backward(self):
+        """
+        reverse by one frame
+        """
+        print(f"VRW step_backward")
+        frame = self._current_frame - 1
+        if frame >= 0:
+            self.request_frame(frame)
+
+    @qc.pyqtSlot()
+    def play_pause(self):
+        """
+        pause the playing
+        """
+        print(f"VRW play_pause")
+        self.clear_queue()
+        self._playing = False
+        
+
+    @qc.pyqtSlot()
+    def play_forward(self):
+        """
+        start playing forward
+        """
+        print(f"VRW play_forward")
+        self.clear_queue()
+        self._playing = True
+        self.request_frame((self._current_frame+1)%self._source.length)
+
+    @qc.pyqtSlot()
+    def play_backward(self):
+        """
+        start playing in reverse
+        """
+        print(f"VRW play_backward")
+        self.clear_queue()
+        self._playing = True
+        self.request_frame((self._current_frame-1)%self._source.length)
