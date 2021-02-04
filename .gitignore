@@ -1,0 +1,14 @@
+__pycache__/
+doc/
+cgt/temp/Grayscale*.png
+cgt/temp/Histogram*.png
+cgt/temp/Mean1.png
+Ui_*
+Ui_*.py
+*.log
+.project
+.pydevproject
+.spyproject
+.settings
+*.bak
+.vscode
