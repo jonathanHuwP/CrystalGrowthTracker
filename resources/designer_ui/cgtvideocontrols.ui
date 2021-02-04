@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>725</width>
-    <height>153</height>
+    <height>160</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -31,22 +31,46 @@
      </item>
      <item>
       <widget class="QPushButton" name="_stepDownButton">
+       <property name="toolTip">
+        <string>Reverse one frame.</string>
+       </property>
        <property name="text">
         <string/>
+       </property>
+       <property name="autoRepeat">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QSlider" name="_frameSlider">
+       <property name="toolTip">
+        <string>Jump to frame.</string>
+       </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="tickPosition">
+        <enum>QSlider::TicksBothSides</enum>
+       </property>
+       <property name="tickInterval">
+        <number>50</number>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="_stepUpButton">
+       <property name="toolTip">
+        <string>Advance one frame.</string>
+       </property>
        <property name="text">
         <string/>
+       </property>
+       <property name="autoRepeat">
+        <bool>true</bool>
+       </property>
+       <property name="autoRepeatInterval">
+        <number>100</number>
        </property>
       </widget>
      </item>
@@ -82,6 +106,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="_firstFrameButton">
+       <property name="toolTip">
+        <string>Jump to first frame of video.</string>
+       </property>
        <property name="text">
         <string/>
        </property>
@@ -119,6 +146,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="_lastFrameButton">
+       <property name="toolTip">
+        <string>Jump to last frame of video.</string>
+       </property>
        <property name="text">
         <string/>
        </property>

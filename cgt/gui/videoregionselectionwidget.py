@@ -29,6 +29,7 @@ import PyQt5.QtCore as qc
 from queue import Queue
 
 from cgt.io.videobuffer import VideoBuffer
+from cgt.gui.regionselectionlabel import RegionSelectionLabel
 
 # import UI
 from cgt.gui.Ui_videoregionselectionwidget import Ui_VideoRegionSelectionWidget
@@ -69,7 +70,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._source = VideoBuffer(video_file, self, self)
 
         ## label for displaying the video
-        self._source_label = qw.QLabel()
+        self._source_label = RegionSelectionLabel()
 
         self._source_label.setAlignment(qc.Qt.AlignTop | qc.Qt.AlignLeft)
         self._source_label.setSizePolicy(qw.QSizePolicy.Fixed,
@@ -78,9 +79,16 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
 
         self._videoScrollArea.setWidget(self._source_label)
         
-        self.connect_controls()
+        self.set_up_controls()
         self.request_frame(0)
         self._source.start()
+        
+    def set_up_controls(self):
+        self.init_slider_range()
+        self.connect_controls()
+        
+    def init_slider_range(self):
+        self._videoControl.set_slider_range(self._source.length()-1)
         
     def connect_controls(self):
         """
@@ -88,7 +96,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         self._videoControl.zoom_value.connect(self.zoom_value)
         self._videoControl.frame_changed.connect(self.request_frame)
-        self._videoControl.frame_step.connect(self.frame_step)
         self._videoControl.start_end.connect(self.start_end)
 
         #stop = qc.pyqtSignal()
@@ -137,6 +144,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
                                  self._source.length(),
                                  0.0)                         
         self._frameLabel.setText(message)
+        self._videoControl.set_slider_value(self._current_frame)
 
     @qc.pyqtSlot(bool)
     def start_end(self, end):
@@ -150,22 +158,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
             self.request_frame(self._source.length()-1)
         else:
             self.request_frame(0)
-        
-    @qc.pyqtSlot(bool)
-    def frame_step(self, forward):
-        """
-        move one frame
-            Args:
-                forward (bool) if true move forward else back
-        """
-        print(f"VRW frame_step forward={forward}")
-        
-        if forward:
-            if self._current_frame <self._source.length():
-                self.request_frame(self._current_frame+1)
-        else:
-            if self._current_frame > 0:
-                self.request_frame(self._current_frame-1)
         
     @qc.pyqtSlot(int)
     def request_frame(self, frame_number):

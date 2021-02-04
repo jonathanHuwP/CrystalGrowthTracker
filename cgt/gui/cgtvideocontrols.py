@@ -38,9 +38,6 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
     ## signal to indicate change of frame
     frame_changed = qc.pyqtSignal(int)
 
-    ## signal to indicate a one step move, forward if parameter = true
-    frame_step = qc.pyqtSignal(bool)
-
     ## signal for start/end of video, end if parameter = true
     start_end = qc.pyqtSignal(bool)
 
@@ -65,6 +62,9 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         """
         super().__init__(parent)
         self.setupUi(self)
+        
+        ## record of last request
+        self._last_requested_frame = 0
 
         # set up the buttons
         style = qw.QCommonStyle()
@@ -75,6 +75,25 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         self._startStopButton.setIcon(style.standardIcon(style.SP_MediaStop))
         self._stepUpButton.setIcon(style.standardIcon(style.SP_ArrowForward))
         self._stepDownButton.setIcon(style.standardIcon(style.SP_ArrowBack))
+        
+    def set_slider_value(self, value):
+        """
+        set the sliders current location
+            Args:
+                value (int) the new value
+        """
+        old_slider_state = self._frameSlider.blockSignals(True)
+        self._frameSlider.setValue(value)
+        self._frameSlider.blockSignals(old_slider_state)
+        
+    def set_slider_range(self, maximum):
+        """
+        set the slider range to 0 to maximum
+            Args:
+                maximum (int) the largest allowd frame number
+        """
+        self._frameSlider.setRange(0, maximum)
+        self._frameSlider.setTickInterval(int(maximum/10))
 
     @qc.pyqtSlot(float)
     def zoom_changed(self, zoom):
@@ -93,8 +112,10 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         """
         respond to the release of the slider
         """
+        value = self._frameSlider.value()
         print(f"VidControls: slider_released {self._frameSlider.value()}")
-        self.frame_changed.emit(self._frameSlider.value())
+        self.frame_changed.emit(value)
+        self._last_requested_frame = value
 
     @qc.pyqtSlot()
     def step_up(self):
@@ -102,7 +123,9 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         one frame down
         """
         print(f"VidControls: step_up")
-        self.frame_step.emit(True)
+        if self._last_requested_frame < self._frameSlider.maximum():
+            self._last_requested_frame += 1
+            self.frame_changed.emit(self._last_requested_frame)
 
     @qc.pyqtSlot()
     def step_down(self):
@@ -110,7 +133,9 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         one frame up
         """
         print(f"VidControls: step_down")
-        self.frame_step.emit(False)
+        if self._last_requested_frame > 0:
+            self._last_requested_frame -= 1
+            self.frame_changed.emit(self._last_requested_frame)
 
     @qc.pyqtSlot()
     def first_frame(self):
@@ -119,6 +144,7 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         """
         print(f"VidControls: first_frame")
         self.start_end.emit(False)
+        self._last_requested_frame = 0
 
     @qc.pyqtSlot()
     def last_frame(self):
@@ -127,6 +153,7 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         """
         print(f"VidControls: last_frame")
         self.start_end.emit(True)
+        self._last_requested_frame = self._frameSlider.maximum()
 
     @qc.pyqtSlot()
     def play_forward(self):
