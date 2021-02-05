@@ -83,6 +83,9 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
 
         self._videoScrollArea.setWidget(self._source_label)
         
+        self._subimage_label = qw.QLabel()
+        self._regionScrollArea.setWidget(self._subimage_label)
+        
         self.set_up_controls()
         self.connect_label()
         self.request_frame(0)
@@ -121,6 +124,9 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         label has a rectangle
         """
         print("rect created")
+        rect = self._source_label.get_rectangle()
+        img = self._current_image.copy(rect)
+        self._subimage_label.setPixmap(qg.QPixmap(img))
     
     @qc.pyqtSlot()    
     def rectangle_deleted(self):
@@ -219,6 +225,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         print(f"VRW zoom_value {value}")
         self._current_zoom = value
+        self._source_label.set_zoom(value)
         self.display()
 
     @qc.pyqtSlot()

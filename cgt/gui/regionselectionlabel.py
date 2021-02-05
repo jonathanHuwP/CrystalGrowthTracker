@@ -65,6 +65,10 @@ class RegionSelectionLabel(qw.QLabel):
         
         ## flag for the creation of a new rectangle
         self._new_rectangle = False
+        
+        ## the zoom transformatin
+        self._zoom_transform = qg.QTransform().scale(1.0, 1.0)
+        self._inverse_zoom, _= self._zoom_transform.inverted()
 
         ## the translated name
         self._translation_name = self.tr("RegionSelectionLabel")
@@ -75,7 +79,10 @@ class RegionSelectionLabel(qw.QLabel):
             Returns:
                 pointer to the rectangle or None
         """
-        return self._rectangle
+        if self._rectangle is None:
+            return None
+            
+        return self._inverse_zoom.mapRect(self._rectangle)
         
     def clear(self):
         """
@@ -100,8 +107,9 @@ class RegionSelectionLabel(qw.QLabel):
             
         if event.button() == qc.Qt.LeftButton and self._rectangle is None:
             pix_rect = self.pixmap().rect()
-            point = event.pos()
-            if pix_rect.contains(point): # test if envent in pixmap
+            point = self._inverse_zoom.map(event.pos())
+            print(f"Point is ({point.x()}, {point.y()})")
+            if pix_rect.contains(point): # test if event in pixmap
                 size = qc.QSize(0,0)
                 self._rectangle = qc.QRect(point, size)
                 self._new_rectangle = True
@@ -136,7 +144,8 @@ class RegionSelectionLabel(qw.QLabel):
             return
             
         if self._rectangle is not None and self._new_rectangle:
-            self._rectangle.setBottomRight(event.pos())
+            point = self._inverse_zoom.map(event.pos())
+            self._rectangle.setBottomRight(point)
             self.repaint()
 
     def mouseReleaseEvent(self, event):
@@ -191,7 +200,9 @@ class RegionSelectionLabel(qw.QLabel):
         painter = qg.QPainter(self)
         painter.setPen(pen)
         painter.setBrush(brush)
-        painter.drawRect(self._rectangle)
-        s = self._rectangle.size()
-        print(f"draw {s.height()} {s.width()}")
+        rect = self._zoom_transform.mapRect(self._rectangle)
+        painter.drawRect(rect)
         
+    def set_zoom(self, value):
+        self._zoom_transform = qg.QTransform().scale(value, value)
+        self._inverse_zoom, _= self._zoom_transform.inverted()
