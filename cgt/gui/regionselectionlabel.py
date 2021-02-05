@@ -58,6 +58,9 @@ class RegionSelectionLabel(qw.QLabel):
 
         ## the current rectangle
         self._rectangle = None
+        
+        ## flag for the creation of a new rectangle
+        self._new_rectangle = False
 
         ## the translated name
         self._translation_name = self.tr("RegionSelectionLabel")
@@ -75,6 +78,7 @@ class RegionSelectionLabel(qw.QLabel):
         delete the current rectangle and repaint
         """
         self._rectangle = None
+        self.rectangle_deleted.emit()
         self.repaint()
         
     def mousePressEvent(self, event):
@@ -95,10 +99,14 @@ class RegionSelectionLabel(qw.QLabel):
             point = event.pos()
             if pix_rect.contains(point):
                 print("Start drawing")
-                self._rectangle = 1
+                size = qc.QSize(0,0)
+                self._rectangle = qc.QRect(point, size)
+                self._new_rectangle = True
         elif event.button() == qc.Qt.RightButton and self._rectangle is not None:
             print("delete question")
             self._rectangle = None
+            self.rectangle_deleted.emit()
+            self._new_rectangle = False
 
     def mouseMoveEvent(self, event):
         """ting draw rectangle
@@ -116,8 +124,8 @@ class RegionSelectionLabel(qw.QLabel):
         if event.buttons() != qc.Qt.LeftButton:
             return
             
-        # handel move out of pixmap
-        print("moving mouse")
+        if self._rectangle is not None and self._new_rectangle:
+            self._rectangle.moveBottomRight(event.pos())
 
     def mouseReleaseEvent(self, event):
         """
@@ -135,5 +143,6 @@ class RegionSelectionLabel(qw.QLabel):
         if event.button() != qc.Qt.LeftButton:
             return
             
-        print("release")
-    
+        if self._rectangle is not None and self._new_rectangle:
+            self.have_rectangle.emit()
+            self._new_rectangle = False

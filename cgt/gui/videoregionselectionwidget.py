@@ -26,6 +26,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
+
 from queue import Queue
 
 from cgt.io.videobuffer import VideoBuffer
@@ -83,6 +84,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._videoScrollArea.setWidget(self._source_label)
         
         self.set_up_controls()
+        self.connect_label()
         self.request_frame(0)
         self._source.start()
         
@@ -105,6 +107,27 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._videoControl.pause .connect(self.play_pause)
         self._videoControl.forwards.connect(self.play_forward)
         self._videoControl.backwards.connect(self.play_backward)
+        
+    def connect_label(self):
+        """
+        set up the qt connections for the label
+        """
+        self._source_label.have_rectangle.connect(self.rectangle_drawn)
+        self._source_label.rectangle_deleted.connect(self.rectangle_deleted)
+      
+    @qc.pyqtSlot()
+    def rectangle_drawn(self):
+        """
+        label has a rectangle
+        """
+        print("rect created")
+    
+    @qc.pyqtSlot()    
+    def rectangle_deleted(self):
+        """
+        rectangle deleted in label
+        """
+        print("rect removed")
         
     def get_frame_queue(self):
         """
