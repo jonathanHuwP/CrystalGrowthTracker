@@ -73,7 +73,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._source = VideoBuffer(video_file, self, self)
 
         ## label for displaying the video
-        self._source_label = RegionSelectionLabel()
+        self._source_label = RegionSelectionLabel(self)
 
         self._source_label.setAlignment(qc.Qt.AlignTop | qc.Qt.AlignLeft)
         self._source_label.setSizePolicy(qw.QSizePolicy.Fixed,
@@ -113,7 +113,15 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
                 pointer to the frame queue
         """
         return self._frame_queue
-        
+
+    def is_playing(self):
+        """
+        getter for the playing status
+            Returns:
+                True if the widget is playing video else False
+        """
+        return self._playing
+      
     def display_image(self, image, frame_number):
         """
         display an image
@@ -219,7 +227,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self.clear_queue()
         self._playing = False
         
-
     @qc.pyqtSlot()
     def play_forward(self):
         """

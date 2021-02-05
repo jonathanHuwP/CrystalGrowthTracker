@@ -19,15 +19,15 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 @copyright 2020
 @author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 """
-import numpy as np
-
-import PyQt5.QtWidgets as qw
-import PyQt5.QtGui as qg
-import PyQt5.QtCore as qc
-
 # set up linting conditions
 # pylint: disable = too-many-public-methods
 # pylint: disable = c-extension-no-member
+
+import numpy as np
+
+import PyQt5.QtWidgets as qw
+#import PyQt5.QtGui as qg
+import PyQt5.QtCore as qc
 
 class RegionSelectionLabel(qw.QLabel):
     """
@@ -36,22 +36,104 @@ class RegionSelectionLabel(qw.QLabel):
     """
     
     ## signal to indicate the user has selected a new rectangle
-    new_selection = qc.pyqtSignal()
+    have_rectangle = qc.pyqtSignal()
+    
+    ## signal to indicate the user has deleted the rectangle
+    rectangle_deleted = qc.pyqtSignal()
     
     def __init__(self, parent=None):
         """
         Set up the label
 
             Args:
-                parent (QObject) the parent object
+                parent (VideoRegionSelectionWidget) the parent object
 
             Returns:
                 None
         """
         super().__init__(parent)
+        
+        ## store drawing widget
+        self._parent = parent
 
-        ## the widget's state
-        self._drawing = False
+        ## the current rectangle
+        self._rectangle = None
 
         ## the translated name
         self._translation_name = self.tr("RegionSelectionLabel")
+        
+    def get_rectangle(self):
+        """
+        getter for the rectangle
+            Returns:
+                pointer to the rectangle or None
+        """
+        return self._rectangle
+        
+    def clear(self):
+        """
+        delete the current rectangle and repaint
+        """
+        self._rectangle = None
+        self.repaint()
+        
+    def mousePressEvent(self, event):
+        """
+        detect the start of selection
+
+            Args:
+                event (QEvent) the event data
+
+            Returns:
+                None
+        """
+        if self._parent.is_playing():
+            return
+            
+        if event.button() == qc.Qt.LeftButton and self._rectangle is None:
+            pix_rect = self.pixmap().rect()
+            point = event.pos()
+            if pix_rect.contains(point):
+                print("Start drawing")
+                self._rectangle = 1
+        elif event.button() == qc.Qt.RightButton and self._rectangle is not None:
+            print("delete question")
+            self._rectangle = None
+
+    def mouseMoveEvent(self, event):
+        """ting draw rectangle
+
+            Args:
+                event (QEvent) the event data
+
+            Returns:
+                None
+        """
+        if self._parent.is_playing():
+            return
+            
+        # use buttons() for mouse move as more than one can be held
+        if event.buttons() != qc.Qt.LeftButton:
+            return
+            
+        # handel move out of pixmap
+        print("moving mouse")
+
+    def mouseReleaseEvent(self, event):
+        """
+        select rectangle
+
+            Args:
+                event (QEvent) the event data
+
+            Returns:
+                None
+        """
+        if self._parent.is_playing():
+            return
+            
+        if event.button() != qc.Qt.LeftButton:
+            return
+            
+        print("release")
+    
