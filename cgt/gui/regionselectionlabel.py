@@ -33,6 +33,12 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
+def qtransform_to_string(trans):
+    row1 = f"|{trans.m11():+.2f} {trans.m12():+.2f} {trans.m13():+.2f}|\n"
+    row2 = f"|{trans.m21():+.2f} {trans.m22():+.2f} {trans.m23():+.2f}|\n"
+    row3 = f"|{trans.m31():+.2f} {trans.m32():+.2f} {trans.m33():+.2f}|"
+    return row1 + row2 + row3
+
 class RegionSelectionLabel(qw.QLabel):
     """
     subclass of label allowing selection of region by drawing rectangle and
@@ -108,7 +114,6 @@ class RegionSelectionLabel(qw.QLabel):
         if event.button() == qc.Qt.LeftButton and self._rectangle is None:
             pix_rect = self.pixmap().rect()
             point = self._inverse_zoom.map(event.pos())
-            print(f"Point is ({point.x()}, {point.y()})")
             if pix_rect.contains(point): # test if event in pixmap
                 size = qc.QSize(0,0)
                 self._rectangle = qc.QRect(point, size)
@@ -179,7 +184,6 @@ class RegionSelectionLabel(qw.QLabel):
             Returns:
                 None
         """
-        print("paint")
         # pass on to get pixmap displayed
         qw.QLabel.paintEvent(self, event)
 
@@ -206,3 +210,7 @@ class RegionSelectionLabel(qw.QLabel):
     def set_zoom(self, value):
         self._zoom_transform = qg.QTransform().scale(value, value)
         self._inverse_zoom, _= self._zoom_transform.inverted()
+        print("Forward")
+        print(qtransform_to_string(self._zoom_transform))
+        print("Backward")
+        print(qtransform_to_string(self._inverse_zoom)+"\n")

@@ -123,7 +123,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         label has a rectangle
         """
-        print("rect created")
         rect = self._source_label.get_rectangle()
         img = self._current_image.copy(rect)
         self._subimage_label.setPixmap(qg.QPixmap(img))
@@ -133,7 +132,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         rectangle deleted in label
         """
-        print("rect removed")
+        self._subimage_label.clear()
         
     def get_frame_queue(self):
         """
@@ -158,7 +157,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
                 image (QImage) the image 
                 frame_number
         """
-        print(f"VRW: diplay {type(image)} {frame_number}")
         self._current_image = image
         self._current_frame = frame_number
         
@@ -204,7 +202,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
             Args:
                 end (bool) if true jump to end else start
         """
-        print(f"VRW start_end start={end}")
         if end:
             self.request_frame(self._source.length-1)
         else:
@@ -215,7 +212,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         a specific frame should be displayed
         """
-        print(f"VRW request frame {frame_number}")
         self._frame_queue.put(frame_number)
         
     @qc.pyqtSlot(float)
@@ -223,7 +219,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         a new value for the zoom has been entered
         """
-        print(f"VRW zoom_value {value}")
         self._current_zoom = value
         self._source_label.set_zoom(value)
         self.display()
@@ -233,7 +228,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         advance by one frame
         """
-        print(f"VRW step_forward")
         frame = self._current_frame + 1
         if frame < self._source.length:
             self.request_frame(frame)
@@ -243,7 +237,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         reverse by one frame
         """
-        print(f"VRW step_backward")
         frame = self._current_frame - 1
         if frame >= 0:
             self.request_frame(frame)
@@ -253,7 +246,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         pause the playing
         """
-        print(f"VRW play_pause")
         self.clear_queue()
         self._playing = False
         
@@ -262,7 +254,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         start playing forward
         """
-        print(f"VRW play_forward")
         self.clear_queue()
         self._playing = True
         self.request_frame((self._current_frame+1)%self._source.length)
@@ -272,7 +263,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         start playing in reverse
         """
-        print(f"VRW play_backward")
         self.clear_queue()
         self._playing = True
         self.request_frame((self._current_frame-1)%self._source.length)
