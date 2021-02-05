@@ -23,10 +23,14 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = too-many-public-methods
 # pylint: disable = c-extension-no-member
 
+# TODO handel out of pixmap move/release
+# move => freaze untill back
+# release => delete and reset
+
 import numpy as np
 
 import PyQt5.QtWidgets as qw
-#import PyQt5.QtGui as qg
+import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
 class RegionSelectionLabel(qw.QLabel):
@@ -97,10 +101,12 @@ class RegionSelectionLabel(qw.QLabel):
         if event.button() == qc.Qt.LeftButton and self._rectangle is None:
             pix_rect = self.pixmap().rect()
             point = event.pos()
-            if pix_rect.contains(point):
+            if pix_rect.contains(point): # test if envent in pixmap
                 size = qc.QSize(0,0)
                 self._rectangle = qc.QRect(point, size)
                 self._new_rectangle = True
+                self.repaint()
+                
         elif event.button() == qc.Qt.RightButton and self._rectangle is not None:
             message = self.tr("Do you wish to remove the region?")
             mb_reply = qw.QMessageBox.question(self,
@@ -130,7 +136,8 @@ class RegionSelectionLabel(qw.QLabel):
             return
             
         if self._rectangle is not None and self._new_rectangle:
-            self._rectangle.moveBottomRight(event.pos())
+            self._rectangle.setBottomRight(event.pos())
+            self.repaint()
 
     def mouseReleaseEvent(self, event):
         """
@@ -151,3 +158,40 @@ class RegionSelectionLabel(qw.QLabel):
         if self._rectangle is not None and self._new_rectangle:
             self.have_rectangle.emit()
             self._new_rectangle = False
+            self.repaint()
+            
+    def paintEvent(self, event):
+        """
+        if selecting than draw a rectagle
+
+            Args:
+                event (QEvent) the event data
+
+            Returns:
+                None
+        """
+        print("paint")
+        # pass on to get pixmap displayed
+        qw.QLabel.paintEvent(self, event)
+
+        self.draw_rectangle()
+            
+    def draw_rectangle(self):
+        """
+        Draw the rectagle
+
+            Returns:
+                None
+        """
+        if self._rectangle is None:
+            return
+            
+        pen = qg.QPen(qg.QColor(qc.Qt.black), 1, qc.Qt.DashLine)
+        brush = qg.QBrush(qg.QColor(255, 255, 255, 120))
+        painter = qg.QPainter(self)
+        painter.setPen(pen)
+        painter.setBrush(brush)
+        painter.drawRect(self._rectangle)
+        s = self._rectangle.size()
+        print(f"draw {s.height()} {s.width()}")
+        
