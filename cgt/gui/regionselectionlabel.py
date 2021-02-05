@@ -98,15 +98,20 @@ class RegionSelectionLabel(qw.QLabel):
             pix_rect = self.pixmap().rect()
             point = event.pos()
             if pix_rect.contains(point):
-                print("Start drawing")
                 size = qc.QSize(0,0)
                 self._rectangle = qc.QRect(point, size)
                 self._new_rectangle = True
         elif event.button() == qc.Qt.RightButton and self._rectangle is not None:
-            print("delete question")
-            self._rectangle = None
-            self.rectangle_deleted.emit()
-            self._new_rectangle = False
+            message = self.tr("Do you wish to remove the region?")
+            mb_reply = qw.QMessageBox.question(self,
+                                               'CrystalGrowthTracker',
+                                               message,
+                                               qw.QMessageBox.Yes | qw.QMessageBox.No,
+                                               qw.QMessageBox.No)
+            if mb_reply == qw.QMessageBox.Yes:
+                self._rectangle = None
+                self._new_rectangle = False
+                self.rectangle_deleted.emit()
 
     def mouseMoveEvent(self, event):
         """ting draw rectangle
