@@ -28,12 +28,18 @@ import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
 from queue import Queue
+from enum import Enum
 
 from cgt.io.videobuffer import VideoBuffer
 from cgt.gui.regionselectionlabel import RegionSelectionLabel
 
 # import UI
 from cgt.gui.Ui_videoregionselectionwidget import Ui_VideoRegionSelectionWidget
+
+class PlayState(Enum):
+    MANUAL = 1
+    PLAY_FORWARD = 2
+    PLAY_BACKWARD = 3
 
 class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
     """
@@ -60,7 +66,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._frame_queue = Queue(256)
         
         ## state variable determines if video is playing
-        self._playing = False
+        self._playing = PlayState.MANUAL
         
         ## the current image
         self._current_image = None
@@ -152,7 +158,10 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
             Returns:
                 True if the widget is playing video else False
         """
-        return self._playing
+        if self._playing == PlayState.MANUAL:
+            return False
+            
+        return True
       
     def display_image(self, image, frame_number):
         """
@@ -191,10 +200,12 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
                                                 self._source.length,
                                                 time))
         
-        if self._playing:
+        if self._playing == PlayState.PLAY_FORWARD:
             next_frame = (self._current_frame + 1)
             self.request_frame(next_frame%self._source.length)
-            
+        elif self._playing == PlayState.PLAY_BACKWARD:
+            next_frame = (self._current_frame - 1)
+            self.request_frame(next_frame%self._source.length)
    
         
     def clear_queue(self):
@@ -256,7 +267,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         pause the playing
         """
         self.clear_queue()
-        self._playing = False
+        self._playing = PlayState.MANUAL
         
     @qc.pyqtSlot()
     def play_forward(self):
@@ -264,7 +275,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         start playing forward
         """
         self.clear_queue()
-        self._playing = True
+        self._playing = PlayState.PLAY_FORWARD
         self.request_frame((self._current_frame+1)%self._source.length)
 
     @qc.pyqtSlot()
@@ -273,5 +284,5 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         start playing in reverse
         """
         self.clear_queue()
-        self._playing = True
+        self._playing = PlayState.PLAY_BACKWARD
         self.request_frame((self._current_frame-1)%self._source.length)
