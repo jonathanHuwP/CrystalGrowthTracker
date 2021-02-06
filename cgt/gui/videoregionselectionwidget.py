@@ -41,12 +41,13 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
     data-structures required to implement the intended behaviour
     """
 
-    def __init__(self, video_file, parent=None):
+    def __init__(self, video_file, frames_per_second, parent=None):
         """
         the object initalization function
 
             Args:
                 video_file (string) the name of the file holding the video
+                frames_per_second (int) the number of frame per second in the video
                 parent (QObject): the parent QObject for this window
 
             Returns:
@@ -69,6 +70,9 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         
         ## the current value of the zoom
         self._current_zoom = 1.0
+        
+        ## the number of frames per second
+        self._frames_per_second = frames_per_second
 
         ## the player 
         self._source = VideoBuffer(video_file, self, self)
@@ -159,6 +163,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         self._current_image = image
         self._current_frame = frame_number
+        self._videoControl.set_frame_currently_displayed(frame_number)
         
         self.display()
         
@@ -177,17 +182,20 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
 
         self._source_label.setPixmap(qg.QPixmap(tmp))
         
-        message = "Frame {:d} of {:d}, approx {:.2f} seconds"
-        #time, _ = self.get_current_video_time()
-        message = message.format(self._current_frame+1,
-                                 self._source.length,
-                                 0.0)                         
-        self._frameLabel.setText(message)
         self._videoControl.set_slider_value(self._current_frame)
+        
+        display_number = self._current_frame+1
+        time = display_number/self._frames_per_second
+        message = "Frame {:d} of {:d}, approx {:.2f} seconds video time"
+        self._frameLabel.setText(message.format(display_number,
+                                                self._source.length,
+                                                time))
         
         if self._playing:
             next_frame = (self._current_frame + 1)
             self.request_frame(next_frame%self._source.length)
+            
+   
         
     def clear_queue(self):
         """
@@ -212,6 +220,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         a specific frame should be displayed
         """
+        print("request frame", frame_number)
         self._frame_queue.put(frame_number)
         
     @qc.pyqtSlot(float)

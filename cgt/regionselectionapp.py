@@ -41,7 +41,8 @@ class RegionSelectionApp(qw.QApplication):
         self.setOrganizationDomain("leeds.ac.uk")
         self.setAttribute(qc.Qt.AA_EnableHighDpiScaling)
 
-        window = VideoRegionSelectionWidget(video_file)
+        frames_per_second = 8
+        window = VideoRegionSelectionWidget(video_file, frames_per_second)
         window.show()
 
         self.exec_()    # enter event loop
