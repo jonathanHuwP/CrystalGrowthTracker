@@ -179,7 +179,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QDoubleSpinBox" name="_zoomDoubleSpinBox">
+      <widget class="QDoubleSpinBox" name="_zoomSpinBox">
        <property name="minimum">
         <double>0.100000000000000</double>
        </property>
@@ -270,7 +270,7 @@
  <resources/>
  <connections>
   <connection>
-   <sender>_zoomDoubleSpinBox</sender>
+   <sender>_zoomSpinBox</sender>
    <signal>valueChanged(double)</signal>
    <receiver>CGTVideoControls</receiver>
    <slot>zoom_changed()</slot>

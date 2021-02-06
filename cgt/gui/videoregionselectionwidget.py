@@ -186,7 +186,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         
         display_number = self._current_frame+1
         time = display_number/self._frames_per_second
-        message = "Frame {:d} of {:d}, approx {:.2f} seconds video time"
+        message =   "Frame {:d} of {:d}, approx {:.2f} seconds video time"
         self._frameLabel.setText(message.format(display_number,
                                                 self._source.length,
                                                 time))

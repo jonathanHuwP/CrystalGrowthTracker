@@ -114,6 +114,7 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         self._stepUpButton.setEnabled(False)
         self._lastFrameButton.setEnabled(False)
         self._goToButton.setEnabled(False)
+        self._zoomSpinBox.setEnabled(False)
 
     def enable_fine_controls(self):
         """
@@ -126,6 +127,7 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         self._stepUpButton.setEnabled(True)
         self._lastFrameButton.setEnabled(True)
         self._goToButton.setEnabled(True)
+        self._zoomSpinBox.setEnabled(True)
 
     def play_forwards(self):
         """
