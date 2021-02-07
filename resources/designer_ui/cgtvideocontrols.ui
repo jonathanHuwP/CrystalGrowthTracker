@@ -429,5 +429,21 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>_gotoSpinBox</sender>
+   <signal>editingFinished()</signal>
+   <receiver>CGTVideoControls</receiver>
+   <slot>go_to_frame()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>414</x>
+     <y>120</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>362</x>
+     <y>80</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
 </ui>
