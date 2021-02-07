@@ -12,3 +12,4 @@ Ui_*.py
 .settings
 *.bak
 .vscode
+wizard.py

@@ -61,26 +61,26 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         super().__init__(parent)
         self.setupUi(self)
-        
+
         ## the frame queue
         self._frame_queue = Queue(256)
-        
+
         ## state variable determines if video is playing
         self._playing = PlayState.MANUAL
-        
+
         ## the current image
         self._current_image = None
-        
+
         ## the currently displayed frame
         self._current_frame = None
-        
+
         ## the current value of the zoom
         self._current_zoom = 1.0
-        
+
         ## the number of frames per second
         self._frames_per_second = frames_per_second
 
-        ## the player 
+        ## the player
         self._source = VideoBuffer(video_file, self, self)
 
         ## label for displaying the video
@@ -92,22 +92,25 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._source_label.setMargin(0)
 
         self._videoScrollArea.setWidget(self._source_label)
-        
+
         self._subimage_label = qw.QLabel()
         self._regionScrollArea.setWidget(self._subimage_label)
-        
+
+        font = qg.QFont( "Arial", 11, qg.QFont.Bold);
+        self._frameLabel.setFont(font);
+
         self.set_up_controls()
         self.connect_label()
         self.request_frame(0)
         self._source.start()
-        
+
     def set_up_controls(self):
         """
         initalize the controls
         """
         self._videoControl.set_range(self._source.length)
         self.connect_controls()
-        
+
     def connect_controls(self):
         """
         connect the video controls to self
@@ -120,14 +123,14 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._videoControl.pause .connect(self.play_pause)
         self._videoControl.forwards.connect(self.play_forward)
         self._videoControl.backwards.connect(self.play_backward)
-        
+
     def connect_label(self):
         """
         set up the qt connections for the label
         """
         self._source_label.have_rectangle.connect(self.rectangle_drawn)
         self._source_label.rectangle_deleted.connect(self.rectangle_deleted)
-      
+
     @qc.pyqtSlot()
     def rectangle_drawn(self):
         """
@@ -136,14 +139,14 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         rect = self._source_label.get_rectangle()
         img = self._current_image.copy(rect)
         self._subimage_label.setPixmap(qg.QPixmap(img))
-    
-    @qc.pyqtSlot()    
+
+    @qc.pyqtSlot()
     def rectangle_deleted(self):
         """
         rectangle deleted in label
         """
         self._subimage_label.clear()
-        
+
     def get_frame_queue(self):
         """
         getter for the frame queue
@@ -160,22 +163,22 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         if self._playing == PlayState.MANUAL:
             return False
-            
+
         return True
-      
+
     def display_image(self, image, frame_number):
         """
         display an image
             Args:
-                image (QImage) the image 
+                image (QImage) the image
                 frame_number
         """
         self._current_image = image
         self._current_frame = frame_number
         self._videoControl.set_frame_currently_displayed(frame_number)
-        
+
         self.display()
-        
+
     def display(self):
         """
         display the current image
@@ -190,24 +193,23 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         tmp = self._current_image.scaled(width, height)
 
         self._source_label.setPixmap(qg.QPixmap(tmp))
-        
+
         self._videoControl.set_slider_value(self._current_frame)
-        
+
         display_number = self._current_frame+1
         time = display_number/self._frames_per_second
-        message =   "Frame {:d} of {:d}, approx {:.2f} seconds video time"
+        message =   "Frame {:d} of {:d}, approx {:.1f} seconds video time"
         self._frameLabel.setText(message.format(display_number,
                                                 self._source.length,
                                                 time))
-        
+
         if self._playing == PlayState.PLAY_FORWARD:
             next_frame = (self._current_frame + 1)
             self.request_frame(next_frame%self._source.length)
         elif self._playing == PlayState.PLAY_BACKWARD:
             next_frame = (self._current_frame - 1)
             self.request_frame(next_frame%self._source.length)
-   
-        
+
     def clear_queue(self):
         """
         clear the video buffer queue
@@ -225,15 +227,14 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
             self.request_frame(self._source.length-1)
         else:
             self.request_frame(0)
-        
+
     @qc.pyqtSlot(int)
     def request_frame(self, frame_number):
         """
         a specific frame should be displayed
         """
-        print("request frame", frame_number)
         self._frame_queue.put(frame_number)
-        
+
     @qc.pyqtSlot(float)
     def zoom_value(self, value):
         """
@@ -251,7 +252,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         frame = self._current_frame + 1
         if frame < self._source.length:
             self.request_frame(frame)
-        
+
     @qc.pyqtSlot()
     def step_backward(self):
         """
@@ -268,7 +269,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         self.clear_queue()
         self._playing = PlayState.MANUAL
-        
+
     @qc.pyqtSlot()
     def play_forward(self):
         """

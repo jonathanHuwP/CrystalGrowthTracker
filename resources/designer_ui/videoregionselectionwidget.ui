@@ -20,11 +20,11 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <widget class="QWidget" name="layoutWidget">
-      <layout class="QVBoxLayout" name="verticalLayout">
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
        <item>
         <widget class="QScrollArea" name="_videoScrollArea">
          <property name="toolTip">
-          <string>Left button draw; right clear</string>
+          <string>Left button drag to draw; right to clear</string>
          </property>
          <property name="toolTipDuration">
           <number>-1</number>
