@@ -174,8 +174,14 @@ class RegionSelectionLabel(qw.QLabel):
             return
 
         if self._rectangle is not None and self._new_rectangle:
-            self.have_rectangle.emit()
-            self._new_rectangle = False
+            size = self._rectangle.size()
+            diagonal = size.width()*size.width() + size.height()*size.height()
+            if diagonal < 8:
+                self._rectangle = None
+                self._new_rectangle = False
+            else:
+                self.have_rectangle.emit()
+                self._new_rectangle = False
             self.repaint()
 
     def paintEvent(self, event):
