@@ -107,7 +107,6 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         """
         disable the fine controls
         """
-        print("disable")
         self._firstFrameButton.setEnabled(False)
         self._stepDownButton.setEnabled(False)
         self._frameSlider.setEnabled(False)
@@ -120,7 +119,6 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         """
         enable the fine controls
         """
-        print("enable")
         self._firstFrameButton.setEnabled(True)
         self._stepDownButton.setEnabled(True)
         self._frameSlider.setEnabled(True)
@@ -166,7 +164,6 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
             Returns:
                 None
         """
-        print(f"VidControls: zoom_changed {zoom}")
         self.zoom_value.emit(zoom)
 
     @qc.pyqtSlot()
@@ -175,7 +172,6 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         respond to the release of the slider
         """
         value = self._frameSlider.value()
-        print(f"VidControls: slider_released {self._frameSlider.value()}")
         self.frame_changed.emit(value)
 
     @qc.pyqtSlot()
@@ -183,7 +179,6 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         """
         one frame down
         """
-        print(f"VidControls: step_up")
         self.one_frame_forward.emit()
 
     @qc.pyqtSlot()
@@ -191,7 +186,6 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         """
         one frame up
         """
-        print(f"VidControls: step_down")
         self.one_frame_backward.emit()
 
     @qc.pyqtSlot()
@@ -199,7 +193,6 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         """
         jump to first frame
         """
-        print(f"VidControls: first_frame")
         self.start_end.emit(False)
 
     @qc.pyqtSlot()
@@ -207,7 +200,6 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         """
         jump to last frame
         """
-        print(f"VidControls: last_frame")
         self.start_end.emit(True)
 
     @qc.pyqtSlot()
@@ -215,5 +207,4 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         """
         jump to typed in frame
         """
-        print("VidControls: goto")
         self.frame_changed.emit(self._gotoSpinBox.value()-1)

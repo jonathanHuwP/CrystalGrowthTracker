@@ -21,10 +21,13 @@ import argparse
 from cgt.regionselectionapp import RegionSelectionApp
 
 def get_args():
+    """
+    use argparse to get the video file name
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("-v", "--video", type=str, required=True, help="input file")
     return parser.parse_args()
-    
+
 if __name__ == "__main__":
     args = get_args()
     application = RegionSelectionApp(sys.argv, args.video)

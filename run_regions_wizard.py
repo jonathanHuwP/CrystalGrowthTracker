@@ -16,6 +16,10 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 @copyright 2021
 @author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 """
+# pylint: disable = import-error
+# pylint: disable = c-extension-no-member
+# pylint: disable = no-name-in-module
+
 import PyQt5.QtWidgets as qw
 
 from cgt.gui.wizard.regionswizard import RegionsWizard

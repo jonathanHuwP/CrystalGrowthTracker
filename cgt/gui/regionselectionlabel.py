@@ -120,7 +120,8 @@ class RegionSelectionLabel(qw.QLabel):
             pix_rect = self.pixmap().rect()
             if pix_rect.contains(event.pos()): # test if event in pixmap
                 size = qc.QSize(0,0)
-                self._rectangle = qc.QRect(event.pos(), size)
+                point = self._inverse_zoom.map(event.pos())
+                self._rectangle = qc.QRect(point, size)
                 self._new_rectangle = True
                 self.repaint()
 
@@ -153,8 +154,8 @@ class RegionSelectionLabel(qw.QLabel):
             return
 
         if self._rectangle is not None and self._new_rectangle:
-            #point = self._inverse_zoom.map(event.pos())
-            self._rectangle.setBottomRight(event.pos())
+            point = self._inverse_zoom.map(event.pos())
+            self._rectangle.setBottomRight(point)
             self.repaint()
 
     def mouseReleaseEvent(self, event):
@@ -213,8 +214,8 @@ class RegionSelectionLabel(qw.QLabel):
         painter = qg.QPainter(self)
         painter.setPen(pen)
         painter.setBrush(brush)
-        #rect = self._zoom_transform.mapRect(self._rectangle)
-        painter.drawRect(self._rectangle)
+        rect = self._zoom_transform.mapRect(self._rectangle)
+        painter.drawRect(rect)
 
     def set_zoom(self, value):
         self._zoom_transform = qg.QTransform().scale(value, value)

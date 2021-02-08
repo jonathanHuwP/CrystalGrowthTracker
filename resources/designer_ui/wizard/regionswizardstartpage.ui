@@ -17,7 +17,7 @@
    <string>Start New Region</string>
   </property>
   <attribute name="pageId">
-   <string notr="true">0</string>
+   <string notr="true"/>
   </attribute>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
