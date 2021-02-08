@@ -1,10 +1,7 @@
 __pycache__/
-doc/
-cgt/temp/Grayscale*.png
-cgt/temp/Histogram*.png
-cgt/temp/Mean1.png
+docs/
 Ui_*
-Ui_*.py
+Ui_*
 *.log
 .project
 .pydevproject
@@ -12,4 +9,3 @@ Ui_*.py
 .settings
 *.bak
 .vscode
-wizard.py

@@ -46,4 +46,6 @@ class RegionsWizard(qw.QWizard):
         """
         greeting = self.field("greeting-choice")
         person = self.field("person-choice")
-        print(f"{greeting} {person}")
+        text = self.field("text-displayed")
+        
+        print(f"{greeting} {person} the display widget showed {text}")

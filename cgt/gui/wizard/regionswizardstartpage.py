@@ -17,6 +17,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 @author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 """
 import PyQt5.QtWidgets as qw
+import PyQt5.QtCore as qc
 
 from cgt.gui.wizard.regionswizardpages import RegionsWizardPages as rwp
 
@@ -36,12 +37,34 @@ class RegionsWizardStartPage(qw.QWizardPage):
         self._comboBox.addItem("Arrive", "Hello")
         self._comboBox.addItem("Leave", "Bye")
         
+        # add an output widget
+        self._label = qw.QLabel(self)
+        
+        # add a button
+        self._button = qw.QPushButton("Make")
+        self._button.clicked.connect(self.make_text)
+        
         layout = qw.QVBoxLayout()
         layout.addWidget(self._comboBox)
+        layout.addWidget(self._label)
+        layout.addWidget(self._button)
         self.setLayout(layout)
         
         # register the combobox data function for access by main wizard
         self.registerField("greeting-choice", self._comboBox, "currentData")
+        self.registerField("text-displayed", self._label, "text")
+        
+        # completed flag
+        self._complete = False
+
+    qc.pyqtSlot()
+    def make_text(self):
+        self._label.setText("Once upon a time in Yorkshire ....")
+        self._complete = True
+        self.completeChanged.emit()
+        
+    def isComplete(self):
+        return self._complete
         
     def nextId(self):
         """
