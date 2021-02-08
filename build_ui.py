@@ -26,7 +26,9 @@ import pathlib
 
 # a list of the modules that the package requires
 ROOT_FILE_NAMES = ["videoregionselectionwidget",
-                   "cgtvideocontrols"]
+                   "cgtvideocontrols",
+                   "wizard/regionswizardstartpage",
+                   "wizard/regionswizardfinalpage"]
 
 # relative path to the Qt .ui files
 UI_PATH = "./resources/designer_ui/"
@@ -67,8 +69,10 @@ def build(file_name_root):
         Args:
             file_name_root (string) the module name with no decoration or postfix
     """
+    code_path = pathlib.Path(file_name_root)
+    code_path = code_path.parent.joinpath(f"Ui_{code_path.name}.py")
     ui_file = pathlib.Path(UI_PATH).joinpath(f"{file_name_root}.ui")
-    py_file = pathlib.Path(PY_PATH).joinpath(f"Ui_{file_name_root}.py")
+    py_file = pathlib.Path(PY_PATH).joinpath(code_path)
 
     # in the case of failure CPython will print its own error message
     if os.system(f"pyuic5 {ui_file} -o {py_file}") == 0:
