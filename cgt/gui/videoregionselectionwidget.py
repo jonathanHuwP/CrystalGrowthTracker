@@ -73,7 +73,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
 
         ## the currently displayed frame
         self._current_frame = None
-        
+
         ## the currently displayed subimage
         self._current_subimage = None
 
@@ -153,8 +153,11 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         rect = self._source_label.get_rectangle()
         self._current_subimage = self._current_image.copy(rect)
         self.display_subimage()
-        
+
     def display_subimage(self):
+        """
+        if current subimage exists display it at the current zoom
+        """
         if self._current_subimage is None:
             return
 
@@ -199,7 +202,17 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._current_frame = frame_number
         self._videoControl.set_frame_currently_displayed(frame_number)
 
+        self.animate_subimage()
         self.display()
+
+    def animate_subimage(self):
+        """
+        if there is a subimage copy get a new copy and display
+        """
+        if self._current_subimage is None:
+            return
+
+        self.rectangle_drawn()
 
     def display(self):
         """
@@ -224,8 +237,8 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._frameLabel.setText(message.format(display_number,
                                                 self._source.length,
                                                 time))
-                                                
-        # dispaly any subimage                 
+
+        # dispaly any subimage
         self.display_subimage()
 
         if self._playing == PlayState.PLAY_FORWARD:
