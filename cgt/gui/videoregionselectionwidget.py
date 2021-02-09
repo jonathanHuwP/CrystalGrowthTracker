@@ -84,6 +84,22 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._source = VideoBuffer(video_file, self, self)
 
         ## label for displaying the video
+        self._source_label = None
+        
+        ## label for the subimage
+        self._subimage_label = None
+        
+        self.setup_labels()
+
+        font = qg.QFont( "Arial", 11, qg.QFont.Bold);
+        self._frameLabel.setFont(font);
+
+        self.set_up_controls()
+        self.connect_label()
+        self.request_frame(0)
+        self._source.start()
+
+    def setup_labels(self):
         self._source_label = RegionSelectionLabel(self)
 
         self._source_label.setAlignment(qc.Qt.AlignTop | qc.Qt.AlignLeft)
@@ -95,14 +111,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
 
         self._subimage_label = qw.QLabel()
         self._regionScrollArea.setWidget(self._subimage_label)
-
-        font = qg.QFont( "Arial", 11, qg.QFont.Bold);
-        self._frameLabel.setFont(font);
-
-        self.set_up_controls()
-        self.connect_label()
-        self.request_frame(0)
-        self._source.start()
 
     def set_up_controls(self):
         """
