@@ -85,10 +85,10 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
 
         ## label for displaying the video
         self._source_label = None
-        
+
         ## label for the subimage
         self._subimage_label = None
-        
+
         self.setup_labels()
 
         font = qg.QFont( "Arial", 11, qg.QFont.Bold);
@@ -100,6 +100,9 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._source.start()
 
     def setup_labels(self):
+        """
+        setup the two labels used for dispalying image and subimage
+        """
         self._source_label = RegionSelectionLabel(self)
 
         self._source_label.setAlignment(qc.Qt.AlignTop | qc.Qt.AlignLeft)
@@ -146,6 +149,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         rect = self._source_label.get_rectangle()
         img = self._current_image.copy(rect)
+        # resize img using self._current_zoom
         self._subimage_label.setPixmap(qg.QPixmap(img))
 
     @qc.pyqtSlot()
@@ -196,9 +200,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         if self._current_image is None or self.isHidden():
             return
 
-        height = self._current_image.height()*self._current_zoom
-        width = self._current_image.width()*self._current_zoom
-        tmp = self._current_image.scaled(width, height)
+        tmp = self.apply_zoom_to_image(self._current_image)
 
         self._source_label.setPixmap(qg.QPixmap(tmp))
 
@@ -217,6 +219,18 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         elif self._playing == PlayState.PLAY_BACKWARD:
             next_frame = (self._current_frame - 1)
             self.request_frame(next_frame%self._source.length)
+
+    def apply_zoom_to_image(self, image):
+        """
+        apply the current zoom to an image
+            Args:
+                image (Qimage) the image to be resized
+            Returns
+                Qimage resized by current zoom
+        """
+        height = image.height()*self._current_zoom
+        width = image.width()*self._current_zoom
+        return image.scaled(width, height)
 
     def clear_queue(self):
         """
