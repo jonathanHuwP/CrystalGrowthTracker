@@ -30,7 +30,7 @@ class RegionsWizard(qw.QWizard):
         self.setWizardStyle(qw.QWizard.ClassicStyle)
         
         # the pages are not interdepenent and the start page has no back button
-        self.setOptions(qw.QWizard.IndependentPages|qw.QWizard.NoBackButtonOnStartPage)
+        self.setOptions(qw.QWizard.IndependentPages|qw.QWizard.NoBackButtonOnStartPage|qw.QWizard.NoCancelButton)
         
         # set up the pages
         self.setPage(rwp.PAGE_START, RegionsWizardStartPage(self))

@@ -32,6 +32,7 @@ from enum import Enum
 
 from cgt.io.videobuffer import VideoBuffer
 from cgt.gui.regionselectionlabel import RegionSelectionLabel
+from cgt.gui.wizard.regionswizard import RegionsWizard
 
 # import UI
 from cgt.gui.Ui_videoregionselectionwidget import Ui_VideoRegionSelectionWidget
@@ -91,6 +92,11 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
 
         ## label for the subimage
         self._subimage_label = None
+        
+        ## the embedded wizard
+        self._regionsWizard = RegionsWizard(self)
+        self._wizardLayout.addWidget(self._regionsWizard)
+        self._regionsWizard.setEnabled(False)
 
         self.setup_labels()
 
@@ -153,6 +159,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         rect = self._source_label.get_rectangle()
         self._current_subimage = self._current_image.copy(rect)
         self.display_subimage()
+        self._regionsWizard.setEnabled(True)
 
     def display_subimage(self):
         """
@@ -171,6 +178,8 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         self._subimage_label.clear()
         self._current_subimage = None
+        self._regionsWizard.restart()
+        self._regionsWizard.setEnabled(False)
 
     def get_frame_queue(self):
         """
