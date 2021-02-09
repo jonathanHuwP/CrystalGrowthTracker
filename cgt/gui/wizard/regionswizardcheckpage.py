@@ -16,12 +16,26 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 @copyright 2021
 @author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 """
-from enum import IntEnum
+import PyQt5.QtWidgets as qw
+import PyQt5.QtCore as qc
 
-class RegionsWizardPages(IntEnum):
+from cgt.gui.wizard.regionswizardpages import RegionsWizardPages as rwp
+from cgt.gui.wizard.Ui_regionswizardcheckpage import Ui_RegionsWizardCheckPage
+
+class RegionsWizardCheckPage(qw.QWizardPage, Ui_RegionsWizardCheckPage):
     """
-    specify the number of the pages in the wizard
+    the first page of the region selection
     """
-    PAGE_START = 0
-    PAGE_CHECK = 2
-    PAGE_FINAL = 10
+
+    def __init__(self, parent=None):
+        """
+        set up the page
+        """
+        super().__init__(parent)
+        self.setupUi(self)
+
+    def nextId(self):
+        """
+        return the id of the next page
+        """
+        return rwp.PAGE_FINAL

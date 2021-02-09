@@ -28,6 +28,7 @@ import pathlib
 ROOT_FILE_NAMES = ["videoregionselectionwidget",
                    "cgtvideocontrols",
                    "wizard/regionswizardstartpage",
+                   "wizard/regionswizardcheckpage",
                    "wizard/regionswizardfinalpage"]
 
 # relative path to the Qt .ui files

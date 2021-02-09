@@ -237,8 +237,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._frameLabel.setText(message.format(display_number,
                                                 self._source.length,
                                                 time))
-
-        # dispaly any subimage
+        # display any subimage
         self.display_subimage()
 
         if self._playing == PlayState.PLAY_FORWARD:

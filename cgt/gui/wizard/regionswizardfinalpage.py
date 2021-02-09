@@ -19,8 +19,9 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 import PyQt5.QtWidgets as qw
 
 from cgt.gui.wizard.regionswizardpages import RegionsWizardPages as rwp
+from cgt.gui.wizard.Ui_regionswizardfinalpage import Ui_RegionsWizardFinalPage
 
-class RegionsWizardFinalPage(qw.QWizardPage):
+class RegionsWizardFinalPage(qw.QWizardPage,  Ui_RegionsWizardFinalPage):
     """
     final page of region selection
     """
@@ -30,14 +31,4 @@ class RegionsWizardFinalPage(qw.QWizardPage):
         set up the widget
         """
         super().__init__(parent)
-        
-        # combo box 
-        self._comboBox = qw.QComboBox(self)
-        self._comboBox.addItem("Final 1", "Alice")
-        self._comboBox.addItem("Final 2", "Bob")
-        
-        layout = qw.QVBoxLayout()
-        layout.addWidget(self._comboBox)
-        self.setLayout(layout)
-        
-        self.registerField("person-choice", self._comboBox, "currentData")
+        self.setupUi(self)

@@ -19,6 +19,7 @@ import PyQt5.QtWidgets as qw
 
 from cgt.gui.wizard.regionswizardpages import RegionsWizardPages as rwp
 from cgt.gui.wizard.regionswizardstartpage import RegionsWizardStartPage
+from cgt.gui.wizard.regionswizardcheckpage import RegionsWizardCheckPage
 from cgt.gui.wizard.regionswizardfinalpage import RegionsWizardFinalPage
 
 class RegionsWizard(qw.QWizard):
@@ -33,6 +34,7 @@ class RegionsWizard(qw.QWizard):
         
         # set up the pages
         self.setPage(rwp.PAGE_START, RegionsWizardStartPage(self))
+        self.setPage(rwp.PAGE_CHECK, RegionsWizardCheckPage(self))
         self.setPage(rwp.PAGE_FINAL, RegionsWizardFinalPage(self))
         
         # make sure the start page is set
@@ -44,8 +46,5 @@ class RegionsWizard(qw.QWizard):
         """
         action when the user clicks "Finished"
         """
-        greeting = self.field("greeting-choice")
-        person = self.field("person-choice")
-        text = self.field("text-displayed")
         
-        print(f"{greeting} {person} the display widget showed {text}")
+        print(f"Editing finished")

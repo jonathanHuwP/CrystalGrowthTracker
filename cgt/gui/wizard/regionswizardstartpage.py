@@ -20,8 +20,9 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
 
 from cgt.gui.wizard.regionswizardpages import RegionsWizardPages as rwp
+from cgt.gui.wizard.Ui_regionswizardstartpage import Ui_RegionsWizardStartPage
 
-class RegionsWizardStartPage(qw.QWizardPage):
+class RegionsWizardStartPage(qw.QWizardPage, Ui_RegionsWizardStartPage):
     """
     the first page of the region selection
     """
@@ -31,43 +32,10 @@ class RegionsWizardStartPage(qw.QWizardPage):
         set up the page
         """
         super().__init__(parent)
-        
-        # combo box with some data
-        self._comboBox = qw.QComboBox(self)
-        self._comboBox.addItem("Arrive", "Hello")
-        self._comboBox.addItem("Leave", "Bye")
-        
-        # add an output widget
-        self._label = qw.QLabel(self)
-        
-        # add a button
-        self._button = qw.QPushButton("Make")
-        self._button.clicked.connect(self.make_text)
-        
-        layout = qw.QVBoxLayout()
-        layout.addWidget(self._comboBox)
-        layout.addWidget(self._label)
-        layout.addWidget(self._button)
-        self.setLayout(layout)
-        
-        # register the combobox data function for access by main wizard
-        self.registerField("greeting-choice", self._comboBox, "currentData")
-        self.registerField("text-displayed", self._label, "text")
-        
-        # completed flag
-        self._complete = False
+        self.setupUi(self)
 
-    qc.pyqtSlot()
-    def make_text(self):
-        self._label.setText("Once upon a time in Yorkshire ....")
-        self._complete = True
-        self.completeChanged.emit()
-        
-    def isComplete(self):
-        return self._complete
-        
     def nextId(self):
         """
         return the id of the next page
         """
-        return rwp.PAGE_FINAL
+        return rwp.PAGE_CHECK
