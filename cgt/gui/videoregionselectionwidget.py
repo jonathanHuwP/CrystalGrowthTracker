@@ -73,6 +73,9 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
 
         ## the currently displayed frame
         self._current_frame = None
+        
+        ## the currently displayed subimage
+        self._current_subimage = None
 
         ## the current value of the zoom
         self._current_zoom = 1.0
@@ -148,7 +151,14 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         label has a rectangle
         """
         rect = self._source_label.get_rectangle()
-        img = self._current_image.copy(rect)
+        self._current_subimage = self._current_image.copy(rect)
+        self.display_subimage()
+        
+    def display_subimage(self):
+        if self._current_subimage is None:
+            return
+
+        img = self.apply_zoom_to_image(self._current_subimage)
         self._subimage_label.setPixmap(qg.QPixmap(img))
 
     @qc.pyqtSlot()
@@ -157,6 +167,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         rectangle deleted in label
         """
         self._subimage_label.clear()
+        self._current_subimage = None
 
     def get_frame_queue(self):
         """
@@ -199,18 +210,23 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         if self._current_image is None or self.isHidden():
             return
 
+        # zoom and display image
         tmp = self.apply_zoom_to_image(self._current_image)
-
         self._source_label.setPixmap(qg.QPixmap(tmp))
 
+        # update the controls
         self._videoControl.set_slider_value(self._current_frame)
 
+        # display the current frame number and time
         display_number = self._current_frame+1
         time = display_number/self._frames_per_second
         message =   "Frame {:d} of {:d}, approx {:.1f} seconds video time"
         self._frameLabel.setText(message.format(display_number,
                                                 self._source.length,
                                                 time))
+                                                
+        # dispaly any subimage                 
+        self.display_subimage()
 
         if self._playing == PlayState.PLAY_FORWARD:
             next_frame = (self._current_frame + 1)
