@@ -93,7 +93,7 @@ class RegionSelectionLabel(qw.QLabel):
         if self._rectangle is None:
             return None
 
-        return self._inverse_zoom.mapRect(self._rectangle)
+        return self._rectangle
 
     def clear(self):
         """

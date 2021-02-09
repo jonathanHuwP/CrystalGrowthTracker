@@ -149,7 +149,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         rect = self._source_label.get_rectangle()
         img = self._current_image.copy(rect)
-        # resize img using self._current_zoom
         self._subimage_label.setPixmap(qg.QPixmap(img))
 
     @qc.pyqtSlot()
