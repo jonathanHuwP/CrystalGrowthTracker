@@ -107,7 +107,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._regionsWizard = RegionsWizard(self)
         self._wizardLayout.addWidget(self._regionsWizard)
         self._regionsWizard.setEnabled(False)
-        self._regionsWizard.region_check.connect(self.region_check)
+        #self._regionsWizard.region_check.connect(self.region_check)
         self._regionsWizard.region_finished.connect(self.region_finished)
         spacer = qw.QSpacerItem(40, 20, qw.QSizePolicy.Expanding, qw.QSizePolicy.Minimum)
         self._wizardLayout.addItem(spacer)
@@ -164,6 +164,14 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         self._source_label.have_rectangle.connect(self.rectangle_drawn)
         self._source_label.rectangle_deleted.connect(self.rectangle_deleted)
+        
+    def get_operating_mode(self):
+        """
+        getter for the operating mode
+            Returns:
+                operating mode (VideoRegionSelectionWidgetStates)
+        """
+        return self._mode
 
     @qc.pyqtSlot(int)
     def set_opertating_mode(self, mode):
@@ -190,13 +198,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
                                    self.tr("CGT Region Selected"),
                                    message)
         self._source_label.clear()
-        
-    @qc.pyqtSlot()
-    def region_check(self):
-        """
-        the user has entered region checking mode
-        """
-        print("region checking should start")
                                    
     def display_subimage(self):
         """
