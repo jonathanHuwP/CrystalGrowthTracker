@@ -33,13 +33,14 @@ from enum import Enum
 from cgt.io.videobuffer import VideoBuffer
 from cgt.gui.regionselectionlabel import RegionSelectionLabel
 from cgt.gui.wizard.regionswizard import RegionsWizard
+from cgt.gui.regionviewcontrol import RegionViewControl
 
 # import UI
 from cgt.gui.Ui_videoregionselectionwidget import Ui_VideoRegionSelectionWidget
 
 class PlayState(Enum):
-    MANUAL = 1
-    PLAY_FORWARD = 2
+    MANUAL        = 1
+    PLAY_FORWARD  = 2
     PLAY_BACKWARD = 3
 
 class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
@@ -93,14 +94,23 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         ## label for the subimage
         self._subimage_label = None
         
+        rvc = RegionViewControl(self)
+        self._wizardLayout.addWidget(rvc)
+        
         ## the embedded wizard
         self._regionsWizard = RegionsWizard(self)
         self._wizardLayout.addWidget(self._regionsWizard)
         self._regionsWizard.setEnabled(False)
+        self._regionsWizard.region_check.connect(self.region_check)
+        self._regionsWizard.region_finished.connect(self.region_finished)
+        
+        spacer = qw.QSpacerItem(40, 20, qw.QSizePolicy.Expanding, qw.QSizePolicy.Minimum)
+        self._wizardLayout.addItem(spacer)
+
 
         self.setup_labels()
 
-        font = qg.QFont( "Arial", 11, qg.QFont.Bold);
+        font = qg.QFont( "Monospace", 11, qg.QFont.Bold);
         self._frameLabel.setFont(font);
 
         self.set_up_controls()
@@ -160,7 +170,25 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._current_subimage = self._current_image.copy(rect)
         self.display_subimage()
         self._regionsWizard.setEnabled(True)
-
+        
+    @qc.pyqtSlot()
+    def region_finished(self):
+        """
+        the user has finished and accepted a region
+        """
+        message = "Region finished"
+        qw.QMessageBox.information(self,
+                                   self.tr("CGT Region Selected"),
+                                   message)
+        self._source_label.clear()
+        
+    @qc.pyqtSlot()
+    def region_check(self):
+        """
+        the user has entered region checking mode
+        """
+        print("region checking should start")
+                                   
     def display_subimage(self):
         """
         if current subimage exists display it at the current zoom
@@ -242,7 +270,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         # display the current frame number and time
         display_number = self._current_frame+1
         time = display_number/self._frames_per_second
-        message =   "Frame {:d} of {:d}, approx {:.1f} seconds video time"
+        message =   "Frame {:0>5d} of {:0>5d}, approx {:0>5.1f} seconds video time"
         self._frameLabel.setText(message.format(display_number,
                                                 self._source.length,
                                                 time))
@@ -273,6 +301,16 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         clear the video buffer queue
         """
         self._frame_queue = Queue(256)
+        
+    def save_region_video(self):
+        import numpy as np
+        import cv2
+        
+        writer = cv2.VideoWriter("output.avi",cv2.VideoWriter_fourcc(*"MJPG"), 30,(640,480))
+        for frame in range(1000):
+            writer.write(np.random.randint(0, 255, (480,640,3)).astype('uint8'))
+            
+        writer.release()
 
     @qc.pyqtSlot(bool)
     def start_end(self, end):

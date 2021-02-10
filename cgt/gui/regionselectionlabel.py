@@ -28,6 +28,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # release => delete and reset
 
 import numpy as np
+from enum import IntEnum
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
@@ -43,6 +44,28 @@ def rectangle_to_string(rect):
     tl = rect.topLeft()
     size = rect.size()
     return f"Label: rectangle({tl.x()}, {tl.y()}) ({size.width()}, {size.height()})"
+    
+def rectangle_properties(rectangle):
+    """
+    find the top left, bottom right and centre of a rectangle
+        Args:
+            rectangle (QRect) the rectangle 
+        Returns:
+            top_left (QPoint), bottom_right (QPoint), centre (QPoint)
+    """
+    top_left = rectangle.topLeft()
+    bottom_right = rectangle.bottomRight()
+    ctr = top_left + bottom_right
+    ctr /= 2
+    
+    return top_left, bottom_right, ctr
+
+class RegionSelectionLabelStates(IntEnum):
+    """
+    enumeration of the possible states of RegionSelectionLabel
+    """
+    CREATING = 0
+    ADJUSING = 10
 
 class RegionSelectionLabel(qw.QLabel):
     """
@@ -76,6 +99,12 @@ class RegionSelectionLabel(qw.QLabel):
 
         ## flag for the creation of a new rectangle
         self._new_rectangle = False
+        
+        ## flag to signal that an adjusement is underway
+        self._adjustment_underway = False
+        
+        ## the state of the widget
+        self._state = RegionSelectionLabelStates.CREATING
 
         ## the zoom transformatin
         self._zoom_transform = qg.QTransform().scale(1.0, 1.0)
@@ -83,6 +112,18 @@ class RegionSelectionLabel(qw.QLabel):
 
         ## the translated name
         self._translation_name = self.tr("RegionSelectionLabel")
+        
+    def set_creating(self):
+        """
+        set the label to create new rectangles
+        """
+        self._state = RegionSelectionLabelStates.CREATING
+        
+    def set_adjusting(self):
+        """
+        set the label to adjust the size of existing rectangle
+        """
+        self._state = RegionSelectionLabelStates.ADJUSING
 
     def get_rectangle(self):
         """
@@ -115,6 +156,10 @@ class RegionSelectionLabel(qw.QLabel):
         """
         if self._parent.is_playing():
             return
+            
+        if self._state == RegionSelectionLabelStates.ADJUSING:
+            self.mouse_press_adjusting(event)
+            return
 
         if event.button() == qc.Qt.LeftButton and self._rectangle is None:
             pix_rect = self.pixmap().rect()
@@ -136,9 +181,17 @@ class RegionSelectionLabel(qw.QLabel):
                 self._rectangle = None
                 self._new_rectangle = False
                 self.rectangle_deleted.emit()
-
+                
+    def mouse_press_adjusting(self, event):
+        """
+        handel mouse press when in adjusting mode
+        """
+        if event.button() == qc.Qt.LeftButton and self._rectangle is not None:
+            self._adjustment_underway = True
+            
     def mouseMoveEvent(self, event):
-        """ting draw rectangle
+        """
+        respond to a mouse movement
 
             Args:
                 event (QEvent) the event data
@@ -148,15 +201,23 @@ class RegionSelectionLabel(qw.QLabel):
         """
         if self._parent.is_playing():
             return
+            
+        if self._rectangle is None:
+            return
 
         # use buttons() for mouse move as more than one can be held
         if event.buttons() != qc.Qt.LeftButton:
             return
-
-        if self._rectangle is not None and self._new_rectangle:
-            point = self._inverse_zoom.map(event.pos())
-            self._rectangle.setBottomRight(point)
-            self.repaint()
+            
+        if self._state == RegionSelectionLabelStates.CREATING:
+            if self._new_rectangle:
+                point = self._inverse_zoom.map(event.pos())
+                self._rectangle.setBottomRight(point)
+                self.repaint()
+           
+        elif self._state == RegionSelectionLabelStates.ADJUSING:
+            if self._adjustment_underway:
+                print("move adjusing")
 
     def mouseReleaseEvent(self, event):
         """
@@ -173,8 +234,15 @@ class RegionSelectionLabel(qw.QLabel):
 
         if event.button() != qc.Qt.LeftButton:
             return
+            
+        if self._rectangle is None:
+            return
+            
+        if self._state == RegionSelectionLabelStates.ADJUSING:
+            self.mouse_up_adjusting(event.pos())
+            return
 
-        if self._rectangle is not None and self._new_rectangle:
+        if self._new_rectangle:
             size = self._rectangle.size()
             diagonal = size.width()*size.width() + size.height()*size.height()
             if diagonal < 8:
@@ -184,6 +252,16 @@ class RegionSelectionLabel(qw.QLabel):
                 self.have_rectangle.emit()
                 self._new_rectangle = False
             self.repaint()
+            
+    def mouse_up_adjusting(self, position):
+        """
+        mouse up in adjustment mode
+        """
+        if event.button() != qc.Qt.LeftButton:
+            return
+            
+        print("end adjustment")
+        self._adjustment_underway = False
 
     def paintEvent(self, event):
         """

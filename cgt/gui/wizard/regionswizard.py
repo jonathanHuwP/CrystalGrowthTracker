@@ -16,6 +16,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 @author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 """
 import PyQt5.QtWidgets as qw
+import PyQt5.QtCore as qc
 
 from cgt.gui.wizard.regionswizardpages import RegionsWizardPages as rwp
 from cgt.gui.wizard.regionswizardstartpage import RegionsWizardStartPage
@@ -23,28 +24,50 @@ from cgt.gui.wizard.regionswizardcheckpage import RegionsWizardCheckPage
 from cgt.gui.wizard.regionswizardfinalpage import RegionsWizardFinalPage
 
 class RegionsWizard(qw.QWizard):
+    """
+    top level wizard object for managing region selection
+    """
+
+    ## the user has finished the region
+    region_finished = qc.pyqtSignal()
     
+    ## the user want to check the region
+    region_check = qc.pyqtSignal()
+
     def __init__(self, parent=None):
+        """
+        initalize the wizard, set the pages
+        """
         super().__init__(parent)
         # ensure we have a "Back" button
         self.setWizardStyle(qw.QWizard.ClassicStyle)
-        
+
         # the pages are not interdepenent and the start page has no back button
         self.setOptions(qw.QWizard.IndependentPages|qw.QWizard.NoBackButtonOnStartPage|qw.QWizard.NoCancelButton)
-        
+
         # set up the pages
         self.setPage(rwp.PAGE_START, RegionsWizardStartPage(self))
         self.setPage(rwp.PAGE_CHECK, RegionsWizardCheckPage(self))
         self.setPage(rwp.PAGE_FINAL, RegionsWizardFinalPage(self))
-        
+
         # make sure the start page is set
         self.setStartId(rwp.PAGE_START)
-        
+
         self.setWindowTitle(self.tr("CGT Region Selection"))
         
+        self.button(qw.QWizard.NextButton).clicked.connect(self.user_advance)
+        
+    qc.pyqtSlot()
+    def user_advance(self):
+        """
+        user has clicked next page
+        """
+        if self.currentId() == rwp.PAGE_CHECK:
+            self.region_check.emit()
+
     def accept(self):
         """
         action when the user clicks "Finished"
         """
-        
+        self.region_finished.emit()
         print(f"Editing finished")

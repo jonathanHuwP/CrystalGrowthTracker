@@ -29,7 +29,8 @@ ROOT_FILE_NAMES = ["videoregionselectionwidget",
                    "cgtvideocontrols",
                    "wizard/regionswizardstartpage",
                    "wizard/regionswizardcheckpage",
-                   "wizard/regionswizardfinalpage"]
+                   "wizard/regionswizardfinalpage",
+                   "regionviewcontrol"]
 
 # relative path to the Qt .ui files
 UI_PATH = "./resources/designer_ui/"
