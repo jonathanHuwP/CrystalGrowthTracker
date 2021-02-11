@@ -45,19 +45,14 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
     @qc.pyqtSlot(qw.QAbstractButton)
     def button_clicked(self, button):
         if button == self._viewVideoButton:
-            print("view video clicked")
             self.state_change.emit(states.VIEW)
         elif button == self._createRegionButton:
-            print("create clicked")
             self.state_change.emit(states.CREATE)
         elif button == self._editRegionButton:
-            print("edit clicked")
             self.state_change.emit(states.EDIT)
         elif button == self._displayMultipleButton:
-            print("display clicked")
             self.state_change.emit(states.DISPLAY)
         elif button == self._deleteButton:
-            print("delete clicked")
             self.state_change.emit(states.DELETE)
             
         self.enable_combo_boxes()

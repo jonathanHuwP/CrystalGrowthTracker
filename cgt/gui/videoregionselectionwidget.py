@@ -33,6 +33,7 @@ from enum import Enum
 from cgt.io.videobuffer import VideoBuffer
 from cgt.gui.regionselectionlabel import RegionSelectionLabel
 from cgt.gui.regioncreationlabel import RegionCreationLabel
+from cgt.gui.regioneditlabel import RegionEditLabel
 
 from cgt.gui.regionviewcontrol import RegionViewControl
 from cgt.gui.videoregionselectionwidgetstates import VideoRegionSelectionWidgetStates as states
@@ -102,6 +103,9 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         
         ## label for creating regions
         self._create_label = None
+        
+        ## label for editing regions
+        self._edit_label = None
 
         ## label for the subimage
         self._subimage_label = None
@@ -131,10 +135,26 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self.set_up_controls()
         self.request_frame(0)
         self._source.start()
+        
+    def make_edit_label(self):
+        """
+        setup the label for editing
+        """
+        self._edit_label = RegionEditLabel()
+        self._edit_label.setAlignment(qc.Qt.AlignTop | qc.Qt.AlignLeft)
+        self._edit_label.setSizePolicy(qw.QSizePolicy.Fixed,
+                                       qw.QSizePolicy.Fixed)
+        self._edit_label.setMargin(0)
+        
+        self._current_label = self._edit_label
+        self._videoScrollArea.setWidget(self._current_label)
+        
+        self._create_label = None
+        self._view_label = None
 
     def make_view_label(self):
         """
-        setup the two labels used for dispalying image and subimage
+        setup the label used for simple viewing
         """
         # view label
         self._view_label = qw.QLabel()
@@ -147,6 +167,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._videoScrollArea.setWidget(self._current_label)
         
         self._create_label = None
+        self._edit_label = None
         
     def make_create_label(self):
         # create label
@@ -167,6 +188,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._videoScrollArea.setWidget(self._current_label)
         
         self._view_label = None
+        self._edit_label = None
 
     def set_up_subimage_label(self):
         # subimage label
@@ -207,8 +229,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
     @qc.pyqtSlot(int)
     def set_opertating_mode(self, mode):
         self._mode = mode
-        print(f"mode set to {states(mode).name}")
-        print(f"view label is {self._view_label}")
         
         if self._mode == states.VIEW:
             self.make_view_label()
@@ -256,7 +276,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._current_image = image
         self._current_frame = frame_number
         self._videoControl.set_frame_currently_displayed(frame_number)
-
+        
         self.animate_subimage()
         self.display()
 
@@ -280,7 +300,8 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
 
         # zoom and display image
         tmp = self.apply_zoom_to_image(self._current_image)
-        self._current_label.setPixmap(qg.QPixmap(tmp))
+        #self._current_label.clear()
+        self._current_label.setPixmap(qg.QPixmap.fromImage(tmp))
 
         # update the controls
         self._videoControl.set_slider_value(self._current_frame)
@@ -398,7 +419,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         label has a rectangle
         """
-        print("widget: rect draw")
         self._current_rectangle = self._create_label.get_rectangle()
         self._current_subimage = self._current_image.copy(self._current_rectangle)
         self.display_subimage()
@@ -408,7 +428,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         rectangle deleted in label
         """
-        print("widget: rect deleted")
         self._subimage_label.clear()
         self._current_subimage = None
         self._current_rectangle = None
@@ -418,7 +437,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         store the current rectangle
         """
-        print("Widget: store rectangle")
         self._subimage_label.clear()
         self._view_control.add_rectangle(self._current_rectangle)
         self._current_subimage = None
