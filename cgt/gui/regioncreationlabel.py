@@ -65,6 +65,12 @@ class RegionCreationLabel(qw.QLabel):
     displaying a list of already selected rectangles.
     """
 
+    ## signal to indicate the user has selected a new rectangle
+    have_rectangle = qc.pyqtSignal()
+
+    ## signal to indicate the user has deleted the rectangle
+    rectangle_deleted = qc.pyqtSignal()
+
     def __init__(self, parent=None):
         """
         Set up the label
@@ -107,6 +113,8 @@ class RegionCreationLabel(qw.QLabel):
         """
         self._rectangle = None
         self.repaint()
+        print("label rect deleted")
+        self.rectangle_deleted.emit()
 
     def mousePressEvent(self, event):
         """
@@ -120,12 +128,12 @@ class RegionCreationLabel(qw.QLabel):
         """
         if self._parent.is_playing():
             return
-            
+
         if event.button() == qc.Qt.LeftButton:
             self.mouse_press_create(event)
         elif event.button() == qc.Qt.RightButton:
             self.mouse_press_delete(event)
-            
+
     def mouse_press_create(self, event):
         """
         handle mouse press when in crate mode
@@ -140,7 +148,7 @@ class RegionCreationLabel(qw.QLabel):
                 self._rectangle = qc.QRect(point, size)
                 self._create_state = CreateStates.MAKING
                 self.repaint()
-            
+
     def mouse_press_delete(self, event):
         """
         responde to a mouse press in delet mode
@@ -191,7 +199,7 @@ class RegionCreationLabel(qw.QLabel):
         """
         if self._parent.is_playing():
             return
-            
+
         if event.button() != qc.Qt.LeftButton:
             return
 
@@ -203,6 +211,7 @@ class RegionCreationLabel(qw.QLabel):
                 self._create_state = CreateStates.READY_TO_MAKE
             else:
                 self._create_state = CreateStates.FINISHED_MAKING
+                self.have_rectangle.emit()
             self.repaint()
 
     def paintEvent(self, event):
@@ -236,7 +245,7 @@ class RegionCreationLabel(qw.QLabel):
         painter.setBrush(brush)
         rect = self._zoom_transform.mapRect(self._rectangle)
         painter.drawRect(rect)
-        
+
         props = rectangle_properties(rect)
         ctr = props[4]
         left = qc.QPoint(ctr.x()-5, ctr.y())

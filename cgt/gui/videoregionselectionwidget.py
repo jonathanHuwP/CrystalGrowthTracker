@@ -119,8 +119,8 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         spacer = qw.QSpacerItem(40, 20, qw.QSizePolicy.Expanding, qw.QSizePolicy.Minimum)
         self._wizardLayout.addItem(spacer)
 
-        self.setup_labels()
-        self.set_current_label()
+        self.set_up_subimage_label()
+        self.make_view_label()
 
         font = qg.QFont( "Monospace", 10, qg.QFont.DemiBold);
         self._frameLabel.setFont(font);
@@ -129,25 +129,47 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self.request_frame(0)
         self._source.start()
 
-    def setup_labels(self):
+    def make_view_label(self):
         """
         setup the two labels used for dispalying image and subimage
         """
+        # view label
         self._view_label = qw.QLabel()
         self._view_label.setAlignment(qc.Qt.AlignTop | qc.Qt.AlignLeft)
         self._view_label.setSizePolicy(qw.QSizePolicy.Fixed,
                                        qw.QSizePolicy.Fixed)
         self._view_label.setMargin(0)
         
+        self._current_label = self._view_label
+        self._videoScrollArea.setWidget(self._current_label)
+        
+        self._create_label = None
+        
+    def make_create_label(self):
+        # create label
         self._create_label = RegionCreationLabel(self)
         self._create_label.setAlignment(qc.Qt.AlignTop | qc.Qt.AlignLeft)
         self._create_label.setSizePolicy(qw.QSizePolicy.Fixed,
                                          qw.QSizePolicy.Fixed)
         self._create_label.setMargin(0)
+        
+        self._create_label.set_zoom(self._current_zoom)
+        
+        # connect up create's signals
+        self._create_label.have_rectangle.connect(self.rectangle_drawn)
+        self._create_label.rectangle_deleted.connect(self.rectangle_deleted)
+        
+        self._current_label = self._create_label
+        self._videoScrollArea.setWidget(self._current_label)
+        
+        self._view_label = None
 
+    def set_up_subimage_label(self):
+        # subimage label
         self._subimage_label = qw.QLabel()
         self._regionScrollArea.setWidget(self._subimage_label)
         
+        # set initalize current to view
         self._current_label = self._view_label
 
     def set_up_controls(self):
@@ -156,9 +178,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         self._videoControl.set_range(self._source.length)
         self.connect_controls()
-        
-    def set_current_label(self):
-        self._videoScrollArea.setWidget(self._current_label)
 
     def connect_controls(self):
         """
@@ -185,13 +204,14 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
     def set_opertating_mode(self, mode):
         self._mode = mode
         print(f"mode set to {states(mode).name}")
+        print(f"view label is {self._view_label}")
         
-        if mode == states.VIEW:
-            self._current_label = self._view_label
-            self.set_current_label()
-        elif mode == states.CREATE:
-            self._current_label = self._create_label
-            self.set_current_label()
+        if self._mode == states.VIEW:
+            self.make_view_label()
+            self.display()
+        elif self._mode == states.CREATE:
+            self.make_create_label()
+            self.display()
                                    
     def display_subimage(self):
         """
@@ -321,7 +341,8 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         a new value for the zoom has been entered
         """
         self._current_zoom = value
-        self._create_label.set_zoom(value)
+        if self._create_label is not None:
+            self._create_label.set_zoom(value)
         self.display()
 
     @qc.pyqtSlot()
@@ -367,3 +388,22 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self.clear_queue()
         self._playing = PlayStates.PLAY_BACKWARD
         self.request_frame((self._current_frame-1)%self._source.length)
+        
+    @qc.pyqtSlot()
+    def rectangle_drawn(self):
+        """
+        label has a rectangle
+        """
+        print("widget: rect draw")
+        rect = self._create_label.get_rectangle()
+        self._current_subimage = self._current_image.copy(rect)
+        self.display_subimage()
+        
+    @qc.pyqtSlot()
+    def rectangle_deleted(self):
+        """
+        rectangle deleted in label
+        """
+        print("widget: rect deleted")
+        self._subimage_label.clear()
+        self._current_subimage = None
