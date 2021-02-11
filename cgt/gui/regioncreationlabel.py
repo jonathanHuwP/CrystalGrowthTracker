@@ -128,12 +128,12 @@ class RegionCreationLabel(qw.QLabel):
             Returns:
                 None
         """
-        if self._parent.is_playing():
+        if self._parent.is_playing() or event.button() != qc.Qt.LeftButton:
             return
 
-        if event.button() == qc.Qt.LeftButton:
+        if self._create_state == CreateStates.READY_TO_MAKE:
             self.mouse_press_create(event)
-        elif event.button() == qc.Qt.RightButton:
+        elif self._create_state == CreateStates.FINISHED_MAKING:
             self.mouse_press_created(event)
 
     def mouse_press_create(self, event):
@@ -142,14 +142,13 @@ class RegionCreationLabel(qw.QLabel):
             Args:
                 event (QEvent) the event data
         """
-        if self._rectangle is None:
-            pix_rect = self.pixmap().rect()
-            if pix_rect.contains(event.pos()): # test if event in pixmap
-                size = qc.QSize(0,0)
-                point = self._inverse_zoom.map(event.pos())
-                self._rectangle = qc.QRect(point, size)
-                self._create_state = CreateStates.MAKING
-                self.repaint()
+        pix_rect = self.pixmap().rect()
+        if pix_rect.contains(event.pos()): # test if event in pixmap
+            size = qc.QSize(0,0)
+            point = self._inverse_zoom.map(event.pos())
+            self._rectangle = qc.QRect(point, size)
+            self._create_state = CreateStates.MAKING
+            self.repaint()
 
     def mouse_press_created(self, event):
         """
@@ -157,29 +156,28 @@ class RegionCreationLabel(qw.QLabel):
             Args:
                 event (QEvent) the event data
         """
-        if self._rectangle is not None:
-            message = self.tr("Do you wish to store the region for further use, or delete?")
-            title = self.tr("CrystalGrowthTracker")
-            m_box = qw.QMessageBox(self)
-            m_box.setText(message)
-            m_box.setWindowTitle(title)
-            button_store = m_box.addButton(self.tr("Store"), qw.QMessageBox.YesRole) 
-            button_del = m_box.addButton(self.tr("Delete"), qw.QMessageBox.NoRole)
-            button_cancel = m_box.addButton(self.tr("Cancel"), qw.QMessageBox.RejectRole)
-                                               
-            m_box.exec()
-            reply = m_box.clickedButton()
+        message = self.tr("Do you wish to store the region for further use, or delete?")
+        title = self.tr("CrystalGrowthTracker")
+        m_box = qw.QMessageBox(self)
+        m_box.setText(message)
+        m_box.setWindowTitle(title)
+        button_store = m_box.addButton(self.tr("Store"), qw.QMessageBox.YesRole) 
+        button_del = m_box.addButton(self.tr("Delete"), qw.QMessageBox.NoRole)
+        button_cancel = m_box.addButton(self.tr("Cancel"), qw.QMessageBox.RejectRole)
+                                           
+        m_box.exec()
+        reply = m_box.clickedButton()
+        
+        if reply == button_cancel:
+            return
+        
+        if m_box.clickedButton() == button_store:
+            self.store_rectangle.emit()
+            print("Label: Store the region")   
             
-            if reply == button_cancel:
-                return
-            
-            if m_box.clickedButton() == button_store:
-                self.store_rectangle.emit()
-                print("Label: Store the region")   
-                
-            # for store or delete clear and reset
-            self._rectangle = None
-            self._create_state = CreateStates.READY_TO_MAKE
+        # for store or delete clear and reset
+        self._rectangle = None
+        self._create_state = CreateStates.READY_TO_MAKE
 
     def mouseMoveEvent(self, event):
         """
