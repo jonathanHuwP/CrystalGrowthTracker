@@ -114,7 +114,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
 
         self.setup_labels()
 
-        font = qg.QFont( "Monospace", 11, qg.QFont.Bold);
+        font = qg.QFont( "Monospace", 10, qg.QFont.DemiBold);
         self._frameLabel.setFont(font);
 
         self.set_up_controls()

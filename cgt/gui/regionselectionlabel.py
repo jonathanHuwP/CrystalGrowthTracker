@@ -34,6 +34,8 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
+from enum import IntEnum
+
 from cgt.gui.videoregionselectionwidgetstates import VideoRegionSelectionWidgetStates as states
 
 def qtransform_to_string(trans):
@@ -52,6 +54,14 @@ def rectangle_to_string(rect):
     top_left = rect.topLeft()
     size = rect.size()
     return f"Label: rectangle({top_left.x()}, {top_left.y()}) ({size.width()}, {size.height()})"
+
+class CreateStates(IntEnum):
+    """
+    the possible states of the widget when creating a region
+    """
+    READY_TO_MAKE = 0
+    MAKING = 2
+    FINISHED_MAKING = 4
 
 def rectangle_properties(rectangle):
     """
@@ -101,7 +111,7 @@ class RegionSelectionLabel(qw.QLabel):
         self._rectangle = None
 
         ## flag for the creation of a new rectangle
-        self._new_rectangle = False
+        self._create_state = CreateStates.READY_TO_MAKE
 
         ## flag to signal that an adjusement is underway
         self._adjustment_underway = False
@@ -142,7 +152,7 @@ class RegionSelectionLabel(qw.QLabel):
             Returns:
                 None
         """
-        if self._parent.is_playing():
+        if self._parent.is_playing() or event.button() != qc.Qt.LeftButton:
             return
             
         mode = self._parent.get_operating_mode()
@@ -150,20 +160,47 @@ class RegionSelectionLabel(qw.QLabel):
         if mode == states.VIEW or mode == states.DISPLAY:
             return
 
-        if mode == states.EDIT:
-            self.mouse_press_adjusting(event)
-            return
+        if mode == states.CREATE:
+            self.mouse_press_create(event)
+        elif mode == states.EDIT:
+            self.mouse_press_edit(event)
+        elif mode == states.DELETE:
+            self.mouse_press_delete(event)
+            
+    def mouse_press_create(self, event):
+        """
+        handle mouse press when in crate mode
+            Args:
+                event (QEvent) the event data
+        """
+        print("mouse press create")
 
-        if event.button() == qc.Qt.LeftButton and self._rectangle is None:
+        if self._rectangle is None:
             pix_rect = self.pixmap().rect()
             if pix_rect.contains(event.pos()): # test if event in pixmap
                 size = qc.QSize(0,0)
                 point = self._inverse_zoom.map(event.pos())
                 self._rectangle = qc.QRect(point, size)
-                self._new_rectangle = True
+                self._create_state = CreateStates.MAKING
                 self.repaint()
-
-        elif event.button() == qc.Qt.RightButton and self._rectangle is not None:
+                
+    def mouse_press_edit(self, event):
+        """
+        handel mouse press when in adjusting mode
+        """
+        print("mouse press edit")
+        if event.button() == qc.Qt.LeftButton and self._rectangle is not None:
+            
+            self._adjustment_underway = True
+            
+    def mouse_press_delete(self, event):
+        """
+        responde to a mouse press in delet mode
+            Args:
+                event (QEvent) the event data
+        """
+        print("mouse press delete")
+        if self._rectangle is not None:
             message = self.tr("Do you wish to remove the region?")
             mb_reply = qw.QMessageBox.question(self,
                                                'CrystalGrowthTracker',
@@ -172,15 +209,8 @@ class RegionSelectionLabel(qw.QLabel):
                                                qw.QMessageBox.No)
             if mb_reply == qw.QMessageBox.Yes:
                 self._rectangle = None
-                self._new_rectangle = False
+                self._create_state = CreateStates.READY_TO_MAKE
                 self.rectangle_deleted.emit()
-
-    def mouse_press_adjusting(self, event):
-        """
-        handel mouse press when in adjusting mode
-        """
-        if event.button() == qc.Qt.LeftButton and self._rectangle is not None:
-            self._adjustment_underway = True
 
     def mouseMoveEvent(self, event):
         """
@@ -192,7 +222,7 @@ class RegionSelectionLabel(qw.QLabel):
             Returns:
                 None
         """
-        if self._parent.is_playing():
+        if self._parent.is_playing() or event.button() == qc.Qt.LeftButton:
             return
 
         if self._rectangle is None:
@@ -208,7 +238,9 @@ class RegionSelectionLabel(qw.QLabel):
             return
 
         if self._parent.get_operating_mode() == states.CREATE:
-            if self._new_rectangle:
+            print(f"moveing {CreateStates(self._create_state).name}")
+            if self._create_state == CreateStates.MAKING:
+            
                 point = self._inverse_zoom.map(event.pos())
                 self._rectangle.setBottomRight(point)
                 self.repaint()
@@ -229,31 +261,39 @@ class RegionSelectionLabel(qw.QLabel):
         """
         if self._parent.is_playing():
             return
-
-        if event.button() != qc.Qt.LeftButton:
-            return
-
-        if self._rectangle is None:
-            return
             
         mode = self._parent.get_operating_mode()
 
         if mode == states.VIEW or mode == states.DISPLAY:
             return
-
+            
+        if self._parent.get_operating_mode() == states.CREATE:
+            self.mouse_up_creating(event)
+            return
+            
         if self._parent.get_operating_mode() == states.EDIT:
             self.mouse_up_adjusting(event)
             return
+            
+    def mouse_up_creating(self, event):
+        """
+        respond to a mouse up event in crating mode
+            Args:
+                event (QEvent) the event object
+        """
+        if event.button() != qc.Qt.LeftButton:
+            return
 
-        if self._new_rectangle:
+        print(f"mouse up {CreateStates(self._create_state).name}")
+        if self._create_state == CreateStates.MAKING:
             size = self._rectangle.size()
             diagonal = size.width()*size.width() + size.height()*size.height()
             if diagonal < 8:
                 self._rectangle = None
-                self._new_rectangle = False
+                self._create_state = CreateStates.READY_TO_MAKE
             else:
                 self.have_rectangle.emit()
-                self._new_rectangle = False
+                self._create_state = CreateStates.FINISHED_MAKING
             self.repaint()
 
     def mouse_up_adjusting(self, event):
@@ -297,8 +337,15 @@ class RegionSelectionLabel(qw.QLabel):
         painter.setBrush(brush)
         rect = self._zoom_transform.mapRect(self._rectangle)
         painter.drawRect(rect)
+        
         props = rectangle_properties(rect)
-        painter.drawEllipse(props[4], 10, 10)
+        ctr = props[4]
+        left = qc.QPoint(ctr.x()-5, ctr.y())
+        right = qc.QPoint(ctr.x()+5, ctr.y())
+        top = qc.QPoint(ctr.x(), ctr.y()-5)
+        bottom = qc.QPoint(ctr.x(), ctr.y()+5)
+        painter.drawLine(left, right)
+        painter.drawLine(top, bottom)
 
     def set_zoom(self, value):
         """
