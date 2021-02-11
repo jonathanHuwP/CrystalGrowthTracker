@@ -32,6 +32,8 @@ from enum import Enum
 
 from cgt.io.videobuffer import VideoBuffer
 from cgt.gui.regionselectionlabel import RegionSelectionLabel
+from cgt.gui.regioncreationlabel import RegionCreationLabel
+
 from cgt.gui.regionviewcontrol import RegionViewControl
 from cgt.gui.videoregionselectionwidgetstates import VideoRegionSelectionWidgetStates as states
 from cgt.gui.wizard.regionswizard import RegionsWizard
@@ -89,12 +91,18 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         ## the player
         self._source = VideoBuffer(video_file, self, self)
 
-        ## label for displaying the video
-        self._source_label = None
+        ## pointer to the label currently in use
+        self._current_label = None
+        
+        ## label for viewing video
+        self._view_label = None
+        
+        ## label for creating regions
+        self._create_label = None
 
         ## label for the subimage
         self._subimage_label = None
-        
+
         # the operating mode control
         rvc = RegionViewControl(self)
         self._wizardLayout.addWidget(rvc)
@@ -108,17 +116,16 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._wizardLayout.addWidget(self._regionsWizard)
         self._regionsWizard.setEnabled(False)
         #self._regionsWizard.region_check.connect(self.region_check)
-        self._regionsWizard.region_finished.connect(self.region_finished)
         spacer = qw.QSpacerItem(40, 20, qw.QSizePolicy.Expanding, qw.QSizePolicy.Minimum)
         self._wizardLayout.addItem(spacer)
 
         self.setup_labels()
+        self.set_current_label()
 
         font = qg.QFont( "Monospace", 10, qg.QFont.DemiBold);
         self._frameLabel.setFont(font);
 
         self.set_up_controls()
-        self.connect_label()
         self.request_frame(0)
         self._source.start()
 
@@ -126,17 +133,22 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         setup the two labels used for dispalying image and subimage
         """
-        self._source_label = RegionSelectionLabel(self)
-
-        self._source_label.setAlignment(qc.Qt.AlignTop | qc.Qt.AlignLeft)
-        self._source_label.setSizePolicy(qw.QSizePolicy.Fixed,
+        self._view_label = qw.QLabel()
+        self._view_label.setAlignment(qc.Qt.AlignTop | qc.Qt.AlignLeft)
+        self._view_label.setSizePolicy(qw.QSizePolicy.Fixed,
+                                       qw.QSizePolicy.Fixed)
+        self._view_label.setMargin(0)
+        
+        self._create_label = RegionCreationLabel(self)
+        self._create_label.setAlignment(qc.Qt.AlignTop | qc.Qt.AlignLeft)
+        self._create_label.setSizePolicy(qw.QSizePolicy.Fixed,
                                          qw.QSizePolicy.Fixed)
-        self._source_label.setMargin(0)
-
-        self._videoScrollArea.setWidget(self._source_label)
+        self._create_label.setMargin(0)
 
         self._subimage_label = qw.QLabel()
         self._regionScrollArea.setWidget(self._subimage_label)
+        
+        self._current_label = self._view_label
 
     def set_up_controls(self):
         """
@@ -144,6 +156,9 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         self._videoControl.set_range(self._source.length)
         self.connect_controls()
+        
+    def set_current_label(self):
+        self._videoScrollArea.setWidget(self._current_label)
 
     def connect_controls(self):
         """
@@ -157,13 +172,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._videoControl.pause .connect(self.play_pause)
         self._videoControl.forwards.connect(self.play_forward)
         self._videoControl.backwards.connect(self.play_backward)
-
-    def connect_label(self):
-        """
-        set up the qt connections for the label
-        """
-        self._source_label.have_rectangle.connect(self.rectangle_drawn)
-        self._source_label.rectangle_deleted.connect(self.rectangle_deleted)
         
     def get_operating_mode(self):
         """
@@ -177,27 +185,13 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
     def set_opertating_mode(self, mode):
         self._mode = mode
         print(f"mode set to {states(mode).name}")
-
-    @qc.pyqtSlot()
-    def rectangle_drawn(self):
-        """
-        label has a rectangle
-        """
-        rect = self._source_label.get_rectangle()
-        self._current_subimage = self._current_image.copy(rect)
-        self.display_subimage()
-        self._regionsWizard.setEnabled(True)
         
-    @qc.pyqtSlot()
-    def region_finished(self):
-        """
-        the user has finished and accepted a region
-        """
-        message = "Region finished"
-        qw.QMessageBox.information(self,
-                                   self.tr("CGT Region Selected"),
-                                   message)
-        self._source_label.clear()
+        if mode == states.VIEW:
+            self._current_label = self._view_label
+            self.set_current_label()
+        elif mode == states.CREATE:
+            self._current_label = self._create_label
+            self.set_current_label()
                                    
     def display_subimage(self):
         """
@@ -208,16 +202,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
 
         img = self.apply_zoom_to_image(self._current_subimage)
         self._subimage_label.setPixmap(qg.QPixmap(img))
-
-    @qc.pyqtSlot()
-    def rectangle_deleted(self):
-        """
-        rectangle deleted in label
-        """
-        self._subimage_label.clear()
-        self._current_subimage = None
-        self._regionsWizard.restart()
-        self._regionsWizard.setEnabled(False)
 
     def get_frame_queue(self):
         """
@@ -272,7 +256,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
 
         # zoom and display image
         tmp = self.apply_zoom_to_image(self._current_image)
-        self._source_label.setPixmap(qg.QPixmap(tmp))
+        self._current_label.setPixmap(qg.QPixmap(tmp))
 
         # update the controls
         self._videoControl.set_slider_value(self._current_frame)
@@ -311,16 +295,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         clear the video buffer queue
         """
         self._frame_queue = Queue(256)
-        
-    def save_region_video(self):
-        import numpy as np
-        import cv2
-        
-        writer = cv2.VideoWriter("output.avi",cv2.VideoWriter_fourcc(*"MJPG"), 30,(640,480))
-        for frame in range(1000):
-            writer.write(np.random.randint(0, 255, (480,640,3)).astype('uint8'))
-            
-        writer.release()
 
     @qc.pyqtSlot(bool)
     def start_end(self, end):
@@ -347,7 +321,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         a new value for the zoom has been entered
         """
         self._current_zoom = value
-        self._source_label.set_zoom(value)
+        self._create_label.set_zoom(value)
         self.display()
 
     @qc.pyqtSlot()
