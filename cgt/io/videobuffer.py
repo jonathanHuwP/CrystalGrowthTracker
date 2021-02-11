@@ -76,7 +76,7 @@ class VideoBuffer:
                 None
         """
         self._running = True
-        thread = Thread(target=self.make_frames, args=())
+        thread = Thread(target=self.make_frames, args=(), daemon=True)
         thread.daemon = True
         thread.start()
         
@@ -120,3 +120,4 @@ class VideoBuffer:
 
         # call the region viewing object with the image and frame
         self._region_view.display_image(image, frame)
+        print(f"video thread sent {frame}")

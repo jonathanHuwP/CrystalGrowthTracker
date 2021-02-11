@@ -236,6 +236,9 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         elif self._mode == states.CREATE:
             self.make_create_label()
             self.display()
+        elif self._mode == states.EDIT:
+            self.make_edit_label()
+            self.display()
                                    
     def display_subimage(self):
         """
@@ -300,7 +303,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
 
         # zoom and display image
         tmp = self.apply_zoom_to_image(self._current_image)
-        #self._current_label.clear()
+        self._current_label.clear()
         self._current_label.setPixmap(qg.QPixmap.fromImage(tmp))
 
         # update the controls
