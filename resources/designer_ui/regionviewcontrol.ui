@@ -39,6 +39,9 @@
    </item>
    <item>
     <widget class="QRadioButton" name="_editRegionButton">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="text">
       <string>Edit Region</string>
      </property>
@@ -48,10 +51,17 @@
     </widget>
    </item>
    <item>
-    <widget class="QComboBox" name="_editComboBox"/>
+    <widget class="QComboBox" name="_editComboBox">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QRadioButton" name="_displayMultipleButton">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="text">
       <string>Display Multiple</string>
      </property>
@@ -62,6 +72,9 @@
    </item>
    <item>
     <widget class="QComboBox" name="_displayComboBox">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <item>
       <property name="text">
        <string>All</string>
@@ -71,6 +84,9 @@
    </item>
    <item>
     <widget class="QRadioButton" name="_deleteButton">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="text">
       <string>Delete</string>
      </property>
@@ -80,7 +96,11 @@
     </widget>
    </item>
    <item>
-    <widget class="QComboBox" name="_deleteComboBox"/>
+    <widget class="QComboBox" name="_deleteComboBox">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+    </widget>
    </item>
    <item>
     <spacer name="verticalSpacer">

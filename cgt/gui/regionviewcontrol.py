@@ -59,3 +59,29 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
         elif button == self._deleteButton:
             print("delete clicked")
             self.state_change.emit(states.DELETE)
+            
+        self.enable_combo_boxes()
+            
+    def add_rectangle(self, rectangle):
+        number = self._editComboBox.count() + 1
+        text = f"{number:0>2d}"
+        self._editComboBox.addItem(text, rectangle)
+        
+        if not self._editRegionButton.isEnabled():
+            self._editRegionButton.setEnabled(True)
+            
+    def enable_combo_boxes(self):
+        edit_box = False
+        display_box = False
+        delete_box = False
+        
+        if self._editRegionButton.isChecked():
+            edit_box = True
+        elif self._displayMultipleButton.isChecked():
+            display_box = True
+        elif self._deleteButton.isChecked():
+            delete_box = True
+            
+        self._editComboBox.setEnabled(edit_box)
+        self._displayComboBox.setEnabled(display_box)
+        self._deleteComboBox.setEnabled(delete_box)

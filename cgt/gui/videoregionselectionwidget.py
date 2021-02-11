@@ -81,6 +81,9 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
 
         ## the currently displayed subimage
         self._current_subimage = None
+        
+        ## the currently used subimage rectangle
+        self._current_rectangle = None
 
         ## the current value of the zoom
         self._current_zoom = 1.0
@@ -104,9 +107,9 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._subimage_label = None
 
         # the operating mode control
-        rvc = RegionViewControl(self)
-        self._wizardLayout.addWidget(rvc)
-        rvc.state_change.connect(self.set_opertating_mode)
+        self._view_control = RegionViewControl(self)
+        self._wizardLayout.addWidget(self._view_control)
+        self._view_control.state_change.connect(self.set_opertating_mode)
         
         ## state variable for the operating mode
         self._mode = states.VIEW
@@ -158,6 +161,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         # connect up create's signals
         self._create_label.have_rectangle.connect(self.rectangle_drawn)
         self._create_label.rectangle_deleted.connect(self.rectangle_deleted)
+        self._create_label.store_rectangle.connect(self.store_rectangle)
         
         self._current_label = self._create_label
         self._videoScrollArea.setWidget(self._current_label)
@@ -395,8 +399,8 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         label has a rectangle
         """
         print("widget: rect draw")
-        rect = self._create_label.get_rectangle()
-        self._current_subimage = self._current_image.copy(rect)
+        self._current_rectangle = self._create_label.get_rectangle()
+        self._current_subimage = self._current_image.copy(self._current_rectangle)
         self.display_subimage()
         
     @qc.pyqtSlot()
@@ -407,3 +411,15 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         print("widget: rect deleted")
         self._subimage_label.clear()
         self._current_subimage = None
+        self._current_rectangle = None
+        
+    @qc.pyqtSlot()
+    def store_rectangle(self):
+        """
+        store the current rectangle
+        """
+        print("Widget: store rectangle")
+        self._subimage_label.clear()
+        self._view_control.add_rectangle(self._current_rectangle)
+        self._current_subimage = None
+        self._current_rectangle = None
