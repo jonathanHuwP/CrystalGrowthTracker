@@ -31,6 +31,9 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
 
     ## signal a change of state
     state_change = qc.pyqtSignal(int)
+    
+    ## signal to change the editing region
+    change_edit_region = qc.pyqtSignal()
 
     def __init__(self, parent=None):
         """
@@ -42,6 +45,8 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
         super().__init__(parent)
         self.setupUi(self)
         
+        self._edit_data = []
+
     @qc.pyqtSlot(qw.QAbstractButton)
     def button_clicked(self, button):
         if button == self._viewVideoButton:
@@ -54,29 +59,76 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
             self.state_change.emit(states.DISPLAY)
         elif button == self._deleteButton:
             self.state_change.emit(states.DELETE)
-            
+
         self.enable_combo_boxes()
-            
+        
+    @qc.pyqtSlot(int)
+    def edit_combo_changed(self, index):
+        self.change_edit_region.emit()
+
     def add_rectangle(self, rectangle):
-        number = self._editComboBox.count() + 1
-        text = f"{number:0>2d}"
-        self._editComboBox.addItem(text, rectangle)
+        self._edit_data.append(rectangle)
+        self.fill_edit_box()
         
         if not self._editRegionButton.isEnabled():
             self._editRegionButton.setEnabled(True)
+        
+    def fill_edit_box(self):
+        old_state = self._editComboBox.blockSignals(True)
+        
+        old_index = self._editComboBox.currentIndex()
+        print(f"old index {old_index}")
+        self._editComboBox.clear()
+        for i, rect in enumerate(self._edit_data):
+            text = f"{i+1:0>2d}"
+            self._editComboBox.addItem(text, rect)
             
+        if old_index < 0:
+            old_index = 0
+            
+        self._editComboBox.setCurrentIndex(old_index)
+
+        self._editComboBox.blockSignals(old_state)
+ 
+    def get_current_rectangle(self):
+        """
+        getter for the rectangle currently displayed in the edit combobox
+            Retruns:
+                tuple of (rectangle, index) or None if box is empty
+        """
+        if self._editComboBox.count() < 1:
+            return None
+            
+        index = self._editComboBox.currentIndex()
+            
+        return (self._edit_data[index], index)
+        
+    def replace_rectangle(self, rectangle, index):
+        """
+        replace an existing rectangle in edit combobox
+            Args:
+                rectangle (QRect) the new rectangle
+                index (int) the index in the combobox
+        """
+        print(f"replace rect {rectangle}, {index}")
+        self._edit_data[index] = rectangle
+        self.fill_edit_box()
+
     def enable_combo_boxes(self):
+        """
+        enable disable the combo boxes according to the checked radio buttons
+        """
         edit_box = False
         display_box = False
         delete_box = False
-        
+
         if self._editRegionButton.isChecked():
             edit_box = True
         elif self._displayMultipleButton.isChecked():
             display_box = True
         elif self._deleteButton.isChecked():
             delete_box = True
-            
+
         self._editComboBox.setEnabled(edit_box)
         self._displayComboBox.setEnabled(display_box)
         self._deleteComboBox.setEnabled(delete_box)

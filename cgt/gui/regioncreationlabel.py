@@ -134,7 +134,7 @@ class RegionCreationLabel(qw.QLabel):
         if self._create_state == CreateStates.READY_TO_MAKE:
             self.mouse_press_create(event)
         elif self._create_state == CreateStates.FINISHED_MAKING:
-            self.mouse_press_created(event)
+            self.save_discarde_options()
 
     def mouse_press_create(self, event):
         """
@@ -150,7 +150,7 @@ class RegionCreationLabel(qw.QLabel):
             self._create_state = CreateStates.MAKING
             self.repaint()
 
-    def mouse_press_created(self, event):
+    def save_discarde_options(self):
         """
         responde to a mouse when a region has been created
             Args:
@@ -225,6 +225,7 @@ class RegionCreationLabel(qw.QLabel):
             else:
                 self._create_state = CreateStates.FINISHED_MAKING
                 self.have_rectangle.emit()
+                self.save_discarde_options()
             self.repaint()
 
     def paintEvent(self, event):
@@ -251,7 +252,8 @@ class RegionCreationLabel(qw.QLabel):
         if self._rectangle is None:
             return
 
-        pen = qg.QPen(qg.QColor(qc.Qt.black), 1, qc.Qt.DashLine)
+        #pen = qg.QPen(qg.QColor(qc.Qt.black), 1, qc.Qt.DashLine)
+        pen = qg.QPen(qg.QColor(70, 102, 255), 1, qc.Qt.DashLine)
         brush = qg.QBrush(qg.QColor(255, 255, 255, 120))
         painter = qg.QPainter(self)
         painter.setPen(pen)
