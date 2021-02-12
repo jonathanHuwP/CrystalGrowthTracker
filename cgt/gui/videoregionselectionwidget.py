@@ -68,6 +68,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         super().__init__(parent)
         self.setupUi(self)
 
+        # MAY NEED TO REPLACE WITH QList or QQueue to fit Qt thread model
         ## the frame queue
         self._frame_queue = Queue(256)
 

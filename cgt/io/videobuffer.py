@@ -19,12 +19,13 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # set up linting conditions
 # pylint: disable = c-extension-no-member
 
-from threading import Thread
 import cv2
+import PyQt5.QtCore as qc
 
+from threading import Thread
 from cgt.util.utils import nparray_to_qimage
 
-class VideoBuffer:
+class VideoBuffer(qc.QObject):
     """
     a video reader that is designed to run as a seperate thread
     from the display object, allowing smoother animation, once started
@@ -118,6 +119,7 @@ class VideoBuffer:
         # convert to Qt cv2 produces image in green/red/blue
         image = nparray_to_qimage(img, True)
 
+        # REPLACE THIS CALL WITH A SIGNAL 
         # call the region viewing object with the image and frame
         self._region_view.display_image(image, frame)
         print(f"video thread sent {frame}")
