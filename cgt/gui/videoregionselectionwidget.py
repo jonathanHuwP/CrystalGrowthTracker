@@ -27,10 +27,11 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
-from queue import Queue
+#from queue import Queue
 from enum import Enum
 
 from cgt.io.videobuffer import VideoBuffer
+from cgt.util.qthreadsafequeue import QThreadSafeQueue
 from cgt.gui.regionselectionlabel import RegionSelectionLabel
 from cgt.gui.regioncreationlabel import RegionCreationLabel
 from cgt.gui.regioneditlabel import RegionEditLabel
@@ -68,9 +69,8 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         super().__init__(parent)
         self.setupUi(self)
 
-        # MAY NEED TO REPLACE WITH QList or QQueue to fit Qt thread model
         ## the frame queue
-        self._frame_queue = Queue(256)
+        self._frame_queue = QThreadSafeQueue(self)
 
         ## state variable determines if video is playing
         self._playing = PlayStates.MANUAL
@@ -94,7 +94,10 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._frames_per_second = frames_per_second
 
         ## the player
-        self._source = VideoBuffer(video_file, self, self)
+        self._source = VideoBuffer(video_file, self)
+        
+        ## thread for the player
+        self._video_thread = None
 
         ## pointer to the label currently in use
         self._current_label = None
@@ -135,7 +138,20 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
 
         self.set_up_controls()
         self.request_frame(0)
-        self._source.start()
+        self.start_video_source()
+        
+    def start_video_source(self):
+        self._video_thread = qc.QThread()
+        
+        # move sourse to the thread
+        self._source.moveToThread(self._video_thread)
+
+        # make connections
+        self._video_thread.started.connect(self._source.make_frames)
+        self._video_thread.finished.connect(self._video_thread.deleteLater)
+        
+        # start the thread
+        self._video_thread.start()
         
     def make_edit_label(self):
         """
@@ -343,7 +359,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         clear the video buffer queue
         """
-        self._frame_queue = Queue(256)
+        self._frame_queue.clear()
 
     @qc.pyqtSlot(bool)
     def start_end(self, end):
@@ -362,7 +378,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         a specific frame should be displayed
         """
-        self._frame_queue.put(frame_number)
+        self._frame_queue.push(frame_number)
 
     @qc.pyqtSlot(float)
     def zoom_value(self, value):
