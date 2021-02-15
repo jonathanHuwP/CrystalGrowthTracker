@@ -65,7 +65,6 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
     @qc.pyqtSlot(int)
     def edit_combo_changed(self, index):
         self.change_edit_region.emit()
-        print("emitted change")
 
     def add_rectangle(self, rectangle):
         self._edit_data.append(rectangle)

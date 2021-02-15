@@ -38,23 +38,6 @@ from enum import IntEnum
 
 from cgt.gui.videoregionselectionwidgetstates import VideoRegionSelectionWidgetStates as states
 
-def qtransform_to_string(trans):
-    """
-    print out matrix
-    """
-    row1 = f"|{trans.m11():+.2f} {trans.m12():+.2f} {trans.m13():+.2f}|\n"
-    row2 = f"|{trans.m21():+.2f} {trans.m22():+.2f} {trans.m23():+.2f}|\n"
-    row3 = f"|{trans.m31():+.2f} {trans.m32():+.2f} {trans.m33():+.2f}|"
-    return row1 + row2 + row3
-
-def rectangle_to_string(rect):
-    """
-    print out rect
-    """
-    top_left = rect.topLeft()
-    size = rect.size()
-    return f"Label: rectangle({top_left.x()}, {top_left.y()}) ({size.width()}, {size.height()})"
-
 class CreateStates(IntEnum):
     """
     the possible states of the widget when creating a region
@@ -62,23 +45,6 @@ class CreateStates(IntEnum):
     READY_TO_MAKE = 0
     MAKING = 2
     FINISHED_MAKING = 4
-
-def rectangle_properties(rectangle):
-    """
-    find the top left, bottom right and centre of a rectangle
-        Args:
-            rectangle (QRect) the rectangle
-        Returns:
-            top left, top right, bottom left, bottom right, centre (QPoint)
-    """
-    top_left = rectangle.topLeft()
-    top_right = rectangle.topRight()
-    bottom_left = rectangle.bottomLeft()
-    bottom_right = rectangle.bottomRight()
-    ctr = top_left + bottom_right
-    ctr /= 2
-
-    return top_left, top_right, bottom_left, bottom_right, ctr
 
 class RegionSelectionLabel(qw.QLabel):
     """
