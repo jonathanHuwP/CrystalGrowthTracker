@@ -140,15 +140,17 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         
         self._edit_label.set_zoom(self._current_zoom)
         
-        rectangle_data = self._view_control.get_current_rectangle()
-        self._edit_label.set_rectangle(rectangle_data[0], rectangle_data[1])
-        
+        self._edit_label.have_rectangle.connect(self.rectangle_drawn)
+        self._edit_label.rectangle_changed.connect(self.rectangle_drawn)
         self._edit_label.rectangle_changed.connect(self.rectangle_changed)
         
         self._current_label = self._edit_label
         self._videoScrollArea.setWidget(self._current_label)
         self._videoScrollArea.setToolTip(self.tr("Left click and drag on corners or centre"))
         
+        rectangle_data = self._view_control.get_current_rectangle()
+        self._edit_label.set_rectangle(rectangle_data[0], rectangle_data[1])
+       
         self._create_label = None
         
     def make_create_label(self):
@@ -403,7 +405,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         label has a rectangle
         """
-        self._current_rectangle = self._create_label.get_rectangle()
+        self._current_rectangle = self._current_label.get_rectangle()
         self._current_subimage = self._current_image.copy(self._current_rectangle)
         self.display_subimage()
         
@@ -431,7 +433,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         if self._edit_label is None:
             return
             
-        data = self._edit_label.get_rectangle()
+        data = self._edit_label.get_rectangle_and_index()
         self._view_control.replace_rectangle(data[0], data[1])
         
     @qc.pyqtSlot()

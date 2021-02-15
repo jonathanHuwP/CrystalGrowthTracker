@@ -34,7 +34,7 @@ import PyQt5.QtCore as qc
 
 from enum import IntEnum
 
-from cgt.util.utils import rectangle_properties
+from cgt.util.utils import rectangle_properties, qpoint_sepertation_squared
 
 from cgt.gui.videoregionselectionwidgetstates import VideoRegionSelectionWidgetStates as states
 
@@ -48,18 +48,6 @@ class AdjustmentPoints(IntEnum):
     BOTTOM_LEFT = 8
     BOTTOM_RIGHT = 16
     CENTRE = 32
-    
-def qpoint_sepertation_squared(point_a, point_b):
-    """
-    find the square of the distance apart of two points
-        Args:
-            point_a (QPoint) first point
-            point_b (QPoint) second point
-        Returns:
-            the square of the distance from a to b
-    """
-    difference = point_a - point_b
-    return difference.x()*difference.x() + difference.y()*difference.y()
 
 class RegionEditLabel(qw.QLabel):
     """
@@ -67,8 +55,12 @@ class RegionEditLabel(qw.QLabel):
     displaying a list of already selected rectangles.
     """
 
-    ## signal to indicate the user has deleted the rectangle
+    ## signal to indicate the user has changed the rectangle
     rectangle_changed = qc.pyqtSignal()
+
+    ## signal to indicate the user has selected a new rectangle
+    have_rectangle = qc.pyqtSignal()
+
 
     def __init__(self, parent=None):
         """
@@ -87,10 +79,10 @@ class RegionEditLabel(qw.QLabel):
 
         ## the current rectangle
         self._rectangle = None
-        
+
         ## the index of the rectangle
         self._index = 0
-        
+
         ## the feature of the rectangle that is being moved
         self._adjustment_point = AdjustmentPoints.NONE
 
@@ -101,17 +93,28 @@ class RegionEditLabel(qw.QLabel):
         ## the translated name
         self._translation_name = self.tr("RegionSelectionLabel")
 
-    def get_rectangle(self):
+    def get_rectangle_and_index(self):
         """
-        getter for the rectangle
+        getter for the rectangle and it's index
             Returns:
                 tuple of (pointer to the rectangle, index) or None
         """
         if self._rectangle is None:
             return None
-            
+
         return (self._rectangle, self._index)
-        
+
+    def get_rectangle(self):
+        """
+        getter for the rectangle
+            Returns:
+                (rectangle) or None
+        """
+        if self._rectangle is None:
+            return None
+
+        return self._rectangle
+
     def set_rectangle(self, rectangle, index):
         """
         setter for the rectangle
@@ -119,10 +122,10 @@ class RegionEditLabel(qw.QLabel):
                 retctangle (QRect) the rectangle to set
                 index (int) the rectangle's index
         """
-        print("set rect")
         self._rectangle = rectangle
         self._index = index
         self.repaint()
+        self.have_rectangle.emit()
 
     def mousePressEvent(self, event):
         """
@@ -136,12 +139,12 @@ class RegionEditLabel(qw.QLabel):
         """
         if self._parent.is_playing() or event.button() != qc.Qt.LeftButton:
             return
-            
+
         if self._rectangle is None:
             return
-            
+
         props = rectangle_properties(self._rectangle)
-        
+
         if qpoint_sepertation_squared(props[0], event.pos()) < 25:
             self._adjustment_point = AdjustmentPoints.TOP_LEFT
         elif qpoint_sepertation_squared(props[1], event.pos()) < 25:
@@ -165,13 +168,13 @@ class RegionEditLabel(qw.QLabel):
             Returns:
                 None
         """
-        
+
         if self._parent.is_playing() or event.buttons() != qc.Qt.LeftButton:
             return
-        
+
         if self._rectangle is None:
             return
-            
+
         if self._adjustment_point == AdjustmentPoints.NONE:
             return
 
@@ -187,7 +190,7 @@ class RegionEditLabel(qw.QLabel):
             self._rectangle.moveCenter(event.pos())
         else:
             return
-            
+
         self.repaint()
 
     def mouseReleaseEvent(self, event):
@@ -202,10 +205,10 @@ class RegionEditLabel(qw.QLabel):
         """
         if self._parent.is_playing() or event.button() != qc.Qt.LeftButton:
             return
-            
+
         if self._adjustment_point == AdjustmentPoints.NONE:
             return
-            
+
         self.rectangle_changed.emit()
         self._adjustment_point = AdjustmentPoints.NONE
 
@@ -241,7 +244,7 @@ class RegionEditLabel(qw.QLabel):
         painter.setBrush(brush)
         rect = self._zoom_transform.mapRect(self._rectangle)
         painter.drawRect(rect)
-        
+
         props = rectangle_properties(rect)
         ctr = props[4]
         left = qc.QPoint(ctr.x()-5, ctr.y())

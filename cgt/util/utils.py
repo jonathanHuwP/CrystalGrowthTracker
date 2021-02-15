@@ -211,7 +211,7 @@ def difference_list_to_velocities(diff_list, scale, fps):
             velocities.append(velocity)
 
     return velocities
-    
+
 def rectangle_properties(rectangle):
     """
     find the top left, bottom right and centre of a rectangle
@@ -228,6 +228,18 @@ def rectangle_properties(rectangle):
     ctr /= 2
 
     return top_left, top_right, bottom_left, bottom_right, ctr
+
+def qpoint_sepertation_squared(point_a, point_b):
+    """
+    find the square of the distance apart of two points
+        Args:
+            point_a (QPoint) first point
+            point_b (QPoint) second point
+        Returns:
+            the square of the distance from a to b
+    """
+    difference = point_a - point_b
+    return difference.x()*difference.x() + difference.y()*difference.y()
 
 # For debugging
 ################
