@@ -36,6 +36,8 @@ import PyQt5.QtCore as qc
 
 from enum import IntEnum
 
+from cgt.util.utils import rectangle_properties
+
 from cgt.gui.videoregionselectionwidgetstates import VideoRegionSelectionWidgetStates as states
 
 class CreateStates(IntEnum):

@@ -34,6 +34,8 @@ import PyQt5.QtCore as qc
 
 from enum import IntEnum
 
+from cgt.util.utils import rectangle_properties
+
 from cgt.gui.videoregionselectionwidgetstates import VideoRegionSelectionWidgetStates as states
 
 class AdjustmentPoints(IntEnum):
@@ -46,23 +48,6 @@ class AdjustmentPoints(IntEnum):
     BOTTOM_LEFT = 8
     BOTTOM_RIGHT = 16
     CENTRE = 32
-
-def rectangle_properties(rectangle):
-    """
-    find the top left, bottom right and centre of a rectangle
-        Args:
-            rectangle (QRect) the rectangle
-        Returns:
-            top left, top right, bottom left, bottom right, centre (QPoint)
-    """
-    top_left = rectangle.topLeft()
-    top_right = rectangle.topRight()
-    bottom_left = rectangle.bottomLeft()
-    bottom_right = rectangle.bottomRight()
-    ctr = top_left + bottom_right
-    ctr /= 2
-
-    return top_left, top_right, bottom_left, bottom_right, ctr
     
 def qpoint_sepertation_squared(point_a, point_b):
     """
