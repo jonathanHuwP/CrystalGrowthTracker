@@ -6,31 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>194</width>
-    <height>288</height>
+    <width>238</width>
+    <height>322</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Region views controls</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <widget class="QRadioButton" name="_viewVideoButton">
-     <property name="text">
-      <string>View Video</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-     <attribute name="buttonGroup">
-      <string notr="true">_buttonGroup</string>
-     </attribute>
-    </widget>
-   </item>
    <item>
     <widget class="QRadioButton" name="_createRegionButton">
      <property name="text">
       <string>Create New Region</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
      </property>
      <attribute name="buttonGroup">
       <string notr="true">_buttonGroup</string>
@@ -45,6 +35,9 @@
      <property name="text">
       <string>Edit Region</string>
      </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
      <attribute name="buttonGroup">
       <string notr="true">_buttonGroup</string>
      </attribute>
@@ -52,6 +45,26 @@
    </item>
    <item>
     <widget class="QComboBox" name="_editComboBox">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QRadioButton" name="_selectFramesButton">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>Select Frames</string>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">_buttonGroup</string>
+     </attribute>
+    </widget>
+   </item>
+   <item>
+    <widget class="QComboBox" name="_framesComboBox">
      <property name="enabled">
       <bool>false</bool>
      </property>

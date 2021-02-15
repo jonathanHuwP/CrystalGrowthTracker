@@ -22,8 +22,8 @@ class VideoRegionSelectionWidgetStates(IntEnum):
     """
     specify the number of the pages in the wizard
     """
-    VIEW = 0
-    CREATE = 2
-    EDIT = 4
+    CREATE = 0
+    EDIT = 2
+    FRAMES = 4
     DISPLAY = 8
     DELETE = 16

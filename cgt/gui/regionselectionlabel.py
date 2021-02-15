@@ -157,7 +157,7 @@ class RegionSelectionLabel(qw.QLabel):
             
         mode = self._parent.get_operating_mode()
 
-        if mode == states.VIEW or mode == states.DISPLAY:
+        if mode == states.DISPLAY:
             return
 
         if mode == states.CREATE:
@@ -234,7 +234,7 @@ class RegionSelectionLabel(qw.QLabel):
             
         mode = self._parent.get_operating_mode()
 
-        if mode == states.VIEW or mode == states.DISPLAY:
+        if mode == states.DISPLAY:
             return
 
         if self._parent.get_operating_mode() == states.CREATE:
@@ -264,7 +264,7 @@ class RegionSelectionLabel(qw.QLabel):
             
         mode = self._parent.get_operating_mode()
 
-        if mode == states.VIEW or mode == states.DISPLAY:
+        if mode == states.DISPLAY:
             return
             
         if self._parent.get_operating_mode() == states.CREATE:

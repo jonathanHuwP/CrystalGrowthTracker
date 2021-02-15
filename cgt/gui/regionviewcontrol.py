@@ -49,12 +49,12 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
 
     @qc.pyqtSlot(qw.QAbstractButton)
     def button_clicked(self, button):
-        if button == self._viewVideoButton:
-            self.state_change.emit(states.VIEW)
-        elif button == self._createRegionButton:
+        if button == self._createRegionButton:
             self.state_change.emit(states.CREATE)
         elif button == self._editRegionButton:
             self.state_change.emit(states.EDIT)
+        elif button == self._selectFramesButton:
+            self.state_change.emit(states.FRAMES)
         elif button == self._displayMultipleButton:
             self.state_change.emit(states.DISPLAY)
         elif button == self._deleteButton:
@@ -65,6 +65,7 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
     @qc.pyqtSlot(int)
     def edit_combo_changed(self, index):
         self.change_edit_region.emit()
+        print("emitted change")
 
     def add_rectangle(self, rectangle):
         self._edit_data.append(rectangle)

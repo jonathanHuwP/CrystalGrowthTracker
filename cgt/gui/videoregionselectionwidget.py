@@ -98,9 +98,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         ## pointer to the label currently in use
         self._current_label = None
         
-        ## label for viewing video
-        self._view_label = None
-        
         ## label for creating regions
         self._create_label = None
         
@@ -111,24 +108,18 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._subimage_label = None
 
         # the operating mode control
-        self._view_control = RegionViewControl(self)
-        self._wizardLayout.addWidget(self._view_control)
-        self._view_control.state_change.connect(self.set_opertating_mode)
-        self._view_control.change_edit_region.connect(self.editing_rectangle_changed)
+        #self._view_control = RegionViewControl(self)
+        #self._wizardLayout.addWidget(self._view_control)
+        #self._view_control.state_change.connect(self.set_opertating_mode)
+        #self._view_control.change_edit_region.connect(self.editing_rectangle_changed)
+        #spacer = qw.QSpacerItem(40, 20, qw.QSizePolicy.Expanding, qw.QSizePolicy.Minimum)
+        #self._wizardLayout.addItem(spacer)
         
         ## state variable for the operating mode
-        self._mode = states.VIEW
-        
-        ## the embedded wizard
-        self._regionsWizard = RegionsWizard(self)
-        self._wizardLayout.addWidget(self._regionsWizard)
-        self._regionsWizard.setEnabled(False)
-        #self._regionsWizard.region_check.connect(self.region_check)
-        spacer = qw.QSpacerItem(40, 20, qw.QSizePolicy.Expanding, qw.QSizePolicy.Minimum)
-        self._wizardLayout.addItem(spacer)
+        self._mode = states.CREATE
 
         self.set_up_subimage_label()
-        self.make_view_label()
+        self.make_create_label()
 
         font = qg.QFont( "Monospace", 10, qg.QFont.DemiBold);
         self._frameLabel.setFont(font);
@@ -157,25 +148,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._videoScrollArea.setToolTip(self.tr("Left click and drag on corners or centre"))
         
         self._create_label = None
-        self._view_label = None
-
-    def make_view_label(self):
-        """
-        setup the label used for simple viewing
-        """
-        # view label
-        self._view_label = qw.QLabel()
-        self._view_label.setAlignment(qc.Qt.AlignTop | qc.Qt.AlignLeft)
-        self._view_label.setSizePolicy(qw.QSizePolicy.Fixed,
-                                       qw.QSizePolicy.Fixed)
-        self._view_label.setMargin(0)
-        
-        self._current_label = self._view_label
-        self._videoScrollArea.setWidget(self._current_label)
-        self._videoScrollArea.setToolTip(self.tr("No action in view"))
-        
-        self._create_label = None
-        self._edit_label = None
         
     def make_create_label(self):
         # create label
@@ -195,8 +167,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._current_label = self._create_label
         self._videoScrollArea.setWidget(self._current_label)
         self._videoScrollArea.setToolTip(self.tr("Left click and drag to make/save/delete"))
-        
-        self._view_label = None
+
         self._edit_label = None
 
     def set_up_subimage_label(self):
@@ -206,7 +177,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         
         # TODO check this
         # set initalize current to view
-        self._current_label = self._view_label
+        self._current_label = self._create_label
 
     def set_up_controls(self):
         """
@@ -240,10 +211,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
     def set_opertating_mode(self, mode):
         self._mode = mode
         
-        if self._mode == states.VIEW:
-            self.make_view_label()
-            self.display()
-        elif self._mode == states.CREATE:
+        if self._mode == states.CREATE:
             self.make_create_label()
             self.display()
         elif self._mode == states.EDIT:
@@ -464,6 +432,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         
     @qc.pyqtSlot()
     def editing_rectangle_changed(self):
+        print(f"recieved edit labe is {self._edit_label}")
         if self._edit_label is None:
             return
 
