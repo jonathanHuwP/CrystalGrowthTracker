@@ -138,6 +138,8 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
                                        qw.QSizePolicy.Fixed)
         self._edit_label.setMargin(0)
         
+        self._edit_label.set_zoom(self._current_zoom)
+        
         rectangle_data = self._view_control.get_current_rectangle()
         self._edit_label.set_rectangle(rectangle_data[0], rectangle_data[1])
         
@@ -348,6 +350,8 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._current_zoom = value
         if self._create_label is not None:
             self._create_label.set_zoom(value)
+        elif self._edit_label is not None:
+            self._edit_label.set_zoom(value)
         self.display()
 
     @qc.pyqtSlot()
@@ -432,7 +436,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         
     @qc.pyqtSlot()
     def editing_rectangle_changed(self):
-        print(f"recieved edit labe is {self._edit_label}")
         if self._edit_label is None:
             return
 

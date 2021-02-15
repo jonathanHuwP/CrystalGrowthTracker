@@ -271,7 +271,6 @@ class RegionSelectionLabel(qw.QLabel):
         if event.button() != qc.Qt.LeftButton:
             return
 
-        print("end adjustment")
         self._adjustment_underway = False
 
     def paintEvent(self, event):
