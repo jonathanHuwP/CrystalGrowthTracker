@@ -61,7 +61,6 @@ class RegionEditLabel(qw.QLabel):
     ## signal to indicate the user has selected a new rectangle
     have_rectangle = qc.pyqtSignal()
 
-
     def __init__(self, parent=None):
         """
         Set up the label

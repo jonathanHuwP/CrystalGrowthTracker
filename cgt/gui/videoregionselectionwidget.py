@@ -106,14 +106,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
 
         ## label for the subimage
         self._subimage_label = None
-
-        # the operating mode control
-        #self._view_control = RegionViewControl(self)
-        #self._wizardLayout.addWidget(self._view_control)
-        #self._view_control.state_change.connect(self.set_opertating_mode)
-        #self._view_control.change_edit_region.connect(self.editing_rectangle_changed)
-        #spacer = qw.QSpacerItem(40, 20, qw.QSizePolicy.Expanding, qw.QSizePolicy.Minimum)
-        #self._wizardLayout.addItem(spacer)
         
         ## state variable for the operating mode
         self._mode = states.CREATE
@@ -127,6 +119,27 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self.set_up_controls()
         self.request_frame(0)
         self._source.start()
+        
+    def make_create_label(self):
+        # create label
+        self._create_label = RegionCreationLabel(self)
+        self._create_label.setAlignment(qc.Qt.AlignTop | qc.Qt.AlignLeft)
+        self._create_label.setSizePolicy(qw.QSizePolicy.Fixed,
+                                         qw.QSizePolicy.Fixed)
+        self._create_label.setMargin(0)
+        
+        self._create_label.set_zoom(self._current_zoom)
+        
+        # connect up create's signals
+        self._create_label.have_rectangle.connect(self.rectangle_drawn)
+        self._create_label.rectangle_deleted.connect(self.rectangle_deleted)
+        self._create_label.store_rectangle.connect(self.store_rectangle)
+        
+        self._current_label = self._create_label
+        self._videoScrollArea.setWidget(self._current_label)
+        self._videoScrollArea.setToolTip(self.tr("Left click and drag to make/save/delete"))
+
+        self._edit_label = None
         
     def make_edit_label(self):
         """
@@ -152,27 +165,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._edit_label.set_rectangle(rectangle_data[0], rectangle_data[1])
        
         self._create_label = None
-        
-    def make_create_label(self):
-        # create label
-        self._create_label = RegionCreationLabel(self)
-        self._create_label.setAlignment(qc.Qt.AlignTop | qc.Qt.AlignLeft)
-        self._create_label.setSizePolicy(qw.QSizePolicy.Fixed,
-                                         qw.QSizePolicy.Fixed)
-        self._create_label.setMargin(0)
-        
-        self._create_label.set_zoom(self._current_zoom)
-        
-        # connect up create's signals
-        self._create_label.have_rectangle.connect(self.rectangle_drawn)
-        self._create_label.rectangle_deleted.connect(self.rectangle_deleted)
-        self._create_label.store_rectangle.connect(self.store_rectangle)
-        
-        self._current_label = self._create_label
-        self._videoScrollArea.setWidget(self._current_label)
-        self._videoScrollArea.setToolTip(self.tr("Left click and drag to make/save/delete"))
-
-        self._edit_label = None
 
     def set_up_subimage_label(self):
         # subimage label
@@ -217,6 +209,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         
         if self._mode == states.CREATE:
             self.make_create_label()
+            self.rectangle_deleted()
             self.display()
         elif self._mode == states.EDIT:
             self.make_edit_label()
@@ -415,8 +408,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         rectangle deleted in label
         """
         self._subimage_label.clear()
-        self._current_subimage = None
-        self._current_rectangle = None
+        self.clear_subimage()
         
     @qc.pyqtSlot()
     def store_rectangle(self):
@@ -425,6 +417,9 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         self._subimage_label.clear()
         self._view_control.add_rectangle(self._current_rectangle)
+        self.clear_subimage()
+        
+    def clear_subimage(self):
         self._current_subimage = None
         self._current_rectangle = None
         
