@@ -27,7 +27,6 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
-#from queue import Queue
 from enum import Enum
 
 from cgt.io.videobuffer import VideoBuffer
@@ -149,6 +148,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         # make connections
         self._video_thread.started.connect(self._source.make_frames)
         self._video_thread.finished.connect(self._video_thread.deleteLater)
+        self._source.display_image.connect(self.display_image)
         
         # start the thread
         self._video_thread.start()
@@ -219,7 +219,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         initalize the controls
         """
-        self._videoControl.set_range(self._source.length)
+        self._videoControl.set_range(self._source.get_length())
         self.connect_controls()
 
     def connect_controls(self):
@@ -286,14 +286,16 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
 
         return True
 
-    def display_image(self, image, frame_number):
+    @qc.pyqtSlot(qg.QPixmap, int)
+    def display_image(self, pixmap, frame_number):
         """
-        display an image
+        display an image, the image must be a pixmap so that
+        it can safely be recieved from another thread
             Args:
-                image (QImage) the image
+                pixmpa (QPixmap) the image in pixmap form
                 frame_number
         """
-        self._current_image = image
+        self._current_image = qg.QImage(pixmap)
         self._current_frame = frame_number
         self._videoControl.set_frame_currently_displayed(frame_number)
         
@@ -317,12 +319,15 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         if self._current_image is None or self.isHidden():
             return
-
         # zoom and display image
         tmp = self.apply_zoom_to_image(self._current_image)
         self._current_label.clear()
-        self._current_label.setPixmap(qg.QPixmap.fromImage(tmp))
-
+        print(f"cleared and zoomed {tmp.size()}")
+        pixmap = qg.QPixmap(tmp)
+        print(f"pixmap {pixmap}")
+        self._current_label.setPixmap(tmp)
+        print("set pixmap")
+        
         # update the controls
         self._videoControl.set_slider_value(self._current_frame)
 
@@ -331,17 +336,17 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         time = display_number/self._frames_per_second
         message =   "Frame {:0>5d} of {:0>5d}, approx {:0>5.1f} seconds video time"
         self._frameLabel.setText(message.format(display_number,
-                                                self._source.length,
+                                                self._source.get_length(),
                                                 time))
         # display any subimage
         self.display_subimage()
 
         if self._playing == PlayStates.PLAY_FORWARD:
             next_frame = (self._current_frame + 1)
-            self.request_frame(next_frame%self._source.length)
+            self.request_frame(next_frame%self._source.get_length())
         elif self._playing == PlayStates.PLAY_BACKWARD:
             next_frame = (self._current_frame - 1)
-            self.request_frame(next_frame%self._source.length)
+            self.request_frame(next_frame%self._source.get_length())
 
     def apply_zoom_to_image(self, image):
         """
@@ -369,7 +374,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
                 end (bool) if true jump to end else start
         """
         if end:
-            self.request_frame(self._source.length-1)
+            self.request_frame(self._source.get_length()-1)
         else:
             self.request_frame(0)
 
@@ -396,7 +401,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         advance by one frame
         """
         frame = self._current_frame + 1
-        if frame < self._source.length:
+        if frame < self._source.get_length():
             self.request_frame(frame)
 
     @qc.pyqtSlot()
@@ -423,7 +428,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         self.clear_queue()
         self._playing = PlayStates.PLAY_FORWARD
-        self.request_frame((self._current_frame+1)%self._source.length)
+        self.request_frame((self._current_frame+1)%self._source.get_length())
 
     @qc.pyqtSlot()
     def play_backward(self):
@@ -432,7 +437,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         self.clear_queue()
         self._playing = PlayStates.PLAY_BACKWARD
-        self.request_frame((self._current_frame-1)%self._source.length)
+        self.request_frame((self._current_frame-1)%self._source.get_length())
         
     @qc.pyqtSlot()
     def rectangle_drawn(self):

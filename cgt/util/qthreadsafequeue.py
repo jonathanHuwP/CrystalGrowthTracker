@@ -71,6 +71,8 @@ class QThreadSafeQueue(qc.QObject):
             Returns:
                 True if queue has no items else False
         """
+        flag = True
         self._mutex.lock()
-        return len(self._list) < 1
+        flag = len(self._list) < 1
         self._mutex.unlock()
+        return flag

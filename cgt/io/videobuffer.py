@@ -35,7 +35,7 @@ class VideoBuffer(qc.QObject):
     """
     
     ## signal that a frame is ready to display
-    display_image = qc.pyqtSignal(qg.QImage, int)
+    display_image = qc.pyqtSignal(qg.QPixmap, int)
     
     def __init__(self, path, region_view):
         """
@@ -49,15 +49,14 @@ class VideoBuffer(qc.QObject):
         
         ## initiaize the file video stream
         self._video_reader = cv2.VideoCapture(str(path))
+        
+        ## cache the length
+        self._length = self._video_reader.get(cv2.CAP_PROP_FRAME_COUNT)
 
         ## pointer to the region view
         self._region_view = region_view
-        
-        ## mutex for the length call
-        self._mutex = qc.QMutex()
 
-    @property
-    def length(self):
+    def get_length(self):
         """
         get the numer of frames in the video file, the maximum 
         accepted frame number is this minus 1
@@ -65,11 +64,7 @@ class VideoBuffer(qc.QObject):
             Returns:
                 the number of frames (int)
         """
-        length = 0
-        self._mutex.lock()
-        lenght = int(self._video_reader.get(cv2.CAP_PROP_FRAME_COUNT))
-        self._mutex.unlock()
-        return length
+        return self._length
 
     @qc.pyqtSlot()
     def make_frames(self):
@@ -105,5 +100,4 @@ class VideoBuffer(qc.QObject):
         image = nparray_to_qimage(img, True)
  
         # call the region viewing object with the image and frame
-        self.display_image.emit(image, frame)
-        print(f"video thread sent {frame}")
+        self.display_image.emit(qg.QPixmap.fromImage(image), frame)
