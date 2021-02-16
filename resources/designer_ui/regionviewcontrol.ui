@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>238</width>
-    <height>322</height>
+    <height>256</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -45,26 +45,6 @@
    </item>
    <item>
     <widget class="QComboBox" name="_editComboBox">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QRadioButton" name="_selectFramesButton">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="text">
-      <string>Select Frames</string>
-     </property>
-     <attribute name="buttonGroup">
-      <string notr="true">_buttonGroup</string>
-     </attribute>
-    </widget>
-   </item>
-   <item>
-    <widget class="QComboBox" name="_framesComboBox">
      <property name="enabled">
       <bool>false</bool>
      </property>

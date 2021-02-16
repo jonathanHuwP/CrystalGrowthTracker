@@ -31,7 +31,6 @@ from enum import Enum
 
 from cgt.io.videobuffer import VideoBuffer
 from cgt.util.qthreadsafequeue import QThreadSafeQueue
-from cgt.gui.regionselectionlabel import RegionSelectionLabel
 from cgt.gui.regioncreationlabel import RegionCreationLabel
 from cgt.gui.regioneditlabel import RegionEditLabel
 

@@ -53,8 +53,6 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
             self.state_change.emit(states.CREATE)
         elif button == self._editRegionButton:
             self.state_change.emit(states.EDIT)
-        elif button == self._selectFramesButton:
-            self.state_change.emit(states.FRAMES)
         elif button == self._displayMultipleButton:
             self.state_change.emit(states.DISPLAY)
         elif button == self._deleteButton:

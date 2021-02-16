@@ -24,6 +24,5 @@ class VideoRegionSelectionWidgetStates(IntEnum):
     """
     CREATE = 0
     EDIT = 2
-    FRAMES = 4
-    DISPLAY = 8
-    DELETE = 16
+    DISPLAY = 4
+    DELETE = 8
