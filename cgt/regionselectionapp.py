@@ -19,9 +19,8 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # set up linting conditions
 # pylint: disable = too-few-public-methods
 # pylint: disable = c-extension-no-member
+# pylint: disable = no-name-in-module
 # pylint: disable = import-error
-
-import sys
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc

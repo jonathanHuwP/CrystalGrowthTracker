@@ -20,23 +20,16 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 @author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 """
 # set up linting conditions
-# pylint: disable = too-many-instance-attributes
-# pylint: disable = too-many-public-methods
+# pylint: disable = no-name-in-module
 # pylint: disable = c-extension-no-member
 
-# TODO handel out of pixmap move/release
-# move => freaze untill back
-# release => delete and reset
+from enum import IntEnum
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
-from enum import IntEnum
-
 from cgt.util.utils import rectangle_properties, qpoint_sepertation_squared
-
-from cgt.gui.videoregionselectionwidgetstates import VideoRegionSelectionWidgetStates as states
 
 class AdjustmentPoints(IntEnum):
     """
@@ -143,16 +136,17 @@ class RegionEditLabel(qw.QLabel):
             return
 
         props = rectangle_properties(self._rectangle)
+        pos = self._inverse_zoom.map(event.pos())
 
-        if qpoint_sepertation_squared(props[0], event.pos()) < 25:
+        if qpoint_sepertation_squared(props[0], pos) < 25:
             self._adjustment_point = AdjustmentPoints.TOP_LEFT
-        elif qpoint_sepertation_squared(props[1], event.pos()) < 25:
+        elif qpoint_sepertation_squared(props[1], pos) < 25:
             self._adjustment_point = AdjustmentPoints.TOP_RIGHT
-        elif qpoint_sepertation_squared(props[2], event.pos()) < 25:
+        elif qpoint_sepertation_squared(props[2], pos) < 25:
             self._adjustment_point = AdjustmentPoints.BOTTOM_LEFT
-        elif qpoint_sepertation_squared(props[3], event.pos()) < 25:
+        elif qpoint_sepertation_squared(props[3], pos) < 25:
             self._adjustment_point = AdjustmentPoints.BOTTOM_RIGHT
-        elif qpoint_sepertation_squared(props[4], event.pos()) < 25:
+        elif qpoint_sepertation_squared(props[4], pos) < 25:
             self._adjustment_point = AdjustmentPoints.CENTRE
         else:
             self._adjustment_point = AdjustmentPoints.NONE
@@ -177,16 +171,18 @@ class RegionEditLabel(qw.QLabel):
         if self._adjustment_point == AdjustmentPoints.NONE:
             return
 
+        pos = self._inverse_zoom.map(event.pos())
+
         if self._adjustment_point == AdjustmentPoints.TOP_LEFT:
-            self._rectangle.setTopLeft(event.pos())
+            self._rectangle.setTopLeft(pos)
         elif self._adjustment_point == AdjustmentPoints.TOP_RIGHT:
-            self._rectangle.setTopRight(event.pos())
+            self._rectangle.setTopRight(pos)
         elif self._adjustment_point == AdjustmentPoints.BOTTOM_LEFT:
-            self._rectangle.setBottomLeft(event.pos())
+            self._rectangle.setBottomLeft(pos)
         elif self._adjustment_point == AdjustmentPoints.BOTTOM_RIGHT:
-            self._rectangle.setBottomRight(event.pos())
+            self._rectangle.setBottomRight(pos)
         elif self._adjustment_point == AdjustmentPoints.CENTRE:
-            self._rectangle.moveCenter(event.pos())
+            self._rectangle.moveCenter(pos)
         else:
             return
 
@@ -235,8 +231,7 @@ class RegionEditLabel(qw.QLabel):
         if self._rectangle is None:
             return
 
-        #pen = qg.QPen(qg.QColor(qc.Qt.black), 1, qc.Qt.DashLine)
-        pen = qg.QPen(qg.QColor(70, 102, 255), 1, qc.Qt.DashLine)
+        pen = qg.QPen(qg.QColor(70, 102, 255), 2, qc.Qt.DashLine)
         brush = qg.QBrush(qg.QColor(255, 255, 255, 120))
         painter = qg.QPainter(self)
         painter.setPen(pen)

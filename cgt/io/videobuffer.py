@@ -33,10 +33,10 @@ class VideoBuffer(qc.QObject):
     they will be popped and video display object called to dispaly the
     resultant image.
     """
-    
+
     ## signal that a frame is ready to display
     display_image = qc.pyqtSignal(qg.QPixmap, int)
-    
+
     def __init__(self, path, region_view):
         """
         initalize by usng opencv opening the video file
@@ -46,10 +46,10 @@ class VideoBuffer(qc.QObject):
                 region_view (qwidget) the viewer for the video
         """
         super().__init__()
-        
+
         ## initiaize the file video stream
         self._video_reader = cv2.VideoCapture(str(path))
-        
+
         ## cache the length
         self._length = int(self._video_reader.get(cv2.CAP_PROP_FRAME_COUNT))
 
@@ -58,7 +58,7 @@ class VideoBuffer(qc.QObject):
 
     def get_length(self):
         """
-        get the numer of frames in the video file, the maximum 
+        get the numer of frames in the video file, the maximum
         accepted frame number is this minus 1
 
             Returns:
@@ -98,6 +98,6 @@ class VideoBuffer(qc.QObject):
 
         # convert to Qt cv2 produces image in green/red/blue
         image = nparray_to_qimage(img, True)
- 
+
         # call the region viewing object with the image and frame
         self.display_image.emit(qg.QPixmap.fromImage(image), frame)

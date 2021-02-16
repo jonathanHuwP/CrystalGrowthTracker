@@ -20,19 +20,15 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 @author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 """
 # set up linting conditions
-# pylint: disable = too-many-instance-attributes
-# pylint: disable = too-many-public-methods
 # pylint: disable = c-extension-no-member
+# pylint: disable = no-name-in-module
+# pylint: disable = import-error
 
 from enum import IntEnum
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
-
-from enum import IntEnum
-
-from cgt.gui.videoregionselectionwidgetstates import VideoRegionSelectionWidgetStates as states
 
 class CreateStates(IntEnum):
     """
@@ -70,7 +66,7 @@ class RegionCreationLabel(qw.QLabel):
 
     ## signal to indicate the user has deleted the rectangle
     rectangle_deleted = qc.pyqtSignal()
-    
+
     ## signal to store the current rectangle
     store_rectangle = qc.pyqtSignal()
 
@@ -161,20 +157,20 @@ class RegionCreationLabel(qw.QLabel):
         m_box = qw.QMessageBox(self)
         m_box.setText(message)
         m_box.setWindowTitle(title)
-        button_store = m_box.addButton(self.tr("Store"), qw.QMessageBox.YesRole) 
-        button_del = m_box.addButton(self.tr("Delete"), qw.QMessageBox.NoRole)
+        button_store = m_box.addButton(self.tr("Store"), qw.QMessageBox.YesRole)
         button_cancel = m_box.addButton(self.tr("Cancel"), qw.QMessageBox.RejectRole)
-                                           
+        m_box.addButton(self.tr("Delete"), qw.QMessageBox.NoRole) #fall through option
+
         m_box.exec()
         reply = m_box.clickedButton()
-        
+
         if reply == button_cancel:
             return
-        
+
         if m_box.clickedButton() == button_store:
             self.store_rectangle.emit()
-            print("Label: Store the region")   
-            
+            print("Label: Store the region")
+
         # for store or delete clear and reset
         self._rectangle = None
         self._create_state = CreateStates.READY_TO_MAKE
@@ -252,8 +248,7 @@ class RegionCreationLabel(qw.QLabel):
         if self._rectangle is None:
             return
 
-        #pen = qg.QPen(qg.QColor(qc.Qt.black), 1, qc.Qt.DashLine)
-        pen = qg.QPen(qg.QColor(70, 102, 255), 1, qc.Qt.DashLine)
+        pen = qg.QPen(qg.QColor(255, 7, 58), 2, qc.Qt.DashLine)
         brush = qg.QBrush(qg.QColor(255, 255, 255, 120))
         painter = qg.QPainter(self)
         painter.setPen(pen)
