@@ -51,7 +51,7 @@ class VideoBuffer(qc.QObject):
         self._video_reader = cv2.VideoCapture(str(path))
         
         ## cache the length
-        self._length = self._video_reader.get(cv2.CAP_PROP_FRAME_COUNT)
+        self._length = int(self._video_reader.get(cv2.CAP_PROP_FRAME_COUNT))
 
         ## pointer to the region view
         self._region_view = region_view

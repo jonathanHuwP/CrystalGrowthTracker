@@ -292,7 +292,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         display an image, the image must be a pixmap so that
         it can safely be recieved from another thread
             Args:
-                pixmpa (QPixmap) the image in pixmap form
+                pixmap (QPixmap) the image in pixmap form
                 frame_number
         """
         self._current_image = qg.QImage(pixmap)
@@ -322,11 +322,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         # zoom and display image
         tmp = self.apply_zoom_to_image(self._current_image)
         self._current_label.clear()
-        print(f"cleared and zoomed {tmp.size()}")
-        pixmap = qg.QPixmap(tmp)
-        print(f"pixmap {pixmap}")
-        self._current_label.setPixmap(tmp)
-        print("set pixmap")
+        self._current_label.setPixmap(qg.QPixmap(tmp))
         
         # update the controls
         self._videoControl.set_slider_value(self._current_frame)
