@@ -296,7 +296,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
             return
         # zoom and display image
         tmp = self.apply_zoom_to_image(self._current_image)
-        #self._current_label.clear()
         self._current_label.setPixmap(qg.QPixmap(tmp))
         
         # update the controls
