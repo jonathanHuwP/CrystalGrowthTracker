@@ -30,6 +30,8 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
+from cgt.util.utils import rectangle_properties
+
 class CreateStates(IntEnum):
     """
     the possible states of the widget when creating a region
@@ -37,23 +39,6 @@ class CreateStates(IntEnum):
     READY_TO_MAKE = 0
     MAKING = 2
     FINISHED_MAKING = 4
-
-def rectangle_properties(rectangle):
-    """
-    find the top left, bottom right and centre of a rectangle
-        Args:
-            rectangle (QRect) the rectangle
-        Returns:
-            top left, top right, bottom left, bottom right, centre (QPoint)
-    """
-    top_left = rectangle.topLeft()
-    top_right = rectangle.topRight()
-    bottom_left = rectangle.bottomLeft()
-    bottom_right = rectangle.bottomRight()
-    ctr = top_left + bottom_right
-    ctr /= 2
-
-    return top_left, top_right, bottom_left, bottom_right, ctr
 
 class RegionCreationLabel(qw.QLabel):
     """

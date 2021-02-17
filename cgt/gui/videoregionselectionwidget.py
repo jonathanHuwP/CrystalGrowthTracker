@@ -184,9 +184,11 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._videoScrollArea.setWidget(self._current_label)
         self._videoScrollArea.setToolTip(self.tr("Left click and drag on corners or centre"))
 
-        rectangle_data = self._view_control.get_current_rectangle()
-        self._edit_label.set_rectangle(rectangle_data[0], rectangle_data[1])
-        self.rectangle_drawn()
+        index = self._view_control.get_current_rectangle()
+        
+        if index is not None:
+            self._edit_label.set_rectangle(self._data_store.get_region(index), index)
+            self.rectangle_drawn()
 
         self._create_label = None
         self._display_label = None
@@ -474,7 +476,8 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         store the current rectangle
         """
         self._subimage_label.clear()
-        self._view_control.add_rectangle(self._current_rectangle)
+        index = self._data_store.append(self._current_rectangle)
+        self._view_control.add_rectangle(index)
         self.clear_subimage()
 
     def clear_subimage(self):
@@ -493,7 +496,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
             return
 
         data = self._edit_label.get_rectangle_and_index()
-        self._view_control.replace_rectangle(data[0], data[1])
+        self._data_store.replace_region(data[0], data[1])
 
     @qc.pyqtSlot()
     def editing_rectangle_changed(self):
@@ -503,7 +506,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         if self._edit_label is None:
             return
 
-        data = self._view_control.get_current_rectangle()
+        index = self._view_control.get_current_rectangle()
 
-        if data is not None:
-            self._edit_label.set_rectangle(data[0], data[1])
+        if index is not None:
+            self._edit_label.set_rectangle(self._data_store.get_region(index), index)

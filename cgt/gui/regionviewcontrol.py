@@ -53,7 +53,7 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
         super().__init__(parent)
         self.setupUi(self)
 
-        self._edit_data = []
+        self._number_rects = 0
         
         ## instructions
         self._inst_create = self.tr("""
@@ -95,34 +95,16 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
         """
         add a new rectangle to the results
             Args:
-                rectangle (QRect) the rectangle to be added
+                rectangle (int) the index of the rectangle to be added
         """
-        self._edit_data.append(rectangle)
-        self.fill_edit_box()
+        self._number_rects += 1
+        self._editComboBox.addItem(str(rectangle))
 
         if not self._editRegionButton.isEnabled():
             self._editRegionButton.setEnabled(True)
             
         if not self._displayMultipleButton.isEnabled():
             self._displayMultipleButton.setEnabled(True)
-
-    def fill_edit_box(self):
-        """
-        refill the editing combo box
-        """
-        old_state = self._editComboBox.blockSignals(True)
-
-        old_index = self._editComboBox.currentIndex()
-        self._editComboBox.clear()
-        for i, rect in enumerate(self._edit_data):
-            text = f"{i+1:0>2d}"
-            self._editComboBox.addItem(text, rect)
-
-        if old_index < 0:
-            old_index = 0
-
-        self._editComboBox.setCurrentIndex(old_index)
-        self._editComboBox.blockSignals(old_state)
 
     def get_current_rectangle(self):
         """
@@ -133,20 +115,7 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
         if self._editComboBox.count() < 1:
             return None
 
-        index = self._editComboBox.currentIndex()
-
-        return (self._edit_data[index], index)
-
-    def replace_rectangle(self, rectangle, index):
-        """
-        replace an existing rectangle in edit combobox
-            Args:
-                rectangle (QRect) the new rectangle
-                index (int) the index in the combobox
-        """
-        print(f"replace rect {rectangle}, {index}")
-        self._edit_data[index] = rectangle
-        self.fill_edit_box()
+        return self._editComboBox.currentIndex()
 
     def enable_combo_boxes(self):
         """

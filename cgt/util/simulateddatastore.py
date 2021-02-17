@@ -7,6 +7,10 @@ class SimulatedDataStore():
         
     def append(self, datum):
         self._data.append(datum)
+        return len(self._data)
         
     def remove(self, index):
         self._data.pop(index)
+        
+    def replace_region(self, rectangle, index):
+        self._data[index] = rectangle
