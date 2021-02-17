@@ -54,6 +54,16 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
         self.setupUi(self)
 
         self._edit_data = []
+        
+        ## instructions
+        self._inst_create = self.tr("""
+        <p>To draw a region, left click down then drag.</p><p>On release you will have the options of storing, deleting or cancelling.</p><p>If cancelled you can access the options again by left clicking.</p>""")
+    
+        self._ints_edit = self.tr("""
+        <p>Left click and drag on corners to adjust size</P><p>Left click and drag on centre to move region</p>
+        """)
+        
+        self.display_instructions()
 
     @qc.pyqtSlot(qw.QAbstractButton)
     def button_clicked(self, button):
@@ -72,6 +82,7 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
             self.state_change.emit(states.DELETE)
 
         self.enable_combo_boxes()
+        self.display_instructions()
 
     @qc.pyqtSlot(int)
     def edit_combo_changed(self):
@@ -99,7 +110,6 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
         old_state = self._editComboBox.blockSignals(True)
 
         old_index = self._editComboBox.currentIndex()
-        print(f"old index {old_index}")
         self._editComboBox.clear()
         for i, rect in enumerate(self._edit_data):
             text = f"{i+1:0>2d}"
@@ -109,7 +119,6 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
             old_index = 0
 
         self._editComboBox.setCurrentIndex(old_index)
-
         self._editComboBox.blockSignals(old_state)
 
     def get_current_rectangle(self):
@@ -154,3 +163,27 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
         self._editComboBox.setEnabled(edit_box)
         self._displayComboBox.setEnabled(display_box)
         self._deleteComboBox.setEnabled(delete_box)
+        
+    qc.pyqtSlot(int)
+    def show_hide_instructions(self, value):
+        if value == 0:
+            self._instructionsBrowser.setVisible(False)
+            self._instructionsBrowser.clear()
+        else:
+            self._instructionsBrowser.setVisible(True)
+            self.display_instructions()
+            
+    def display_instructions(self):
+        """
+        display the instructions 
+        """
+        self._instructionsBrowser.clear()
+        
+        if self._createRegionButton.isChecked():
+            self._instructionsBrowser.append(self._inst_create)
+        elif self._editRegionButton.isChecked():
+            self._instructionsBrowser.append(self._ints_edit)
+        elif self._displayMultipleButton.isChecked():
+            print("inst multipl")
+        elif self._deleteButton.isChecked():
+            print("delete")

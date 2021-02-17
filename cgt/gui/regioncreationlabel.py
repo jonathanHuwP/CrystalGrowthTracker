@@ -271,3 +271,12 @@ class RegionCreationLabel(qw.QLabel):
         """
         self._zoom_transform = qg.QTransform().scale(value, value)
         self._inverse_zoom, _= self._zoom_transform.inverted()
+        
+    def has_rectangle(self):
+        """
+        Test if object holds rectangle
+            Returns:
+                true if object has a rectangle else false
+        """
+        return self._rectangle is None
+            
