@@ -34,8 +34,10 @@ import PyQt5.QtCore as qc
 
 from cgt.io.videobuffer import VideoBuffer
 from cgt.util.qthreadsafequeue import QThreadSafeQueue
+from cgt.util.simulateddatastore import SimulatedDataStore
 from cgt.gui.regioncreationlabel import RegionCreationLabel
 from cgt.gui.regioneditlabel import RegionEditLabel
+from cgt.gui.regiondisplaylabel import RegionDisplayLabel
 
 from cgt.gui.videoregionselectionwidgetstates import VideoRegionSelectionWidgetStates as states
 
@@ -70,6 +72,8 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         super().__init__(parent)
         self.setupUi(self)
+        
+        self._data_store = SimulatedDataStore()
 
         ## the frame queue
         self._frame_queue = QThreadSafeQueue(self)
@@ -109,6 +113,9 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
 
         ## label for editing regions
         self._edit_label = None
+        
+        ## label for displaying regions
+        self._display_label = None
 
         ## label for the subimage
         self._subimage_label = None
@@ -148,12 +155,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         set up a create label and assign to current label
         """
         self._create_label = RegionCreationLabel(self)
-        self._create_label.setAlignment(qc.Qt.AlignTop | qc.Qt.AlignLeft)
-        self._create_label.setSizePolicy(qw.QSizePolicy.Fixed,
-                                         qw.QSizePolicy.Fixed)
-        self._create_label.setMargin(0)
-
-        self._create_label.set_zoom(self._current_zoom)
+        self.setup_label(self._create_label)
 
         # connect up create's signals
         self._create_label.have_rectangle.connect(self.rectangle_drawn)
@@ -165,18 +167,14 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._videoScrollArea.setToolTip(self.tr("Left click and drag to make/save/delete"))
 
         self._edit_label = None
+        self._display_label = None
 
     def make_edit_label(self):
         """
         setup the label for editing
         """
         self._edit_label = RegionEditLabel(self)
-        self._edit_label.setAlignment(qc.Qt.AlignTop | qc.Qt.AlignLeft)
-        self._edit_label.setSizePolicy(qw.QSizePolicy.Fixed,
-                                       qw.QSizePolicy.Fixed)
-        self._edit_label.setMargin(0)
-
-        self._edit_label.set_zoom(self._current_zoom)
+        self.setup_label(self._edit_label)
 
         self._edit_label.have_rectangle.connect(self.rectangle_drawn)
         self._edit_label.rectangle_changed.connect(self.rectangle_drawn)
@@ -188,8 +186,34 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
 
         rectangle_data = self._view_control.get_current_rectangle()
         self._edit_label.set_rectangle(rectangle_data[0], rectangle_data[1])
+        self.rectangle_drawn()
 
         self._create_label = None
+        self._display_label = None
+        
+    def make_display_label(self):
+        """
+        set up label for dispaly
+        """
+        self._display_label = RegionDisplayLabel(self)
+        self.setup_label(self._display_label)
+        
+        self._current_label = self._display_label
+        self._videoScrollArea.setWidget(self._current_label)
+        self._videoScrollArea.setToolTip(None)
+        
+        self._create_label = None
+        self._edit_label = None
+        
+    def setup_label(self, label):
+        """
+        set up a label for the main video
+        """
+        label.setAlignment(qc.Qt.AlignTop | qc.Qt.AlignLeft)
+        label.setSizePolicy(qw.QSizePolicy.Fixed, qw.QSizePolicy.Fixed)
+        label.setMargin(0)
+
+        label.set_zoom(self._current_zoom)
 
     def set_up_subimage_label(self):
         """
@@ -241,6 +265,11 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
             self.display()
         elif self._mode == states.EDIT:
             self.make_edit_label()
+            self.rectangle_drawn()
+            self.display()
+        elif self._mode == states.DISPLAY:
+            self.make_display_label()
+            self.rectangle_deleted()
             self.display()
 
     def display_subimage(self):

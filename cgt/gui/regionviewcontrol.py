@@ -102,6 +102,9 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
 
         if not self._editRegionButton.isEnabled():
             self._editRegionButton.setEnabled(True)
+            
+        if not self._displayMultipleButton.isEnabled():
+            self._displayMultipleButton.setEnabled(True)
 
     def fill_edit_box(self):
         """
