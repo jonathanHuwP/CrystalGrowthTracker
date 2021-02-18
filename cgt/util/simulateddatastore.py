@@ -14,3 +14,7 @@ class SimulatedDataStore():
         
     def replace_region(self, rectangle, index):
         self._data[index] = rectangle
+        
+    @property
+    def length(self):
+        return len(self._data)

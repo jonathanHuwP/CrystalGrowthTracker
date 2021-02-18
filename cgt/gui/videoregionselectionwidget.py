@@ -117,6 +117,9 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         ## label for displaying regions
         self._display_label = None
 
+        ## label for deleting regions
+        self._delete_label = None
+
         ## label for the subimage
         self._subimage_label = None
 
@@ -184,7 +187,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
 
         index = self._view_control.get_current_rectangle()
 
-        if index is not None:
+        if index > -1:
             self._edit_label.set_rectangle(self._data_store.get_region(index), index)
             self.rectangle_drawn()
 
@@ -198,7 +201,8 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._display_label = RegionDisplayLabel(self)
         self.setup_label(self._display_label)
         self.move_label_to_main_scroll(self._display_label)
-
+        self._display_label.display_rectangle(0)
+        
         self._create_label = None
         self._edit_label = None
 
@@ -531,5 +535,40 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
 
         index = self._view_control.get_current_rectangle()
 
-        if index is not None:
+        if index > -1:
             self._edit_label.set_rectangle(self._data_store.get_region(index), index)
+
+    @qc.pyqtSlot()
+    def display_rectangle_changed(self):
+        """
+        callback for a user change of the currently edited rectangle
+        """
+        if self._display_label is None:
+            return
+
+        index = self._view_control.get_current_rectangle()
+
+        if index > -1:
+            self._display_label.display_rectangle(index)
+            
+    @qc.pyqtSlot()
+    def delete_rectangle_changed(self):
+        """
+        callback for a user change of the currently edited rectangle
+        """
+        if self._delete_label is None:
+            return
+
+        index = self._view_control.get_current_rectangle()
+
+        if index > -1:
+            print(f"delete {index}")
+            #self._delete_label.set_rectangle(self._data_store.get_region(index), index)
+            
+    def get_data(self):
+        """
+        get the data store
+            Returns:
+                pointer to data (SimulatedDataStore) 
+        """
+        return self._data_store

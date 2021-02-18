@@ -182,6 +182,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>_displayComboBox</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>RegionViewControl</receiver>
+   <slot>display_combo_changed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>97</x>
+     <y>156</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>223</x>
+     <y>144</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_deleteComboBox</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>RegionViewControl</receiver>
+   <slot>delete_combo_changed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>97</x>
+     <y>222</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>223</x>
+     <y>144</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <buttongroups>
   <buttongroup name="_buttonGroup"/>

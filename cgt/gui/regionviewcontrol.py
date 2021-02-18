@@ -43,6 +43,12 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
     ## signal to change the editing region
     change_edit_region = qc.pyqtSignal()
 
+    ## signal to change the editing region
+    change_display_region = qc.pyqtSignal()
+
+    ## signal to change the editing region
+    change_delete_region = qc.pyqtSignal()
+
     def __init__(self, parent=None):
         """
         the object initalization function
@@ -61,6 +67,15 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
     
         self._ints_edit = self.tr("""
         <p>Left click and drag on corners to adjust size</P><p>Left click and drag on centre to move region</p>
+        """)
+        
+        self._inst_display = self.tr("""
+        <p>Review your work.</p><p>Use the selection box to choose the region, or all.</p>
+        """)
+        
+        self._inst_delete = self.tr("""
+        <p>Use the selection box to choose the region, then left mouse button to delete.</p>
+        <p>This is not reversable.</p>
         """)
         
         self.display_instructions()
@@ -90,6 +105,20 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
         emit the signal for editing box changed
         """
         self.change_edit_region.emit()
+        
+    @qc.pyqtSlot(int)
+    def display_combo_changed(self):
+        """
+        emit the signal for display box changed
+        """
+        self.change_display_region.emit()
+        
+    @qc.pyqtSlot(int)
+    def delete_combo_changed(self):
+        """
+        emit the signal for delete box changed
+        """
+        self.change_delete_region.emit()
 
     def add_rectangle(self, rectangle_index):
         """
@@ -115,13 +144,17 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
     def get_current_rectangle(self):
         """
         getter for the rectangle currently displayed in the edit combobox
-            Retruns:
-                tuple of (rectangle, index) or None if box is empty
+            Returns:
+                index (int) or -1 if box is empty
         """
-        if self._editComboBox.count() < 1:
-            return None
-
-        return self._editComboBox.currentIndex()
+        if self._editRegionButton.isChecked():
+            return self._editComboBox.currentIndex()
+        elif self._displayMultipleButton.isChecked():
+            return self._displayComboBox.currentIndex()
+        elif self._deleteButton.isChecked():
+            return self._deleteComboBox.currentIndex()
+            
+        return -1
 
     def enable_combo_boxes(self):
         """
@@ -162,6 +195,6 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
         elif self._editRegionButton.isChecked():
             self._instructionsBrowser.append(self._ints_edit)
         elif self._displayMultipleButton.isChecked():
-            print("inst multipl")
+            self._instructionsBrowser.append(self._inst_display)
         elif self._deleteButton.isChecked():
-            print("delete")
+            self._instructionsBrowser.append(self._inst_delete)

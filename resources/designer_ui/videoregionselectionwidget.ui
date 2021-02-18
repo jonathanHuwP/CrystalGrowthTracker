@@ -129,7 +129,7 @@
             <x>0</x>
             <y>0</y>
             <width>405</width>
-            <height>384</height>
+            <height>398</height>
            </rect>
           </property>
          </widget>
@@ -213,6 +213,38 @@
     <hint type="sourcelabel">
      <x>773</x>
      <y>426</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>495</x>
+     <y>229</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_view_control</sender>
+   <signal>change_delete_region()</signal>
+   <receiver>VideoRegionSelectionWidget</receiver>
+   <slot>delete_rectangle_changed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>773</x>
+     <y>433</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>495</x>
+     <y>229</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_view_control</sender>
+   <signal>change_display_region()</signal>
+   <receiver>VideoRegionSelectionWidget</receiver>
+   <slot>display_rectangle_changed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>773</x>
+     <y>433</y>
     </hint>
     <hint type="destinationlabel">
      <x>495</x>

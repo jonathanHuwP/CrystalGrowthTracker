@@ -27,6 +27,8 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
+from cgt.util.utils import rectangle_properties
+
 class RegionDisplayLabel(qw.QLabel):
     """
     subclass of label allowing display of rectangles.
@@ -47,11 +49,8 @@ class RegionDisplayLabel(qw.QLabel):
         ## store drawing widget
         self._parent = parent
 
-        ## the current rectangle
-        self._rectangles = []
-
         ## the index of the rectangle
-        self._index = None
+        self._index = -1
 
         ## the zoom transformatin
         self._zoom_transform = qg.QTransform().scale(1.0, 1.0)
@@ -60,7 +59,7 @@ class RegionDisplayLabel(qw.QLabel):
         ## the translated name
         self._translation_name = self.tr("RegionDisplayLabel")
 
-    def set_display_index(self, rectangle, index):
+    def display_rectangle(self, index):
         """
         which rectangle should be displayed
             Args:
@@ -100,11 +99,15 @@ class RegionDisplayLabel(qw.QLabel):
         """
         # pass on to get pixmap displayed
         qw.QLabel.paintEvent(self, event)
-        if self._index is None:
-            for rectangle in self._rectangles:
+        if self._index == 0:
+            stop = self._parent.get_data().length
+            for i in range(0, stop):
+                rectangle = self._parent.get_data().get_region(i)
                 self.draw_rectangle(rectangle)
         else:
-            self.draw_rectangle(self._rectangles[index])
+            i = self._index - 1
+            rectangle = self._parent.get_data().get_region(i)
+            self.draw_rectangle(rectangle)
 
     def draw_rectangle(self, rectangle):
         """
