@@ -91,20 +91,26 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
         """
         self.change_edit_region.emit()
 
-    def add_rectangle(self, rectangle):
+    def add_rectangle(self, rectangle_index):
         """
         add a new rectangle to the results
             Args:
-                rectangle (int) the index of the rectangle to be added
+                rectangle_index (int) the index of the rectangle to be added
         """
         self._number_rects += 1
-        self._editComboBox.addItem(str(rectangle))
+        text = str(rectangle_index)
+        self._editComboBox.addItem(text)
+        self._displayComboBox.addItem(text)
+        self._deleteComboBox.addItem(text)
 
         if not self._editRegionButton.isEnabled():
             self._editRegionButton.setEnabled(True)
             
         if not self._displayMultipleButton.isEnabled():
             self._displayMultipleButton.setEnabled(True)
+            
+        if not self._deleteButton.isEnabled():
+            self._deleteButton.setEnabled(True)
 
     def get_current_rectangle(self):
         """

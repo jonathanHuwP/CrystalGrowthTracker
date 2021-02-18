@@ -72,7 +72,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         super().__init__(parent)
         self.setupUi(self)
-        
+
         self._data_store = SimulatedDataStore()
 
         ## the frame queue
@@ -113,7 +113,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
 
         ## label for editing regions
         self._edit_label = None
-        
+
         ## label for displaying regions
         self._display_label = None
 
@@ -162,9 +162,8 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._create_label.rectangle_deleted.connect(self.rectangle_deleted)
         self._create_label.store_rectangle.connect(self.store_rectangle)
 
-        self._current_label = self._create_label
-        self._videoScrollArea.setWidget(self._current_label)
-        self._videoScrollArea.setToolTip(self.tr("Left click and drag to make/save/delete"))
+        tip = self.tr("Left click and drag to make/save/delete")
+        self.move_label_to_main_scroll(self._create_label, tip)
 
         self._edit_label = None
         self._display_label = None
@@ -180,33 +179,57 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._edit_label.rectangle_changed.connect(self.rectangle_drawn)
         self._edit_label.rectangle_changed.connect(self.rectangle_changed)
 
-        self._current_label = self._edit_label
-        self._videoScrollArea.setWidget(self._current_label)
-        self._videoScrollArea.setToolTip(self.tr("Left click and drag on corners or centre"))
+        tip = self.tr("Left click and drag on corners or centre")
+        self.move_label_to_main_scroll(self._edit_label, tip)
 
         index = self._view_control.get_current_rectangle()
-        
+
         if index is not None:
             self._edit_label.set_rectangle(self._data_store.get_region(index), index)
             self.rectangle_drawn()
 
         self._create_label = None
         self._display_label = None
-        
+
     def make_display_label(self):
         """
         set up label for dispaly
         """
         self._display_label = RegionDisplayLabel(self)
         self.setup_label(self._display_label)
-        
-        self._current_label = self._display_label
-        self._videoScrollArea.setWidget(self._current_label)
-        self._videoScrollArea.setToolTip(None)
-        
+        self.move_label_to_main_scroll(self._display_label)
+
         self._create_label = None
         self._edit_label = None
+
+    def move_label_to_main_scroll(self, label, tooltip=None):
+        """
+        move a label to the main scroll area and assign it to _current_label
+            Args:
+                label (QLabel) the label to be assigned
+                tooltip (string) the scroll area's tooltip
+        """
+        self._current_label = label
+
+        self._videoScrollArea.setToolTip(tooltip)
+
+        h_bar = self._videoScrollArea.horizontalScrollBar()
+        v_bar = self._videoScrollArea.verticalScrollBar()
+        dx = h_bar.value()
+        dy = v_bar.value()
+
+        self._videoScrollArea.setWidget(label)
+
+        # when adding a widget the max of scroll bars is set to zero
+        if dx > h_bar.maximum():
+            h_bar.setMaximum(dx)
         
+        if dy > v_bar.maximum():
+            v_bar.setMaximum(dy)
+        
+        h_bar.setValue(dx)
+        v_bar.setValue(dy)
+
     def setup_label(self, label):
         """
         set up a label for the main video
