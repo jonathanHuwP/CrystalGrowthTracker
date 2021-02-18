@@ -33,6 +33,9 @@ class RegionDisplayLabel(qw.QLabel):
     """
     subclass of label allowing display of rectangles.
     """
+    
+    ## signal a region selected
+    region_selected = qc.pyqtSignal(int)
 
     def __init__(self, parent=None):
         """
@@ -78,14 +81,21 @@ class RegionDisplayLabel(qw.QLabel):
             Returns:
                 None
         """
-        print("RegionDisplayLabel")
         if self._parent.is_playing() or event.button() != qc.Qt.LeftButton:
             return
-
-        if len(self._rectangles) == 0:
-            return
             
-        print(f"mouse press {event.pos()}")
+        if self._index < 0:
+            return
+
+        if self._index == 0:
+            for i in range(0, self._parent.get_data().length):
+                rect = self._parent.get_data().get_region(i)
+                if rect.contains(event.pos()):
+                    self.region_selected.emit(i)
+        else:
+            rect = self._parent.get_data().get_region(self._index-1)
+            if rect.contains(event.pos()):
+                self.region_selected.emit(self._index-1)
 
     def paintEvent(self, event):
         """

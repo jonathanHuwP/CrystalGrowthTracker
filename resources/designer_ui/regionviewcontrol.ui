@@ -100,6 +100,11 @@
          <property name="enabled">
           <bool>false</bool>
          </property>
+         <item>
+          <property name="text">
+           <string>All</string>
+          </property>
+         </item>
         </widget>
        </item>
        <item>

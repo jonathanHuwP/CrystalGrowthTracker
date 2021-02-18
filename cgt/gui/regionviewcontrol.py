@@ -74,7 +74,7 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
         """)
         
         self._inst_delete = self.tr("""
-        <p>Use the selection box to choose the region, then left mouse button to delete.</p>
+        <p>Left mouse button to select for delete. Click "yes" on pop-up to complete.</p>
         <p>This is not reversable.</p>
         """)
         

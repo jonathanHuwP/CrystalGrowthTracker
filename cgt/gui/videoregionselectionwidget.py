@@ -193,10 +193,11 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
 
         self._create_label = None
         self._display_label = None
+        self._delete_label = None
 
     def make_display_label(self):
         """
-        set up label for dispaly
+        set up label for display
         """
         self._display_label = RegionDisplayLabel(self)
         self.setup_label(self._display_label)
@@ -205,6 +206,22 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         
         self._create_label = None
         self._edit_label = None
+        self._delete_label = None
+        
+    def make_delete_label(self):
+        """
+        set up label for display
+        """
+        self._delete_label = RegionDisplayLabel(self)
+        self.setup_label(self._delete_label)
+        self.move_label_to_main_scroll(self._delete_label)
+        self._delete_label.display_rectangle(0)
+        
+        self._delete_label.region_selected.connect(self.selected_for_delete)
+        
+        self._create_label = None
+        self._edit_label = None
+        self._display_label = None
 
     def move_label_to_main_scroll(self, label, tooltip=None):
         """
@@ -298,6 +315,10 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
             self.display()
         elif self._mode == states.DISPLAY:
             self.make_display_label()
+            self.rectangle_deleted()
+            self.display()
+        elif self._mode == states.DELETE:
+            self.make_delete_label()
             self.rectangle_deleted()
             self.display()
 
@@ -562,9 +583,12 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         index = self._view_control.get_current_rectangle()
 
         if index > -1:
-            print(f"delete {index}")
-            #self._delete_label.set_rectangle(self._data_store.get_region(index), index)
-            
+            self._delete_label.display_rectangle(index)
+
+    @qc.pyqtSlot(int)
+    def selected_for_delete(self, index):
+        print(f"region {index} selected for deletion")
+    
     def get_data(self):
         """
         get the data store

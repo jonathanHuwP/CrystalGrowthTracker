@@ -154,7 +154,6 @@ class RegionCreationLabel(qw.QLabel):
 
         if m_box.clickedButton() == button_store:
             self.store_rectangle.emit()
-            print("Label: Store the region")
 
         # for store or delete clear and reset
         self._rectangle = None
