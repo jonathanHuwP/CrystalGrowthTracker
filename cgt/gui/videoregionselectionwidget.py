@@ -31,6 +31,7 @@ from enum import Enum
 import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
+import PyQt5.Qt as qt
 
 from cgt.io.videobuffer import VideoBuffer
 from cgt.util.qthreadsafequeue import QThreadSafeQueue
@@ -418,7 +419,12 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         height = image.height()*self._current_zoom
         width = image.width()*self._current_zoom
-        return image.scaled(width, height)
+        
+        transform = qt.Qt.SmoothTransformation
+        if self._videoControl.use_fast_transform():
+            transform = qt.Qt.FastTransformation
+
+        return image.scaled(width, height, transformMode=transform)
 
     def clear_queue(self):
         """

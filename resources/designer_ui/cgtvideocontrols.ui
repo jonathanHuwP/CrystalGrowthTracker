@@ -195,6 +195,19 @@
       </widget>
      </item>
      <item>
+      <widget class="QRadioButton" name="_fastSmoothButton">
+       <property name="toolTip">
+        <string>Check for fast scaling, else smooth</string>
+       </property>
+       <property name="text">
+        <string>Fast/Smooth</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer_2">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
