@@ -56,10 +56,11 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
             Returns:
                 None
         """
-        super().__init__(parent)
+        super().__init__()
         self.setupUi(self)
 
-        self._number_rects = 0
+        # the parent holding the data store
+        self._data_source = None
         
         ## instructions
         self._inst_create = self.tr("""
@@ -79,6 +80,14 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
         """)
         
         self.display_instructions()
+        
+    def set_data_source(self, data_source):
+        """
+        assign the object holding the data on rectangles
+            Args:
+                data_source (object) the widget holding the data
+        """
+        self._data_source = data_source
 
     @qc.pyqtSlot(qw.QAbstractButton)
     def button_clicked(self, button):
@@ -120,17 +129,23 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
         """
         self.change_delete_region.emit()
 
-    def add_rectangle(self, rectangle_index):
+    def data_changed(self):
         """
-        add a new rectangle to the results
-            Args:
-                rectangle_index (int) the index of the rectangle to be added
+        the results have changed reload combo boxes
         """
-        self._number_rects += 1
-        text = str(rectangle_index)
-        self._editComboBox.addItem(text)
-        self._displayComboBox.addItem(text)
-        self._deleteComboBox.addItem(text)
+        all = self.tr("All")
+        
+        self._editComboBox.clear()
+        self._displayComboBox.clear()
+        self._displayComboBox.addItem(all)
+        self._deleteComboBox.clear()
+        self._deleteComboBox.addItem(all)
+        
+        for rectangle_index in range(0, self._data_source.get_data().length):
+            text = str(rectangle_index + 1)
+            self._editComboBox.addItem(text)
+            self._displayComboBox.addItem(text)
+            self._deleteComboBox.addItem(text)
 
         if not self._editRegionButton.isEnabled():
             self._editRegionButton.setEnabled(True)

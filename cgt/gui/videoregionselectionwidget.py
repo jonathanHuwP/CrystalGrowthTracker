@@ -275,6 +275,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         self._videoControl.set_range(self._source.get_length())
         self.connect_controls()
+        self._view_control.set_data_source(self)
 
     def connect_controls(self):
         """
@@ -461,6 +462,11 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
             self._create_label.set_zoom(value)
         elif self._edit_label is not None:
             self._edit_label.set_zoom(value)
+        elif self._display_label is not None:
+            self._display_label.set_zoom(value)
+        elif self._delete_label is not None:
+            self._delete_label.set_zoom(value)
+            
         self.display()
 
     @qc.pyqtSlot()
@@ -531,7 +537,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         self._subimage_label.clear()
         index = self._data_store.append(self._current_rectangle)
-        self._view_control.add_rectangle(index)
+        self._view_control.data_changed()
         self.clear_subimage()
 
     def clear_subimage(self):
@@ -593,7 +599,17 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
 
     @qc.pyqtSlot(int)
     def selected_for_delete(self, index):
-        print(f"region {index} selected for deletion")
+        message = self.tr(f"Do you wish to remove region {index+1}. Cannot be reversed.")
+        mb_reply = qw.QMessageBox.question(self,
+                                           'CrystalGrowthTracker',
+                                           message,
+                                           qw.QMessageBox.Yes | qw.QMessageBox.No,
+                                           qw.QMessageBox.No)
+
+        if mb_reply == qw.QMessageBox.Yes:
+            print(f"deleting {index}")
+            self._data_store.remove(index)
+            self._view_control.data_changed()
     
     def get_data(self):
         """
