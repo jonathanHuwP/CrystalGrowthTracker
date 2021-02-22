@@ -1,8 +1,16 @@
+import inspect
+
 class SimulatedDataStore():
     def __init__(self):
         self._data = []
     
     def get_region(self, index):
+        current_frame = inspect.currentframe()
+        calling_frames = inspect.getouterframes(current_frame)
+        print(f"getting region {index} out of {len(self._data)}")
+        for item in calling_frames:
+            print(f"\t{item.function}")
+
         return self._data[index]
         
     def append(self, datum):

@@ -30,7 +30,7 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
-from cgt.util.utils import rectangle_properties
+from cgt.gui.regionbaselabel import RegionBaseLabel
 
 class CreateStates(IntEnum):
     """
@@ -40,7 +40,7 @@ class CreateStates(IntEnum):
     MAKING = 2
     FINISHED_MAKING = 4
 
-class RegionCreationLabel(qw.QLabel):
+class RegionCreationLabel(RegionBaseLabel):
     """
     subclass of label allowing selection of region by drawing rectangle and
     displaying a list of already selected rectangles.
@@ -67,18 +67,11 @@ class RegionCreationLabel(qw.QLabel):
         """
         super().__init__(parent)
 
-        ## store drawing widget
-        self._parent = parent
-
         ## the current rectangle
         self._rectangle = None
 
         ## flag for the creation of a new rectangle
         self._create_state = CreateStates.READY_TO_MAKE
-
-        ## the zoom transformatin
-        self._zoom_transform = qg.QTransform().scale(1.0, 1.0)
-        self._inverse_zoom, _= self._zoom_transform.inverted()
 
         ## the translated name
         self._translation_name = self.tr("RegionSelectionLabel")
@@ -109,7 +102,7 @@ class RegionCreationLabel(qw.QLabel):
             Returns:
                 None
         """
-        if self._parent.is_playing() or event.button() != qc.Qt.LeftButton:
+        if self.get_parent().is_playing() or event.button() != qc.Qt.LeftButton:
             return
 
         if self._create_state == CreateStates.READY_TO_MAKE:
@@ -169,7 +162,7 @@ class RegionCreationLabel(qw.QLabel):
             Returns:
                 None
         """
-        if self._parent.is_playing() or event.buttons() != qc.Qt.LeftButton:
+        if self.get_parent().is_playing() or event.buttons() != qc.Qt.LeftButton:
             return
 
         if self._rectangle is None:
@@ -190,7 +183,7 @@ class RegionCreationLabel(qw.QLabel):
             Returns:
                 None
         """
-        if self._parent.is_playing():
+        if self.get_parent().is_playing():
             return
 
         if event.button() != qc.Qt.LeftButton:
@@ -220,41 +213,8 @@ class RegionCreationLabel(qw.QLabel):
         """
         # pass on to get pixmap displayed
         qw.QLabel.paintEvent(self, event)
-        self.draw_rectangle()
-
-    def draw_rectangle(self):
-        """
-        Draw the rectangle
-
-            Returns:
-                None
-        """
-        if self._rectangle is None:
-            return
-
-        pen = qg.QPen(qg.QColor(255, 7, 58), 2, qc.Qt.DashLine)
-        brush = qg.QBrush(qg.QColor(255, 255, 255, 120))
-        painter = qg.QPainter(self)
-        painter.setPen(pen)
-        painter.setBrush(brush)
-        rect = self._zoom_transform.mapRect(self._rectangle)
-        painter.drawRect(rect)
-
-        props = rectangle_properties(rect)
-        ctr = props[4]
-        left = qc.QPoint(ctr.x()-5, ctr.y())
-        right = qc.QPoint(ctr.x()+5, ctr.y())
-        top = qc.QPoint(ctr.x(), ctr.y()-5)
-        bottom = qc.QPoint(ctr.x(), ctr.y()+5)
-        painter.drawLine(left, right)
-        painter.drawLine(top, bottom)
-
-    def set_zoom(self, value):
-        """
-        set the current zoom and inverse zoom matrices
-        """
-        self._zoom_transform = qg.QTransform().scale(value, value)
-        self._inverse_zoom, _= self._zoom_transform.inverted()
+        if self._rectangle is not None:
+            self.draw_rectangle(self._rectangle)
         
     def has_rectangle(self):
         """

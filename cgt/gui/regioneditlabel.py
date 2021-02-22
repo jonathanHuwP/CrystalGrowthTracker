@@ -30,6 +30,7 @@ import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
 from cgt.util.utils import rectangle_properties, qpoint_sepertation_squared
+from cgt.gui.regionbaselabel import RegionBaseLabel
 
 class AdjustmentPoints(IntEnum):
     """
@@ -42,7 +43,7 @@ class AdjustmentPoints(IntEnum):
     BOTTOM_RIGHT = 16
     CENTRE = 32
 
-class RegionEditLabel(qw.QLabel):
+class RegionEditLabel(RegionBaseLabel):
     """
     subclass of label allowing selection of region by drawing rectangle and
     displaying a list of already selected rectangles.
@@ -54,7 +55,7 @@ class RegionEditLabel(qw.QLabel):
     ## signal to indicate the user has selected a new rectangle
     have_rectangle = qc.pyqtSignal()
 
-    def __init__(self, parent=None):
+    def __init__(self, parent):
         """
         Set up the label
 
@@ -65,10 +66,6 @@ class RegionEditLabel(qw.QLabel):
                 None
         """
         super().__init__(parent)
-
-        ## store drawing widget
-        self._parent = parent
-
         ## the current rectangle
         self._rectangle = None
 
@@ -77,10 +74,6 @@ class RegionEditLabel(qw.QLabel):
 
         ## the feature of the rectangle that is being moved
         self._adjustment_point = AdjustmentPoints.NONE
-
-        ## the zoom transformatin
-        self._zoom_transform = qg.QTransform().scale(1.0, 1.0)
-        self._inverse_zoom, _= self._zoom_transform.inverted()
 
         ## the translated name
         self._translation_name = self.tr("RegionSelectionLabel")
@@ -129,7 +122,7 @@ class RegionEditLabel(qw.QLabel):
             Returns:
                 None
         """
-        if self._parent.is_playing() or event.button() != qc.Qt.LeftButton:
+        if self.get_parent().is_playing() or event.button() != qc.Qt.LeftButton:
             return
 
         if self._rectangle is None:
@@ -162,7 +155,7 @@ class RegionEditLabel(qw.QLabel):
                 None
         """
 
-        if self._parent.is_playing() or event.buttons() != qc.Qt.LeftButton:
+        if self.get_parent().is_playing() or event.buttons() != qc.Qt.LeftButton:
             return
 
         if self._rectangle is None:
@@ -198,7 +191,7 @@ class RegionEditLabel(qw.QLabel):
             Returns:
                 None
         """
-        if self._parent.is_playing() or event.button() != qc.Qt.LeftButton:
+        if self.get_parent().is_playing() or event.button() != qc.Qt.LeftButton:
             return
 
         if self._adjustment_point == AdjustmentPoints.NONE:
@@ -219,38 +212,5 @@ class RegionEditLabel(qw.QLabel):
         """
         # pass on to get pixmap displayed
         qw.QLabel.paintEvent(self, event)
-        self.draw_rectangle()
-
-    def draw_rectangle(self):
-        """
-        Draw the rectangle
-
-            Returns:
-                None
-        """
-        if self._rectangle is None:
-            return
-
-        pen = qg.QPen(qg.QColor(70, 102, 255), 2, qc.Qt.DashLine)
-        brush = qg.QBrush(qg.QColor(255, 255, 255, 120))
-        painter = qg.QPainter(self)
-        painter.setPen(pen)
-        painter.setBrush(brush)
-        rect = self._zoom_transform.mapRect(self._rectangle)
-        painter.drawRect(rect)
-
-        props = rectangle_properties(rect)
-        ctr = props[4]
-        left = qc.QPoint(ctr.x()-5, ctr.y())
-        right = qc.QPoint(ctr.x()+5, ctr.y())
-        top = qc.QPoint(ctr.x(), ctr.y()-5)
-        bottom = qc.QPoint(ctr.x(), ctr.y()+5)
-        painter.drawLine(left, right)
-        painter.drawLine(top, bottom)
-
-    def set_zoom(self, value):
-        """
-        set the current zoom and inverse zoom matrices
-        """
-        self._zoom_transform = qg.QTransform().scale(value, value)
-        self._inverse_zoom, _= self._zoom_transform.inverted()
+        if self._rectangle is not None:
+            self.draw_rectangle(self._rectangle)
