@@ -170,6 +170,7 @@ class RegionSelectionWidget(qw.QWidget, Ui_RegionSelectionWidget):
             Returns:
                 None
         """
+        # TODO selection fails at low zoom values
         time, frame = self.get_current_video_time()
         img, rect = self.get_current_subimage()
         self._region_end = RegionEnd(rect, frame)

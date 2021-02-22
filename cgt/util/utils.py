@@ -93,7 +93,7 @@ def qimage_to_nparray(image):
             np array (uint8) the array
     """
     if image.format() != qg.QImage.Format.Format_RGB32:
-        message = f"QImage not in Format_RGB32, actual{image.format()}"
+        message = f"QImage not in Format_RGB32, actual {image.format()}"
         raise ValueError(message)
         #image = image.convertToFormat(qg.QImage.Format.Format_RGB32)
 
