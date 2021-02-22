@@ -27,7 +27,6 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 from enum import IntEnum
 
 import PyQt5.QtWidgets as qw
-import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
 from cgt.gui.regionbaselabel import RegionBaseLabel
@@ -215,7 +214,7 @@ class RegionCreationLabel(RegionBaseLabel):
         qw.QLabel.paintEvent(self, event)
         if self._rectangle is not None:
             self.draw_rectangle(self._rectangle)
-        
+
     def has_rectangle(self):
         """
         Test if object holds rectangle
@@ -223,4 +222,3 @@ class RegionCreationLabel(RegionBaseLabel):
                 true if object has a rectangle else false
         """
         return self._rectangle is None
-            

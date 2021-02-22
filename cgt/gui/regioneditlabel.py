@@ -22,11 +22,11 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # set up linting conditions
 # pylint: disable = no-name-in-module
 # pylint: disable = c-extension-no-member
+# pylint: disable = import-error
 
 from enum import IntEnum
 
 import PyQt5.QtWidgets as qw
-import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
 from cgt.util.utils import rectangle_properties, qpoint_sepertation_squared

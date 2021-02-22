@@ -22,9 +22,9 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # set up linting conditions
 # pylint: disable = no-name-in-module
 # pylint: disable = c-extension-no-member
+# pylint: disable = import-error
 
 import PyQt5.QtWidgets as qw
-import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
 from cgt.gui.regionbaselabel import RegionBaseLabel
@@ -33,7 +33,7 @@ class RegionDisplayLabel(RegionBaseLabel):
     """
     subclass of label allowing display of rectangles.
     """
-    
+
     ## signal a region selected
     region_selected = qc.pyqtSignal(int)
 
@@ -76,7 +76,7 @@ class RegionDisplayLabel(RegionBaseLabel):
         """
         if self.get_parent().is_playing() or event.button() != qc.Qt.LeftButton:
             return
-            
+
         if self._index < 0:
             return
 

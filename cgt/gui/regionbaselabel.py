@@ -19,8 +19,9 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 @copyright 2020
 @author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 """
-
-from enum import IntEnum
+# set up linting conditions
+# pylint: disable = c-extension-no-member
+# pylint: disable = no-name-in-module
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
@@ -28,13 +29,12 @@ import PyQt5.QtCore as qc
 
 from cgt.util.utils import rectangle_properties
 
-
 class RegionBaseLabel(qw.QLabel):
     """
     subclass of QLabel used as the base of all region
     selection/editing labels
     """
-    
+
     def __init__(self, parent):
         """
         Set up the label
@@ -49,11 +49,11 @@ class RegionBaseLabel(qw.QLabel):
 
         ## store drawing widget (PyQt5 .parent() returns a vanilla widget)
         self._parent = parent
-        
+
         ## the zoom transformatin
         self._zoom_transform = qg.QTransform().scale(1.0, 1.0)
         self._inverse_zoom, _= self._zoom_transform.inverted()
-        
+
     def draw_rectangle(self, rectangle):
         """
         Draw the rectangle
@@ -78,17 +78,17 @@ class RegionBaseLabel(qw.QLabel):
         bottom = qc.QPoint(ctr.x(), ctr.y()+5)
         painter.drawLine(left, right)
         painter.drawLine(top, bottom)
-        
+
     def set_zoom(self, value):
         """
         set the current zoom and inverse zoom matrices
         """
         self._zoom_transform = qg.QTransform().scale(value, value)
         self._inverse_zoom, _= self._zoom_transform.inverted()
-        
+
     def get_parent(self):
         """
-        getter for the parent required because PyQt5 .parent() 
+        getter for the parent required because PyQt5 .parent()
         method only returns a vanilla QWidget, no matter what class
         of object was originally provided.
         """
