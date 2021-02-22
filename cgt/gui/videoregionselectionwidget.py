@@ -607,7 +607,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
                                            qw.QMessageBox.No)
 
         if mb_reply == qw.QMessageBox.Yes:
-            print(f"deleting {index}")
             self._data_store.remove(index)
             self._view_control.data_changed()
     
