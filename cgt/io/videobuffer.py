@@ -19,15 +19,13 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # set up linting conditions
 # pylint: disable = c-extension-no-member
 
-from threading import Thread
 import cv2
-import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
+import PyQt5.QtGui as qg
 
-from cgt.model.region import Region
 from cgt.util.utils import nparray_to_qimage
 
-class VideoBuffer:
+class VideoBuffer(qc.QObject):
     """
     a video reader that is designed to run as a seperate thread
     from the display object, allowing smoother animation, once started
@@ -35,44 +33,40 @@ class VideoBuffer:
     they will be popped and video display object called to dispaly the
     resultant image.
     """
-    def __init__(self, path, parent, region_view):
+
+    ## signal that a frame is ready to display
+    display_image = qc.pyqtSignal(qg.QPixmap, int)
+
+    def __init__(self, path, region_view):
         """
         initalize by usng opencv opening the video file
 
             Args:
                 path (string) the path to the video file
-                parent (object) callback target which must have display_pixmap function
                 region_view (qwidget) the viewer for the video
         """
+        super().__init__()
+
         ## initiaize the file video stream
         self._video_reader = cv2.VideoCapture(str(path))
 
-        ## pointr to the parent
-        self._parent = parent
+        ## cache the length
+        self._length = int(self._video_reader.get(cv2.CAP_PROP_FRAME_COUNT))
 
         ## pointer to the region view
         self._region_view = region_view
 
-    def length(self):
-        """
-        get the numer of frames in the video file
 
+    def get_length(self):
+        """
+        get the numer of frames in the video file, the maximum
+        accepted frame number is this minus 1
             Returns:
                 the number of frames (int)
         """
-        return int(self._video_reader.get(cv2.CAP_PROP_FRAME_COUNT))-1
+        return self._length
 
-    def start(self):
-        """
-        start the thread
-
-            Returns:
-                None
-        """
-        thread = Thread(target=self.make_frames, args=())
-        thread.daemon = True
-        thread.start()
-
+    @qc.pyqtSlot()
     def make_frames(self):
         """
         pop the frame numbers form the queue and convert
@@ -82,7 +76,7 @@ class VideoBuffer:
                 None
         """
         while True:
-            if not self._parent.get_frame_queue().empty():
+            if not self._region_view.get_frame_queue().is_empty():
                 self.make_frame()
 
     def make_frame(self):
@@ -93,7 +87,7 @@ class VideoBuffer:
             Returns:
                 None
         """
-        frame = self._parent.get_frame_queue().get()
+        frame = self._region_view.get_frame_queue().pop()
 
         self._video_reader.set(cv2.CAP_PROP_POS_FRAMES, frame)
         flag, img = self._video_reader.read()
@@ -106,4 +100,4 @@ class VideoBuffer:
         image = nparray_to_qimage(img, True)
 
         # call the region viewing object with the image and frame
-        self._region_view.display_image(image, frame)
+        self.display_image.emit(qg.QPixmap.fromImage(image), frame)

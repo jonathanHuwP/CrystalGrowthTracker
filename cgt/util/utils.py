@@ -18,14 +18,18 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 @copyright 2020
 @author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 '''
+# set up linting conditions
+# pylint: disable = c-extension-no-member
 
 import socket
-from sys import platform as _platform
 import datetime
-import cv2
-import PyQt5.QtGui as qg
-import numpy as np
+
+from sys import platform as _platform
 import array as arr
+import PyQt5.QtGui as qg
+
+import cv2
+import numpy as np
 
 def memview_3b_to_qpixmap(pixels, width, height):
     """
@@ -211,3 +215,52 @@ def difference_list_to_velocities(diff_list, scale, fps):
             velocities.append(velocity)
 
     return velocities
+
+def rectangle_properties(rectangle):
+    """
+    find the top left, bottom right and centre of a rectangle
+        Args:
+            rectangle (QRect) the rectangle
+        Returns:
+            top left, top right, bottom left, bottom right, centre (QPoint)
+    """
+    top_left = rectangle.topLeft()
+    top_right = rectangle.topRight()
+    bottom_left = rectangle.bottomLeft()
+    bottom_right = rectangle.bottomRight()
+    ctr = top_left + bottom_right
+    ctr /= 2
+
+    return top_left, top_right, bottom_left, bottom_right, ctr
+
+def qpoint_sepertation_squared(point_a, point_b):
+    """
+    find the square of the distance apart of two points
+        Args:
+            point_a (QPoint) first point
+            point_b (QPoint) second point
+        Returns:
+            the square of the distance from a to b
+    """
+    difference = point_a - point_b
+    return difference.x()*difference.x() + difference.y()*difference.y()
+
+# For debugging
+################
+
+def qtransform_to_string(trans):
+    """
+    print out matrix
+    """
+    row1 = f"|{trans.m11():+.2f} {trans.m12():+.2f} {trans.m13():+.2f}|\n"
+    row2 = f"|{trans.m21():+.2f} {trans.m22():+.2f} {trans.m23():+.2f}|\n"
+    row3 = f"|{trans.m31():+.2f} {trans.m32():+.2f} {trans.m33():+.2f}|"
+    return row1 + row2 + row3
+
+def rectangle_to_string(rect):
+    """
+    print out rect
+    """
+    top_left = rect.topLeft()
+    size = rect.size()
+    return f"QRect({top_left.x()}, {top_left.y()}) ({size.width()}, {size.height()})"

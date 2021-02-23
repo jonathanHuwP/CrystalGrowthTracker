@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>VideoRegionSelectionWidget</class>
+ <widget class="QWidget" name="VideoRegionSelectionWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>991</width>
+    <height>459</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>VideoRegionSelectionWidget</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_3">
+   <item>
+    <widget class="QSplitter" name="splitter">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <widget class="QWidget" name="layoutWidget">
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
+       <item>
+        <widget class="QScrollArea" name="_videoScrollArea">
+         <property name="toolTip">
+          <string/>
+         </property>
+         <property name="toolTipDuration">
+          <number>-1</number>
+         </property>
+         <property name="widgetResizable">
+          <bool>true</bool>
+         </property>
+         <widget class="QWidget" name="scrollAreaWidgetContents">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>545</width>
+            <height>367</height>
+           </rect>
+          </property>
+         </widget>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <spacer name="horizontalSpacer_7">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="_frameLabel">
+           <property name="text">
+            <string>Frame</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_8">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="CGTVideoControls" name="_videoControl" native="true"/>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="layoutWidget">
+      <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0">
+       <item>
+        <widget class="QScrollArea" name="_regionScrollArea">
+         <property name="widgetResizable">
+          <bool>true</bool>
+         </property>
+         <widget class="QWidget" name="scrollAreaWidgetContents_2">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>405</width>
+            <height>398</height>
+           </rect>
+          </property>
+         </widget>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="_controlsLayout">
+         <item>
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="RegionViewControl" name="_view_control" native="true"/>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_4">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CGTVideoControls</class>
+   <extends>QWidget</extends>
+   <header>cgt.gui.cgtvideocontrols</header>
+  </customwidget>
+  <customwidget>
+   <class>RegionViewControl</class>
+   <extends>QWidget</extends>
+   <header>cgt.gui.regionviewcontrol</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>_view_control</sender>
+   <signal>state_change()</signal>
+   <receiver>VideoRegionSelectionWidget</receiver>
+   <slot>set_opertating_mode()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>773</x>
+     <y>426</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>495</x>
+     <y>229</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_view_control</sender>
+   <signal>change_edit_region()</signal>
+   <receiver>VideoRegionSelectionWidget</receiver>
+   <slot>editing_rectangle_changed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>773</x>
+     <y>426</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>495</x>
+     <y>229</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_view_control</sender>
+   <signal>change_delete_region()</signal>
+   <receiver>VideoRegionSelectionWidget</receiver>
+   <slot>delete_rectangle_changed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>773</x>
+     <y>433</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>495</x>
+     <y>229</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_view_control</sender>
+   <signal>change_display_region()</signal>
+   <receiver>VideoRegionSelectionWidget</receiver>
+   <slot>display_rectangle_changed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>773</x>
+     <y>433</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>495</x>
+     <y>229</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
