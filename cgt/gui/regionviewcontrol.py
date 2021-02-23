@@ -56,31 +56,31 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
             Returns:
                 None
         """
-        super().__init__()
+        super().__init__(parent)
         self.setupUi(self)
 
         # the parent holding the data store
         self._data_source = None
-        
+
         ## instructions
         self._inst_create = self.tr("""
         <p>To draw a region, left click down then drag.</p><p>On release you will have the options of storing, deleting or cancelling.</p><p>If cancelled you can access the options again by left clicking.</p>""")
-    
+
         self._ints_edit = self.tr("""
         <p>Left click and drag on corners to adjust size</P><p>Left click and drag on centre to move region</p>
         """)
-        
+
         self._inst_display = self.tr("""
         <p>Review your work.</p><p>Use the selection box to choose the region, or all.</p>
         """)
-        
+
         self._inst_delete = self.tr("""
         <p>Left mouse button to select for delete. Click "yes" on pop-up to complete.</p>
         <p>This is not reversable.</p>
         """)
-        
+
         self.display_instructions()
-        
+
     def set_data_source(self, data_source):
         """
         assign the object holding the data on rectangles
@@ -114,14 +114,14 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
         emit the signal for editing box changed
         """
         self.change_edit_region.emit()
-        
+
     @qc.pyqtSlot(int)
     def display_combo_changed(self):
         """
         emit the signal for display box changed
         """
         self.change_display_region.emit()
-        
+
     @qc.pyqtSlot(int)
     def delete_combo_changed(self):
         """
@@ -133,14 +133,14 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
         """
         the results have changed reload combo boxes
         """
-        all = self.tr("All")
-        
+        all_text = self.tr("All")
+
         self._editComboBox.clear()
         self._displayComboBox.clear()
-        self._displayComboBox.addItem(all)
+        self._displayComboBox.addItem(all_text)
         self._deleteComboBox.clear()
-        self._deleteComboBox.addItem(all)
-        
+        self._deleteComboBox.addItem(all_text)
+
         for rectangle_index in range(0, self._data_source.get_data().length):
             text = str(rectangle_index + 1)
             self._editComboBox.addItem(text)
@@ -149,10 +149,10 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
 
         if not self._editRegionButton.isEnabled():
             self._editRegionButton.setEnabled(True)
-            
+
         if not self._displayMultipleButton.isEnabled():
             self._displayMultipleButton.setEnabled(True)
-            
+
         if not self._deleteButton.isEnabled():
             self._deleteButton.setEnabled(True)
 
@@ -164,11 +164,13 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
         """
         if self._editRegionButton.isChecked():
             return self._editComboBox.currentIndex()
-        elif self._displayMultipleButton.isChecked():
+
+        if self._displayMultipleButton.isChecked():
             return self._displayComboBox.currentIndex()
-        elif self._deleteButton.isChecked():
+
+        if self._deleteButton.isChecked():
             return self._deleteComboBox.currentIndex()
-            
+
         return -1
 
     def enable_combo_boxes(self):
@@ -189,22 +191,27 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
         self._editComboBox.setEnabled(edit_box)
         self._displayComboBox.setEnabled(display_box)
         self._deleteComboBox.setEnabled(delete_box)
-        
+
     qc.pyqtSlot(int)
     def show_hide_instructions(self, value):
+        """
+        toggel the instructions on/off
+            Args:
+                value (bool) if True instructions visible else hidden
+        """
         if value == 0:
             self._instructionsBrowser.setVisible(False)
             self._instructionsBrowser.clear()
         else:
             self._instructionsBrowser.setVisible(True)
             self.display_instructions()
-            
+
     def display_instructions(self):
         """
-        display the instructions 
+        display the instructions
         """
         self._instructionsBrowser.clear()
-        
+
         if self._createRegionButton.isChecked():
             self._instructionsBrowser.append(self._inst_create)
         elif self._editRegionButton.isChecked():

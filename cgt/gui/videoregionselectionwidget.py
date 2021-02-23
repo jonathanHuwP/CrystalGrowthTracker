@@ -204,11 +204,11 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self.setup_label(self._display_label)
         self.move_label_to_main_scroll(self._display_label)
         self._display_label.display_rectangle(0)
-        
+
         self._create_label = None
         self._edit_label = None
         self._delete_label = None
-        
+
     def make_delete_label(self):
         """
         set up label for display
@@ -217,9 +217,9 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self.setup_label(self._delete_label)
         self.move_label_to_main_scroll(self._delete_label)
         self._delete_label.display_rectangle(0)
-        
+
         self._delete_label.region_selected.connect(self.selected_for_delete)
-        
+
         self._create_label = None
         self._edit_label = None
         self._display_label = None
@@ -237,20 +237,21 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
 
         h_bar = self._videoScrollArea.horizontalScrollBar()
         v_bar = self._videoScrollArea.verticalScrollBar()
-        dx = h_bar.value()
-        dy = v_bar.value()
+        old_x = h_bar.value()
+        old_y = v_bar.value()
 
         self._videoScrollArea.setWidget(label)
 
-        # when adding a widget the max of scroll bars is set to zero
-        if dx > h_bar.maximum():
-            h_bar.setMaximum(dx)
-        
-        if dy > v_bar.maximum():
-            v_bar.setMaximum(dy)
-        
-        h_bar.setValue(dx)
-        v_bar.setValue(dy)
+        # the following is needed becaues when a widget
+        # is added the max of scroll bars defaults to zero
+        if old_x > h_bar.maximum():
+            h_bar.setMaximum(old_x)
+
+        if old_y > v_bar.maximum():
+            v_bar.setMaximum(old_y)
+
+        h_bar.setValue(old_x)
+        v_bar.setValue(old_y)
 
     def setup_label(self, label):
         """
@@ -420,7 +421,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         height = image.height()*self._current_zoom
         width = image.width()*self._current_zoom
-        
+
         transform = qt.Qt.SmoothTransformation
         if self._videoControl.use_fast_transform():
             transform = qt.Qt.FastTransformation
@@ -466,7 +467,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
             self._display_label.set_zoom(value)
         elif self._delete_label is not None:
             self._delete_label.set_zoom(value)
-            
+
         self.display()
 
     @qc.pyqtSlot()
@@ -536,7 +537,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         store the current rectangle
         """
         self._subimage_label.clear()
-        index = self._data_store.append(self._current_rectangle)
+        self._data_store.append(self._current_rectangle)
         self._view_control.data_changed()
         self.clear_subimage()
 
@@ -583,7 +584,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
 
         if index > -1:
             self._display_label.display_rectangle(index)
-            
+
     @qc.pyqtSlot()
     def delete_rectangle_changed(self):
         """
@@ -599,6 +600,11 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
 
     @qc.pyqtSlot(int)
     def selected_for_delete(self, index):
+        """
+        callback for the user requesing deletion of rectangle, offers pop-up question
+            Args:
+                index (int) the list index of the selected region
+        """
         message = self.tr(f"Do you wish to remove region {index+1}. Cannot be reversed.")
         mb_reply = qw.QMessageBox.question(self,
                                            'CrystalGrowthTracker',
@@ -609,11 +615,11 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         if mb_reply == qw.QMessageBox.Yes:
             self._data_store.remove(index)
             self._view_control.data_changed()
-    
+
     def get_data(self):
         """
         get the data store
             Returns:
-                pointer to data (SimulatedDataStore) 
+                pointer to data (SimulatedDataStore)
         """
         return self._data_store

@@ -22,12 +22,14 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = c-extension-no-member
 
 import socket
-from sys import platform as _platform
 import datetime
-import cv2
-import PyQt5.QtGui as qg
-import numpy as np
+
+from sys import platform as _platform
 import array as arr
+import PyQt5.QtGui as qg
+
+import cv2
+import numpy as np
 
 def memview_3b_to_qpixmap(pixels, width, height):
     """
@@ -261,4 +263,4 @@ def rectangle_to_string(rect):
     """
     top_left = rect.topLeft()
     size = rect.size()
-    return f"Label: rectangle({top_left.x()}, {top_left.y()}) ({size.width()}, {size.height()})"
+    return f"QRect({top_left.x()}, {top_left.y()}) ({size.width()}, {size.height()})"

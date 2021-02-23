@@ -146,7 +146,7 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         """
         self.enable_fine_controls()
         self.pause.emit()
-        
+
     def use_fast_transform(self):
         """
         get the users choice of scalling transform
