@@ -4,7 +4,6 @@ cgt/temp/Grayscale*.png
 cgt/temp/Histogram*.png
 cgt/temp/Mean1.png
 Ui_*
-*_ui.py
 *.log
 .project
 .pydevproject
