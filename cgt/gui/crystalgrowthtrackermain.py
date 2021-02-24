@@ -123,6 +123,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         elif tab_index == self._tabWidget.indexOf(self._selectTab):
             if self.has_project():
                 self._selectWidget.setEnabled(True)
+                self._selectWidget.redisplay()
 
     def has_project(self):
         """
@@ -674,6 +675,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
             # start the thread
             self._video_thread.start()
+            
+            self._selectWidget.load_video_and_data()
 
         except (FileNotFoundError, IOError) as ex:
             message_box.close()

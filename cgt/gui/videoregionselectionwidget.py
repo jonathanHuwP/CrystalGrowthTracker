@@ -40,6 +40,9 @@ from cgt.gui.regioncreationlabel import RegionCreationLabel
 from cgt.gui.regioneditlabel import RegionEditLabel
 from cgt.gui.regiondisplaylabel import RegionDisplayLabel
 
+# for development only
+from cgt.util.simulateddatastore import SimulatedDataStore
+
 from cgt.gui.videoregionselectionwidgetstates import VideoRegionSelectionWidgetStates as states
 
 # import UI
@@ -69,6 +72,9 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         super().__init__(parent)
         self.setupUi(self)
+        
+        # for development only
+        self._data_store = SimulatedDataStore()
 
         ## required as QWidget .parent() returns vanilla QWidget
         self._data_source = data_source
@@ -245,7 +251,14 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         print("load video and controls")
         self._videoControl.set_range(self._data_source.get_video_length())
-        self._view_control.set_data_source(self._data_source)
+        # TODO data in main
+        self._view_control.set_data_source(self)
+        
+    def redisplay(self):
+        """
+        get and redisplay the current frame
+        """
+        self.request_frame(self._current_frame)
 
     def connect_controls(self):
         """
