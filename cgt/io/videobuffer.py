@@ -37,13 +37,13 @@ class VideoBuffer(qc.QObject):
     ## signal that a frame is ready to display
     display_image = qc.pyqtSignal(qg.QPixmap, int)
 
-    def __init__(self, path, region_view):
+    def __init__(self, path, queue_holder):
         """
         initalize by usng opencv opening the video file
 
             Args:
                 path (string) the path to the video file
-                region_view (qwidget) the viewer for the video
+                queue_holder (qwidget) the object holding the queue
         """
         super().__init__()
 
@@ -54,8 +54,10 @@ class VideoBuffer(qc.QObject):
         self._length = int(self._video_reader.get(cv2.CAP_PROP_FRAME_COUNT))
 
         ## pointer to the region view
-        self._region_view = region_view
+        self._queue_holder = queue_holder
 
+        ## the running flag
+        self._running = True
 
     def get_length(self):
         """
@@ -75,8 +77,8 @@ class VideoBuffer(qc.QObject):
             Returns:
                 None
         """
-        while True:
-            if not self._region_view.get_frame_queue().is_empty():
+        while self._running:
+            if not self._queue_holder.get_frame_queue().is_empty():
                 self.make_frame()
 
     def make_frame(self):
@@ -87,8 +89,9 @@ class VideoBuffer(qc.QObject):
             Returns:
                 None
         """
-        frame = self._region_view.get_frame_queue().pop()
+        frame = self._queue_holder.get_frame_queue().pop()
 
+        # get cv2 image green/red/blue
         self._video_reader.set(cv2.CAP_PROP_POS_FRAMES, frame)
         flag, img = self._video_reader.read()
 
@@ -96,8 +99,20 @@ class VideoBuffer(qc.QObject):
             message = f"failed to read image for frame {frame}"
             raise ValueError(message)
 
-        # convert to Qt cv2 produces image in green/red/blue
+        # convert cv2 image to Qt pimage
         image = nparray_to_qimage(img, True)
 
-        # call the region viewing object with the image and frame
+        # call the region viewing object with the image pixamp and frame number
         self.display_image.emit(qg.QPixmap.fromImage(image), frame)
+
+    def stop(self):
+        """
+        stop making frames
+        """
+        self._running = False
+
+    def start(self):
+        """
+        start making frames
+        """
+        self._running = True
