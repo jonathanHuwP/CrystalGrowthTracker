@@ -500,7 +500,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self._project = project
         self.set_video_scale_parameters()
-        self._frame_queue = Queue(256)
+        self._frame_queue = QThreadSafeQueue()
         self.save_project()
         self.project_created_or_loaded()
 

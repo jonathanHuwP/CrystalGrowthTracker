@@ -95,43 +95,6 @@ def save_csv_results(project):
     header = ["Frame", "Start x", "Start y", "End x", "End y", "Line Index"]
     save_array_cvs(project, title, header, line_segments_array)
 
-    save_region_images(project)
-
-def save_region_images(project):
-    """
-    save the images of the start and end frames of each region.
-
-        Args:
-            project (CGTProject): the project holding the results, must not be None
-        Returns:
-            None
-        Throws:
-            Error if a file cannot be opened
-    """
-    results = project["results"]
-
-    if results is None or len(results.region_images) < 1:
-        return
-
-    path = pathlib.Path(project["proj_full_path"])
-    path = path.joinpath("images")
-    path.mkdir(parents=True, exist_ok=True)
-
-    regions = results.regions
-    images = results.region_images
-
-    for i, start_end in enumerate(images):
-        name_root = f"Region_{str(i)}"
-        np.savez_compressed(path.joinpath(name_root), start=start_end[0], end=start_end[1])
-
-        name = name_root + "_" + str(regions[i].start_frame) + ".png"
-        image = nparray_to_qimage(start_end[0])
-        image.save(str(path.joinpath(name)), quality=100)
-
-        name = name_root + "_" + str(regions[i].end_frame) + ".png"
-        image = nparray_to_qimage(start_end[1])
-        image.save(str(path.joinpath(name+".png")), quality=100)
-
 def save_array_cvs(info, title, header, data_array):
     """
     writes an array into a commer seperated values files
