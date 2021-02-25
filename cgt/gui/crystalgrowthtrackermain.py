@@ -320,8 +320,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             return
 
         # grab tab image
-        pixmap = widget.get_pixmap()
-        if pixmap is None:
+        image = widget.get_image_copy()
+        if image is None:
             message = self.tr("You do not appear to be displaying an image.")
             qw.QMessageBox.information(self, self.tr("Save Image"), message)
             return
@@ -334,7 +334,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         if file_path is None or file_path == '':
             return
-        pixmap.save(file_path, quality=100)
+        image.save(file_path, quality=100)
 
         message = f"Image saved to {file_path}"
         qw.QMessageBox.information(self, self.tr("Save Image"), message)

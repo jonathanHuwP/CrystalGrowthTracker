@@ -614,4 +614,11 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         self._current_label.clear()
         self._subimage_label.clear()
-        print("Selection Widget clear")
+
+    def get_image_copy(self):
+        """
+        get the current main image
+            Returns:
+                deep copy of current image (QImage)
+        """
+        return self._current_image.copy()
