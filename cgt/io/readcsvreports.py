@@ -23,6 +23,7 @@ import csv
 import numpy as np
 from pathlib import Path
 from itertools import groupby
+from PyQt5.QtCore import QRect, QPoint
 
 from cgt.model.videoanalysisresultsstore import VideoAnalysisResultsStore
 from cgt.model.line import Line
@@ -149,13 +150,12 @@ def store_regions(store, regions_data, dirpath):
         left = int(region["Left"])
         bottom = int(region["Bottom"])
         right = int(region["Right"])
-        start_frame = int(region["Start frame"])
-        end_frame = int(region["End frame"])
 
-        tmp_region = Region(top, left, bottom, right, start_frame, end_frame)
-        start_end = read_argb_numpy_images(dirpath, i)
+        point_tl = QPoint(left, top)
+        point_br = QPoint(right, bottom)
+        tmp_region = QRect(point_tl, point_br)
 
-        store.add_region(tmp_region, start_end)
+        store.add_region(tmp_region)
 
 def read_argb_numpy_images(dirpath, i):
     """

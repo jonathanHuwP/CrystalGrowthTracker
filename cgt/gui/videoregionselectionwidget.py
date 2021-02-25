@@ -76,9 +76,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         ## required as QWidget .parent() returns vanilla QWidget
         self._data_source = data_source
 
-        ## the frame queue
-        self._frame_queue = QThreadSafeQueue(self)
-
         ## state variable determines if video is playing
         self._playing = PlayStates.MANUAL
 
@@ -249,9 +246,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         initalize the controls
         """
-        print("load video and controls")
         self._videoControl.set_range(self._data_source.get_video_length())
-        # TODO data in main
         self._view_control.set_data_source(self)
 
     def redisplay(self):
@@ -316,14 +311,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
 
         img = self.apply_zoom_to_image(self._current_subimage)
         self._subimage_label.setPixmap(qg.QPixmap(img))
-
-    def get_frame_queue(self):
-        """
-        getter for the frame queue
-            Returns:
-                pointer to the frame queue
-        """
-        return self._frame_queue
 
     def is_playing(self):
         """
@@ -411,12 +398,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
 
         return image.scaled(width, height, transformMode=transform)
 
-    def clear_queue(self):
-        """
-        clear the video buffer queue
-        """
-        self._frame_queue.clear()
-
     @qc.pyqtSlot(bool)
     def start_end(self, end):
         """
@@ -476,7 +457,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         pause the playing
         """
-        self.clear_queue()
+        self._data_source.clear_queue()
         self._playing = PlayStates.MANUAL
 
     @qc.pyqtSlot()
@@ -484,7 +465,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         start playing forward
         """
-        self.clear_queue()
+        self._data_source.clear_queue()
         self._playing = PlayStates.PLAY_FORWARD
         self.request_frame((self._current_frame+1)%self._data_source.get_video_length())
 
@@ -493,7 +474,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         start playing in reverse
         """
-        self.clear_queue()
+        self._data_source.clear_queue()
         self._playing = PlayStates.PLAY_BACKWARD
         self.request_frame((self._current_frame-1)%self._data_source.get_video_length())
 

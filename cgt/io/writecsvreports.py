@@ -59,12 +59,10 @@ def save_csv_results(project):
 
     for index, region in enumerate(results.regions):
         regions_array.append([index,
-                              region.top,
-                              region.left,
-                              region.bottom,
-                              region.right,
-                              region.start_frame,
-                              region.end_frame])
+                              region.top(),
+                              region.left(),
+                              region.bottom(),
+                              region.right()])
 
     lines_array = []
     line_segments_array = []
@@ -84,7 +82,7 @@ def save_csv_results(project):
                                         index])
 
     title = r"_project_regions.csv"
-    header = ("Region index", "Top", "Left", "Bottom", "Right", "Start frame", "End frame")
+    header = ("Region index", "Top", "Left", "Bottom", "Right")
     save_array_cvs(project, title, header, regions_array)
 
     title = r"_project_lines.csv"

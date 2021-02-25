@@ -207,7 +207,7 @@ class RegionEditLabel(RegionBaseLabel):
             Returns:
                 None
         """
-        # pass on to get pixmap displayed
+        # pass on event
         qw.QLabel.paintEvent(self, event)
         if self._rectangle is not None:
             self.draw_rectangle(self._rectangle)

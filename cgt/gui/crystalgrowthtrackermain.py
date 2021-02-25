@@ -559,6 +559,12 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         self._frame_queue.push(frame_number)
 
+    def clear_queue(self):
+        """
+        clear the queue of video frames to be displayed
+        """
+        self._frame_queue.clear()
+
     def get_frame_queue(self):
         """
         getter for the queue of frames to be displayed
