@@ -54,15 +54,11 @@ class RegionCreationLabel(RegionBaseLabel):
     ## signal to store the current rectangle
     store_rectangle = qc.pyqtSignal()
 
-    def __init__(self, parent=None):
+    def __init__(self, parent):
         """
         Set up the label
-
             Args:
-                parent (VideoRegionSelectionWidget) the parent object
-
-            Returns:
-                None
+                parent (VideoRegionSelectionWidget) the parent widget
         """
         super().__init__(parent)
 
@@ -101,7 +97,7 @@ class RegionCreationLabel(RegionBaseLabel):
             Returns:
                 None
         """
-        if self.get_parent().is_playing() or event.button() != qc.Qt.LeftButton:
+        if self.get_select_widget().is_playing() or event.button() != qc.Qt.LeftButton:
             return
 
         if self._create_state == CreateStates.READY_TO_MAKE:
@@ -161,7 +157,7 @@ class RegionCreationLabel(RegionBaseLabel):
             Returns:
                 None
         """
-        if self.get_parent().is_playing() or event.buttons() != qc.Qt.LeftButton:
+        if self.get_select_widget().is_playing() or event.buttons() != qc.Qt.LeftButton:
             return
 
         if self._rectangle is None:
@@ -182,7 +178,7 @@ class RegionCreationLabel(RegionBaseLabel):
             Returns:
                 None
         """
-        if self.get_parent().is_playing():
+        if self.get_select_widget().is_playing():
             return
 
         if event.button() != qc.Qt.LeftButton:

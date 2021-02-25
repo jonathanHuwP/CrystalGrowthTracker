@@ -87,7 +87,8 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
             Args:
                 data_source (object) the widget holding the data
         """
-        self._data_source = data_source
+        print(f"viewcontrol set source {type(data_source.get_data())}")
+        self._data_source = data_source.get_data()
 
     @qc.pyqtSlot(qw.QAbstractButton)
     def button_clicked(self, button):
@@ -141,7 +142,7 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
         self._deleteComboBox.clear()
         self._deleteComboBox.addItem(all_text)
 
-        for rectangle_index in range(0, self._data_source.get_data().length):
+        for rectangle_index in range(0, self._data_source.get_results().number_of_regions):
             text = str(rectangle_index + 1)
             self._editComboBox.addItem(text)
             self._displayComboBox.addItem(text)

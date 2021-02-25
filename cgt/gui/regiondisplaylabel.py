@@ -40,12 +40,8 @@ class RegionDisplayLabel(RegionBaseLabel):
     def __init__(self, parent):
         """
         Set up the label
-
             Args:
-                parent (VideoRegionSelectionWidget) the parent object
-
-            Returns:
-                None
+                parent (VideoRegionSelectionWidget) the parent widget
         """
         super().__init__(parent)
 
@@ -74,20 +70,20 @@ class RegionDisplayLabel(RegionBaseLabel):
             Returns:
                 None
         """
-        if self.get_parent().is_playing() or event.button() != qc.Qt.LeftButton:
+        if self.get_select_widget().is_playing() or event.button() != qc.Qt.LeftButton:
             return
 
         if self._index < 0:
             return
 
         if self._index == 0:
-            for i in range(0, self.get_parent().get_data().length):
-                rect = self.get_parent().get_data().get_region(i)
+            for i in range(0, self.get_select_widget().get_data().get_results().number_of_regions):
+                rect = self.get_select_widget().get_data().get_results().regions[i]
                 if rect.contains(event.pos()):
                     self.region_selected.emit(i)
                     return
         else:
-            rect = self.get_parent().get_data().get_region(self._index-1)
+            rect = self.get_select_widget().get_data().get_results().regions[self._index-1]
             if rect.contains(event.pos()):
                 self.region_selected.emit(self._index-1)
 
@@ -104,11 +100,11 @@ class RegionDisplayLabel(RegionBaseLabel):
         # pass on to get pixmap displayed
         qw.QLabel.paintEvent(self, event)
         if self._index == 0:
-            stop = self.get_parent().get_data().length
+            stop = self.get_select_widget().get_data().get_results().number_of_regions
             for i in range(0, stop):
-                rectangle = self.get_parent().get_data().get_region(i)
+                rectangle = self.get_select_widget().get_data().get_results().regions[i]
                 self.draw_rectangle(rectangle)
         else:
             i = self._index - 1
-            rectangle = self.get_parent().get_data().get_region(i)
+            rectangle = self.get_select_widget().get_data().get_results().regions[i]
             self.draw_rectangle(rectangle)

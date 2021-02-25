@@ -72,9 +72,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         super().__init__(parent)
         self.setupUi(self)
-        
-        # for development only
-        self._data_store = SimulatedDataStore()
 
         ## required as QWidget .parent() returns vanilla QWidget
         self._data_source = data_source
@@ -164,7 +161,8 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         index = self._view_control.get_current_rectangle()
 
         if index > -1:
-            self._edit_label.set_rectangle(self._data_store.get_region(index), index)
+            regions = self._data_source.get_results().regions
+            self._edit_label.set_rectangle(regions[index], index)
             self.rectangle_drawn()
 
         self._create_label = None
@@ -178,7 +176,8 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._display_label = RegionDisplayLabel(self)
         self.setup_label(self._display_label)
         self.move_label_to_main_scroll(self._display_label)
-        self._display_label.display_rectangle(0)
+        index = self._view_control.get_current_rectangle()
+        self._display_label.display_rectangle(index)
 
         self._create_label = None
         self._edit_label = None
@@ -191,7 +190,8 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._delete_label = RegionDisplayLabel(self)
         self.setup_label(self._delete_label)
         self.move_label_to_main_scroll(self._delete_label)
-        self._delete_label.display_rectangle(0)
+        index = self._view_control.get_current_rectangle()
+        self._delete_label.display_rectangle(index)
 
         self._delete_label.region_selected.connect(self.selected_for_delete)
 
@@ -253,7 +253,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._videoControl.set_range(self._data_source.get_video_length())
         # TODO data in main
         self._view_control.set_data_source(self)
-        
+
     def redisplay(self):
         """
         get and redisplay the current frame
@@ -520,7 +520,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         store the current rectangle
         """
         self._subimage_label.clear()
-        self._data_store.append(self._current_rectangle)
+        self._data_source.append_region(self._current_rectangle)
         self._view_control.data_changed()
         self.clear_subimage()
 
@@ -540,7 +540,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
             return
 
         data = self._edit_label.get_rectangle_and_index()
-        self._data_store.replace_region(data[0], data[1])
+        self._data_source.get_results().replace_region(data[0], data[1])
 
     @qc.pyqtSlot()
     def editing_rectangle_changed(self):
@@ -553,7 +553,8 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         index = self._view_control.get_current_rectangle()
 
         if index > -1:
-            self._edit_label.set_rectangle(self._data_store.get_region(index), index)
+            results = self._data_source.get_results()
+            self._edit_label.set_rectangle(results.regions[index], index)
 
     @qc.pyqtSlot()
     def display_rectangle_changed(self):
@@ -596,7 +597,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
                                            qw.QMessageBox.No)
 
         if mb_reply == qw.QMessageBox.Yes:
-            self._data_store.remove(index)
+            self._data_source.remove_region(index)
             self._view_control.data_changed()
 
     def get_data(self):
@@ -605,7 +606,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
             Returns:
                 pointer to data (SimulatedDataStore)
         """
-        return self._data_store
+        return self._data_source
 
     def clear(self):
         """

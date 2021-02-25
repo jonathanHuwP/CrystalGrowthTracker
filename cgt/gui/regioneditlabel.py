@@ -58,14 +58,11 @@ class RegionEditLabel(RegionBaseLabel):
     def __init__(self, parent):
         """
         Set up the label
-
             Args:
-                parent (VideoRegionSelectionWidget) the parent object
-
-            Returns:
-                None
+                parent (VideoRegionSelectionWidget) the parent widget
         """
         super().__init__(parent)
+
         ## the current rectangle
         self._rectangle = None
 
@@ -122,7 +119,7 @@ class RegionEditLabel(RegionBaseLabel):
             Returns:
                 None
         """
-        if self.get_parent().is_playing() or event.button() != qc.Qt.LeftButton:
+        if self.get_select_widget().is_playing() or event.button() != qc.Qt.LeftButton:
             return
 
         if self._rectangle is None:
@@ -155,7 +152,7 @@ class RegionEditLabel(RegionBaseLabel):
                 None
         """
 
-        if self.get_parent().is_playing() or event.buttons() != qc.Qt.LeftButton:
+        if self.get_select_widget().is_playing() or event.buttons() != qc.Qt.LeftButton:
             return
 
         if self._rectangle is None:
@@ -191,7 +188,7 @@ class RegionEditLabel(RegionBaseLabel):
             Returns:
                 None
         """
-        if self.get_parent().is_playing() or event.button() != qc.Qt.LeftButton:
+        if self.get_select_widget().is_playing() or event.button() != qc.Qt.LeftButton:
             return
 
         if self._adjustment_point == AdjustmentPoints.NONE:

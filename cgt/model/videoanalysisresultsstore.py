@@ -21,6 +21,8 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = too-many-public-methods
 # pylint: disable = too-many-arguments
 
+import PyQt5.QtCore as qc
+
 class VideoAnalysisResultsStore:
     """
     a storage class that records the results of a video analysis
@@ -36,9 +38,6 @@ class VideoAnalysisResultsStore:
         """
         ## storage for the regions
         self._regions = []
-
-        ## store for the first and last images of each region (tuple)
-        self._region_images = []
 
         ## storage for the lines
         self._lines = []
@@ -90,16 +89,6 @@ class VideoAnalysisResultsStore:
         """
         return self._regions
 
-    @property
-    def region_images(self):
-        """
-        getter for the array of image tuples
-
-            Returns:
-                region images array (numpy.array, numpy.array)
-        """
-        return self._region_images
-
     def reserve_regions(self, size):
         """
         set the size of the regions array, will overwrite all existing enteries
@@ -111,44 +100,54 @@ class VideoAnalysisResultsStore:
                 None
         """
         self._regions.extend(['']*size)
-        self._region_images.extend(['']*size)
 
-    def insert_region(self, region, region_images, index):
+    def insert_region(self, region, index):
         """
         insert a region at a specified index in the regions array, will overwrite existing
-
             Args:
                 region (Region) the region to be added
-                region_images ((numpy.array, numpy.array)) the start/end images
                 index (int) the index at which the region is to be located
-
-            Returns:
-                None
-
             Throws:
                 IndexError if index out of range
         """
         self._regions[index] = region
-        self._region_images[index] = region_images
         self.set_changed()
 
-    def add_region(self, region, region_images):
+    def add_region(self, region):
         """
         add a crystal to the results
-
             Args:
                 region (Region) the region to be added
-                region_images ((numpy.array, numpy.array)) the start/end images
-
             Reterns:
                 index of the new region
         """
         index = len(self._regions)
         self._regions.append(region)
-        self._region_images.append(region_images)
         self.set_changed()
-        print(f"results: image added: {len(self._region_images)}")
         return index
+
+    def replace_region(self, region, index):
+        """
+        replace an existing region
+            Args:
+                rectangle (QRect) the new region
+                index (int) the list index
+            Throws:
+                IndexError: pop index out of range
+        """
+        self._regions[index] = region
+
+    def remove_region(self, index):
+        """
+        remove an item
+            Args:
+                index (int) the index of the item to be removed
+            Throws:
+                IndexError: pop index out of range
+        """
+        self._regions.pop(index)
+        self._region_line_association.removed_region(index)
+        self.set_changed()
 
     @property
     def lines(self):
@@ -162,7 +161,6 @@ class VideoAnalysisResultsStore:
     def number_of_regions(self):
         """
         getter for the number of regions in the store
-
             Returns:
                 the number of regions
         """
@@ -171,10 +169,8 @@ class VideoAnalysisResultsStore:
     def get_lines(self, region_index):
         """
         get all the lines associated with region at region_index
-
             Args:
                 region_index (int) the array index of the region
-
             Returns:
                 a list of lines in the region
         """
@@ -192,10 +188,8 @@ class VideoAnalysisResultsStore:
     def get_lines_and_indices(self, region_index):
         """
         get all the lines, and their list indices, associated with region at region_index
-
             Args:
                 region_index (int) the array index of the region
-
             Returns:
                 a list of (line_index, line) of lines in the region
         """
@@ -213,13 +207,9 @@ class VideoAnalysisResultsStore:
     def add_line(self, region_index, line):
         """
         add a line
-
             Args:
                 region_index (int) the array index of the line
                 line (Line) the line to be added
-
-            Returns:
-                None
         """
         self._lines.append(line)
         line_index = len(self._lines)-1
@@ -229,7 +219,7 @@ class VideoAnalysisResultsStore:
 class RegionLineAssociation(list):
     """
     array of pairs associating regions, with lines, each line
-    must appear only once, it the the users respocibility to
+    must appear only once, it the the users responsibility to
     enforce this
     """
     def __init__(self):
@@ -238,23 +228,17 @@ class RegionLineAssociation(list):
     def add_association(self, region_index, line_index):
         """
         add a region line association
-
             Args:
                 region_index (int) the array index of the region
                 line_index (int) the array index of the region
-
-            Returns:
-                None
         """
         self.append((region_index, line_index))
 
     def get_region(self, line_index):
         """
         get a region given the index of the line
-
             Args:
                 line_index (int) the array index of the line
-
             Returns:
                 the array index of the region, or None if line is unknown
         """
@@ -267,10 +251,8 @@ class RegionLineAssociation(list):
     def get_lines_for_region(self, region_index):
         """
         get the lines in a region
-
             Args:
                 region_index (int) the array index of the region
-
             Returns:
                 a list of the the array indecies of the lines in the region
         """
@@ -280,3 +262,18 @@ class RegionLineAssociation(list):
                 tmp.append(pair[1])
 
         return tmp
+
+    def removed_region(self, index):
+        """
+        remove region and reduce the indices in associations with larger region indices
+            Args:
+                index (int) the index of the region that no longer exists
+        """
+        tmp = [x for x in self if x[0] == index]
+        for item in tmp:
+            self.remove(item)
+
+        for i, item in enumerate(self):
+            if item[0] > index:
+                self[i] = (item[0]-1, item[1])
+

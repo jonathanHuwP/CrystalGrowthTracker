@@ -105,12 +105,12 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         # the thread for the VideoBuffer
         self._video_thread = None
-        
+
         # connect tab widget to change function
         self._tabWidget.currentChanged.connect(self.tab_changed)
         # set up the title
         self.set_title()
-        
+
     @qc.pyqtSlot(int)
     def tab_changed(self, tab_index):
         """
@@ -132,7 +132,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 True if project loaded, else False
         """
         return not (self._project is None or self._video_reader is None)
-            
+
     def add_tab(self, tab_widget, target_widget, title):
         """
         add a new tab
@@ -284,7 +284,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         if self._video_thread is not None:
             self._video_thread.quit()
             self._video_thread.wait()
-            
+
         self._video_reader = None
         self._video_thread = None
 
@@ -587,20 +587,25 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         return self._project
 
-    def append_region(self, region, region_images):
+    def append_region(self, region):
         """
         add a region to the results and notify the crystal drawing widget
-
             Args:
-                region (Region) the region
-                region_images ((numpy.array. numpy.array)) start, end images of region
-
-            Returns:
-                None
+                region (QRect) the region
         """
-        self._project["results"].add_region(region, region_images)
-        self._drawingWidget.new_region()
-        self._resultsWidget.display_data()
+        self._project["results"].add_region(region)
+        #self._drawingWidget.new_region()
+        #self._resultsWidget.display_data()
+
+    def remove_region(self, region_index):
+        """
+        remove a region from the results and notify the crystal drawing widget
+            Args:
+                region (QRect) the region
+        """
+        self._project["results"].remove_region(region_index)
+        #self._drawingWidget.new_region()
+        #self._resultsWidget.display_data()
 
     def append_lines(self, region_index, lines):
         """
@@ -660,7 +665,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         message_box = qw.QMessageBox()
         message_box.setText("Loading Video.")
         message_box.setInformativeText("Loading video may take some time.")
-        
+
         try:
             message_box.show()
             # make the objects
@@ -675,7 +680,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
             # start the thread
             self._video_thread.start()
-            
+
             self._selectWidget.load_video_and_data()
 
         except (FileNotFoundError, IOError) as ex:
@@ -748,7 +753,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             return
 
         self._resultsWidget.save(file_path)
-        
+
     def get_video_length(self):
         """
         get the length of the video

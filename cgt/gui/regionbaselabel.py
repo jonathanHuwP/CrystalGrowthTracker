@@ -38,21 +38,23 @@ class RegionBaseLabel(qw.QLabel):
     def __init__(self, parent):
         """
         Set up the label
-
             Args:
-                parent (VideoRegionSelectionWidget) the parent object
-
-            Returns:
-                None
+                parent (VideoRegionSelectionWidget) the parent widget
         """
         super().__init__(parent)
 
-        ## store drawing widget (PyQt5 .parent() returns a vanilla widget)
-        self._parent = parent
+        ## store seperatly as the PyQt5 .parent() returns a vanilla QWidget
+        self._select_widget = parent
 
         ## the zoom transformatin
         self._zoom_transform = qg.QTransform().scale(1.0, 1.0)
         self._inverse_zoom, _= self._zoom_transform.inverted()
+
+    def set_data_source(self, data_source):
+        """
+        assign the data source
+        """
+        self._data_source = data_source
 
     def draw_rectangle(self, rectangle):
         """
@@ -86,10 +88,10 @@ class RegionBaseLabel(qw.QLabel):
         self._zoom_transform = qg.QTransform().scale(value, value)
         self._inverse_zoom, _= self._zoom_transform.inverted()
 
-    def get_parent(self):
+    def get_select_widget(self):
         """
-        getter for the parent required because PyQt5 .parent()
-        method only returns a vanilla QWidget, no matter what class
-        of object was originally provided.
+        getter for the select widget
+            Returns:
+                the data source (Object)
         """
-        return self._parent
+        return self._select_widget
