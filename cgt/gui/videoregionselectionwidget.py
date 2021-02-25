@@ -505,6 +505,12 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         self._view_control.data_changed()
         self.clear_subimage()
 
+    def data_changed(self):
+        """
+        allow parent widget to notify controls of a change of data
+        """
+        self._view_control.data_changed()
+
     def clear_subimage(self):
         """
         remove the subimage and rectangle

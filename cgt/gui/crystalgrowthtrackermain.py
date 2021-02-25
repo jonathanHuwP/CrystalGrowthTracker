@@ -266,7 +266,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 self._selectWidget.load_video_and_data()
                 #self._drawingWidget.new_region()
 
-        #self._selectWidget.setEnabled(False)
+        self._selectWidget.data_changed()
         #self._drawingWidget.setEnabled(False)
         #self._resultsWidget.display_data()
 
