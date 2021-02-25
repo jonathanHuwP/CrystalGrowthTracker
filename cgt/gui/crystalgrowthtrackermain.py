@@ -41,6 +41,7 @@ from cgt.gui.projectstartdialog import ProjectStartDialog
 from cgt.gui.projectpropertieswidget import ProjectPropertiesWidget
 from cgt.gui.videoparametersdialog import VideoParametersDialog
 from cgt.gui.videoregionselectionwidget import VideoRegionSelectionWidget
+from cgt.gui.editnotesdialog import EditNotesDialog
 
 from cgt.io import htmlreport
 from cgt.io import writecsvreports
@@ -504,13 +505,16 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self.save_project()
         self.project_created_or_loaded()
 
+    @qc.pyqtSlot()
     def set_video_scale_parameters(self):
         """
         get the video scaling parameters from the user
-
             Returns:
                 None
         """
+        if self._project is None:
+            return
+
         if self._project['frame_rate'] is not None:
             fps = int(self._project['frame_rate'])
         else:
@@ -768,6 +772,14 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         if self._video_reader is not None:
             return self._video_reader.get_length()
+
+    @qc.pyqtSlot()
+    def edit_notes(self):
+        if self._project is None:
+            return
+
+        ew = EditNotesDialog(self, self._project)
+        ew.show()
 
     @qc.pyqtSlot()
     def closeEvent(self, event):

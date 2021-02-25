@@ -22,8 +22,6 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
-from cgt.gui.editnotesdialog import EditNotesDialog
-
 # import UI
 from cgt.gui.Ui_projectpropertieswidget import Ui_ProjectPropertiesWidget
 
@@ -50,11 +48,11 @@ class ProjectPropertiesWidget(qw.QWidget, Ui_ProjectPropertiesWidget):
 
         ## the class holding the data
         self._data_source = data_source
-        
+
     def clear(self):
         """
         clear the contents
-        
+
             Return:
                 None
         """
@@ -85,32 +83,15 @@ class ProjectPropertiesWidget(qw.QWidget, Ui_ProjectPropertiesWidget):
                 None
         """
         self._propertiesBrowser.append(text)
-        
+
     def show_top_text(self):
         self._propertiesBrowser.verticalScrollBar().setValue(0)
-
-
-    @qc.pyqtSlot()
-    def set_video_scale_parameters(self):
-        print("ProjectPropertiesWidget.'set_video_scale_parameters'")
-        if self._data_source is not None:
-            self._data_source.set_video_scale_parameters()
-
-    @qc.pyqtSlot()
-    def edit_notes(self):
-        print("ProjectPropertiesWidget.edit_notes")
-        if self._data_source._project is None:
-            return
-
-        ew = EditNotesDialog(self._data_source, self._data_source._project)
-        ew.show()
 
 #####################################
 
 def run_main():
     """
     use a local function to make an isolated the QApplication object
-
         Returns:
             None
     """
