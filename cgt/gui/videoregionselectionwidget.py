@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed 03 Feb 2020
+Created on Wed 03 Feb 2021
 
 this widget allow the user to select regions in a video
 

@@ -51,6 +51,8 @@ import cgt.util.utils as utils
 
 from cgt.model.cgtproject import CGTProject
 
+from cgt.gui.videopropertieswidget import VideoPropertiesWidget
+
 # import UI
 from cgt.gui.Ui_crystalgrowthtrackermain import Ui_CrystalGrowthTrackerMain
 
@@ -82,6 +84,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         ## the project data structure
         self._project = None
 
+        ## Properties
+        #############
         ## base widget for properties tab
         self._propertiesTab = qw.QWidget(self)
 
@@ -90,9 +94,15 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         # set up tab
         self.add_tab(self._propertiesTab, self._propertiesWidget, "Project Properties")
+        
+        ## Selection
+        ############
 
         ## the queue of video frames to be displayed
         self._frame_queue = QThreadSafeQueue()
+        
+        ## the thread for the VideoBuffer
+        self._video_thread = None
 
         ## base widget for region selection tab
         self._selectTab = qw.QWidget(self)
@@ -104,11 +114,24 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         # set up tab
         self.add_tab(self._selectTab, self._selectWidget, "Select Regions")
 
-        # the thread for the VideoBuffer
-        self._video_thread = None
+        ## Video Statistics
+        ###################
+        
+        ## base widget for the video properties tab
+        self._videoPropsTab = qw.QWidget(self)
+
+        ## the region selection widget
+        self._videoPropsWidget = VideoPropertiesWidget(self._videoPropsTab, self)
+        self._videoPropsWidget.setEnabled(False)
+
+        # set up tab
+        self.add_tab(self._videoPropsTab, self._videoPropsWidget, "Video Properties")
+
+        
 
         # connect tab widget to change function
         self._tabWidget.currentChanged.connect(self.tab_changed)
+        
         # set up the title
         self.set_title()
 

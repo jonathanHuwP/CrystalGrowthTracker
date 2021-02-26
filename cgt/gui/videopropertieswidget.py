@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed 03 Feb 2020
+Created on Wed 26 Feb 2021
 
 this widget allow the user to select regions in a video
 
@@ -26,6 +26,8 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = no-member
 # pylint: disable = too-many-public-methods
 
+from enum import Enum
+
 import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
@@ -38,6 +40,13 @@ from cgt.gui.regioncreationlabel import RegionCreationLabel
 from cgt.gui.regioneditlabel import RegionEditLabel
 from cgt.gui.regiondisplaylabel import RegionDisplayLabel
 
+class PlayStates(Enum):
+    """
+    enumeration of video playing states
+    """
+    MANUAL        = 1
+    PLAY_FORWARD  = 2
+    PLAY_BACKWARD = 3
 
 # import UI
 from cgt.gui.Ui_videopropertieswidget import Ui_VideoPropertiesWidget
@@ -62,131 +71,31 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
         ## required as QWidget .parent() returns vanilla QWidget
         self._data_source = data_source
 
-        self.make_create_label()
+        ## label for showing video
+        self._video_label = None
+        
+        ## state variable determines if video is playing
+        self._playing = PlayStates.MANUAL
 
         font = qg.QFont( "Monospace", 10, qg.QFont.DemiBold)
         self._frameLabel.setFont(font)
 
         self.connect_controls()
-
-    def make_create_label(self):
-        """
-        set up a create label and assign to current label
-        """
-        self._create_label = RegionCreationLabel(self)
-        self.setup_label(self._create_label)
-
-        # connect up create's signals
-        self._create_label.have_rectangle.connect(self.rectangle_drawn)
-        self._create_label.rectangle_deleted.connect(self.rectangle_deleted)
-        self._create_label.store_rectangle.connect(self.store_rectangle)
-
-        tip = self.tr("Left click and drag to make/save/delete")
-        self.move_label_to_main_scroll(self._create_label, tip)
-
-        self._edit_label = None
-        self._display_label = None
-
-    def make_edit_label(self):
-        """
-        setup the label for editing
-        """
-        self._edit_label = RegionEditLabel(self)
-        self.setup_label(self._edit_label)
-
-        self._edit_label.have_rectangle.connect(self.rectangle_drawn)
-        self._edit_label.rectangle_changed.connect(self.rectangle_drawn)
-        self._edit_label.rectangle_changed.connect(self.rectangle_changed)
-
-        tip = self.tr("Left click and drag on corners or centre")
-        self.move_label_to_main_scroll(self._edit_label, tip)
-
-        index = self._view_control.get_current_rectangle()
-
-        if index > -1:
-            regions = self._data_source.get_results().regions
-            self._edit_label.set_rectangle(regions[index], index)
-            self.rectangle_drawn()
-
-        self._create_label = None
-        self._display_label = None
-        self._delete_label = None
-
-    def make_display_label(self):
+        
+    def make_label(self):
         """
         set up label for display
         """
-        self._display_label = RegionDisplayLabel(self)
-        self.setup_label(self._display_label)
+        self._video_label = RegionDisplayLabel(self)
+        self._video_label.setAlignment(qc.Qt.AlignTop | qc.Qt.AlignLeft)
+        self._video_label.setSizePolicy(qw.QSizePolicy.Fixed, qw.QSizePolicy.Fixed)
+        self._video_label.setMargin(0)
+
+        self._video_label.set_zoom(self._current_zoom)
+        self._videoScrollArea.setWidget(self._video_label)
+        
         self.move_label_to_main_scroll(self._display_label)
-        index = self._view_control.get_current_rectangle()
-        self._display_label.display_rectangle(index)
 
-        self._create_label = None
-        self._edit_label = None
-        self._delete_label = None
-
-    def make_delete_label(self):
-        """
-        set up label for display
-        """
-        self._delete_label = RegionDisplayLabel(self)
-        self.setup_label(self._delete_label)
-        self.move_label_to_main_scroll(self._delete_label)
-        index = self._view_control.get_current_rectangle()
-        self._delete_label.display_rectangle(index)
-
-        self._delete_label.region_selected.connect(self.selected_for_delete)
-
-        self._create_label = None
-        self._edit_label = None
-        self._display_label = None
-
-    def move_label_to_main_scroll(self, label, tooltip=None):
-        """
-        move a label to the main scroll area and assign it to _current_label
-            Args:
-                label (QLabel) the label to be assigned
-                tooltip (string) the scroll area's tooltip
-        """
-        self._current_label = label
-
-        self._videoScrollArea.setToolTip(tooltip)
-
-        h_bar = self._videoScrollArea.horizontalScrollBar()
-        v_bar = self._videoScrollArea.verticalScrollBar()
-        old_x = h_bar.value()
-        old_y = v_bar.value()
-
-        self._videoScrollArea.setWidget(label)
-
-        # the following is needed becaues when a widget
-        # is added the max of scroll bars defaults to zero
-        if old_x > h_bar.maximum():
-            h_bar.setMaximum(old_x)
-
-        if old_y > v_bar.maximum():
-            v_bar.setMaximum(old_y)
-
-        h_bar.setValue(old_x)
-        v_bar.setValue(old_y)
-
-    def setup_label(self, label):
-        """
-        set up a label for the main video
-        """
-        label.setAlignment(qc.Qt.AlignTop | qc.Qt.AlignLeft)
-        label.setSizePolicy(qw.QSizePolicy.Fixed, qw.QSizePolicy.Fixed)
-        label.setMargin(0)
-
-        label.set_zoom(self._current_zoom)
-
-    def set_up_subimage_label(self):
-        """
-        initalize the subimage label
-        """
-        self._subimage_label = qw.QLabel()
-        self._regionScrollArea.setWidget(self._subimage_label)
 
     def load_video_and_data(self):
         """
@@ -214,61 +123,6 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
         self._videoControl.forwards.connect(self.play_forward)
         self._videoControl.backwards.connect(self.play_backward)
 
-    def get_operating_mode(self):
-        """
-        getter for the operating mode
-            Returns:
-                operating mode (VideoRegionSelectionWidgetStates)
-        """
-        return self._mode
-
-    @qc.pyqtSlot(int)
-    def set_opertating_mode(self, mode):
-        """
-        callback for change of operating mode
-            Args:
-                mode (VideoRegionSelectionWidgetStates) the new mode
-        """
-        self._mode = mode
-
-        if self._mode == states.CREATE:
-            self.make_create_label()
-            self.rectangle_deleted()
-            self.display()
-        elif self._mode == states.EDIT:
-            self.make_edit_label()
-            self.rectangle_drawn()
-            self.display()
-        elif self._mode == states.DISPLAY:
-            self.make_display_label()
-            self.rectangle_deleted()
-            self.display()
-        elif self._mode == states.DELETE:
-            self.make_delete_label()
-            self.rectangle_deleted()
-            self.display()
-
-    def display_subimage(self):
-        """
-        if current subimage exists display it at the current zoom
-        """
-        if self._current_subimage is None:
-            return
-
-        img = self.apply_zoom_to_image(self._current_subimage)
-        self._subimage_label.setPixmap(qg.QPixmap(img))
-
-    def is_playing(self):
-        """
-        getter for the playing status
-            Returns:
-                True if the widget is playing video else False
-        """
-        if self._playing == PlayStates.MANUAL:
-            return False
-
-        return True
-
     @qc.pyqtSlot(qg.QPixmap, int)
     def display_image(self, pixmap, frame_number):
         """
@@ -285,14 +139,12 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
         self.animate_subimage()
         self.display()
 
-    def animate_subimage(self):
+    def animate_graphs(self):
         """
-        if there is a subimage copy get a new copy and display
+        adjust graphs in step with view of video
         """
-        if self._current_subimage is None:
-            return
-
-        self.rectangle_drawn()
+        if self._have_stats:
+            self.update_graphs()
 
     def display(self):
         """
@@ -318,7 +170,7 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
                                                 self._data_source.get_video_length(),
                                                 time))
         # display any subimage
-        self.display_subimage()
+        self.animate_graphs()
 
         if self._playing == PlayStates.PLAY_FORWARD:
             next_frame = (self._current_frame + 1)
@@ -432,121 +284,6 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
         self._current_rectangle = self._current_label.get_rectangle()
         self._current_subimage = self._current_image.copy(self._current_rectangle)
         self.display_subimage()
-
-    @qc.pyqtSlot()
-    def rectangle_deleted(self):
-        """
-        rectangle deleted in label
-        """
-        self._subimage_label.clear()
-        self.clear_subimage()
-
-    @qc.pyqtSlot()
-    def store_rectangle(self):
-        """
-        store the current rectangle
-        """
-        self._subimage_label.clear()
-        self._data_source.append_region(self._current_rectangle)
-        self._view_control.data_changed()
-        self.clear_subimage()
-
-    def data_changed(self):
-        """
-        allow parent widget to notify controls of a change of data
-        """
-        self._view_control.data_changed()
-
-    def clear_subimage(self):
-        """
-        remove the subimage and rectangle
-        """
-        self._current_subimage = None
-        self._current_rectangle = None
-
-    @qc.pyqtSlot()
-    def rectangle_changed(self):
-        """
-        signal that a rectangle has been editied
-        """
-        if self._edit_label is None:
-            return
-
-        data = self._edit_label.get_rectangle_and_index()
-        self._data_source.get_results().replace_region(data[0], data[1])
-
-    @qc.pyqtSlot()
-    def editing_rectangle_changed(self):
-        """
-        callback for a user change of the currently edited rectangle
-        """
-        if self._edit_label is None:
-            return
-
-        index = self._view_control.get_current_rectangle()
-
-        if index > -1:
-            results = self._data_source.get_results()
-            self._edit_label.set_rectangle(results.regions[index], index)
-
-    @qc.pyqtSlot()
-    def display_rectangle_changed(self):
-        """
-        callback for a user change of the currently edited rectangle
-        """
-        if self._display_label is None:
-            return
-
-        index = self._view_control.get_current_rectangle()
-
-        if index > -1:
-            self._display_label.display_rectangle(index)
-
-    @qc.pyqtSlot()
-    def delete_rectangle_changed(self):
-        """
-        callback for a user change of the currently edited rectangle
-        """
-        if self._delete_label is None:
-            return
-
-        index = self._view_control.get_current_rectangle()
-
-        if index > -1:
-            self._delete_label.display_rectangle(index)
-
-    @qc.pyqtSlot(int)
-    def selected_for_delete(self, index):
-        """
-        callback for the user requesing deletion of rectangle, offers pop-up question
-            Args:
-                index (int) the list index of the selected region
-        """
-        message = self.tr(f"Do you wish to remove region {index+1}. Cannot be reversed.")
-        mb_reply = qw.QMessageBox.question(self,
-                                           'CrystalGrowthTracker',
-                                           message,
-                                           qw.QMessageBox.Yes | qw.QMessageBox.No,
-                                           qw.QMessageBox.No)
-
-        if mb_reply == qw.QMessageBox.Yes:
-            self._data_source.remove_region(index)
-            self._view_control.data_changed()
-
-    def get_data(self):
-        """
-        get the data store
-            Returns:
-                pointer to data (SimulatedDataStore)
-        """
-        return self._data_source
-
-    def clear(self):
-        """
-        reset to initial conditions
-        """
-        self._current_label.clear()
-        self._subimage_label.clear()
 
     def get_image_copy(self):
         """
