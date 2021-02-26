@@ -49,9 +49,10 @@ from cgt.io import readcsvreports
 
 import cgt.util.utils as utils
 
+from cgt.io.videoanalyser import VideoAnalyser
 from cgt.model.cgtproject import CGTProject
-
 from cgt.gui.videopropertieswidget import VideoPropertiesWidget
+
 
 # import UI
 from cgt.gui.Ui_crystalgrowthtrackermain import Ui_CrystalGrowthTrackerMain
@@ -74,6 +75,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         super().__init__(parent)
         self.setupUi(self)
+        
+        ########################
+        self._video_statistics = []
+        ########################
 
         ## the name in the current translation
         self._translated_name = self.tr("CrystalGrowthTracker")
@@ -821,6 +826,41 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         ew = EditNotesDialog(self, self._project)
         ew.show()
+        
+        
+    @qc.pyqtSlot()
+    def make_video_statistics(self):
+        if self._project is None:
+            return
+            
+        if self._tabWidget.currentWidget() != self._videoPropsTab:
+            return
+            
+        print("ready for stats")
+            
+        if len(self._video_statistics) > 0:
+            return
+
+        message_box = qw.QMessageBox()
+        message_box.setText("Video Statistics.")
+        message_box.setInformativeText("Calculating video may take some time.")
+
+        message_box.show()
+        self.calculate_video_statistics()
+        message_box.close()
+
+    def calculate_video_statistics(self):
+        analyser = VideoAnalyser(self._project["enhanced_video"])
+        print(f"analyser {analyser}")
+        self._video_statistics = analyser.stats_whole_film()
+        
+    def get_video_stats(self):
+        """
+        getter for video stats
+            Returns:
+                video stats array
+        """
+        return self._video_statistics
 
     @qc.pyqtSlot()
     def closeEvent(self, event):

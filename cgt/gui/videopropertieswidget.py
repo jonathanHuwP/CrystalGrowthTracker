@@ -75,9 +75,6 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
         ## the current value of the zoom
         self._current_zoom = 1.0
         
-        ## has the video been processed
-        self._have_stats = False
-        
         ## state variable determines if video is playing
         self._playing = PlayStates.MANUAL
 
@@ -139,8 +136,16 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
         """
         adjust graphs in step with view of video
         """
-        if self._have_stats:
+        stats = self._data_source.get_video_stats()
+        
+        if len(stats):
             self.update_graphs()
+            
+    def update_graphs(self):
+        """
+        load the stats into the graphs
+        """
+        print("update graphs")
 
     def display(self):
         """
