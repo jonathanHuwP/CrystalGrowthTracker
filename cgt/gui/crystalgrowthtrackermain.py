@@ -848,6 +848,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         message_box.show()
         self.calculate_video_statistics()
         message_box.close()
+        self._videoPropsWidget.redisplay()
 
     def calculate_video_statistics(self):
         analyser = VideoAnalyser(self._project["enhanced_video"])

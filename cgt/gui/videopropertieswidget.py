@@ -32,6 +32,8 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 import PyQt5.Qt as qt
+import pyqtgraph as pg
+import numpy as np
 
 from cgt.gui.regiondisplaylabel import RegionDisplayLabel
 
@@ -77,6 +79,11 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
         
         ## state variable determines if video is playing
         self._playing = PlayStates.MANUAL
+        
+        ## the plot widget used display
+        self._graph = pg.PlotWidget(title="Intensity")
+        self._graph.setBackground('w')
+        self._graphScrollArea.setWidget(self._graph)
 
         font = qg.QFont( "Monospace", 10, qg.QFont.DemiBold)
         self._frameLabel.setFont(font)
@@ -138,15 +145,35 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
         """
         stats = self._data_source.get_video_stats()
         
-        if len(stats):
-            self.update_graphs()
+        if len(stats) > 0:
+            self.update_graphs(stats)
             
-    def update_graphs(self):
+    def update_graphs(self, stats):
         """
         load the stats into the graphs
+            Args:
+                stats ([FrameData]) the stats
         """
-        print("update graphs")
-
+        means = [x.mean for x in stats]
+        std_dev = [x.std_deviation for x in stats]
+        
+        means_plus = []
+        means_minus = []
+        
+        for i, mean in enumerate(means):
+            means_plus.append(mean + std_dev[i])
+            means_minus.append(mean - std_dev[i])
+            
+        self._graph.getAxis('left').setLabel("Intensity (Level)")
+        self._graph.getAxis('bottom').setLabel("Frame (number)")
+        
+        x_axis = range(0, len(stats))
+        self._graph.plot(x_axis, means, pen='b', name="Mean")
+        self._graph.plot(x_axis, means_plus, pen='r', name="Std Dev up")
+        self._graph.plot(x_axis, means_minus, pen='r', name="Std Dev down")
+        
+        self._graph.addLegend()
+        
     def display(self):
         """
         display the current image
