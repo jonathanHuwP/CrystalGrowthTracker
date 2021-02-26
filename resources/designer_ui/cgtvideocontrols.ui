@@ -200,7 +200,7 @@
         <string>Check for fast scaling, else smooth</string>
        </property>
        <property name="text">
-        <string>Fast/Smooth</string>
+        <string>Scale Fast</string>
        </property>
        <property name="checked">
         <bool>true</bool>

@@ -99,6 +99,9 @@ class RegionDisplayLabel(RegionBaseLabel):
         """
         # pass on to get pixmap displayed
         qw.QLabel.paintEvent(self, event)
+        if self._index < 0:
+            return 
+
         if self._index == 0:
             stop = self.get_select_widget().get_data().get_results().number_of_regions
             for i in range(0, stop):

@@ -142,12 +142,21 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Args:
                 tab_index (int) the index of the new tab
         """
+        self._propertiesTab.setEnabled(False)
+        self._selectWidget.setEnabled(False)
+        self._videoPropsWidget.setEnabled(False)
+        
+        if not self.has_project():
+            return
+        
         if tab_index == self._tabWidget.indexOf(self._propertiesTab):
-            self._selectWidget.setEnabled(False)
+            self._propertiesTab.setEnabled(True)
         elif tab_index == self._tabWidget.indexOf(self._selectTab):
-            if self.has_project():
-                self._selectWidget.setEnabled(True)
-                self._selectWidget.redisplay()
+            self._selectWidget.setEnabled(True)
+            self._selectWidget.redisplay()
+        elif tab_index == self._tabWidget.indexOf(self._videoPropsTab):
+            self._videoPropsWidget.setEnabled(True)
+            self._videoPropsWidget.redisplay()
 
     def has_project(self):
         """
@@ -288,7 +297,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         if self._project["results"] is not None:
             if self._project["results"].number_of_regions > 0:
                 self._selectWidget.load_video_and_data()
-                #self._drawingWidget.new_region()
+                self._videoPropsWidget.load_video()
 
         self._selectWidget.data_changed()
         #self._drawingWidget.setEnabled(False)
@@ -584,6 +593,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Args:
                 frame_number (int) the frame to be displayed
         """
+        print(f"main frame {frame_number}")
         self._frame_queue.push(frame_number)
 
     def clear_queue(self):
@@ -735,8 +745,16 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
     qc.pyqtSlot(qg.QPixmap, int)
     def display_image(self, image, frame_number):
+        """
+        have the current widget display an image
+            Args:
+                image (QImage) the image to display
+                frame_number (int) the frame number in the video
+        """
         if self._tabWidget.currentWidget() == self._selectTab:
             self._selectWidget.display_image(image, frame_number)
+        elif self._tabWidget.currentWidget() == self._videoPropsTab:
+            self._videoPropsWidget.display_image(image, frame_number)
 
     qc.pyqtSlot()
     def print_results(self):

@@ -33,11 +33,6 @@ import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 import PyQt5.Qt as qt
 
-from cgt.io.videobuffer import VideoBuffer
-from cgt.util.qthreadsafequeue import QThreadSafeQueue
-from cgt.util.simulateddatastore import SimulatedDataStore
-from cgt.gui.regioncreationlabel import RegionCreationLabel
-from cgt.gui.regioneditlabel import RegionEditLabel
 from cgt.gui.regiondisplaylabel import RegionDisplayLabel
 
 class PlayStates(Enum):
@@ -74,6 +69,15 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
         ## label for showing video
         self._video_label = None
         
+        ## the currently displayed frame
+        self._current_frame = 0
+        
+        ## the current value of the zoom
+        self._current_zoom = 1.0
+        
+        ## has the video been processed
+        self._have_stats = False
+        
         ## state variable determines if video is playing
         self._playing = PlayStates.MANUAL
 
@@ -81,6 +85,8 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
         self._frameLabel.setFont(font)
 
         self.connect_controls()
+        
+        self.make_label()
         
     def make_label(self):
         """
@@ -93,16 +99,6 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
 
         self._video_label.set_zoom(self._current_zoom)
         self._videoScrollArea.setWidget(self._video_label)
-        
-        self.move_label_to_main_scroll(self._display_label)
-
-
-    def load_video_and_data(self):
-        """
-        initalize the controls
-        """
-        self._videoControl.set_range(self._data_source.get_video_length())
-        self._view_control.set_data_source(self)
 
     def redisplay(self):
         """
@@ -136,7 +132,7 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
         self._current_frame = frame_number
         self._videoControl.set_frame_currently_displayed(frame_number)
 
-        self.animate_subimage()
+        self.animate_graphs()
         self.display()
 
     def animate_graphs(self):
@@ -156,7 +152,7 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
             return
         # zoom and display image
         tmp = self.apply_zoom_to_image(self._current_image)
-        self._current_label.setPixmap(qg.QPixmap(tmp))
+        self._video_label.setPixmap(qg.QPixmap(tmp))
 
         # update the controls
         self._videoControl.set_slider_value(self._current_frame)
@@ -213,6 +209,7 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
         """
         a specific frame should be displayed
         """
+        print(f"props request {frame_number}")
         self._data_source.request_video_frame(frame_number)
 
     @qc.pyqtSlot(float)
@@ -221,15 +218,7 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
         a new value for the zoom has been entered
         """
         self._current_zoom = value
-        if self._create_label is not None:
-            self._create_label.set_zoom(value)
-        elif self._edit_label is not None:
-            self._edit_label.set_zoom(value)
-        elif self._display_label is not None:
-            self._display_label.set_zoom(value)
-        elif self._delete_label is not None:
-            self._delete_label.set_zoom(value)
-
+        self._video_label.set_zoom(value)
         self.display()
 
     @qc.pyqtSlot()
@@ -276,15 +265,6 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
         self._playing = PlayStates.PLAY_BACKWARD
         self.request_frame((self._current_frame-1)%self._data_source.get_video_length())
 
-    @qc.pyqtSlot()
-    def rectangle_drawn(self):
-        """
-        label has a rectangle
-        """
-        self._current_rectangle = self._current_label.get_rectangle()
-        self._current_subimage = self._current_image.copy(self._current_rectangle)
-        self.display_subimage()
-
     def get_image_copy(self):
         """
         get the current main image
@@ -292,3 +272,18 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
                 deep copy of current image (QImage)
         """
         return self._current_image.copy()
+    
+    def get_data(self):
+        """
+        get the data store
+            Returns:
+                pointer to data (SimulatedDataStore)
+        """
+        return self._data_source
+        
+    def load_video(self):
+        """
+        initalize the controls
+        """
+        self._videoControl.set_range(self._data_source.get_video_length())
+        
