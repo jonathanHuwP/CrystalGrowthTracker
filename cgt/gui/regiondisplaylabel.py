@@ -79,11 +79,13 @@ class RegionDisplayLabel(RegionBaseLabel):
         if self._index == 0:
             for i in range(0, self.get_select_widget().get_data().get_results().number_of_regions):
                 rect = self.get_select_widget().get_data().get_results().regions[i]
+                rect = self._zoom_transform.mapRect(rect)
                 if rect.contains(event.pos()):
                     self.region_selected.emit(i)
                     return
         else:
             rect = self.get_select_widget().get_data().get_results().regions[self._index-1]
+            rect = self._zoom_transform.mapRect(rect)
             if rect.contains(event.pos()):
                 self.region_selected.emit(self._index-1)
 
