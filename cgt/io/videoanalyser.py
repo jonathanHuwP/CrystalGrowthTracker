@@ -89,7 +89,7 @@ class VideoAnalyser(object):
         standard_deviation = np.std(image)
         histo = np.histogram(image, bins)
 
-        return FrameStats(mean, standard_deviation, skewness, histo)
+        return FrameStats(mean, standard_deviation, histo)
 
     def get_frame(self, frame_number):
         """

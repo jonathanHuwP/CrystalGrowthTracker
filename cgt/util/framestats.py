@@ -21,4 +21,4 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 from collections import namedtuple
 
 ## Storage of the statistics of one frame of video
-FrameStats = namedtuple("FrameStats", ["mean", "std_deviation", "skewness", "histogram"])
+FrameStats = namedtuple("FrameStats", ["mean", "std_deviation", "histogram"])
