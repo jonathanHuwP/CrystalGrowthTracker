@@ -21,7 +21,6 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 
 import numpy as np
 import cv2 as cv
-import scipy.stats as stats
 
 from cgt.util.framestats import FrameStats
 
@@ -64,12 +63,12 @@ class VideoAnalyser(object):
                 bins ([float]) array of bin bounds
                 limit (int) the upper value of the samples
         """
-        # bins 0 to 32, holding eavenly spaced values 0 to limit 
+        # bins 0 to 32, holding eavenly spaced values 0 to limit
         bins = np.linspace(0, limit, 32)
         image = self.get_image_values(frame_number)
-        
+
         return np.histogram(image, bins)
-        
+
     def stats_whole_film(self):
         """
         get the statistics for every frame of the video
@@ -80,17 +79,16 @@ class VideoAnalyser(object):
             vid_statistics.append(self.make_stats(i, bins))
             if i%100 == 0:
                 print(f"proc vid {i}")
-            
+
         return vid_statistics
 
     def make_stats(self, frame_number, bins):
         image = self.get_image_values(frame_number)
-        
+
         mean = np.mean(image)
         standard_deviation = np.std(image)
-        skewness = stats.skew(image)
         histo = np.histogram(image, bins)
-        
+
         return FrameStats(mean, standard_deviation, skewness, histo)
 
     def get_frame(self, frame_number):
@@ -107,9 +105,9 @@ class VideoAnalyser(object):
         if not flag:
             message = f"failed to read image for frame {frame}"
             raise ValueError(message)
-            
+
         return img
-        
+
     def get_image_values(self, frame_number):
         """
         get image as a one dimensional array
