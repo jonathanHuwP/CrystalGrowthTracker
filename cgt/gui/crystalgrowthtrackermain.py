@@ -839,24 +839,20 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         if len(self._video_statistics) > 0:
             return
 
-        message_box = qw.QMessageBox()
-        message_box.setText("Video Statistics.")
-        message_box.setInformativeText("Calculating video may take some time.")
+        progress = qw.QProgressDialog("Processing Video", "cancel", 0, 0, self)
+        progress.setAutoClose(True)
+        progress.setWindowModality(qc.Qt.WindowModal)
+        progress.setModal(True)
 
-        message_box.show()
-        self.calculate_video_statistics()
-        message_box.close()
-        self._videoStatsWidget.redisplay()
-
-    def calculate_video_statistics(self):
-        """
-        calculates the intensity statistics of the graph
-        """
-        analyser = VideoAnalyser(self._project["enhanced_video"])
-        print(f"analyser {analyser}")
+        analyser = VideoAnalyser(self._project["enhanced_video"], self)
+        analyser.frames_analysed.connect(progress.setValue)
+        progress.setMaximum(analyser.length)
+        progress.show()
         self._video_statistics = analyser.stats_whole_film()
+
         self._videoStatsWidget.setEnabled(True)
         self._videoStatsWidget.draw_stats_graph()
+        self._videoStatsWidget.redisplay()
 
     def get_video_stats(self):
         """

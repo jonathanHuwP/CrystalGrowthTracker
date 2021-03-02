@@ -19,6 +19,8 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # set up linting conditions
 # pylint: disable = c-extension-no-member
 
+import PyQt5.QtCore as qc
+
 import numpy as np
 import cv2 as cv
 
@@ -28,18 +30,24 @@ def bgr_to_gray(rgb):
     tmp = np.dot(rgb[...,:3], [0.1140, 0.5870, 0.2989])
     return tmp.astype(np.uint8)
 
-class VideoAnalyser(object):
+class VideoAnalyser(qc.QObject):
     """
     a video reader that is designed to run as a seperate thread
     from the display object, allowing smoother animation
     """
-    def __init__(self, video_file):
+
+    ## the progress signal
+    frames_analysed = qc.pyqtSignal(int)
+
+    def __init__(self, video_file, parent=None):
         """
         initalize by usng opencv opening the video file
 
             Args:
                 video_file (string) the path to the video file
         """
+        super().__init__(parent)
+
         ## initiaize the file video stream
         self._video_reader = cv.VideoCapture(video_file)
 
@@ -78,7 +86,10 @@ class VideoAnalyser(object):
         for i in range(self.length):
             vid_statistics.append(self.make_stats(i, bins))
             if i%100 == 0:
-                print(f"proc vid {i}")
+                print(f"emit {i}")
+                self.frames_analysed.emit(i)
+
+        self.frames_analysed.emit(self.length)
 
         return vid_statistics
 
@@ -103,7 +114,7 @@ class VideoAnalyser(object):
         flag, img = self._video_reader.read()
 
         if not flag:
-            message = f"failed to read image for frame {frame}"
+            message = f"failed to read image for frame {frame_number}"
             raise ValueError(message)
 
         return img
