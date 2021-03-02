@@ -53,6 +53,7 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
     The implementation of the GUI, all the functions and
     data-structures required to implement the intended behaviour
     """
+    label_style = {'font-weight': 'bold'}
 
     def __init__(self, parent, data_source):
         """
@@ -81,12 +82,12 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
         self._playing = PlayStates.MANUAL
 
         ## the plot widget used display
-        self._graph = pg.PlotWidget(title="Intensity")
+        self._graph = pg.PlotWidget(title="<b>Intensity</b>")
         self._graph.setBackground('w')
         self._graphScrollArea.setWidget(self._graph)
 
         ## the histogram widget
-        self._histogram = pg.PlotWidget(title="Intensity")
+        self._histogram = pg.PlotWidget(title="<b>Intensity</b>")
         self._histogram.setBackground('w')
         self._histogramScrollArea.setWidget(self._histogram)
 
@@ -158,15 +159,17 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
         """
         stats = self._data_source.get_video_stats()
         counts, bins = stats[self._current_frame].histogram
+        tick_font = qg.QFont()
+        tick_font.setBold(True)
+
         self._histogram.clear()
-        self._histogram.getAxis('left').setLabel("Counts (number)")
-        self._histogram.getAxis('bottom').setLabel("Bins (Level)")
+        self._histogram.getAxis('left').setLabel("Counts (number)",
+                                                 **VideoPropertiesWidget.label_style)
+        self._histogram.getAxis('bottom').setLabel("Bins (Level)",
+                                                   **VideoPropertiesWidget.label_style)
+        self._histogram.getAxis('left').setTickFont(tick_font)
+        self._histogram.getAxis('bottom').setTickFont(tick_font)
         self._histogram.setXRange(0, 260)
-        # self._histogram.plot(bins,
-        #                      counts,
-        #                      stepMode=True,
-        #                      fillLevel=0,
-        #                      brush=(0,0,255,150))
         width = bins[1] - bins[0] - 1.0
         self._histogram.addItem(pg.BarGraphItem(x=bins[:30],
                                                 height=counts,
@@ -177,6 +180,9 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
         """
         draw the statistics graph
         """
+        tick_font = qg.QFont()
+        tick_font.setBold(True)
+
         levels = np.linspace(0.2, 1, 5)
         stats = self._data_source.get_video_stats()
         means = [x.mean for x in stats]
@@ -189,8 +195,12 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
             means_plus.append(mean + std_dev[i])
             means_minus.append(mean - std_dev[i])
 
-        self._graph.getAxis('left').setLabel("Intensity (Level)")
-        self._graph.getAxis('bottom').setLabel("Frame (number)")
+        self._graph.getAxis('left').setLabel("Intensity (Level)",
+                                             **VideoPropertiesWidget.label_style)
+        self._graph.getAxis('left').setTickFont(tick_font)
+        self._graph.getAxis('bottom').setLabel("Frame (number)",
+                                               **VideoPropertiesWidget.label_style)
+        self._graph.getAxis('bottom').setTickFont(tick_font)
         self._graph.setYRange(0, 260)
 
         x_axis = range(1, len(stats)+1)
