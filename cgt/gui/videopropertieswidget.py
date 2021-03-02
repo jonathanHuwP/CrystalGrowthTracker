@@ -162,11 +162,16 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
         self._histogram.getAxis('left').setLabel("Counts (number)")
         self._histogram.getAxis('bottom').setLabel("Bins (Level)")
         self._histogram.setXRange(0, 260)
-        self._histogram.plot(bins,
-                             counts,
-                             stepMode=True,
-                             fillLevel=0,
-                             brush=(0,0,255,150))
+        # self._histogram.plot(bins,
+        #                      counts,
+        #                      stepMode=True,
+        #                      fillLevel=0,
+        #                      brush=(0,0,255,150))
+        width = bins[1] - bins[0] - 1.0
+        self._histogram.addItem(pg.BarGraphItem(x=bins[:30],
+                                                height=counts,
+                                                width=width,
+                                                brush='g'))
 
     def draw_stats_graph(self):
         """
