@@ -75,7 +75,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         super().__init__(parent)
         self.setupUi(self)
-        
+
         ########################
         self._video_statistics = []
         ########################
@@ -99,13 +99,13 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         # set up tab
         self.add_tab(self._propertiesTab, self._propertiesWidget, "Project Properties")
-        
+
         ## Selection
         ############
 
         ## the queue of video frames to be displayed
         self._frame_queue = QThreadSafeQueue()
-        
+
         ## the thread for the VideoBuffer
         self._video_thread = None
 
@@ -121,22 +121,22 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         ## Video Statistics
         ###################
-        
+
         ## base widget for the video properties tab
-        self._videoPropsTab = qw.QWidget(self)
+        self._videoStatsTab = qw.QWidget(self)
 
         ## the region selection widget
-        self._videoPropsWidget = VideoPropertiesWidget(self._videoPropsTab, self)
-        self._videoPropsWidget.setEnabled(False)
+        self._videoStatsWidget = VideoPropertiesWidget(self._videoStatsTab, self)
+        self._videoStatsWidget.setEnabled(False)
 
         # set up tab
-        self.add_tab(self._videoPropsTab, self._videoPropsWidget, "Video Properties")
+        self.add_tab(self._videoStatsTab, self._videoStatsWidget, "Video Properties")
 
-        
+
 
         # connect tab widget to change function
         self._tabWidget.currentChanged.connect(self.tab_changed)
-        
+
         # set up the title
         self.set_title()
 
@@ -149,19 +149,20 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         self._propertiesTab.setEnabled(False)
         self._selectWidget.setEnabled(False)
-        self._videoPropsWidget.setEnabled(False)
-        
+        self._videoStatsWidget.setEnabled(False)
+
         if not self.has_project():
             return
-        
+
         if tab_index == self._tabWidget.indexOf(self._propertiesTab):
             self._propertiesTab.setEnabled(True)
         elif tab_index == self._tabWidget.indexOf(self._selectTab):
             self._selectWidget.setEnabled(True)
             self._selectWidget.redisplay()
-        elif tab_index == self._tabWidget.indexOf(self._videoPropsTab):
-            self._videoPropsWidget.setEnabled(True)
-            self._videoPropsWidget.redisplay()
+        elif tab_index == self._tabWidget.indexOf(self._videoStatsTab):
+            if len(self._video_statistics) > 0:
+                self._videoStatsWidget.setEnabled(True)
+                self._videoStatsWidget.redisplay()
 
     def has_project(self):
         """
@@ -302,7 +303,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         if self._project["results"] is not None:
             if self._project["results"].number_of_regions > 0:
                 self._selectWidget.load_video_and_data()
-                self._videoPropsWidget.load_video()
+                self._videoStatsWidget.load_video()
 
         self._selectWidget.data_changed()
         #self._drawingWidget.setEnabled(False)
@@ -598,7 +599,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Args:
                 frame_number (int) the frame to be displayed
         """
-        print(f"main frame {frame_number}")
         self._frame_queue.push(frame_number)
 
     def clear_queue(self):
@@ -758,8 +758,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         if self._tabWidget.currentWidget() == self._selectTab:
             self._selectWidget.display_image(image, frame_number)
-        elif self._tabWidget.currentWidget() == self._videoPropsTab:
-            self._videoPropsWidget.display_image(image, frame_number)
+        elif self._tabWidget.currentWidget() == self._videoStatsTab:
+            self._videoStatsWidget.display_image(image, frame_number)
 
     qc.pyqtSlot()
     def print_results(self):
@@ -826,18 +826,16 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         ew = EditNotesDialog(self, self._project)
         ew.show()
-        
-        
+
+
     @qc.pyqtSlot()
     def make_video_statistics(self):
         if self._project is None:
             return
-            
-        if self._tabWidget.currentWidget() != self._videoPropsTab:
+
+        if self._tabWidget.currentWidget() != self._videoStatsTab:
             return
-            
-        print("ready for stats")
-            
+
         if len(self._video_statistics) > 0:
             return
 
@@ -848,13 +846,18 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         message_box.show()
         self.calculate_video_statistics()
         message_box.close()
-        self._videoPropsWidget.redisplay()
+        self._videoStatsWidget.redisplay()
 
     def calculate_video_statistics(self):
+        """
+        calculates the intensity statistics of the graph
+        """
         analyser = VideoAnalyser(self._project["enhanced_video"])
         print(f"analyser {analyser}")
         self._video_statistics = analyser.stats_whole_film()
-        
+        self._videoStatsWidget.setEnabled(True)
+        self._videoStatsWidget.draw_stats_graph()
+
     def get_video_stats(self):
         """
         getter for video stats

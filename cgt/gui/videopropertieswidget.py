@@ -70,16 +70,16 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
 
         ## label for showing video
         self._video_label = None
-        
+
         ## the currently displayed frame
         self._current_frame = 0
-        
+
         ## the current value of the zoom
         self._current_zoom = 1.0
-        
+
         ## state variable determines if video is playing
         self._playing = PlayStates.MANUAL
-        
+
         ## the plot widget used display
         self._graph = pg.PlotWidget(title="Intensity")
         self._graph.setBackground('w')
@@ -89,9 +89,9 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
         self._frameLabel.setFont(font)
 
         self.connect_controls()
-        
+
         self.make_label()
-        
+
     def make_label(self):
         """
         set up label for display
@@ -136,44 +136,47 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
         self._current_frame = frame_number
         self._videoControl.set_frame_currently_displayed(frame_number)
 
-        self.animate_graphs()
         self.display()
 
     def animate_graphs(self):
         """
         adjust graphs in step with view of video
-        """
-        stats = self._data_source.get_video_stats()
-        
-        if len(stats) > 0:
-            self.update_graphs(stats)
-            
-    def update_graphs(self, stats):
-        """
-        load the stats into the graphs
             Args:
-                stats ([FrameData]) the stats
+                frame_number (int) the current frame number
         """
+        print(f"animate frame {self._current_frame}")
+        self._frame_line.setPos(self._current_frame)
+
+    def draw_stats_graph(self):
+        """
+        draw the statistics graph
+        """
+        print("draw statst")
+        stats = self._data_source.get_video_stats()
         means = [x.mean for x in stats]
         std_dev = [x.std_deviation for x in stats]
-        
+
         means_plus = []
         means_minus = []
-        
+
         for i, mean in enumerate(means):
             means_plus.append(mean + std_dev[i])
             means_minus.append(mean - std_dev[i])
-            
+
         self._graph.getAxis('left').setLabel("Intensity (Level)")
         self._graph.getAxis('bottom').setLabel("Frame (number)")
-        
+
         x_axis = range(0, len(stats))
+        self._graph.addLegend()
         self._graph.plot(x_axis, means, pen='b', name="Mean")
         self._graph.plot(x_axis, means_plus, pen='r', name="Std Dev up")
         self._graph.plot(x_axis, means_minus, pen='r', name="Std Dev down")
-        
-        self._graph.addLegend()
-        
+
+        self._frame_line = pg.InfiniteLine(angle=90, movable=False)
+        self._frame_line.setBounds([0, len(stats)])
+        self._graph.addItem(self._frame_line)
+
+
     def display(self):
         """
         display the current image
@@ -197,7 +200,7 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
         self._frameLabel.setText(message.format(display_number,
                                                 self._data_source.get_video_length(),
                                                 time))
-        # display any subimage
+        # adjust the graphs
         self.animate_graphs()
 
         if self._playing == PlayStates.PLAY_FORWARD:
@@ -241,7 +244,6 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
         """
         a specific frame should be displayed
         """
-        print(f"props request {frame_number}")
         self._data_source.request_video_frame(frame_number)
 
     @qc.pyqtSlot(float)
@@ -304,7 +306,7 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
                 deep copy of current image (QImage)
         """
         return self._current_image.copy()
-    
+
     def get_data(self):
         """
         get the data store
@@ -312,10 +314,9 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
                 pointer to data (SimulatedDataStore)
         """
         return self._data_source
-        
+
     def load_video(self):
         """
         initalize the controls
         """
         self._videoControl.set_range(self._data_source.get_video_length())
-        
