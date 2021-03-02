@@ -827,7 +827,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         ew = EditNotesDialog(self, self._project)
         ew.show()
 
-
     @qc.pyqtSlot()
     def make_video_statistics(self):
         if self._project is None:

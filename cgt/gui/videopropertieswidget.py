@@ -25,7 +25,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = too-many-instance-attributes
 # pylint: disable = no-member
 # pylint: disable = too-many-public-methods
-
+import numpy as np
 from enum import Enum
 
 import PyQt5.QtWidgets as qw
@@ -172,6 +172,7 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
         """
         draw the statistics graph
         """
+        levels = np.linspace(0.2, 1, 5)
         stats = self._data_source.get_video_stats()
         means = [x.mean for x in stats]
         std_dev = [x.std_deviation for x in stats]
@@ -189,9 +190,12 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
 
         x_axis = range(1, len(stats)+1)
         self._graph.addLegend()
-        self._graph.plot(x_axis, means, pen='b', name="Mean")
-        self._graph.plot(x_axis, means_plus, pen='r', name="Std Dev up")
-        self._graph.plot(x_axis, means_minus, pen='r', name="Std Dev down")
+        m_plot = self._graph.plot(x_axis, means, pen='b', name="Mean")
+        up_plot = self._graph.plot(x_axis, means_plus, pen='r', name="Std Dev up")
+        down_plot = self._graph.plot(x_axis, means_minus, pen='r', name="Std Dev down")
+
+        self._graph.addItem(pg.FillBetweenItem(m_plot, up_plot, levels[3]))
+        self._graph.addItem(pg.FillBetweenItem(m_plot, down_plot, levels[3]))
 
         self._frame_line = pg.InfiniteLine(angle=90, movable=False)
         self._frame_line.setBounds([0, len(stats)])
