@@ -85,6 +85,11 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
         self._graph.setBackground('w')
         self._graphScrollArea.setWidget(self._graph)
 
+        ## the histogram widget
+        self._histogram = pg.PlotWidget(title="Intensity")
+        self._histogram.setBackground('w')
+        self._histogramScrollArea.setWidget(self._histogram)
+
         font = qg.QFont( "Monospace", 10, qg.QFont.DemiBold)
         self._frameLabel.setFont(font)
 
@@ -144,14 +149,29 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
             Args:
                 frame_number (int) the current frame number
         """
-        print(f"animate frame {self._current_frame}")
-        self._frame_line.setPos(self._current_frame)
+        self._frame_line.setPos(self._current_frame+1)
+        self.plot_histogram()
+
+    def plot_histogram(self):
+        """
+        draw the histogram of the current frame
+        """
+        stats = self._data_source.get_video_stats()
+        counts, bins = stats[self._current_frame].histogram
+        self._histogram.clear()
+        self._histogram.getAxis('left').setLabel("Counts (number)")
+        self._histogram.getAxis('bottom').setLabel("Bins (Level)")
+        self._histogram.setXRange(0, 260)
+        self._histogram.plot(bins,
+                             counts,
+                             stepMode=True,
+                             fillLevel=0,
+                             brush=(0,0,255,150))
 
     def draw_stats_graph(self):
         """
         draw the statistics graph
         """
-        print("draw statst")
         stats = self._data_source.get_video_stats()
         means = [x.mean for x in stats]
         std_dev = [x.std_deviation for x in stats]
@@ -165,8 +185,9 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
 
         self._graph.getAxis('left').setLabel("Intensity (Level)")
         self._graph.getAxis('bottom').setLabel("Frame (number)")
+        self._graph.setYRange(0, 260)
 
-        x_axis = range(0, len(stats))
+        x_axis = range(1, len(stats)+1)
         self._graph.addLegend()
         self._graph.plot(x_axis, means, pen='b', name="Mean")
         self._graph.plot(x_axis, means_plus, pen='r', name="Std Dev up")
@@ -175,7 +196,6 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
         self._frame_line = pg.InfiniteLine(angle=90, movable=False)
         self._frame_line.setBounds([0, len(stats)])
         self._graph.addItem(self._frame_line)
-
 
     def display(self):
         """
@@ -189,7 +209,7 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
         tmp = self.apply_zoom_to_image(self._current_image)
         self._video_label.setPixmap(qg.QPixmap(tmp))
 
-        # update the controls
+        # update the line (frame+1 in common with video controls)
         self._videoControl.set_slider_value(self._current_frame)
 
         # display the current frame number and time
