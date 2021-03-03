@@ -26,8 +26,15 @@ import cv2 as cv
 
 from cgt.util.framestats import FrameStats, VideoIntensityStats
 
-def bgr_to_gray(rgb):
-    tmp = np.dot(rgb[...,:3], [0.1140, 0.5870, 0.2989])
+def bgr_to_gray(bgr):
+    """
+    convert blue green red to gray 256
+        Args:
+            bgr (np.array [width:height:3] uint8)
+        Retruns
+            np.array [width:height] uint8
+    """
+    tmp = np.dot(bgr[...,:3], [0.1140, 0.5870, 0.2989])
     return tmp.astype(np.uint8)
 
 class VideoAnalyser(qc.QObject):
@@ -86,8 +93,7 @@ class VideoAnalyser(qc.QObject):
         vid_statistics = VideoIntensityStats(bins)
         for i in range(self.length):
             vid_statistics.append_frame(self.make_stats(i, bins))
-            if i%20 == 0:
-                print(f"emit {i}")
+            if i%10 == 0:
                 self.frames_analysed.emit(i)
 
         self.frames_analysed.emit(self.length)
@@ -95,6 +101,12 @@ class VideoAnalyser(qc.QObject):
         return vid_statistics
 
     def make_stats(self, frame_number, bins):
+        """
+        make the statistics for a single frame
+            Args:
+                frame_number (int) the frame
+                bins ([int]) the bins for counting
+        """
         image = self.get_image_values(frame_number)
 
         mean = np.mean(image)
