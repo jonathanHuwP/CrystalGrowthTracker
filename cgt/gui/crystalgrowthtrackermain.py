@@ -126,7 +126,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._videoStatsWidget.setEnabled(False)
 
         # set up tab
-        self.add_tab(self._videoStatsTab, self._videoStatsWidget, "Video Properties")
+        self.add_tab(self._videoStatsTab,
+                     self._videoStatsWidget,
+                     self.tr("Video Intensity Statistics"))
 
 
 
@@ -156,7 +158,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self._selectWidget.setEnabled(True)
             self._selectWidget.redisplay()
         elif tab_index == self._tabWidget.indexOf(self._videoStatsTab):
-            if len(self._project["results"].video_statistics) > 0:
+            if self._project["results"].video_statistics is not None:
                 self._videoStatsWidget.setEnabled(True)
                 self._videoStatsWidget.redisplay()
 
@@ -308,7 +310,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         if self._project["results"] is not None:
             if self._project["results"].number_of_regions > 0:
                 self._selectWidget.load_video_and_data()
+            if self._project["results"].video_statistics is not None:
                 self._videoStatsWidget.load_video()
+                self._videoStatsWidget.draw_stats_graph()
 
         self._selectWidget.data_changed()
         # TODO update results displays

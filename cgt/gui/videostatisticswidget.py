@@ -85,6 +85,9 @@ class VideoStatisticsWidget(qw.QWidget, Ui_VideoStatisticsWidget):
         self._graph.setBackground('w')
         self._graphScrollArea.setWidget(self._graph)
 
+        ## pointer for the vertical line identifying the frame
+        self._frame_line = None
+
         ## the histogram widget
         self._histogram = pg.PlotWidget(title="<b>Intensity</b>")
         self._histogram.setBackground('w')
@@ -149,6 +152,10 @@ class VideoStatisticsWidget(qw.QWidget, Ui_VideoStatisticsWidget):
             Args:
                 frame_number (int) the current frame number
         """
+        if self._frame_line is None:
+            print("No graphics set")
+            return
+
         self._frame_line.setPos(self._current_frame+1)
         self.plot_histogram()
 

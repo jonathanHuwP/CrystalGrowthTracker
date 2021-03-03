@@ -30,6 +30,7 @@ from cgt.model.line import Line
 from cgt.model.region import Region
 from cgt.model.imagepoint import ImagePoint
 from cgt.model.imagelinesegment import ImageLineSegment
+from cgt.util.framestats import FrameStats, VideoIntensityStats
 
 def read_csv_project(results_dir, new_project):
     '''Coordinates the reading of a selection of csv reports.
@@ -55,6 +56,7 @@ def read_csv_project(results_dir, new_project):
     info_flag = False
     lines_flag = False
     region_flag = False
+    video_stats = None
 
     for file in files:
         if file.endswith('.csv'):
@@ -70,6 +72,9 @@ def read_csv_project(results_dir, new_project):
             elif "project_regions" in file:
                 region_data = readcsv2listofdicts(file, dirpath)
                 region_flag = True
+            elif "video_statistics" in file:
+                video_stats = readcsv2videostats(file, dirpath)
+
 
     if not segments_flag:
         raise IOError(f"no project_line_segments file found in {dirpath}")
@@ -81,10 +86,45 @@ def read_csv_project(results_dir, new_project):
         raise IOError(f"no project_info file found in {dirpath}")
 
     store = VideoAnalysisResultsStore()
+    if video_stats is not None:
+        store.set_video_statistics(video_stats)
     store_regions(store, region_data, dirpath)
     store_lines(store, line_data, line_seg_data)
     new_project["results"] = store
     new_project.ensure_numeric()
+
+def readcsv2videostats(file, dirpath):
+    '''
+    Reads a video statistics file
+        Args:
+                file (str) the file name
+                dirpath (str) the path to the directory holding the file
+            Returns:
+                data (framestats.VideoIntensityStats)
+            Throws:
+                IOError, OSError, EOFError if reaing error
+    '''
+    dir_in = Path(dirpath)
+    file_to_open = dir_in / file
+    stats = None
+
+    with open(file_to_open, 'r') as file_in:
+        reader = csv.reader(file_in)
+        row = next(reader)
+        bins = []
+        for item in row:
+            if bin is not None:
+                bins.append(np.float64(item))
+
+        stats = VideoIntensityStats(bins)
+
+        for row in reader:
+            mean = np.float64(row.pop(0))
+            std_dev = np.float64(row.pop(0))
+            bin_counts = [np.float64(i) for i in row]
+            stats.append_frame(FrameStats(mean, std_dev, bin_counts))
+
+    return stats
 
 def readcsv2listofdicts(file, dirpath):
     '''Reads regions, crystals and lines csv reports created by the Crystal Growth Tracker
