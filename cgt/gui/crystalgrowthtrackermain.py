@@ -839,7 +839,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         if self._tabWidget.currentWidget() != self._videoStatsTab:
             return
 
-        if len(self._project["results"].video_statistics) > 0:
+        if self._project["results"].video_statistics is not None:
+            # TODO replace with question
             return
 
         progress = qw.QProgressDialog("Processing Video", "cancel", 0, 0, self)

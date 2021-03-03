@@ -43,7 +43,7 @@ class VideoAnalysisResultsStore:
         self._lines = []
 
         ## storage for the intensity statistics of the video
-        self._video_statistics = []
+        self._video_statistics = None
 
         ## flag to indicate store has been changed
         self._changed = False

@@ -55,6 +55,37 @@ def save_csv_results(project):
     if results is None:
         return
 
+    if results.video_statistics is not None:
+        save_csv_video_statistics(project, results.video_statistics)
+
+    save_csv_growth_rates(project, results)
+
+def save_csv_video_statistics(project, stats):
+    """
+    save the video statistics
+        Args:
+            project (CGTProject)
+            stats (VideoIntensityStats)
+    """
+    path = pathlib.Path(project["proj_full_path"])
+    csv_outfile_name = project["prog"] + r"_" + project["proj_name"] + r"_video_statistics.csv"
+
+    with open(path.joinpath(csv_outfile_name), "w") as fout:
+        writer = csv.writer(fout, delimiter=',', lineterminator='\n')
+        writer.writerow(stats.bins)
+        for item in stats.frames:
+            array = []
+            array.append(item.mean)
+            array.append(item.std_deviation)
+            array.extend(item.bin_counts)
+            writer.writerow(array)
+
+def save_csv_growth_rates(project, results):
+    """
+    save everything except the video statistics
+        Args:
+            results (VideoAnalysisResultsStore)
+    """
     regions_array = []
 
     for index, region in enumerate(results.regions):
