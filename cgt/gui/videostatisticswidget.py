@@ -46,12 +46,11 @@ class PlayStates(Enum):
     PLAY_BACKWARD = 3
 
 # import UI
-from cgt.gui.Ui_videopropertieswidget import Ui_VideoPropertiesWidget
+from cgt.gui.Ui_videostatisticswidget import Ui_VideoStatisticsWidget
 
-class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
+class VideoStatisticsWidget(qw.QWidget, Ui_VideoStatisticsWidget):
     """
-    The implementation of the GUI, all the functions and
-    data-structures required to implement the intended behaviour
+    A widget intended to dispay the intensity statistics
     """
     label_style = {'font-weight': 'bold'}
 
@@ -164,9 +163,9 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
 
         self._histogram.clear()
         self._histogram.getAxis('left').setLabel("Counts (number)",
-                                                 **VideoPropertiesWidget.label_style)
+                                                 **VideoStatisticsWidget.label_style)
         self._histogram.getAxis('bottom').setLabel("Bins (Level)",
-                                                   **VideoPropertiesWidget.label_style)
+                                                   **VideoStatisticsWidget.label_style)
         self._histogram.getAxis('left').setTickFont(tick_font)
         self._histogram.getAxis('bottom').setTickFont(tick_font)
         self._histogram.setXRange(0, 260)
@@ -196,10 +195,10 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
             means_minus.append(mean - std_dev[i])
 
         self._graph.getAxis('left').setLabel("Intensity (Level)",
-                                             **VideoPropertiesWidget.label_style)
+                                             **VideoStatisticsWidget.label_style)
         self._graph.getAxis('left').setTickFont(tick_font)
         self._graph.getAxis('bottom').setLabel("Frame (number)",
-                                               **VideoPropertiesWidget.label_style)
+                                               **VideoStatisticsWidget.label_style)
         self._graph.getAxis('bottom').setTickFont(tick_font)
         self._graph.setYRange(0, 260)
 

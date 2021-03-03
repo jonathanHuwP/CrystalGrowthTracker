@@ -51,7 +51,7 @@ import cgt.util.utils as utils
 
 from cgt.io.videoanalyser import VideoAnalyser
 from cgt.model.cgtproject import CGTProject
-from cgt.gui.videopropertieswidget import VideoPropertiesWidget
+from cgt.gui.videostatisticswidget import VideoStatisticsWidget
 
 
 # import UI
@@ -126,7 +126,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._videoStatsTab = qw.QWidget(self)
 
         ## the region selection widget
-        self._videoStatsWidget = VideoPropertiesWidget(self._videoStatsTab, self)
+        self._videoStatsWidget = VideoStatisticsWidget(self._videoStatsTab, self)
         self._videoStatsWidget.setEnabled(False)
 
         # set up tab

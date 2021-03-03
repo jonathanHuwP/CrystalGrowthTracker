@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>VideoPropertiesWidget</class>
- <widget class="QWidget" name="VideoPropertiesWidget">
+ <class>VideoStatisticsWidget</class>
+ <widget class="QWidget" name="VideoStatisticsWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Video Properties</string>
+   <string>Video Intensity Statistics</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
@@ -116,7 +116,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="">
+     <widget class="QWidget" name="layoutWidget">
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <widget class="QScrollArea" name="_graphScrollArea">
