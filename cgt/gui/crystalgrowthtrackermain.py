@@ -282,6 +282,15 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._project.reset_changed()
         self.project_created_or_loaded()
 
+    def reset_video_widgets(self):
+        """
+        clear and reset the video widgets and the frame queue
+        """
+        self._videoStatsWidget.clear()
+        self._selectWidget.clear()
+        if self._frame_queue is not None:
+            self._frame_queue.clear()
+
     def project_created_or_loaded(self):
         """
         carry out action for a newly created or loaded project
@@ -306,8 +315,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 self._videoStatsWidget.load_video()
 
         self._selectWidget.data_changed()
-        #self._drawingWidget.setEnabled(False)
-        #self._resultsWidget.display_data()
+        # TODO update results displays
 
         if self._project["latest_report"] is not None:
             if self._project["latest_report"] != "":
@@ -334,7 +342,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 None
         """
-        self._selectWidget.clear()
+        self.reset_video_widgets()
         self._propertiesWidget.clear()
 
     @qc.pyqtSlot()

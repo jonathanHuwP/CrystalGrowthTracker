@@ -354,6 +354,15 @@ class VideoPropertiesWidget(qw.QWidget, Ui_VideoPropertiesWidget):
         """
         return self._data_source
 
+    def clear(self):
+        """
+        reset the widget
+        """
+        self._video_label.clear()
+        self._histogram.clear()
+        self._graph.clear()
+        self._current_frame = 0
+
     def load_video(self):
         """
         initalize the controls

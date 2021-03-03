@@ -87,7 +87,6 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
             Args:
                 data_source (object) the widget holding the data
         """
-        print(f"viewcontrol set source {type(data_source.get_data())}")
         self._data_source = data_source.get_data()
 
     @qc.pyqtSlot(qw.QAbstractButton)
