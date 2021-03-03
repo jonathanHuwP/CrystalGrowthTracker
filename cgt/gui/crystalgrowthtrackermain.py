@@ -847,16 +847,17 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             # TODO replace with question
             return
 
-        progress = qw.QProgressDialog("Processing Video", "cancel", 0, 0, self)
-        progress.setAutoClose(True)
-        progress.setWindowModality(qc.Qt.WindowModal)
-        progress.setModal(True)
+        progress = qg.QProgressBar(self)
+        progress.setGeometry(200, 80, 250, 20)
 
         analyser = VideoAnalyser(self._project["enhanced_video"], self)
-        analyser.frames_analysed.connect(progress.setValue)
         progress.setMaximum(analyser.length)
+        analyser.frames_analysed.connect(progress.setValue)
         progress.show()
+
         self._project["results"].set_video_statistics(analyser.stats_whole_film())
+        progress.close()
+        progress = None
 
         self._videoStatsWidget.setEnabled(True)
         self._videoStatsWidget.draw_stats_graph()
