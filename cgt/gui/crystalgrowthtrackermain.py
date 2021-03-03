@@ -76,10 +76,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         super().__init__(parent)
         self.setupUi(self)
 
-        ########################
-        self._video_statistics = []
-        ########################
-
         ## the name in the current translation
         self._translated_name = self.tr("CrystalGrowthTracker")
 
@@ -160,7 +156,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self._selectWidget.setEnabled(True)
             self._selectWidget.redisplay()
         elif tab_index == self._tabWidget.indexOf(self._videoStatsTab):
-            if len(self._video_statistics) > 0:
+            if len(self._project["results"].video_statistics) > 0:
                 self._videoStatsWidget.setEnabled(True)
                 self._videoStatsWidget.redisplay()
 
@@ -843,7 +839,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         if self._tabWidget.currentWidget() != self._videoStatsTab:
             return
 
-        if len(self._video_statistics) > 0:
+        if len(self._project["results"].video_statistics) > 0:
             return
 
         progress = qw.QProgressDialog("Processing Video", "cancel", 0, 0, self)
@@ -855,7 +851,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         analyser.frames_analysed.connect(progress.setValue)
         progress.setMaximum(analyser.length)
         progress.show()
-        self._video_statistics = analyser.stats_whole_film()
+        self._project["results"].set_video_statistics(analyser.stats_whole_film())
 
         self._videoStatsWidget.setEnabled(True)
         self._videoStatsWidget.draw_stats_graph()
@@ -867,7 +863,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 video stats array
         """
-        return self._video_statistics
+        return self._project["results"].video_statistics
 
     @qc.pyqtSlot()
     def closeEvent(self, event):

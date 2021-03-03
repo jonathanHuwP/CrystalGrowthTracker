@@ -42,6 +42,9 @@ class VideoAnalysisResultsStore:
         ## storage for the lines
         self._lines = []
 
+        ## storage for the intensity statistics of the video
+        self._video_statistics = []
+
         ## flag to indicate store has been changed
         self._changed = False
 
@@ -78,6 +81,24 @@ class VideoAnalysisResultsStore:
                 None
         """
         self._changed = True
+
+    @property
+    def video_statistics(self):
+        """
+        getter for the video statistics
+            Returns:
+                [FrameStats]
+        """
+        return self._video_statistics
+
+    def set_video_statistics(self, video_stats):
+        """
+        setter for the video statistics
+            Args:
+                video_stats ([FrameStats]) the statistics
+        """
+        self._video_statistics = video_stats
+        self.set_changed()
 
     @property
     def regions(self):
