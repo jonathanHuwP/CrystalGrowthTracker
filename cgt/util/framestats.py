@@ -21,4 +21,35 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 from collections import namedtuple
 
 ## Storage of the statistics of one frame of video
-FrameStats = namedtuple("FrameStats", ["mean", "std_deviation", "histogram"])
+FrameStats = namedtuple("FrameStats", ["mean", "std_deviation", "bin_counts"])
+
+class VideoIntensityStats():
+    """
+    storage for the intensity statistics of  a video
+    """
+
+    def __init__(self, bins=None):
+        """
+        initalize the object
+            Args:
+                bins [np.float] the bins
+        """
+        ## the statistics of the individual frames
+        self._frames = []
+
+        ## the bins used in the bin counts
+        self._bins = bins
+
+    @property
+    def bins(self):
+        return self._bins
+
+    @property
+    def frames(self):
+        return self._frames
+
+    def append_frame(self, frame):
+        self._frames.append(frame)
+
+    def set_bins(self, bins):
+        self._bins = bins

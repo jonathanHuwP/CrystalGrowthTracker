@@ -156,8 +156,6 @@ class VideoStatisticsWidget(qw.QWidget, Ui_VideoStatisticsWidget):
         """
         draw the histogram of the current frame
         """
-        stats = self._data_source.get_video_stats()
-        counts, bins = stats[self._current_frame].histogram
         tick_font = qg.QFont()
         tick_font.setBold(True)
 
@@ -169,9 +167,18 @@ class VideoStatisticsWidget(qw.QWidget, Ui_VideoStatisticsWidget):
         self._histogram.getAxis('left').setTickFont(tick_font)
         self._histogram.getAxis('bottom').setTickFont(tick_font)
         self._histogram.setXRange(0, 260)
-        width = bins[1] - bins[0] - 1.0
-        self._histogram.addItem(pg.BarGraphItem(x=bins[:30],
-                                                height=counts,
+
+        stats = self._data_source.get_video_stats()
+
+        # use only lower limits of bins
+        plot_bins = stats.bins[:len(stats.bins)-1]
+
+        # visible width 7/8 of full bin width
+        width = stats.bins[1] - stats.bins[0]
+        width -= width/8.0
+
+        self._histogram.addItem(pg.BarGraphItem(x=plot_bins,
+                                                height=stats.frames[self._current_frame].bin_counts,
                                                 width=width,
                                                 brush='g'))
 
@@ -184,8 +191,8 @@ class VideoStatisticsWidget(qw.QWidget, Ui_VideoStatisticsWidget):
 
         levels = np.linspace(0.2, 1, 5)
         stats = self._data_source.get_video_stats()
-        means = [x.mean for x in stats]
-        std_dev = [x.std_deviation for x in stats]
+        means = [x.mean for x in stats.frames]
+        std_dev = [x.std_deviation for x in stats.frames]
 
         means_plus = []
         means_minus = []
@@ -202,7 +209,7 @@ class VideoStatisticsWidget(qw.QWidget, Ui_VideoStatisticsWidget):
         self._graph.getAxis('bottom').setTickFont(tick_font)
         self._graph.setYRange(0, 260)
 
-        x_axis = range(1, len(stats)+1)
+        x_axis = range(1, len(stats.frames)+1)
         self._graph.addLegend()
         m_plot = self._graph.plot(x_axis, means, pen='b', name="Mean")
         up_plot = self._graph.plot(x_axis, means_plus, pen='r', name="Std Dev up")
@@ -212,7 +219,7 @@ class VideoStatisticsWidget(qw.QWidget, Ui_VideoStatisticsWidget):
         self._graph.addItem(pg.FillBetweenItem(m_plot, down_plot, levels[3]))
 
         self._frame_line = pg.InfiniteLine(angle=90, movable=False)
-        self._frame_line.setBounds([0, len(stats)])
+        self._frame_line.setBounds([0, len(stats.frames)])
         self._graph.addItem(self._frame_line)
 
     def display(self):

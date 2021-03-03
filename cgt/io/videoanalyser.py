@@ -24,7 +24,7 @@ import PyQt5.QtCore as qc
 import numpy as np
 import cv2 as cv
 
-from cgt.util.framestats import FrameStats
+from cgt.util.framestats import FrameStats, VideoIntensityStats
 
 def bgr_to_gray(rgb):
     tmp = np.dot(rgb[...,:3], [0.1140, 0.5870, 0.2989])
@@ -69,7 +69,6 @@ class VideoAnalyser(qc.QObject):
             Returns:
                 counts ([int]) array of bin counts
                 bins ([float]) array of bin bounds
-                limit (int) the upper value of the samples
         """
         # bins 0 to 32, holding eavenly spaced values 0 to limit
         bins = np.linspace(0, limit, 32)
@@ -80,12 +79,14 @@ class VideoAnalyser(qc.QObject):
     def stats_whole_film(self):
         """
         get the statistics for every frame of the video
+            Returns:
+                the statistics (VideoIntensityStats)
         """
         bins = np.linspace(0, 256, 32)
-        vid_statistics = []
+        vid_statistics = VideoIntensityStats(bins)
         for i in range(self.length):
-            vid_statistics.append(self.make_stats(i, bins))
-            if i%100 == 0:
+            vid_statistics.append_frame(self.make_stats(i, bins))
+            if i%20 == 0:
                 print(f"emit {i}")
                 self.frames_analysed.emit(i)
 
@@ -98,9 +99,9 @@ class VideoAnalyser(qc.QObject):
 
         mean = np.mean(image)
         standard_deviation = np.std(image)
-        histo = np.histogram(image, bins)
+        count, _ = np.histogram(image, bins)
 
-        return FrameStats(mean, standard_deviation, histo)
+        return FrameStats(mean, standard_deviation, count)
 
     def get_frame(self, frame_number):
         """
