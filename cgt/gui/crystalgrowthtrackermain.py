@@ -861,6 +861,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self._videoStatsWidget.setEnabled(True)
         self._videoStatsWidget.draw_stats_graph()
+        self._videoStatsWidget.load_video()
         self._videoStatsWidget.redisplay()
 
     def get_video_stats(self):
