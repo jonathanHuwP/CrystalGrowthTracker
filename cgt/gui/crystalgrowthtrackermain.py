@@ -131,18 +131,18 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                      self._videoStatsWidget,
                      self.tr("Video Intensity Statistics"))
 
-        # User drawing
-        ##############
+        # # User drawing
+        # ##############
 
-        ## base widget of crystal drawing tab
-        self._drawingTab = qw.QWidget(self)
+        # ## base widget of crystal drawing tab
+        # self._drawingTab = qw.QWidget(self)
 
-        ## the crystal drawing widget
-        self._drawingWidget = CrystalDrawingWidget(self._drawingTab, self)
+        # ## the crystal drawing widget
+        # self._drawingWidget = CrystalDrawingWidget(self._drawingTab, self)
 
-        # set up tab
-        self.add_tab(self._drawingTab, self._drawingWidget, self.tr("Draw Features"))
-        self._drawingWidget.setEnabled(False)
+        # # set up tab
+        # self.add_tab(self._drawingTab, self._drawingWidget, self.tr("Draw Features"))
+        # self._drawingWidget.setEnabled(False)
 
         # connect tab widget to change function
         self._tabWidget.currentChanged.connect(self.tab_changed)
@@ -160,7 +160,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._propertiesTab.setEnabled(False)
         self._selectWidget.setEnabled(False)
         self._videoStatsWidget.setEnabled(False)
-        self._drawingWidget.setEnabled(False)
+        #self._drawingWidget.setEnabled(False)
 
         if not self.has_project():
             return
@@ -174,9 +174,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             if self._project["results"].video_statistics is not None:
                 self._videoStatsWidget.setEnabled(True)
                 self._videoStatsWidget.redisplay()
-        elif  tab_index == self._tabWidget.indexOf(self._drawingTab):
-            if len(self._project["results"].regions) is not None:
-                self._drawingWidget.setEnabled(True)
+        #elif  tab_index == self._tabWidget.indexOf(self._drawingTab):
+        #    if len(self._project["results"].regions) is not None:
+        #        self._drawingWidget.setEnabled(True)
 
     def has_project(self):
         """
@@ -326,7 +326,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         if self._project["results"] is not None:
             if self._project["results"].number_of_regions > 0:
                 self._selectWidget.load_video_and_data()
-                self._drawingWidget.new_region()
+                #self._drawingWidget.new_region()
             if self._project["results"].video_statistics is not None:
                 self._videoStatsWidget.load_video()
                 self._videoStatsWidget.draw_stats_graph()
@@ -694,7 +694,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         for line in lines:
             self._project["results"].add_line(region_index, line)
 
-        self._drawingWidget.new_region()
+        #self._drawingWidget.new_region()
         self._resultsWidget.display_data()
 
     def set_title(self):
