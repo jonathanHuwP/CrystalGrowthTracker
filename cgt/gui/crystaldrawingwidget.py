@@ -165,7 +165,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         """
         print("CDW: store_new_lines")
         lines = []
-        results = self._data_source.get_result()
+        results = self._data_source.get_results()
         current_region = self._rlfWidget.get_selected_region()
         start = len(results.get_lines(current_region))
 
@@ -234,7 +234,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
                 None
         """
         print("CDW: display_image")
-        images = self._data_source.get_result().region_images[region_index]
+        images = self._data_source.get_results().region_images[region_index]
 
         frame_number = 0
         image = None
@@ -250,7 +250,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         line = None
         line_index = self._rlfWidget.get_selected_line()
         if line_index is not None:
-            line = self._data_source.get_result().lines[line_index]
+            line = self._data_source.get_results().lines[line_index]
 
         self._drawing.set_display_line(line)
 
@@ -279,8 +279,8 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         qw.QWidget.showEvent(self, event)
 
         if self._data_source is not None:
-            if self._data_source.get_result() is not None:
-                if len(self._data_source.get_result().regions) > 0:
+            if self._data_source.get_results() is not None:
+                if len(self._data_source.get_results().regions) > 0:
                     self._videoControl.setEnabled(True)
 
     @qc.pyqtSlot()
@@ -317,7 +317,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
 
         self._drawing.clear_all()
 
-        region = self._data_source.get_result().regions[r_index]
+        region = self._data_source.get_results().regions[r_index]
 
 
         self._videoControl.set_range(region.start_frame, region.end_frame)

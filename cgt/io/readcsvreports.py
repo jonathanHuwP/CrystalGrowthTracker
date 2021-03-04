@@ -18,16 +18,19 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 @copyright 2020
 @author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 '''
+# pylint: disable = no-name-in-module
+# pylint: disable = too-many-locals
+# pylint: disable = too-many-branches
+
 import os
 import csv
-import numpy as np
 from pathlib import Path
-from itertools import groupby
+import numpy as np
+
 from PyQt5.QtCore import QRect, QPoint
 
 from cgt.model.videoanalysisresultsstore import VideoAnalysisResultsStore
 from cgt.model.line import Line
-from cgt.model.region import Region
 from cgt.model.imagepoint import ImagePoint
 from cgt.model.imagelinesegment import ImageLineSegment
 from cgt.util.framestats import FrameStats, VideoIntensityStats
@@ -88,7 +91,7 @@ def read_csv_project(results_dir, new_project):
     store = VideoAnalysisResultsStore()
     if video_stats is not None:
         store.set_video_statistics(video_stats)
-    store_regions(store, region_data, dirpath)
+    store_regions(store, region_data)
     store_lines(store, line_data, line_seg_data)
     new_project["results"] = store
     new_project.ensure_numeric()
@@ -174,18 +177,17 @@ def readcsvinfo2dict(new_project, file, dirpath):
                 value = row[1]
                 new_project[key] = value
 
-def store_regions(store, regions_data, dirpath):
+def store_regions(store, regions_data):
     '''
     convert string lists to regions and adds them to a
     Crystal Growth Tracker to a results object.
         Args:
             store:    A results class object.
             regions_data ([dict]): list of dictionarys read in from csv
-            dirpath (string) path to directory holding images directory
         Returns:
             None
     '''
-    for i, region in enumerate(regions_data):
+    for region in regions_data:
         top = int(region["Top"])
         left = int(region["Left"])
         bottom = int(region["Bottom"])

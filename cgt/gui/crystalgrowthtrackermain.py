@@ -142,6 +142,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         # set up tab
         self.add_tab(self._drawingTab, self._drawingWidget, self.tr("Draw Features"))
+        self._drawingWidget.setEnabled(False)
 
         # connect tab widget to change function
         self._tabWidget.currentChanged.connect(self.tab_changed)
@@ -159,6 +160,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._propertiesTab.setEnabled(False)
         self._selectWidget.setEnabled(False)
         self._videoStatsWidget.setEnabled(False)
+        self._drawingWidget.setEnabled(False)
 
         if not self.has_project():
             return
@@ -172,6 +174,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             if self._project["results"].video_statistics is not None:
                 self._videoStatsWidget.setEnabled(True)
                 self._videoStatsWidget.redisplay()
+        elif  tab_index == self._tabWidget.indexOf(self._drawingTab):
+            if len(self._project["results"].regions) is not None:
+                self._drawingWidget.setEnabled(True)
 
     def has_project(self):
         """

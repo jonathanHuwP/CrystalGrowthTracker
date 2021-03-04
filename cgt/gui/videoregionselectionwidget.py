@@ -291,7 +291,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
             self.display()
         elif self._mode == states.EDIT:
             self.make_edit_label()
-            self.rectangle_drawn()
+            #self.rectangle_drawn()
             self.display()
         elif self._mode == states.DISPLAY:
             self.make_display_label()
