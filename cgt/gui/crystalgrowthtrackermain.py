@@ -326,6 +326,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         if self._project["results"] is not None:
             if self._project["results"].number_of_regions > 0:
                 self._selectWidget.load_video_and_data()
+                self._drawingWidget.new_region()
             if self._project["results"].video_statistics is not None:
                 self._videoStatsWidget.load_video()
                 self._videoStatsWidget.draw_stats_graph()

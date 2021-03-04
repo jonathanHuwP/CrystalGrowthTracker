@@ -192,15 +192,11 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
         self._drawing.clear_all()
 
     @qc.pyqtSlot(bool)
-    def frame_changed(self, first_frame):
+    def frame_changed(self, frame_number=0):
         """
         callback for a change of frame
-
             Args:
-                first_frame (bool) true if first frame chosen
-
-            Returns:
-                None
+                frame_number (int) the frame number
         """
         print("CDW: frame_changed")
         region_index = self._rlfWidget.get_selected_region()
@@ -218,7 +214,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
                 self._drawing.clear_all()
             else:
                 # reset the control widget
-                self._videoControl.set_state(not first_frame)
+                self._videoControl.set_state(frame_number)
                 return
 
         print(f"CDW: region index {region_index}")
@@ -234,27 +230,28 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
                 None
         """
         print("CDW: display_image")
-        images = self._data_source.get_results().region_images[region_index]
+        pass
+        # images = self._data_source.get_results().region_images[region_index]
 
-        frame_number = 0
-        image = None
-        if first_frame:
-            image = nparray_to_qimage(images[0])
-            frame_number = self._videoControl.get_minimum()
-        else:
-            image = nparray_to_qimage(images[1])
-            frame_number = self._videoControl.get_maximum()
+        # frame_number = 0
+        # image = None
+        # if first_frame:
+        #     image = nparray_to_qimage(images[0])
+        #     frame_number = self._videoControl.get_minimum()
+        # else:
+        #     image = nparray_to_qimage(images[1])
+        #     frame_number = self._videoControl.get_maximum()
 
-        self._drawing.set_backgroud_pixmap(qg.QPixmap(image), frame_number)
+        # self._drawing.set_backgroud_pixmap(qg.QPixmap(image), frame_number)
 
-        line = None
-        line_index = self._rlfWidget.get_selected_line()
-        if line_index is not None:
-            line = self._data_source.get_results().lines[line_index]
+        # line = None
+        # line_index = self._rlfWidget.get_selected_line()
+        # if line_index is not None:
+        #     line = self._data_source.get_results().lines[line_index]
 
-        self._drawing.set_display_line(line)
+        # self._drawing.set_display_line(line)
 
-        self._drawing.redisplay()
+        # self._drawing.redisplay()
 
     @qc.pyqtSlot()
     def zoom_changed(self):
@@ -316,11 +313,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
                 return
 
         self._drawing.clear_all()
-
-        region = self._data_source.get_results().regions[r_index]
-
-
-        self._videoControl.set_range(region.start_frame, region.end_frame)
+        self._videoControl.set_range(0, self._data_source.get_video_length())
         self._videoControl.setEnabled(True)
         self.display_image(False, r_index)
 
