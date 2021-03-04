@@ -66,7 +66,7 @@ class RegionsLinesFramesWidget(qw.QWidget, Ui_RegionsLinesFramesWidget):
         """
         self.clear()
 
-        result = self._data_source.get_result()
+        result = self._data_source.get_results()
 
         if result is None:
             return

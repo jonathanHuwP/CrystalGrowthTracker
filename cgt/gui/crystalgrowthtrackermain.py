@@ -42,6 +42,7 @@ from cgt.gui.projectpropertieswidget import ProjectPropertiesWidget
 from cgt.gui.videoparametersdialog import VideoParametersDialog
 from cgt.gui.videoregionselectionwidget import VideoRegionSelectionWidget
 from cgt.gui.editnotesdialog import EditNotesDialog
+from cgt.gui.crystaldrawingwidget import CrystalDrawingWidget
 
 from cgt.io import htmlreport
 from cgt.io import writecsvreports
@@ -130,7 +131,17 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                      self._videoStatsWidget,
                      self.tr("Video Intensity Statistics"))
 
+        # User drawing
+        ##############
 
+        ## base widget of crystal drawing tab
+        self._drawingTab = qw.QWidget(self)
+
+        ## the crystal drawing widget
+        self._drawingWidget = CrystalDrawingWidget(self._drawingTab, self)
+
+        # set up tab
+        self.add_tab(self._drawingTab, self._drawingWidget, self.tr("Draw Features"))
 
         # connect tab widget to change function
         self._tabWidget.currentChanged.connect(self.tab_changed)
