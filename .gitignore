@@ -11,3 +11,4 @@ Ui_*
 .settings
 *.bak
 .vscode
+LINT.txt
