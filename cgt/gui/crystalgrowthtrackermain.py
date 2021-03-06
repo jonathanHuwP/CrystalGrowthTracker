@@ -864,7 +864,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             # TODO replace with question
             return
 
-        progress = qg.QProgressBar(self)
+        progress = qw.QProgressBar(self)
         progress.setGeometry(200, 80, 250, 20)
 
         analyser = VideoAnalyser(self._project["enhanced_video"], self)
