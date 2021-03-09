@@ -131,9 +131,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         # self.add_tab(self._drawingTab, self._drawingWidget, self.tr("Draw Features"))
         # self._drawingWidget.setEnabled(False)
 
-        # connect tab widget to change function
-        self._tabWidget.currentChanged.connect(self.tab_changed)
-
         # set up the title
         self.set_title()
 
