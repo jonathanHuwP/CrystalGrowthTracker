@@ -29,8 +29,23 @@
     <item>
      <widget class="QTabWidget" name="_tabWidget">
       <property name="currentIndex">
-       <number>-1</number>
+       <number>0</number>
       </property>
+      <widget class="QWidget" name="_propertiesTab">
+       <attribute name="title">
+        <string>Project Properties</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="_selectTab">
+       <attribute name="title">
+        <string>Select Regions</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="_videoStatsTab">
+       <attribute name="title">
+        <string>Video Intensity Statistics</string>
+       </attribute>
+      </widget>
      </widget>
     </item>
    </layout>

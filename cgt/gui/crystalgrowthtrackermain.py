@@ -86,50 +86,37 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         ## the project data structure
         self._project = None
 
-        ## Properties
-        #############
-        ## base widget for properties tab
-        self._propertiesTab = qw.QWidget(self)
-
-        ## the region selection widget
-        self._propertiesWidget = ProjectPropertiesWidget(self._propertiesTab, self)
-
-        # set up tab
-        self.add_tab(self._propertiesTab, self._propertiesWidget, "Project Properties")
-
-        ## Selection
-        ############
-
         ## the queue of video frames to be displayed
         self._frame_queue = QThreadSafeQueue()
 
         ## the thread for the VideoBuffer
         self._video_thread = None
 
-        ## base widget for region selection tab
-        self._selectTab = qw.QWidget(self)
+        ## Properties
+        #############
+        tab = self._tabWidget.widget(0)
+
+        ## the properties listing widget
+        self._propertiesWidget = ProjectPropertiesWidget(tab, self)
+        setup_tab(tab, self._propertiesWidget)
+
+        ## Selection
+        ############
+        tab = self._tabWidget.widget(1)
 
         ## the region selection widget
-        self._selectWidget = VideoRegionSelectionWidget(self._selectTab, self)
+        self._selectWidget = VideoRegionSelectionWidget(tab, self)
         self._selectWidget.setEnabled(False)
-
-        # set up tab
-        self.add_tab(self._selectTab, self._selectWidget, "Select Regions")
+        setup_tab(tab, self._selectWidget)
 
         ## Video Statistics
         ###################
-
-        ## base widget for the video properties tab
-        self._videoStatsTab = qw.QWidget(self)
+        tab = self._tabWidget.widget(2)
 
         ## the region selection widget
-        self._videoStatsWidget = VideoStatisticsWidget(self._videoStatsTab, self)
+        self._videoStatsWidget = VideoStatisticsWidget(tab, self)
         self._videoStatsWidget.setEnabled(False)
-
-        # set up tab
-        self.add_tab(self._videoStatsTab,
-                     self._videoStatsWidget,
-                     self.tr("Video Intensity Statistics"))
+        setup_tab(tab, self._videoStatsWidget)
 
         # # User drawing
         # ##############
@@ -929,3 +916,14 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         else:
             # dispose of the event in the approved way
             event.ignore()
+
+def setup_tab(tab, widget):
+    """
+    connect widget to tab via layout (allows resizing)
+        Args:
+            tab (QWidget) the page widget from a tab
+            widget (QWidget) the widget to be added
+    """
+    layout = qw.QVBoxLayout()
+    layout.addWidget(widget)
+    tab.setLayout(layout)
