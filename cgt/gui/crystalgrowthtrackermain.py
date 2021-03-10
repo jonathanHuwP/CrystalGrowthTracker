@@ -153,7 +153,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 self._drawingWidget.setEnabled(True)
                 self._video_reader.connect_viewer(self._drawingWidget)
 
-
     def has_project(self):
         """
         find if a project is loaded
