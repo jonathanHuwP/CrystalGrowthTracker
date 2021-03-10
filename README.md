@@ -56,7 +56,7 @@ or the path relative to your current location.
 
 To remove software delete the CrystalGrowthTracker direcory, then delete the environment:
 
-`conda remove --name CGT --all` 
+`conda remove --name CGT --all`
 
 ### Development and Doxygen Documentation
 
@@ -126,3 +126,6 @@ The pylint results are displayed in the problems window so you need to open this
 
 As unnescessary white space is an output of pylint information you may also want to view the what spaces. Select Window -> Preferences and from the proferences window select General -> Editors -> Text Editors and here you can select a number of text display options including showing white space and configuring which caharature of those to include.
 
+## ToDo
+
+- [ ] Refactor the video widgets
