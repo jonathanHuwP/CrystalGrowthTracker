@@ -29,8 +29,9 @@ from enum import IntEnum
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
+import PyQt5.QtGui as qg
 
-from Ui_artifactmarkupwidget import Ui_ArtifactMarkupWidget
+from cgt.gui.Ui_artifactmarkupwidget import Ui_ArtifactMarkupWidget
 
 class DrawingStates(IntEnum):
     """
@@ -51,16 +52,25 @@ class ArtifactMarkupWidget(qw.QWidget, Ui_ArtifactMarkupWidget):
     """
     The main window provides a tab widget for the video widget
     """
+    ## signal that a frame is required
+    request_frame = qc.pyqtSignal(int)
 
-    def __init__(self, parent=None):
+    ## signal that the queue should be cleared
+    clear_queue = qc.pyqtSignal()
+
+    def __init__(self, parent, data_source):
         """
         the object initalization function
             Args:
                 parent (QObject): the parent QObject for this window
+                data_source (CrystalGrowthTrackerMain): the holder of the results
         """
         super().__init__(parent)
         self.setupUi(self)
         self._splitter.setSizes([500, 124])
+
+        ## the holder of the results data
+        self._data_source = data_source
 
         ## the top state
         self._state = DrawingStates.DRAW
@@ -121,20 +131,20 @@ class ArtifactMarkupWidget(qw.QWidget, Ui_ArtifactMarkupWidget):
         """
         print(f"region {index}")
 
-def run():
-    """
-    use a local function to make an isolated the QApplication object
+    @qc.pyqtSlot(qg.QPixmap, int)
+    def display_image(self, pixmap, frame_number):
+        """
+        display an image, the image must be a pixmap so that
+        it can safely be recieved from another thread
+            Args:
+                pixmap (QPixmap) the image in pixmap form
+                frame_number
+        """
+        print(f"markup widget display {pixmap} {frame_number}")
 
-        Returns:
-            None
-    """
-    import sys
-
-    app = qw.QApplication(sys.argv)
-    window = ArtifactMarkupWidget()
-    window.show()
-    app.exec_()
-
-
-if __name__ == "__main__":
-    run()
+    @qc.pyqtSlot()
+    def stop_play(self):
+        """
+        stop the playing
+        """
+        print("markup widget stop play")

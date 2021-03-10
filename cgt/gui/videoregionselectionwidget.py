@@ -78,7 +78,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         super().__init__(parent)
         self.setupUi(self)
 
-        ## required as QWidget .parent() returns vanilla QWidget
+        ## the holder of the results data
         self._data_source = data_source
 
         ## state variable determines if video is playing

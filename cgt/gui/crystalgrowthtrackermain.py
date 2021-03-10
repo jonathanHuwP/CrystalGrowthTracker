@@ -23,20 +23,17 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = too-many-public-methods
 # pylint: disable = too-many-instance-attributes
 # pylint: disable = c-extension-no-member
+# pylint: disable = line-too-long
+# pylint: disable = invalid-name
 
-import sys
 import os
-import array as arr
 from shutil import copy2
-import numpy as np
 
 import PyQt5.QtWidgets as qw
-import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
 from cgt.model.videoanalysisresultsstore import VideoAnalysisResultsStore
 
-from cgt.util.qthreadsafequeue import QThreadSafeQueue
 import cgt.util.utils as utils
 
 from cgt.gui.projectstartdialog import ProjectStartDialog
@@ -44,7 +41,7 @@ from cgt.gui.projectpropertieswidget import ProjectPropertiesWidget
 from cgt.gui.videoparametersdialog import VideoParametersDialog
 from cgt.gui.videoregionselectionwidget import VideoRegionSelectionWidget
 from cgt.gui.editnotesdialog import EditNotesDialog
-from cgt.gui.crystaldrawingwidget import CrystalDrawingWidget
+from cgt.gui.artifactmarkupwidget import ArtifactMarkupWidget
 
 from cgt.io import htmlreport
 from cgt.io import writecsvreports
@@ -113,18 +110,14 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._videoStatsWidget.setEnabled(False)
         setup_tab(tab, self._videoStatsWidget)
 
-        # # User drawing
-        # ##############
+        ## User drawing
+        ###############
+        tab =self._tabWidget.widget(3)
 
-        # ## base widget of crystal drawing tab
-        # self._drawingTab = qw.QWidget(self)
-
-        # ## the crystal drawing widget
-        # self._drawingWidget = CrystalDrawingWidget(self._drawingTab, self)
-
-        # # set up tab
-        # self.add_tab(self._drawingTab, self._drawingWidget, self.tr("Draw Features"))
-        # self._drawingWidget.setEnabled(False)
+        ## the crystal drawing widget
+        self._drawingWidget = ArtifactMarkupWidget(tab, self)
+        self._drawingWidget.setEnabled(False)
+        setup_tab(tab, self._drawingWidget)
 
         # set up the title
         self.set_title()
@@ -139,10 +132,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         if not self.has_project():
             return
 
-        self._propertiesTab.setEnabled(False)
+        self._propertiesWidget.setEnabled(False)
         self._selectWidget.setEnabled(False)
         self._videoStatsWidget.setEnabled(False)
-        #self._drawingWidget.setEnabled(False)
+        self._drawingWidget.setEnabled(False)
 
         if tab_index == self._tabWidget.indexOf(self._propertiesTab):
             self._propertiesTab.setEnabled(True)
@@ -155,9 +148,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 self._videoStatsWidget.setEnabled(True)
                 self._video_reader.connect_viewer(self._videoStatsWidget)
                 self._videoStatsWidget.redisplay()
-        #elif  tab_index == self._tabWidget.indexOf(self._drawingTab):
-        #    if len(self._project["results"].regions) is not None:
-        #        self._drawingWidget.setEnabled(True)
+        elif  tab_index == self._tabWidget.indexOf(self._drawingTab):
+            if len(self._project["results"].regions) is not None:
+                self._drawingWidget.setEnabled(True)
+                self._video_reader.connect_viewer(self._drawingWidget)
+
 
     def has_project(self):
         """
@@ -696,19 +691,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                                    error_title,
                                    message)
             return
-
-    qc.pyqtSlot(qg.QPixmap, int)
-    def display_image(self, image, frame_number):
-        """
-        have the current widget display an image
-            Args:
-                image (QImage) the image to display
-                frame_number (int) the frame number in the video
-        """
-        if self._tabWidget.currentWidget() == self._selectTab:
-            self._selectWidget.display_image(image, frame_number)
-        elif self._tabWidget.currentWidget() == self._videoStatsTab:
-            self._videoStatsWidget.display_image(image, frame_number)
 
     qc.pyqtSlot()
     def print_results(self):
