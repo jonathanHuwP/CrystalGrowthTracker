@@ -52,6 +52,12 @@ class VideoStatisticsWidget(qw.QWidget, Ui_VideoStatisticsWidget):
     """
     A widget intended to dispay the intensity statistics
     """
+    ## signal that a frame is required
+    request_frame = qc.pyqtSignal(int)
+
+    ## signal that the queue should be cleared
+    clear_queue = qc.pyqtSignal()
+
     label_style = {'font-weight': 'bold'}
 
     def __init__(self, parent, data_source):
@@ -73,6 +79,9 @@ class VideoStatisticsWidget(qw.QWidget, Ui_VideoStatisticsWidget):
 
         ## the currently displayed frame
         self._current_frame = 0
+
+        ## the currently displayed image
+        self._current_image = None
 
         ## the current value of the zoom
         self._current_zoom = 1.0
@@ -116,7 +125,7 @@ class VideoStatisticsWidget(qw.QWidget, Ui_VideoStatisticsWidget):
         """
         get and redisplay the current frame
         """
-        self.request_frame(self._current_frame)
+        self.post_request_frame(self._current_frame)
 
     def connect_controls(self):
         """
@@ -127,7 +136,7 @@ class VideoStatisticsWidget(qw.QWidget, Ui_VideoStatisticsWidget):
         self._videoControl.start_end.connect(self.start_end)
         self._videoControl.one_frame_forward.connect(self.step_forward)
         self._videoControl.one_frame_backward.connect(self.step_backward)
-        self._videoControl.pause .connect(self.play_pause)
+        self._videoControl.pause.connect(self.play_pause)
         self._videoControl.forwards.connect(self.play_forward)
         self._videoControl.backwards.connect(self.play_backward)
 
@@ -153,7 +162,6 @@ class VideoStatisticsWidget(qw.QWidget, Ui_VideoStatisticsWidget):
                 frame_number (int) the current frame number
         """
         if self._frame_line is None:
-            print("No graphics set")
             return
 
         self._frame_line.setPos(self._current_frame+1)
@@ -257,10 +265,10 @@ class VideoStatisticsWidget(qw.QWidget, Ui_VideoStatisticsWidget):
 
         if self._playing == PlayStates.PLAY_FORWARD:
             next_frame = (self._current_frame + 1)
-            self.request_frame(next_frame%self._data_source.get_video_length())
+            self.post_request_frame(next_frame%self._data_source.get_video_length())
         elif self._playing == PlayStates.PLAY_BACKWARD:
             next_frame = (self._current_frame - 1)
-            self.request_frame(next_frame%self._data_source.get_video_length())
+            self.post_request_frame(next_frame%self._data_source.get_video_length())
 
     def apply_zoom_to_image(self, image):
         """
@@ -287,16 +295,16 @@ class VideoStatisticsWidget(qw.QWidget, Ui_VideoStatisticsWidget):
                 end (bool) if true jump to end else start
         """
         if end:
-            self.request_frame(self._data_source.get_video_length()-1)
+            self.post_request_frame(self._data_source.get_video_length()-1)
         else:
-            self.request_frame(0)
+            self.post_request_frame(0)
 
     @qc.pyqtSlot(int)
-    def request_frame(self, frame_number):
+    def post_request_frame(self, frame_number):
         """
         a specific frame should be displayed
         """
-        self._data_source.request_video_frame(frame_number)
+        self.request_frame.emit(frame_number)
 
     @qc.pyqtSlot(float)
     def zoom_value(self, value):
@@ -314,7 +322,7 @@ class VideoStatisticsWidget(qw.QWidget, Ui_VideoStatisticsWidget):
         """
         frame = self._current_frame + 1
         if frame < self._data_source.get_video_length():
-            self.request_frame(frame)
+            self.post_request_frame(frame)
 
     @qc.pyqtSlot()
     def step_backward(self):
@@ -323,33 +331,34 @@ class VideoStatisticsWidget(qw.QWidget, Ui_VideoStatisticsWidget):
         """
         frame = self._current_frame - 1
         if frame >= 0:
-            self.request_frame(frame)
+            self.post_request_frame(frame)
 
     @qc.pyqtSlot()
     def play_pause(self):
         """
         pause the playing
         """
-        self._data_source.clear_queue()
+        self.clear_queue.emit()
         self._playing = PlayStates.MANUAL
+        self._videoControl.enable_fine_controls()
 
     @qc.pyqtSlot()
     def play_forward(self):
         """
         start playing forward
         """
-        self._data_source.clear_queue()
+        self.clear_queue.emit()
         self._playing = PlayStates.PLAY_FORWARD
-        self.request_frame((self._current_frame+1)%self._data_source.get_video_length())
+        self.post_request_frame((self._current_frame+1)%self._data_source.get_video_length())
 
     @qc.pyqtSlot()
     def play_backward(self):
         """
         start playing in reverse
         """
-        self._data_source.clear_queue()
+        self.clear_queue.emit()
         self._playing = PlayStates.PLAY_BACKWARD
-        self.request_frame((self._current_frame-1)%self._data_source.get_video_length())
+        self.post_request_frame((self._current_frame-1)%self._data_source.get_video_length())
 
     def get_image_copy(self):
         """
@@ -381,3 +390,9 @@ class VideoStatisticsWidget(qw.QWidget, Ui_VideoStatisticsWidget):
         initalize the controls
         """
         self._videoControl.set_range(self._data_source.get_video_length())
+
+    def stop_play(self):
+        """
+        stop the video
+        """
+        self.play_pause()
