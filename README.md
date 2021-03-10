@@ -132,3 +132,4 @@ As unnescessary white space is an output of pylint information you may also want
 - [ ] Get artifacts widget working
 - [ ] Add a results widget
 - [ ] Video stats on raw
+- [x] Progress bar built into main
