@@ -119,7 +119,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._drawingWidget.setEnabled(False)
         setup_tab(tab, self._drawingWidget)
 
-        # set up the title
+        self._progressBar.hide()
         self.set_title()
 
     @qc.pyqtSlot(int)
@@ -769,17 +769,14 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             # TODO replace with question
             return
 
-        progress = qw.QProgressBar(self)
-        progress.setGeometry(200, 80, 250, 20)
 
         analyser = VideoAnalyser(self._project["enhanced_video"], self)
-        progress.setMaximum(analyser.get_length())
-        analyser.frames_analysed.connect(progress.setValue)
-        progress.show()
+        self._progressBar.setMaximum(analyser.get_length())
+        analyser.frames_analysed.connect(self._progressBar.setValue)
+        self._progressBar.show()
 
         self._project["results"].set_video_statistics(analyser.stats_whole_film())
-        progress.close()
-        progress = None
+        self._progressBar.hide()
 
         self._video_reader.connect_viewer(self._videoStatsWidget)
         self._videoStatsWidget.setEnabled(True)
