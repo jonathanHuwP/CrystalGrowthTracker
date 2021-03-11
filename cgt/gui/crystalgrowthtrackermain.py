@@ -100,6 +100,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         ## the region selection widget
         self._selectWidget = VideoRegionSelectionWidget(tab, self)
+        self._selectWidget.setup_video_widget()
         self._selectWidget.setEnabled(False)
         setup_tab(tab, self._selectWidget)
 
@@ -143,8 +144,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self._propertiesTab.setEnabled(True)
         elif tab_index == self._tabWidget.indexOf(self._selectTab):
             self._selectWidget.setEnabled(True)
-            self._enhanced_video_reader.connect_viewer(self._selectWidget)
-            self._selectWidget.redisplay()
+            #self._selectWidget.redisplay()
         elif tab_index == self._tabWidget.indexOf(self._videoStatsTab):
             if self._project["results"].video_statistics is not None:
                 self._videoStatsWidget.setEnabled(True)
@@ -307,7 +307,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 self._videoStatsWidget.draw_stats_graph()
 
         self._selectWidget.data_changed()
-        # TODO update results displays
 
         if self._project["latest_report"] is not None:
             if self._project["latest_report"] != "":
@@ -655,9 +654,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     def load_video(self):
         """
         read in a video and display
-
-            Returns:
-                None
         """
         error_title = self.tr("CGT Video File Error")
         if self._project is None:
@@ -677,8 +673,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         try:
             # make the objects
             self._enhanced_video_reader = VideoSource(self._project["enhanced_video"])
-            self._enhanced_video_reader.connect_viewer(self._selectWidget)
-            self._selectWidget.load_video_and_data()
+            self._selectWidget.set_video_source(self._enhanced_video_reader)
 
             if self._project["raw_video"] is not None:
                 self._raw_video_reader = VideoSource(self._project["raw_video"])

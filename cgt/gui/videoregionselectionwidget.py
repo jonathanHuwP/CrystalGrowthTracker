@@ -26,13 +26,11 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = no-member
 # pylint: disable = too-many-public-methods
 
-from enum import Enum
-
 import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
-import PyQt5.Qt as qt
 
+from cgt.gui.videobasewidget import VideoBaseWidget, PlayStates
 from cgt.gui.regioncreationlabel import RegionCreationLabel
 from cgt.gui.regioneditlabel import RegionEditLabel
 from cgt.gui.regiondisplaylabel import RegionDisplayLabel
@@ -42,24 +40,11 @@ from cgt.gui.videoregionselectionwidgetstates import VideoRegionSelectionWidgetS
 # import UI
 from cgt.gui.Ui_videoregionselectionwidget import Ui_VideoRegionSelectionWidget
 
-class PlayStates(Enum):
-    """
-    enumeration of video playing states
-    """
-    MANUAL        = 1
-    PLAY_FORWARD  = 2
-    PLAY_BACKWARD = 3
-
-class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
+class VideoRegionSelectionWidget(VideoBaseWidget, Ui_VideoRegionSelectionWidget):
     """
     The implementation of the GUI, all the functions and
     data-structures required to implement the intended behaviour
     """
-    ## signal that a frame is required
-    request_frame = qc.pyqtSignal(int)
-
-    ## signal that the queue should be cleared
-    clear_queue = qc.pyqtSignal()
 
     def __init__(self, parent, data_source):
         """
@@ -75,23 +60,11 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         ## the holder of the results data
         self._data_source = data_source
 
-        ## state variable determines if video is playing
-        self._playing = PlayStates.MANUAL
-
-        ## the current image
-        self._current_image = None
-
-        ## the currently displayed frame
-        self._current_frame = 0
-
         ## the currently displayed subimage
         self._current_subimage = None
 
         ## the currently used subimage rectangle
         self._current_rectangle = None
-
-        ## the current value of the zoom
-        self._current_zoom = 1.0
 
         ## pointer to the label currently in use
         self._current_label = None
@@ -116,11 +89,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
 
         self.set_up_subimage_label()
         self.make_create_label()
-
-        font = qg.QFont( "Monospace", 10, qg.QFont.DemiBold)
-        self._frameLabel.setFont(font)
-
-        self.connect_controls()
 
     def make_create_label(self):
         """
@@ -245,27 +213,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         initalize the controls
         """
-        self._videoControl.set_range(self._data_source.get_video_length())
         self._view_control.set_data_source(self)
-
-    def redisplay(self):
-        """
-        get and redisplay the current frame
-        """
-        self.post_request_frame(self._current_frame)
-
-    def connect_controls(self):
-        """
-        connect the video controls to self
-        """
-        self._videoControl.zoom_value.connect(self.zoom_value)
-        self._videoControl.frame_changed.connect(self.request_frame)
-        self._videoControl.start_end.connect(self.start_end)
-        self._videoControl.one_frame_forward.connect(self.step_forward)
-        self._videoControl.one_frame_backward.connect(self.step_backward)
-        self._videoControl.pause .connect(self.play_pause)
-        self._videoControl.forwards.connect(self.play_forward)
-        self._videoControl.backwards.connect(self.play_backward)
 
     def get_operating_mode(self):
         """
@@ -311,33 +259,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         img = self.apply_zoom_to_image(self._current_subimage)
         self._subimage_label.setPixmap(qg.QPixmap(img))
 
-    def is_playing(self):
-        """
-        getter for the playing status
-            Returns:
-                True if the widget is playing video else False
-        """
-        if self._playing == PlayStates.MANUAL:
-            return False
-
-        return True
-
-    @qc.pyqtSlot(qg.QPixmap, int)
-    def display_image(self, pixmap, frame_number):
-        """
-        display an image, the image must be a pixmap so that
-        it can safely be recieved from another thread
-            Args:
-                pixmap (QPixmap) the image in pixmap form
-                frame_number
-        """
-        self._current_image = qg.QImage(pixmap)
-        self._current_frame = frame_number
-        self._videoControl.set_frame_currently_displayed(frame_number)
-
-        self.animate_subimage()
-        self.display()
-
     def animate_subimage(self):
         """
         if there is a subimage copy get a new copy and display
@@ -353,6 +274,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
             Returns:
                 None
         """
+        self.animate_subimage()
         if self._current_image is None or self.isHidden():
             return
         # zoom and display image
@@ -379,111 +301,6 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         elif self._playing == PlayStates.PLAY_BACKWARD:
             next_frame = (self._current_frame - 1)
             self.post_request_frame(next_frame%self._data_source.get_video_length())
-
-    def apply_zoom_to_image(self, image):
-        """
-        apply the current zoom to an image
-            Args:
-                image (Qimage) the image to be resized
-            Returns
-                Qimage resized by current zoom
-        """
-        height = image.height()*self._current_zoom
-        width = image.width()*self._current_zoom
-
-        transform = qt.Qt.SmoothTransformation
-        if self._videoControl.use_fast_transform():
-            transform = qt.Qt.FastTransformation
-
-        return image.scaled(width, height, transformMode=transform)
-
-    @qc.pyqtSlot(bool)
-    def start_end(self, end):
-        """
-        jump to the start or end of the video
-            Args:
-                end (bool) if true jump to end else start
-        """
-        if end:
-            self.post_request_frame(self._data_source.get_video_length()-1)
-        else:
-            self.post_request_frame(0)
-
-    @qc.pyqtSlot(int)
-    def post_request_frame(self, frame_number):
-        """
-        a specific frame should be displayed
-        """
-        self.request_frame.emit(frame_number)
-
-    @qc.pyqtSlot(float)
-    def zoom_value(self, value):
-        """
-        a new value for the zoom has been entered
-        """
-        self._current_zoom = value
-        if self._create_label is not None:
-            self._create_label.set_zoom(value)
-        elif self._edit_label is not None:
-            self._edit_label.set_zoom(value)
-        elif self._display_label is not None:
-            self._display_label.set_zoom(value)
-        elif self._delete_label is not None:
-            self._delete_label.set_zoom(value)
-
-        self.display()
-
-    @qc.pyqtSlot()
-    def step_forward(self):
-        """
-        advance by one frame
-        """
-        frame = self._current_frame + 1
-        if frame < self._data_source.get_video_length():
-            self.post_request_frame(frame)
-
-    @qc.pyqtSlot()
-    def step_backward(self):
-        """
-        reverse by one frame
-        """
-        frame = self._current_frame - 1
-        if frame >= 0:
-            self.post_request_frame(frame)
-
-    @qc.pyqtSlot()
-    def play_pause(self):
-        """
-        pause the playing
-        """
-        self.clear_queue.emit()
-        self._playing = PlayStates.MANUAL
-        self._videoControl.enable_fine_controls()
-
-    @qc.pyqtSlot()
-    def stop_play(self):
-        """
-        stop the playing
-        """
-        self.play_pause()
-
-    @qc.pyqtSlot()
-    def play_forward(self):
-        """
-        start playing forward
-        """
-        self.clear_queue.emit()
-        self._playing = PlayStates.PLAY_FORWARD
-        self.post_request_frame((self._current_frame+1)%self._data_source.get_video_length())
-
-    @qc.pyqtSlot()
-    def play_backward(self):
-        """
-        start playing in reverse
-        """
-        self.clear_queue.emit()
-        self._playing = PlayStates.PLAY_BACKWARD
-        self.post_request_frame((self._current_frame-1)%self._data_source.get_video_length())
 
     @qc.pyqtSlot()
     def rectangle_drawn(self):
@@ -598,7 +415,7 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         get the data store
             Returns:
-                pointer to data (SimulatedDataStore)
+                pointer to holder of results (CrystalGrowthTrackerMain)
         """
         return self._data_source
 
@@ -608,17 +425,3 @@ class VideoRegionSelectionWidget(qw.QWidget, Ui_VideoRegionSelectionWidget):
         """
         self._current_label.clear()
         self._subimage_label.clear()
-
-    def get_image_copy(self):
-        """
-        get the current main image
-            Returns:
-                deep copy of current image (QImage)
-        """
-        return self._current_image.copy()
-
-    def stop_video(self):
-        """
-        stop the video
-        """
-        self.play_pause()

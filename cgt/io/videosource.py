@@ -99,7 +99,7 @@ class VideoSource(qc.QObject):
         if viewer == None:
             return
 
-        viewer.stop_play()
+        viewer.play_pause()
         self._video_reader.display_image.connect(viewer.display_image)
         viewer.request_frame.connect(self.request_frame)
         viewer.clear_queue.connect(self.clear)
