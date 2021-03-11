@@ -128,8 +128,8 @@ As unnescessary white space is an output of pylint information you may also want
 
 ## ToDo
 
-- [ ] Refactor the video widgets
+- [x] Refactor the video widgets
 - [ ] Get artifacts widget working
 - [ ] Add a results widget
-- [ ] Video stats on raw
+- [x] Video stats on raw
 - [x] Progress bar built into main
