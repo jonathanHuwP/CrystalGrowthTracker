@@ -27,17 +27,6 @@ import cv2 as cv
 
 from cgt.model.videostats import FrameStats, VideoIntensityStats
 
-def bgr_to_gray(bgr):
-    """
-    convert blue green red to gray 256
-        Args:
-            bgr (np.array [width:height:3] uint8)
-        Retruns
-            np.array [width:height] uint8
-    """
-    tmp = np.dot(bgr[...,:3], [0.1140, 0.5870, 0.2989])
-    return tmp.astype(np.uint8)
-
 class VideoAnalyser(qc.QObject):
     """
     a video reader that is designed to run as a seperate thread
@@ -59,8 +48,19 @@ class VideoAnalyser(qc.QObject):
         ## initiaize the file video stream
         self._video_reader = cv.VideoCapture(video_file)
 
+        ## store the file name
+        self._video_file = video_file
+
         ## the lenght
         self._length = int(self._video_reader.get(cv.CAP_PROP_FRAME_COUNT))
+
+    def get_name(self):
+        """
+        getter for the file name
+            Returns:
+                file name (string)
+        """
+        return self._video_file
 
     def get_length(self):
         """
@@ -117,7 +117,7 @@ class VideoAnalyser(qc.QObject):
             message = f"failed to read image for frame {frame_number}"
             raise ValueError(message)
 
-        return img
+        return cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 
     def get_image_values(self, frame_number):
         """
