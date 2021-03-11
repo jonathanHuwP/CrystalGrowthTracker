@@ -71,10 +71,10 @@ class VideoBaseWidget(qw.QWidget):
 
         ## the current value of the zoom
         self._current_zoom = 1.0
-        
+
     def setEnabled(self, enabled):
         """
-        enable/disable widget on enable the source 
+        enable/disable widget on enable the source
         is connected on disable play is paused
         """
         if enabled and self._video_source is not None:
@@ -84,15 +84,14 @@ class VideoBaseWidget(qw.QWidget):
         elif not enabled:
             super().setEnabled(False)
             self.play_pause()
-            
+
     def setup_video_widget(self):
         """
-        setup featuers that require a complete 
+        setup featuers that require a complete
         widget and so cannot be done in __init__
         """
         font = qg.QFont( "Monospace", 10, qg.QFont.DemiBold)
         self._frameLabel.setFont(font)
-
         self.connect_controls()
 
     def set_video_source(self, video_source):
@@ -261,7 +260,7 @@ class VideoBaseWidget(qw.QWidget):
                 deep copy of current image (QImage)
         """
         return self._current_image.copy()
-        
+
     def clear(self):
         """
         reset to initial conditions

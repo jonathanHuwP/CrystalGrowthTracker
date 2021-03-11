@@ -88,7 +88,7 @@ class VideoRegionSelectionWidget(VideoBaseWidget, Ui_VideoRegionSelectionWidget)
         self._mode = states.CREATE
 
         self._view_control.set_data_source(self)
-        
+
         self.set_up_subimage_label()
         self.make_create_label()
 
@@ -209,7 +209,7 @@ class VideoRegionSelectionWidget(VideoBaseWidget, Ui_VideoRegionSelectionWidget)
         initalize the subimage label
         """
         self._subimage_label = qw.QLabel()
-        self._regionScrollArea.setWidget(self._subimage_label) 
+        self._regionScrollArea.setWidget(self._subimage_label)
 
     def get_operating_mode(self):
         """
@@ -421,5 +421,4 @@ class VideoRegionSelectionWidget(VideoBaseWidget, Ui_VideoRegionSelectionWidget)
         """
         self._current_label.clear()
         self._subimage_label.clear()
-        self._video_source = None
         super().clear()

@@ -66,19 +66,28 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         self._video_label = None
 
         ## the plot widget used display
-        self._graph = pg.PlotWidget(title="<b>Intensity</b>")
-        self._graph.setBackground('w')
-        self._graphScrollArea.setWidget(self._graph)
+        self._graph = None
 
         ## pointer for the vertical line identifying the frame
         self._frame_line = None
 
         ## the histogram widget
+        self._histogram = None
+
+        self.make_plots()
+        self.make_label()
+
+    def make_plots(self):
+        """
+        make the plain plots
+        """
+        self._graph = pg.PlotWidget(title="<b>Intensity</b>")
+        self._graph.setBackground('w')
+        self._graphScrollArea.setWidget(self._graph)
+
         self._histogram = pg.PlotWidget(title="<b>Intensity</b>")
         self._histogram.setBackground('w')
         self._histogramScrollArea.setWidget(self._histogram)
-
-        self.make_label()
 
     def make_label(self):
         """
@@ -103,6 +112,14 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
 
         self._frame_line.setPos(self._current_frame+1)
         self.plot_histogram()
+
+    def draw_graphs(self):
+        """
+        draw the two graphs
+        """
+        if self._data_source.get_video_stats() is not None:
+            self.draw_stats_graph()
+            self.histogram()
 
     def plot_histogram(self):
         """
@@ -177,8 +194,6 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
     def display(self):
         """
         display the current image
-            Returns:
-                None
         """
         if self._current_image is None or self.isHidden():
             return
@@ -195,17 +210,17 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         time = display_number/fps
         message =   "Frame {:0>5d} of {:0>5d}, approx {:0>5.1f} seconds video time"
         self._frameLabel.setText(message.format(display_number,
-                                                self._data_source.get_video_length(),
+                                                self._video_source.get_length(),
                                                 time))
         # adjust the graphs
         self.animate_graphs()
 
         if self._playing == PlayStates.PLAY_FORWARD:
             next_frame = (self._current_frame + 1)
-            self.post_request_frame(next_frame%self._data_source.get_video_length())
+            self.post_request_frame(next_frame%self._video_source.get_length())
         elif self._playing == PlayStates.PLAY_BACKWARD:
             next_frame = (self._current_frame - 1)
-            self.post_request_frame(next_frame%self._data_source.get_video_length())
+            self.post_request_frame(next_frame%self._video_source.get_length())
 
     def get_data(self):
         """
@@ -214,9 +229,10 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
                 pointer to data (SimulatedDataStore)
         """
         return self._data_source
-        
+
     def clear(self):
         """
         clear the current contents
         """
-        print("Stats widget clear")
+        self.make_plots()
+        super().clear()

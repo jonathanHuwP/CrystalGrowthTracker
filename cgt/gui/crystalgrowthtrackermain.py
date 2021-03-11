@@ -150,11 +150,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             if self._project["results"].video_statistics is not None:
                 self._videoStatsWidget.setEnabled(True)
                 self._videoStatsWidget.redisplay()
+                self._videoStatsWidget.draw_graphs()
         elif  tab_index == self._tabWidget.indexOf(self._drawingTab):
             if self._raw_video_reader is None:
                 if not self._project["results"].regions == 0:
                     self._drawingWidget.setEnabled(True)
-                    #self._enhanced_video_reader.connect_viewer(self._drawingWidget)
 
     def has_project(self):
         """
@@ -199,17 +199,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._propertiesWidget.show_top_text()
 
         self._tabWidget.setCurrentWidget(self._propertiesTab)
-
-    def video_frame_count(self):
-        """
-        returns the number of frames in the current video
-            Returns:
-                (int) the number of frame in current video
-        """
-        if self._enhanced_video_reader is None:
-            return 0
-
-        return self._enhanced_video_reader.get_length()
 
     @qc.pyqtSlot()
     def new_project(self):
@@ -319,7 +308,12 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         stop and delete the video buffer and it's thread
         """
         if self._enhanced_video_reader is not None:
+            self._enhanced_video_reader.stop()
             self._enhanced_video_reader = None
+
+        if self._raw_video_reader is not None:
+            self._raw_video_reader.stop()
+            self._raw_video_reader = None
 
     def reset_tab_wigets(self):
         """

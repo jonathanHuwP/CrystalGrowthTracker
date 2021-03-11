@@ -132,3 +132,11 @@ class VideoSource(qc.QObject):
         clear the frame queue
         """
         self._frame_queue.clear()
+
+    def stop(self):
+        """
+        stop the thread
+        """
+        self._video_reader.stop()
+        self._video_thread.quit()
+        self._video_thread.wait()
