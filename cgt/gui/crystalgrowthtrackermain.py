@@ -197,7 +197,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self._propertiesWidget.append_text(text)
 
         self._propertiesWidget.show_top_text()
-
         self._tabWidget.setCurrentWidget(self._propertiesTab)
 
     @qc.pyqtSlot()
@@ -277,27 +276,12 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 None
         """
         self.reset_tab_wigets()
-
-        # remove old reader
         self.stop_video()
 
         # dispaly project
         self.display_properties()
         self.set_title()
         self.load_video()
-
-        # if project has regions
-        """if self._project["results"] is not None:
-            if self._project["results"].number_of_regions > 0:
-                #self._drawingWidget.new_region()
-                print("Main get regions into widget")
-            if self._project["results"].video_statistics is not None:
-                #self._videoStatsWidget.load_video()
-                #self._videoStatsWidget.draw_stats_graph()
-                print("Main get stats into widgets")
-
-        self._selectWidget.data_changed()
-        # TODO update results displays """
 
         if self._project["latest_report"] is not None:
             if self._project["latest_report"] != "":
@@ -327,6 +311,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
     @qc.pyqtSlot()
     def save_image(self):
+        """
+        save an image from the currently displayed widget
+        """
         # if no project, or video loaded error
         if self._project is None or self._enhanced_video_reader is None:
             message = self.tr("To save you must have a project and load a video.")
@@ -440,7 +427,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                       copy_files):
         """
         function for starting a new project
-
             Args
                 enhanced_video (pathlib.Path) the video on which the program will run
                 raw_video (pathlib.Path) secondary raw_video video
@@ -448,9 +434,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 proj_name (string) the name of project, will be directory name
                 notes (string) project notes
                 copy_files (bool) if true video files are copied to project dir
-
-            Returns:
-                None
         """
         # make the full project path
         path = proj_dir.joinpath(proj_name)
@@ -692,6 +675,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
     qc.pyqtSlot()
     def print_results(self):
+        """
+        print out the results
+        """
         scale = self._project["resolution"]
         fps = self._project["frame_rate"]
 
@@ -741,6 +727,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
     @qc.pyqtSlot()
     def edit_notes(self):
+        """
+        allow the user the edit the projects notes
+        """
         if self._project is None:
             return
 
@@ -749,6 +738,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
     @qc.pyqtSlot()
     def make_video_statistics(self):
+        """
+        calculate the intensity statistics for the video
+        """
         if self._project is None:
             return
 
@@ -756,8 +748,15 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             return
 
         if self._project["results"].video_statistics is not None:
-            # TODO replace with question
-            return
+            message = self.tr("You already have statistics for this video. Replace?")
+            mb_reply = qw.QMessageBox.question(self,
+                                              'CrystalGrowthTracker',
+                                              message,
+                                              qw.QMessageBox.Yes | qw.QMessageBox.No,
+                                              qw.QMessageBox.No)
+
+            if mb_reply == qw.QMessageBox.No:
+                return
 
         analyser = None
         if self._project["raw_video"] is not None:
