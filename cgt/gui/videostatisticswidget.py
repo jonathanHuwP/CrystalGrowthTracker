@@ -25,17 +25,18 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = too-many-instance-attributes
 # pylint: disable = no-member
 # pylint: disable = too-many-public-methods
-import numpy as np
 from enum import Enum
+import numpy as np
+
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 import PyQt5.Qt as qt
 import pyqtgraph as pg
-import numpy as np
 
 from cgt.gui.regiondisplaylabel import RegionDisplayLabel
+from cgt.gui.Ui_videostatisticswidget import Ui_VideoStatisticsWidget
 
 class PlayStates(Enum):
     """
@@ -44,9 +45,6 @@ class PlayStates(Enum):
     MANUAL        = 1
     PLAY_FORWARD  = 2
     PLAY_BACKWARD = 3
-
-# import UI
-from cgt.gui.Ui_videostatisticswidget import Ui_VideoStatisticsWidget
 
 class VideoStatisticsWidget(qw.QWidget, Ui_VideoStatisticsWidget):
     """
