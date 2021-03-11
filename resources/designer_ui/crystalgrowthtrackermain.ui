@@ -29,9 +29,53 @@
     <item>
      <widget class="QTabWidget" name="_tabWidget">
       <property name="currentIndex">
-       <number>-1</number>
+       <number>0</number>
       </property>
+      <widget class="QWidget" name="_propertiesTab">
+       <attribute name="title">
+        <string>Project Properties</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="_selectTab">
+       <attribute name="title">
+        <string>Select Regions</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="_videoStatsTab">
+       <attribute name="title">
+        <string>Video Intensity Statistics</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="_drawingTab">
+       <attribute name="title">
+        <string>Trace Artifacts</string>
+       </attribute>
+      </widget>
      </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="_progressLayout">
+      <item>
+       <widget class="QProgressBar" name="_progressBar">
+        <property name="value">
+         <number>0</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>
@@ -303,6 +347,22 @@
     <hint type="sourcelabel">
      <x>-1</x>
      <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>470</x>
+     <y>291</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_tabWidget</sender>
+   <signal>currentChanged(int)</signal>
+   <receiver>CrystalGrowthTrackerMain</receiver>
+   <slot>tab_changed(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>470</x>
+     <y>292</y>
     </hint>
     <hint type="destinationlabel">
      <x>470</x>

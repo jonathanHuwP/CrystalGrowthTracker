@@ -18,24 +18,14 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 """
 # set up linting conditions
 # pylint: disable = c-extension-no-member
+# pylint: disable = import-error
 
 import PyQt5.QtCore as qc
 
 import numpy as np
 import cv2 as cv
 
-from cgt.util.framestats import FrameStats, VideoIntensityStats
-
-def bgr_to_gray(bgr):
-    """
-    convert blue green red to gray 256
-        Args:
-            bgr (np.array [width:height:3] uint8)
-        Retruns
-            np.array [width:height] uint8
-    """
-    tmp = np.dot(bgr[...,:3], [0.1140, 0.5870, 0.2989])
-    return tmp.astype(np.uint8)
+from cgt.model.videostats import FrameStats, VideoIntensityStats
 
 class VideoAnalyser(qc.QObject):
     """
@@ -58,30 +48,27 @@ class VideoAnalyser(qc.QObject):
         ## initiaize the file video stream
         self._video_reader = cv.VideoCapture(video_file)
 
-    @property
-    def length(self):
-        """
-        length of video, the largest allowd frame number is lenght
+        ## store the file name
+        self._video_file = video_file
 
+        ## the lenght
+        self._length = int(self._video_reader.get(cv.CAP_PROP_FRAME_COUNT))
+
+    def get_name(self):
+        """
+        getter for the file name
+            Returns:
+                file name (string)
+        """
+        return self._video_file
+
+    def get_length(self):
+        """
+        length of video, the largest allowed frame number is (lenght-1)
             Returns:
                 the number of frames in the video (int)
         """
-        return int(self._video_reader.get(cv.CAP_PROP_FRAME_COUNT))
-
-    def make_histogram(self, frame_number, limit):
-        """
-        make statistics for a frame
-            Args:
-                frame_number (int) the number of the frame
-            Returns:
-                counts ([int]) array of bin counts
-                bins ([float]) array of bin bounds
-        """
-        # bins 0 to 32, holding eavenly spaced values 0 to limit
-        bins = np.linspace(0, limit, 32)
-        image = self.get_image_values(frame_number)
-
-        return np.histogram(image, bins)
+        return self._length
 
     def stats_whole_film(self):
         """
@@ -91,12 +78,12 @@ class VideoAnalyser(qc.QObject):
         """
         bins = np.linspace(0, 256, 32)
         vid_statistics = VideoIntensityStats(bins)
-        for i in range(self.length):
+        for i in range(self._length):
             vid_statistics.append_frame(self.make_stats(i, bins))
             if i%10 == 0:
                 self.frames_analysed.emit(i)
 
-        self.frames_analysed.emit(self.length)
+        self.frames_analysed.emit(self._length)
 
         return vid_statistics
 
@@ -130,7 +117,7 @@ class VideoAnalyser(qc.QObject):
             message = f"failed to read image for frame {frame_number}"
             raise ValueError(message)
 
-        return img
+        return cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 
     def get_image_values(self, frame_number):
         """

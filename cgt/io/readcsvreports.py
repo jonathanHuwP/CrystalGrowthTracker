@@ -175,7 +175,10 @@ def readcsvinfo2dict(new_project, file, dirpath):
             if len(row) == 2:
                 key = row[0]
                 value = row[1]
-                new_project[key] = value
+                if value == "":
+                    new_project[key] = None
+                else:
+                    new_project[key] = value
 
 def store_regions(store, regions_data):
     '''
