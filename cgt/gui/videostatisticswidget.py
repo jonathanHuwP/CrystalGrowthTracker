@@ -235,4 +235,5 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         clear the current contents
         """
         self.make_plots()
+        self._video_label.clear()
         super().clear()
