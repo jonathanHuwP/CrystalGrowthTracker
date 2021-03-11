@@ -261,3 +261,14 @@ class VideoBaseWidget(qw.QWidget):
                 deep copy of current image (QImage)
         """
         return self._current_image.copy()
+        
+    def clear(self):
+        """
+        reset to initial conditions
+        """
+        self._video_source = None
+        self._playing = PlayStates.MANUAL
+        self._current_image = None
+        self._current_frame = 0
+        self._current_zoom = 1.0
+        self._videoControl.clear()

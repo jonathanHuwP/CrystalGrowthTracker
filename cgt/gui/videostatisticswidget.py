@@ -25,28 +25,18 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = too-many-instance-attributes
 # pylint: disable = no-member
 # pylint: disable = too-many-public-methods
-from enum import Enum
 import numpy as np
-
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
-import PyQt5.Qt as qt
 import pyqtgraph as pg
 
 from cgt.gui.regiondisplaylabel import RegionDisplayLabel
+from cgt.gui.videobasewidget import VideoBaseWidget, PlayStates
 from cgt.gui.Ui_videostatisticswidget import Ui_VideoStatisticsWidget
 
-class PlayStates(Enum):
-    """
-    enumeration of video playing states
-    """
-    MANUAL        = 1
-    PLAY_FORWARD  = 2
-    PLAY_BACKWARD = 3
-
-class VideoStatisticsWidget(qw.QWidget, Ui_VideoStatisticsWidget):
+class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
     """
     A widget intended to dispay the intensity statistics
     """
@@ -75,18 +65,6 @@ class VideoStatisticsWidget(qw.QWidget, Ui_VideoStatisticsWidget):
         ## label for showing video
         self._video_label = None
 
-        ## the currently displayed frame
-        self._current_frame = 0
-
-        ## the currently displayed image
-        self._current_image = None
-
-        ## the current value of the zoom
-        self._current_zoom = 1.0
-
-        ## state variable determines if video is playing
-        self._playing = PlayStates.MANUAL
-
         ## the plot widget used display
         self._graph = pg.PlotWidget(title="<b>Intensity</b>")
         self._graph.setBackground('w')
@@ -99,11 +77,6 @@ class VideoStatisticsWidget(qw.QWidget, Ui_VideoStatisticsWidget):
         self._histogram = pg.PlotWidget(title="<b>Intensity</b>")
         self._histogram.setBackground('w')
         self._histogramScrollArea.setWidget(self._histogram)
-
-        font = qg.QFont( "Monospace", 10, qg.QFont.DemiBold)
-        self._frameLabel.setFont(font)
-
-        self.connect_controls()
 
         self.make_label()
 
@@ -118,40 +91,6 @@ class VideoStatisticsWidget(qw.QWidget, Ui_VideoStatisticsWidget):
 
         self._video_label.set_zoom(self._current_zoom)
         self._videoScrollArea.setWidget(self._video_label)
-
-    def redisplay(self):
-        """
-        get and redisplay the current frame
-        """
-        self.post_request_frame(self._current_frame)
-
-    def connect_controls(self):
-        """
-        connect the video controls to self
-        """
-        self._videoControl.zoom_value.connect(self.zoom_value)
-        self._videoControl.frame_changed.connect(self.request_frame)
-        self._videoControl.start_end.connect(self.start_end)
-        self._videoControl.one_frame_forward.connect(self.step_forward)
-        self._videoControl.one_frame_backward.connect(self.step_backward)
-        self._videoControl.pause.connect(self.play_pause)
-        self._videoControl.forwards.connect(self.play_forward)
-        self._videoControl.backwards.connect(self.play_backward)
-
-    @qc.pyqtSlot(qg.QPixmap, int)
-    def display_image(self, pixmap, frame_number):
-        """
-        display an image, the image must be a pixmap so that
-        it can safely be recieved from another thread
-            Args:
-                pixmap (QPixmap) the image in pixmap form
-                frame_number
-        """
-        self._current_image = qg.QImage(pixmap)
-        self._current_frame = frame_number
-        self._videoControl.set_frame_currently_displayed(frame_number)
-
-        self.display()
 
     def animate_graphs(self):
         """
@@ -268,104 +207,6 @@ class VideoStatisticsWidget(qw.QWidget, Ui_VideoStatisticsWidget):
             next_frame = (self._current_frame - 1)
             self.post_request_frame(next_frame%self._data_source.get_video_length())
 
-    def apply_zoom_to_image(self, image):
-        """
-        apply the current zoom to an image
-            Args:
-                image (Qimage) the image to be resized
-            Returns
-                Qimage resized by current zoom
-        """
-        height = image.height()*self._current_zoom
-        width = image.width()*self._current_zoom
-
-        transform = qt.Qt.SmoothTransformation
-        if self._videoControl.use_fast_transform():
-            transform = qt.Qt.FastTransformation
-
-        return image.scaled(width, height, transformMode=transform)
-
-    @qc.pyqtSlot(bool)
-    def start_end(self, end):
-        """
-        jump to the start or end of the video
-            Args:
-                end (bool) if true jump to end else start
-        """
-        if end:
-            self.post_request_frame(self._data_source.get_video_length()-1)
-        else:
-            self.post_request_frame(0)
-
-    @qc.pyqtSlot(int)
-    def post_request_frame(self, frame_number):
-        """
-        a specific frame should be displayed
-        """
-        self.request_frame.emit(frame_number)
-
-    @qc.pyqtSlot(float)
-    def zoom_value(self, value):
-        """
-        a new value for the zoom has been entered
-        """
-        self._current_zoom = value
-        self._video_label.set_zoom(value)
-        self.display()
-
-    @qc.pyqtSlot()
-    def step_forward(self):
-        """
-        advance by one frame
-        """
-        frame = self._current_frame + 1
-        if frame < self._data_source.get_video_length():
-            self.post_request_frame(frame)
-
-    @qc.pyqtSlot()
-    def step_backward(self):
-        """
-        reverse by one frame
-        """
-        frame = self._current_frame - 1
-        if frame >= 0:
-            self.post_request_frame(frame)
-
-    @qc.pyqtSlot()
-    def play_pause(self):
-        """
-        pause the playing
-        """
-        self.clear_queue.emit()
-        self._playing = PlayStates.MANUAL
-        self._videoControl.enable_fine_controls()
-
-    @qc.pyqtSlot()
-    def play_forward(self):
-        """
-        start playing forward
-        """
-        self.clear_queue.emit()
-        self._playing = PlayStates.PLAY_FORWARD
-        self.post_request_frame((self._current_frame+1)%self._data_source.get_video_length())
-
-    @qc.pyqtSlot()
-    def play_backward(self):
-        """
-        start playing in reverse
-        """
-        self.clear_queue.emit()
-        self._playing = PlayStates.PLAY_BACKWARD
-        self.post_request_frame((self._current_frame-1)%self._data_source.get_video_length())
-
-    def get_image_copy(self):
-        """
-        get the current main image
-            Returns:
-                deep copy of current image (QImage)
-        """
-        return self._current_image.copy()
-
     def get_data(self):
         """
         get the data store
@@ -373,24 +214,9 @@ class VideoStatisticsWidget(qw.QWidget, Ui_VideoStatisticsWidget):
                 pointer to data (SimulatedDataStore)
         """
         return self._data_source
-
+        
     def clear(self):
         """
-        reset the widget
+        clear the current contents
         """
-        self._video_label.clear()
-        self._histogram.clear()
-        self._graph.clear()
-        self._current_frame = 0
-
-    def load_video(self):
-        """
-        initalize the controls
-        """
-        self._videoControl.set_range(self._data_source.get_video_length())
-
-    def stop_play(self):
-        """
-        stop the video
-        """
-        self.play_pause()
+        print("Stats widget clear")

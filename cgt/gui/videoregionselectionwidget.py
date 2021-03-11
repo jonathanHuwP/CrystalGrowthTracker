@@ -87,6 +87,8 @@ class VideoRegionSelectionWidget(VideoBaseWidget, Ui_VideoRegionSelectionWidget)
         ## state variable for the operating mode
         self._mode = states.CREATE
 
+        self._view_control.set_data_source(self)
+        
         self.set_up_subimage_label()
         self.make_create_label()
 
@@ -207,13 +209,7 @@ class VideoRegionSelectionWidget(VideoBaseWidget, Ui_VideoRegionSelectionWidget)
         initalize the subimage label
         """
         self._subimage_label = qw.QLabel()
-        self._regionScrollArea.setWidget(self._subimage_label)
-
-    def load_video_and_data(self):
-        """
-        initalize the controls
-        """
-        self._view_control.set_data_source(self)
+        self._regionScrollArea.setWidget(self._subimage_label) 
 
     def get_operating_mode(self):
         """
@@ -290,17 +286,17 @@ class VideoRegionSelectionWidget(VideoBaseWidget, Ui_VideoRegionSelectionWidget)
         time = display_number/fps
         message =   "Frame {:0>5d} of {:0>5d}, approx {:0>5.1f} seconds video time"
         self._frameLabel.setText(message.format(display_number,
-                                                self._data_source.get_video_length(),
+                                                self._video_source.get_length(),
                                                 time))
         # display any subimage
         self.display_subimage()
 
         if self._playing == PlayStates.PLAY_FORWARD:
             next_frame = (self._current_frame + 1)
-            self.post_request_frame(next_frame%self._data_source.get_video_length())
+            self.post_request_frame(next_frame%self._video_source.get_length())
         elif self._playing == PlayStates.PLAY_BACKWARD:
             next_frame = (self._current_frame - 1)
-            self.post_request_frame(next_frame%self._data_source.get_video_length())
+            self.post_request_frame(next_frame%self._video_source.get_length())
 
     @qc.pyqtSlot()
     def rectangle_drawn(self):
@@ -425,3 +421,5 @@ class VideoRegionSelectionWidget(VideoBaseWidget, Ui_VideoRegionSelectionWidget)
         """
         self._current_label.clear()
         self._subimage_label.clear()
+        self._video_source = None
+        super().clear()
