@@ -287,7 +287,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self.load_video()
 
         # if project has regions
-        if self._project["results"] is not None:
+        """if self._project["results"] is not None:
             if self._project["results"].number_of_regions > 0:
                 #self._drawingWidget.new_region()
                 print("Main get regions into widget")
@@ -297,7 +297,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 print("Main get stats into widgets")
 
         self._selectWidget.data_changed()
-        # TODO update results displays
+        # TODO update results displays """
 
         if self._project["latest_report"] is not None:
             if self._project["latest_report"] != "":

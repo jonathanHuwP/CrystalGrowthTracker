@@ -119,7 +119,7 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         """
         if self._data_source.get_video_stats() is not None:
             self.draw_stats_graph()
-            self.histogram()
+            self.plot_histogram()
 
     def plot_histogram(self):
         """
