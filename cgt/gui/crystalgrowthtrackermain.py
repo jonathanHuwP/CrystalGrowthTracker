@@ -760,11 +760,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         analyser = None
         if self._project["raw_video"] is not None:
-            analyser = VideoAnalyser(self._project["raw_video"], self)
+            analyser = VideoAnalyser(str(self._project["raw_video"]), self)
         else:
-            analyser = VideoAnalyser(self._project["enhanced_video"], self)
-
-        print(f"Analyser on {analyser.get_name()}")
+            analyser = VideoAnalyser(str(self._project["enhanced_video"]), self)
 
         self._progressBar.setMaximum(analyser.get_length())
         analyser.frames_analysed.connect(self._progressBar.setValue)
@@ -775,7 +773,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self._videoStatsWidget.setEnabled(True)
         self._videoStatsWidget.draw_stats_graph()
-        self._videoStatsWidget.load_video()
         self._videoStatsWidget.redisplay()
 
     def get_video_stats(self):
