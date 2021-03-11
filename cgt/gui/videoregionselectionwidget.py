@@ -33,15 +33,9 @@ import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 import PyQt5.Qt as qt
 
-from cgt.io.videobuffer import VideoBuffer
-from cgt.util.qthreadsafequeue import QThreadSafeQueue
-from cgt.util.simulateddatastore import SimulatedDataStore
 from cgt.gui.regioncreationlabel import RegionCreationLabel
 from cgt.gui.regioneditlabel import RegionEditLabel
 from cgt.gui.regiondisplaylabel import RegionDisplayLabel
-
-# for development only
-from cgt.util.simulateddatastore import SimulatedDataStore
 
 from cgt.gui.videoregionselectionwidgetstates import VideoRegionSelectionWidgetStates as states
 
