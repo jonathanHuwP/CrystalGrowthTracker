@@ -52,7 +52,6 @@ from cgt.io.videoanalyser import VideoAnalyser
 from cgt.model.cgtproject import CGTProject
 from cgt.gui.videostatisticswidget import VideoStatisticsWidget
 
-
 # import UI
 from cgt.gui.Ui_crystalgrowthtrackermain import Ui_CrystalGrowthTrackerMain
 
@@ -78,8 +77,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         ## the name in the current translation
         self._translated_name = self.tr("CrystalGrowthTracker")
 
-        ## a pointer for the video buffered reader
-        self._video_reader = None
+        ## the reader for the working video
+        self._enhanced_video_reader = None
+
+        ## the reader for the raw video (if used)
+        self._raw_video_reader = None
 
         ## the project data structure
         self._project = None
@@ -141,17 +143,18 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self._propertiesTab.setEnabled(True)
         elif tab_index == self._tabWidget.indexOf(self._selectTab):
             self._selectWidget.setEnabled(True)
-            self._video_reader.connect_viewer(self._selectWidget)
+            self._enhanced_video_reader.connect_viewer(self._selectWidget)
             self._selectWidget.redisplay()
         elif tab_index == self._tabWidget.indexOf(self._videoStatsTab):
             if self._project["results"].video_statistics is not None:
                 self._videoStatsWidget.setEnabled(True)
-                self._video_reader.connect_viewer(self._videoStatsWidget)
+                self._enhanced_video_reader.connect_viewer(self._videoStatsWidget)
                 self._videoStatsWidget.redisplay()
         elif  tab_index == self._tabWidget.indexOf(self._drawingTab):
-            if len(self._project["results"].regions) is not None:
-                self._drawingWidget.setEnabled(True)
-                self._video_reader.connect_viewer(self._drawingWidget)
+            if self._raw_video_reader is None:
+                if not self._project["results"].regions == 0:
+                    self._drawingWidget.setEnabled(True)
+                    self._enhanced_video_reader.connect_viewer(self._drawingWidget)
 
     def has_project(self):
         """
@@ -159,7 +162,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 True if project loaded, else False
         """
-        return not (self._project is None or self._video_reader is None)
+        return not (self._project is None or self._enhanced_video_reader is None)
 
     def add_tab(self, tab_widget, target_widget, title):
         """
@@ -203,10 +206,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 (int) the number of frame in current video
         """
-        if self._video_reader is None:
+        if self._enhanced_video_reader is None:
             return 0
 
-        return self._video_reader.get_length()
+        return self._enhanced_video_reader.get_length()
 
     @qc.pyqtSlot()
     def new_project(self):
@@ -314,8 +317,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         stop and delete the video buffer and it's thread
         """
-        if self._video_reader is not None:
-            self._video_reader = None
+        if self._enhanced_video_reader is not None:
+            self._enhanced_video_reader = None
 
     def reset_tab_wigets(self):
         """
@@ -330,7 +333,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     @qc.pyqtSlot()
     def save_image(self):
         # if no project, or video loaded error
-        if self._project is None or self._video_reader is None:
+        if self._project is None or self._enhanced_video_reader is None:
             message = self.tr("To save you must have a project and load a video.")
             qw.QMessageBox.information(self, self.tr("Save Image"), message)
             return
@@ -607,8 +610,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 region (QRect) the region
         """
         self._project["results"].add_region(region)
-        #self._drawingWidget.new_region()
-        #self._resultsWidget.display_data()
 
     def remove_region(self, region_index):
         """
@@ -617,8 +618,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 region (QRect) the region
         """
         self._project["results"].remove_region(region_index)
-        #self._drawingWidget.new_region()
-        #self._resultsWidget.display_data()
 
     def append_lines(self, region_index, lines):
         """
@@ -677,9 +676,13 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         try:
             # make the objects
-            self._video_reader = VideoSource(self._project["enhanced_video"])
-            self._video_reader.connect_viewer(self._selectWidget)
+            self._enhanced_video_reader = VideoSource(self._project["enhanced_video"])
+            self._enhanced_video_reader.connect_viewer(self._selectWidget)
             self._selectWidget.load_video_and_data()
+
+            if self._project["raw_video"] is not None:
+                self._raw_video_reader = VideoSource(self._project["raw_video"])
+                self._raw_video_reader.connect_viewer(self._videoStatsWidget)
 
         except (FileNotFoundError, IOError) as ex:
             message = self.tr("Unexpected error reading {}: {} => {}")
@@ -746,8 +749,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 length of video in frames (int)
         """
-        if self._video_reader is not None:
-            return self._video_reader.get_length()
+        if self._enhanced_video_reader is not None:
+            return self._enhanced_video_reader.get_length()
 
     @qc.pyqtSlot()
     def edit_notes(self):
@@ -769,8 +772,15 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             # TODO replace with question
             return
 
+        analyser = None
+        if self._project["raw_video"] is not None:
+            analyser = VideoAnalyser(self._project["raw_video"], self)
+            vid = self._project["raw_video"]
+            print(f"analyser raw of {type(vid)}")
+        else:
+            analyser = VideoAnalyser(self._project["enhanced_video"], self)
+            print("analyser enhanced")
 
-        analyser = VideoAnalyser(self._project["enhanced_video"], self)
         self._progressBar.setMaximum(analyser.get_length())
         analyser.frames_analysed.connect(self._progressBar.setValue)
         self._progressBar.show()
@@ -778,7 +788,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._project["results"].set_video_statistics(analyser.stats_whole_film())
         self._progressBar.hide()
 
-        self._video_reader.connect_viewer(self._videoStatsWidget)
         self._videoStatsWidget.setEnabled(True)
         self._videoStatsWidget.draw_stats_graph()
         self._videoStatsWidget.load_video()
