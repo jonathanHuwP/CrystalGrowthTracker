@@ -31,6 +31,8 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
 import PyQt5.QtGui as qg
 
+from cgt.gui.videobasewidget import VideoBaseWidget, PlayStates
+from cgt.gui.regiondisplaylabel import RegionDisplayLabel
 from cgt.gui.Ui_artifactmarkupwidget import Ui_ArtifactMarkupWidget
 
 class DrawingStates(IntEnum):
@@ -48,15 +50,10 @@ class Artifacts(IntEnum):
     LINE = 0
     POINT = 2
 
-class ArtifactMarkupWidget(qw.QWidget, Ui_ArtifactMarkupWidget):
+class ArtifactMarkupWidget(VideoBaseWidget, Ui_ArtifactMarkupWidget):
     """
     The main window provides a tab widget for the video widget
     """
-    ## signal that a frame is required
-    request_frame = qc.pyqtSignal(int)
-
-    ## signal that the queue should be cleared
-    clear_queue = qc.pyqtSignal()
 
     def __init__(self, parent, data_source):
         """
@@ -77,6 +74,10 @@ class ArtifactMarkupWidget(qw.QWidget, Ui_ArtifactMarkupWidget):
 
         ## the artifct to drawing
         self._artifact = Artifacts.LINE
+
+        ## a label in which to display video
+        self._create_label = RegionDisplayLabel(self)
+        self._videoScrollArea.setWidget(self._create_label)
 
         self._regionsComboBox.addItem("Region 1")
         self._regionsComboBox.addItem("Region 2")
@@ -131,8 +132,7 @@ class ArtifactMarkupWidget(qw.QWidget, Ui_ArtifactMarkupWidget):
         """
         print(f"region {index}")
 
-    @qc.pyqtSlot(qg.QPixmap, int)
-    def display_image(self, pixmap, frame_number):
+    def display(self):
         """
         display an image, the image must be a pixmap so that
         it can safely be recieved from another thread
@@ -140,11 +140,38 @@ class ArtifactMarkupWidget(qw.QWidget, Ui_ArtifactMarkupWidget):
                 pixmap (QPixmap) the image in pixmap form
                 frame_number
         """
-        print(f"markup widget display {pixmap} {frame_number}")
+        print("display")
+        if self._current_image is None or self.isHidden():
+            return
+        print("have image")
 
-    @qc.pyqtSlot()
-    def stop_play(self):
+        # zoom and display image
+        tmp = self.apply_zoom_to_image(self._current_image)
+        self._create_label.setPixmap(qg.QPixmap(tmp))
+
+        # update the controls
+        self._videoControl.set_slider_value(self._current_frame)
+
+        # display the current frame number and time
+        display_number = self._current_frame+1
+        fps, _ = self._data_source.get_fps_and_resolution()
+        time = display_number/fps
+        message =   "Frame {:0>5d} of {:0>5d}, approx {:0>5.1f} seconds video time"
+        self._frameLabel.setText(message.format(display_number,
+                                                self._video_source.get_length(),
+                                                time))
+
+        if self._playing == PlayStates.PLAY_FORWARD:
+            next_frame = (self._current_frame + 1)
+            self.post_request_frame(next_frame%self._video_source.get_length())
+        elif self._playing == PlayStates.PLAY_BACKWARD:
+            next_frame = (self._current_frame - 1)
+            self.post_request_frame(next_frame%self._video_source.get_length())
+
+    def clear(self):
         """
-        stop the playing
+        clear the current contents
         """
-        print("markup widget stop play")
+        if self._create_label is not None:
+            self._create_label.clear()
+        super().clear()

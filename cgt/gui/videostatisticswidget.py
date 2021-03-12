@@ -40,12 +40,7 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
     """
     A widget intended to dispay the intensity statistics
     """
-    ## signal that a frame is required
-    request_frame = qc.pyqtSignal(int)
-
-    ## signal that the queue should be cleared
-    clear_queue = qc.pyqtSignal()
-
+    ## font for the graphs
     label_style = {'font-weight': 'bold'}
 
     def __init__(self, parent, data_source):
@@ -235,5 +230,6 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         clear the current contents
         """
         self.make_plots()
-        self._video_label.clear()
+        if self._video_label is not None:
+            self._video_label.clear()
         super().clear()

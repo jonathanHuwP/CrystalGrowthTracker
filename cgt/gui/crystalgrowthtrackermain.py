@@ -64,12 +64,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     def __init__(self, parent=None):
         """
         the object initalization function
-
             Args:
                 parent (QObject): the parent QObject for this window
-
-            Returns:
-                None
         """
         super().__init__(parent)
         self.setupUi(self)
@@ -120,6 +116,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         ## the crystal drawing widget
         self._drawingWidget = ArtifactMarkupWidget(tab, self)
+        self._drawingWidget.setup_video_widget()
         self._drawingWidget.setEnabled(False)
         setup_tab(tab, self._drawingWidget)
 
@@ -152,9 +149,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 self._videoStatsWidget.redisplay()
                 self._videoStatsWidget.draw_graphs()
         elif  tab_index == self._tabWidget.indexOf(self._drawingTab):
-            if self._raw_video_reader is None:
-                if not self._project["results"].regions == 0:
-                    self._drawingWidget.setEnabled(True)
+            if not len(self._project["results"].regions) == 0:
+                self._drawingWidget.setEnabled(True)
+                self._drawingWidget.redisplay()
 
     def has_project(self):
         """
@@ -267,6 +264,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         self._videoStatsWidget.clear()
         self._selectWidget.clear()
+        self._drawingWidget.clear()
 
     def project_created_or_loaded(self):
         """
@@ -662,6 +660,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 self._videoStatsWidget.set_video_source(self._raw_video_reader)
             else:
                 self._videoStatsWidget.set_video_source(self._enhanced_video_reader)
+
+            self._drawingWidget.set_video_source(self._enhanced_video_reader)
 
         except (FileNotFoundError, IOError) as ex:
             message = self.tr("Unexpected error reading {}: {} => {}")
