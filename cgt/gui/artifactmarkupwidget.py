@@ -168,6 +168,17 @@ class ArtifactMarkupWidget(VideoBaseWidget, Ui_ArtifactMarkupWidget):
             next_frame = (self._current_frame - 1)
             self.post_request_frame(next_frame%self._video_source.get_length())
 
+    def setEnabled(self, enabled):
+        """
+        enable/disable widget on enable the source
+        is connected on disable play is paused
+        """
+        if enabled:
+            self._regionsComboBox.clear()
+            for item, _ in enumerate(self._data_source.get_results().regions):
+                self._regionsComboBox.addItem(str(item))
+        super().setEnabled(enabled)
+
     def clear(self):
         """
         clear the current contents
