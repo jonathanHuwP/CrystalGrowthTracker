@@ -67,7 +67,7 @@ class VideoRegionSelectionWidget(VideoBaseWidget, Ui_VideoRegionSelectionWidget)
         self._current_rectangle = None
 
         ## pointer to the label currently in use
-        self._current_label = None
+        self._video_label = None
 
         ## label for creating regions
         self._create_label = None
@@ -189,7 +189,7 @@ class VideoRegionSelectionWidget(VideoBaseWidget, Ui_VideoRegionSelectionWidget)
                 label (QLabel) the label to be assigned
                 tooltip (string) the scroll area's tooltip
         """
-        self._current_label = label
+        self._video_label = label
 
         self._videoScrollArea.setToolTip(tooltip)
 
@@ -292,7 +292,7 @@ class VideoRegionSelectionWidget(VideoBaseWidget, Ui_VideoRegionSelectionWidget)
             return
         # zoom and display image
         tmp = self.apply_zoom_to_image(self._current_image)
-        self._current_label.setPixmap(qg.QPixmap(tmp))
+        self._video_label.setPixmap(qg.QPixmap(tmp))
 
         # update the controls
         self._videoControl.set_slider_value(self._current_frame)
@@ -320,7 +320,7 @@ class VideoRegionSelectionWidget(VideoBaseWidget, Ui_VideoRegionSelectionWidget)
         """
         label has a rectangle
         """
-        self._current_rectangle = self._current_label.get_rectangle()
+        self._current_rectangle = self._video_label.get_rectangle()
         self._current_subimage = self._current_image.copy(self._current_rectangle)
         self.display_subimage()
 
@@ -436,6 +436,6 @@ class VideoRegionSelectionWidget(VideoBaseWidget, Ui_VideoRegionSelectionWidget)
         """
         reset to initial conditions
         """
-        self._current_label.clear()
+        self._video_label.clear()
         self._subimage_label.clear()
         super().clear()

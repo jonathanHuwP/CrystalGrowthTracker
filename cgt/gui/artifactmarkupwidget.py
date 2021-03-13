@@ -96,8 +96,6 @@ class ArtifactMarkupWidget(VideoBaseWidget, Ui_ArtifactMarkupWidget):
         elif button == self._pointsButton and not self._artifact == Artifacts.POINT:
             self._artifact = Artifacts.POINT
 
-        print(f"Artifact {self._artifact.name}")
-
     @qc.pyqtSlot(qw.QAbstractButton)
     def marking_state_selected(self, button):
         """
@@ -112,8 +110,6 @@ class ArtifactMarkupWidget(VideoBaseWidget, Ui_ArtifactMarkupWidget):
         elif button == self._deleteButton and not self._state == DrawingStates.DELETE:
             self._state = DrawingStates.DELETE
 
-        print(f"state {self._state.name}")
-
     @qc.pyqtSlot(int)
     def key_frame_selected(self, index):
         """
@@ -121,7 +117,7 @@ class ArtifactMarkupWidget(VideoBaseWidget, Ui_ArtifactMarkupWidget):
             Args:
                 index (int) index of the clicked value
         """
-        print(f"frame {index}")
+        print(f"markup: frame({index})")
 
     @qc.pyqtSlot(int)
     def region_selected(self, index):
@@ -130,7 +126,7 @@ class ArtifactMarkupWidget(VideoBaseWidget, Ui_ArtifactMarkupWidget):
             Args:
                 index (int) index of the clicked value
         """
-        print(f"region {index}")
+        print(f"markup: region({index})")
 
     def set_zoom_in_labels(self, value):
         """
