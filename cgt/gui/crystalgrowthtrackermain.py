@@ -149,9 +149,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 self._videoStatsWidget.redisplay()
                 self._videoStatsWidget.draw_graphs()
         elif  tab_index == self._tabWidget.indexOf(self._drawingTab):
-            if not len(self._project["results"].regions) == 0:
-                self._drawingWidget.setEnabled(True)
-                self._drawingWidget.redisplay()
+            self._drawingWidget.setEnabled(True)
+            self._drawingWidget.redisplay()
 
     def has_project(self):
         """
