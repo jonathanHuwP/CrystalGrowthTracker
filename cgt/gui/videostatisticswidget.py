@@ -186,6 +186,15 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         self._frame_line.setBounds([0, len(stats.frames)])
         self._graph.addItem(self._frame_line)
 
+    def set_zoom_in_labels(self, value):
+        """
+        apply the zoom to the labels in user
+            Args:
+                value (float) the value of the zoom
+        """
+        if self._video_label is not None:
+            self._video_label.set_zoom(value)
+
     def display(self):
         """
         display the current image

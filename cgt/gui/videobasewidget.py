@@ -189,15 +189,7 @@ class VideoBaseWidget(qw.QWidget):
         a new value for the zoom has been entered
         """
         self._current_zoom = value
-        if self._create_label is not None:
-            self._create_label.set_zoom(value)
-        elif self._edit_label is not None:
-            self._edit_label.set_zoom(value)
-        elif self._display_label is not None:
-            self._display_label.set_zoom(value)
-        elif self._delete_label is not None:
-            self._delete_label.set_zoom(value)
-
+        self.set_zoom_in_labels(value)
         self.display()
 
     @qc.pyqtSlot()

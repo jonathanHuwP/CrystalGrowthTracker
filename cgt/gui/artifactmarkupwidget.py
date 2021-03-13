@@ -76,8 +76,8 @@ class ArtifactMarkupWidget(VideoBaseWidget, Ui_ArtifactMarkupWidget):
         self._artifact = Artifacts.LINE
 
         ## a label in which to display video
-        self._create_label = RegionDisplayLabel(self)
-        self._videoScrollArea.setWidget(self._create_label)
+        self._video_label = RegionDisplayLabel(self)
+        self._videoScrollArea.setWidget(self._video_label)
 
         self._regionsComboBox.addItem("Region 1")
         self._regionsComboBox.addItem("Region 2")
@@ -132,6 +132,15 @@ class ArtifactMarkupWidget(VideoBaseWidget, Ui_ArtifactMarkupWidget):
         """
         print(f"region {index}")
 
+    def set_zoom_in_labels(self, value):
+        """
+        apply the zoom to the labels in user
+            Args:
+                value (float) the value of the zoom
+        """
+        if self._video_label is not None:
+            self._video_label.set_zoom(value)
+
     def display(self):
         """
         display an image, the image must be a pixmap so that
@@ -140,14 +149,12 @@ class ArtifactMarkupWidget(VideoBaseWidget, Ui_ArtifactMarkupWidget):
                 pixmap (QPixmap) the image in pixmap form
                 frame_number
         """
-        print("display")
         if self._current_image is None or self.isHidden():
             return
-        print("have image")
 
         # zoom and display image
         tmp = self.apply_zoom_to_image(self._current_image)
-        self._create_label.setPixmap(qg.QPixmap(tmp))
+        self._video_label.setPixmap(qg.QPixmap(tmp))
 
         # update the controls
         self._videoControl.set_slider_value(self._current_frame)
@@ -183,6 +190,6 @@ class ArtifactMarkupWidget(VideoBaseWidget, Ui_ArtifactMarkupWidget):
         """
         clear the current contents
         """
-        if self._create_label is not None:
-            self._create_label.clear()
+        if self._video_label is not None:
+            self._video_label.clear()
         super().clear()

@@ -149,6 +149,23 @@ class VideoRegionSelectionWidget(VideoBaseWidget, Ui_VideoRegionSelectionWidget)
         self._edit_label = None
         self._delete_label = None
 
+    def set_zoom_in_labels(self, value):
+        """
+        apply the zoom to the labels in user
+            Args:
+                value (float) the value of the zoom
+        """
+        if self._create_label is not None:
+            self._create_label.set_zoom(value)
+        elif self._edit_label is not None:
+            self._edit_label.set_zoom(value)
+        elif self._display_label is not None:
+            self._display_label.set_zoom(value)
+        elif self._delete_label is not None:
+            self._delete_label.set_zoom(value)
+
+
+
     def make_delete_label(self):
         """
         set up label for display
