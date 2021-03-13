@@ -195,36 +195,11 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         if self._video_label is not None:
             self._video_label.set_zoom(value)
 
-    def display(self):
+    def display_extra(self):
         """
-        display the current image
+        location for additional code beyond displaying the video label
         """
-        if self._current_image is None or self.isHidden():
-            return
-        # zoom and display image
-        tmp = self.apply_zoom_to_image(self._current_image)
-        self._video_label.setPixmap(qg.QPixmap(tmp))
-
-        # update the line (frame+1 in common with video controls)
-        self._videoControl.set_slider_value(self._current_frame)
-
-        # display the current frame number and time
-        display_number = self._current_frame+1
-        fps, _ = self._data_source.get_fps_and_resolution()
-        time = display_number/fps
-        message =   "Frame {:0>5d} of {:0>5d}, approx {:0>5.1f} seconds video time"
-        self._frameLabel.setText(message.format(display_number,
-                                                self._video_source.get_length(),
-                                                time))
-        # adjust the graphs
         self.animate_graphs()
-
-        if self._playing == PlayStates.PLAY_FORWARD:
-            next_frame = (self._current_frame + 1)
-            self.post_request_frame(next_frame%self._video_source.get_length())
-        elif self._playing == PlayStates.PLAY_BACKWARD:
-            next_frame = (self._current_frame - 1)
-            self.post_request_frame(next_frame%self._video_source.get_length())
 
     def get_data(self):
         """

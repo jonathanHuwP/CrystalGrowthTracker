@@ -146,6 +146,47 @@ class VideoBaseWidget(qw.QWidget):
         self._videoControl.set_frame_currently_displayed(frame_number)
 
         self.display()
+        self.display_extra()
+
+    def display(self):
+        """
+        display an image, the image must be a pixmap so that
+        it can safely be recieved from another thread
+            Args:
+                pixmap (QPixmap) the image in pixmap form
+                frame_number
+        """
+        if self._current_image is None or self.isHidden():
+            return
+
+        # zoom and display image
+        tmp = self.apply_zoom_to_image(self._current_image)
+        self._video_label.setPixmap(qg.QPixmap(tmp))
+
+        # update the controls
+        self._videoControl.set_slider_value(self._current_frame)
+
+        # display the current frame number and time
+        display_number = self._current_frame+1
+        fps, _ = self._data_source.get_fps_and_resolution()
+        time = display_number/fps
+        message =   "Frame {:0>5d} of {:0>5d}, approx {:0>5.1f} seconds video time"
+        self._frameLabel.setText(message.format(display_number,
+                                                self._video_source.get_length(),
+                                                time))
+
+        if self._playing == PlayStates.PLAY_FORWARD:
+            next_frame = (self._current_frame + 1)
+            self.post_request_frame(next_frame%self._video_source.get_length())
+        elif self._playing == PlayStates.PLAY_BACKWARD:
+            next_frame = (self._current_frame - 1)
+            self.post_request_frame(next_frame%self._video_source.get_length())
+
+    def display_extra(self):
+        """
+        location for additional code beyond displaying the video label
+        """
+        pass
 
     def apply_zoom_to_image(self, image):
         """
