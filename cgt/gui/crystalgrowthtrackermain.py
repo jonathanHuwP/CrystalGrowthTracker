@@ -147,7 +147,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             if self._project["results"].video_statistics is not None:
                 self._videoStatsWidget.setEnabled(True)
                 self._videoStatsWidget.redisplay()
-                self._videoStatsWidget.draw_graphs()
         elif  tab_index == self._tabWidget.indexOf(self._drawingTab):
             self._drawingWidget.setEnabled(True)
             self._drawingWidget.redisplay()
@@ -660,6 +659,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             else:
                 self._videoStatsWidget.set_video_source(self._enhanced_video_reader)
 
+            stats = self.get_results().video_statistics
+            if stats is not None and len(stats.frames) > 0:
+                self._videoStatsWidget.display_stats()
+
             self._drawingWidget.set_video_source(self._enhanced_video_reader)
 
         except (FileNotFoundError, IOError) as ex:
@@ -770,9 +773,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._project["results"].set_video_statistics(analyser.stats_whole_film())
         self._progressBar.hide()
 
+        self._videoStatsWidget.display_stats()
         self._videoStatsWidget.setEnabled(True)
-        self._videoStatsWidget.draw_stats_graph()
-        self._videoStatsWidget.redisplay()
+        #self._videoStatsWidget.redisplay()
+
 
     def get_video_stats(self):
         """

@@ -60,17 +60,25 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         ## label for showing video
         self._video_label = None
 
-        ## the plot widget used display
+        ## the plot widget for time series graph
         self._graph = None
 
         ## pointer for the vertical line identifying the frame
         self._frame_line = None
 
-        ## the histogram widget
+        ## the plot widget for for the histogram
         self._histogram = None
 
         self.make_plots()
         self.make_label()
+
+    def set_video_source(self, video_source):
+        """
+        override base with drawing the graphs
+            video_source (VideoSource): a source of video frames
+        """
+        self.clear()
+        super().set_video_source(video_source)
 
     def make_plots(self):
         """
@@ -108,13 +116,15 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         self._frame_line.setPos(self._current_frame+1)
         self.plot_histogram()
 
-    def draw_graphs(self):
+    @qc.pyqtSlot()
+    def display_stats(self):
         """
         draw the two graphs
         """
-        if self._data_source.get_video_stats() is not None:
-            self.draw_stats_graph()
-            self.plot_histogram()
+        if self._frame_line is not None:
+            self.clear()
+        self.draw_stats_graph()
+        self.plot_histogram()
 
     def plot_histogram(self):
         """
@@ -150,6 +160,7 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         """
         draw the statistics graph
         """
+        print("stats: draw graphs")
         tick_font = qg.QFont()
         tick_font.setBold(True)
 
@@ -213,6 +224,7 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         """
         clear the current contents
         """
+        self._frame_line = None
         self.make_plots()
         if self._video_label is not None:
             self._video_label.clear()
