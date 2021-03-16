@@ -71,6 +71,8 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
 
         self.make_plots()
         self.make_label()
+        font = qg.QFont( "Monospace", 8, qg.QFont.DemiBold)
+        self._videoTypeLabel.setFont(font)
 
     def set_video_source(self, video_source):
         """
@@ -160,7 +162,11 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         """
         draw the statistics graph
         """
-        print("stats: draw graphs")
+        if self._data_source.get_project()["raw_video_path"] is None:
+            self._videoTypeLabel.setText("Enhanced video")
+        else:
+            self._videoTypeLabel.setText("Raw video")
+
         tick_font = qg.QFont()
         tick_font.setBold(True)
 
@@ -225,6 +231,7 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         clear the current contents
         """
         self._frame_line = None
+        self._videoTypeLabel.setText(self.tr("Video"))
         self.make_plots()
         if self._video_label is not None:
             self._video_label.clear()

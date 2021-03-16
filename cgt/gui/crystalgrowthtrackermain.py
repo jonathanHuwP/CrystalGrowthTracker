@@ -790,12 +790,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         Overrides QWidget.closeEvent
         This will be called whenever a MyApp object recieves a QCloseEvent.
         All actions required befor closing widget are here.
-
             Args:
                 event (QEvent) the Qt event object
-
-            Returns:
-                None
         """
         message = self.tr('Do you want to leave?')
         changed = self.tr('You have unsaved data.')
