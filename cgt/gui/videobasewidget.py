@@ -228,7 +228,7 @@ class VideoBaseWidget(qw.QWidget):
         """
         self._current_zoom = value
         self.set_zoom_in_labels(value)
-        self.display()
+        self.post_request_frame(self._current_frame)
 
     @qc.pyqtSlot()
     def step_forward(self):
