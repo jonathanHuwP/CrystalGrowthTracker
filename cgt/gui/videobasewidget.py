@@ -152,9 +152,6 @@ class VideoBaseWidget(qw.QWidget):
         """
         display an image, the image must be a pixmap so that
         it can safely be recieved from another thread
-            Args:
-                pixmap (QPixmap) the image in pixmap form
-                frame_number
         """
         if self._current_image is None or self.isHidden():
             return

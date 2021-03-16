@@ -32,7 +32,7 @@ import PyQt5.QtCore as qc
 import PyQt5.QtGui as qg
 
 from cgt.gui.videobasewidget import VideoBaseWidget, PlayStates
-from cgt.gui.regiondisplaylabel import RegionDisplayLabel
+from cgt.gui.drawinglabel import DrawingLabel
 from cgt.gui.Ui_artifactmarkupwidget import Ui_ArtifactMarkupWidget
 
 class DrawingStates(IntEnum):
@@ -76,13 +76,22 @@ class ArtifactMarkupWidget(VideoBaseWidget, Ui_ArtifactMarkupWidget):
         self._artifact = Artifacts.LINE
 
         ## a label in which to display video
-        self._video_label = RegionDisplayLabel(self)
+        self._video_label = DrawingLabel(self)
         self._videoScrollArea.setWidget(self._video_label)
+        self.setup_controls()
 
-        self._regionsComboBox.addItem("Region 1")
-        self._regionsComboBox.addItem("Region 2")
-        self._framesComboBox.addItem("234")
-        self._framesComboBox.addItem("789")
+    def setup_controls(self):
+        """
+        fill the combo boxes
+        """
+        if self._data_source.get_results() is None:
+            return
+
+        self._regionsComboBox.clear()
+        self._framesComboBox.clear()
+
+        for i, _ in enumerate(self._data_source.get_results().regions):
+            self._regionsComboBox.addItem(str(i+1))
 
     @qc.pyqtSlot(qw.QAbstractButton)
     def mark_type_selected(self, button):
@@ -126,7 +135,7 @@ class ArtifactMarkupWidget(VideoBaseWidget, Ui_ArtifactMarkupWidget):
             Args:
                 index (int) index of the clicked value
         """
-        print(f"markup: region({index})")
+        self.post_request_frame(self._current_frame)
 
     def set_zoom_in_labels(self, value):
         """
@@ -147,6 +156,22 @@ class ArtifactMarkupWidget(VideoBaseWidget, Ui_ArtifactMarkupWidget):
             for item, _ in enumerate(self._data_source.get_results().regions):
                 self._regionsComboBox.addItem(str(item))
         super().setEnabled(enabled)
+
+    def display(self):
+        """
+        display an image, the image must be a pixmap so that
+        it can safely be recieved from another thread
+        """
+        if self._current_image is None or self.isHidden():
+            return
+
+        region_index = self._regionsComboBox.currentIndex()
+
+        if region_index >= 0:
+            rectangle = self._data_source.get_results().regions[region_index]
+            self._current_image = self._current_image.copy(rectangle)
+
+        super().display()
 
     def clear(self):
         """
