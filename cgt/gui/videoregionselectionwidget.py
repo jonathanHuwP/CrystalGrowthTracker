@@ -30,7 +30,7 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
-from cgt.gui.videobasewidget import VideoBaseWidget, PlayStates
+from cgt.gui.videobasewidget import VideoBaseWidget
 from cgt.gui.regioncreationlabel import RegionCreationLabel
 from cgt.gui.regioneditlabel import RegionEditLabel
 from cgt.gui.regiondisplaylabel import RegionDisplayLabel
@@ -163,8 +163,6 @@ class VideoRegionSelectionWidget(VideoBaseWidget, Ui_VideoRegionSelectionWidget)
             self._display_label.set_zoom(value)
         elif self._delete_label is not None:
             self._delete_label.set_zoom(value)
-
-
 
     def make_delete_label(self):
         """
