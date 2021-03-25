@@ -32,7 +32,6 @@ import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 import pyqtgraph as pg
 
-from cgt.gui.regiondisplaylabel import RegionDisplayLabel
 from cgt.gui.videobasewidget import VideoBaseWidget, PlayStates
 from cgt.gui.Ui_videostatisticswidget import Ui_VideoStatisticsWidget
 
@@ -70,7 +69,7 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         self._histogram = None
 
         self.make_plots()
-        self.make_label()
+
         font = qg.QFont( "Monospace", 8, qg.QFont.DemiBold)
         self._videoTypeLabel.setFont(font)
 
@@ -93,18 +92,6 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         self._histogram = pg.PlotWidget(title="<b>Intensity</b>")
         self._histogram.setBackground('w')
         self._histogramScrollArea.setWidget(self._histogram)
-
-    def make_label(self):
-        """
-        set up label for display
-        """
-        self._video_label = RegionDisplayLabel(self)
-        self._video_label.setAlignment(qc.Qt.AlignTop | qc.Qt.AlignLeft)
-        self._video_label.setSizePolicy(qw.QSizePolicy.Fixed, qw.QSizePolicy.Fixed)
-        self._video_label.setMargin(0)
-
-        self._video_label.set_zoom(self._current_zoom)
-        self._videoScrollArea.setWidget(self._video_label)
 
     def animate_graphs(self):
         """
@@ -203,15 +190,6 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         self._frame_line.setBounds([0, len(stats.frames)])
         self._graph.addItem(self._frame_line)
 
-    def set_zoom_in_labels(self, value):
-        """
-        apply the zoom to the labels in user
-            Args:
-                value (float) the value of the zoom
-        """
-        if self._video_label is not None:
-            self._video_label.set_zoom(value)
-
     def display_extra(self):
         """
         location for additional code beyond displaying the video label
@@ -233,6 +211,4 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         self._frame_line = None
         self._videoTypeLabel.setText(self.tr("Video"))
         self.make_plots()
-        if self._video_label is not None:
-            self._video_label.clear()
         super().clear()

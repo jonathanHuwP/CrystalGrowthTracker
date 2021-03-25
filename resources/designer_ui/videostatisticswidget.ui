@@ -22,26 +22,13 @@
      <widget class="QWidget" name="layoutWidget">
       <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0,0">
        <item>
-        <widget class="QScrollArea" name="_videoScrollArea">
+        <widget class="VideoBaseView" name="_graphicsView">
          <property name="toolTip">
           <string/>
          </property>
          <property name="toolTipDuration">
           <number>-1</number>
          </property>
-         <property name="widgetResizable">
-          <bool>true</bool>
-         </property>
-         <widget class="QWidget" name="scrollAreaWidgetContents">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>497</width>
-            <height>473</height>
-           </rect>
-          </property>
-         </widget>
         </widget>
        </item>
        <item>
@@ -165,7 +152,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>370</width>
+            <width>256</width>
             <height>278</height>
            </rect>
           </property>
@@ -182,7 +169,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>370</width>
+            <width>256</width>
             <height>277</height>
            </rect>
           </property>
@@ -200,6 +187,11 @@
    <class>CGTVideoControls</class>
    <extends>QWidget</extends>
    <header>cgt.gui.cgtvideocontrols</header>
+  </customwidget>
+  <customwidget>
+   <class>VideoBaseView</class>
+   <extends>QGraphicsView</extends>
+   <header>cgt.gui.videobaseview</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -92,13 +92,13 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         ## Selection
         ############
-        tab = self._tabWidget.widget(1)
+        # tab = self._tabWidget.widget(1)
 
-        ## the region selection widget
-        self._selectWidget = VideoRegionSelectionWidget(tab, self)
-        self._selectWidget.setup_video_widget()
-        self._selectWidget.setEnabled(False)
-        setup_tab(tab, self._selectWidget)
+        # ## the region selection widget
+        # self._selectWidget = VideoRegionSelectionWidget(tab, self)
+        # self._selectWidget.setup_video_widget()
+        # self._selectWidget.setEnabled(False)
+        # setup_tab(tab, self._selectWidget)
 
         ## Video Statistics
         ###################
@@ -112,13 +112,13 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         ## User drawing
         ###############
-        tab =self._tabWidget.widget(3)
+        # tab =self._tabWidget.widget(3)
 
-        ## the crystal drawing widget
-        self._drawingWidget = ArtifactMarkupWidget(tab, self)
-        self._drawingWidget.setup_video_widget()
-        self._drawingWidget.setEnabled(False)
-        setup_tab(tab, self._drawingWidget)
+        # ## the crystal drawing widget
+        # self._drawingWidget = ArtifactMarkupWidget(tab, self)
+        # self._drawingWidget.setup_video_widget()
+        # self._drawingWidget.setEnabled(False)
+        # setup_tab(tab, self._drawingWidget)
 
         self._progressBar.hide()
         self.set_title()
@@ -134,22 +134,22 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             return
 
         self._propertiesWidget.setEnabled(False)
-        self._selectWidget.setEnabled(False)
+        #self._selectWidget.setEnabled(False)
         self._videoStatsWidget.setEnabled(False)
-        self._drawingWidget.setEnabled(False)
+        #self._drawingWidget.setEnabled(False)
 
         if tab_index == self._tabWidget.indexOf(self._propertiesTab):
             self._propertiesTab.setEnabled(True)
-        elif tab_index == self._tabWidget.indexOf(self._selectTab):
-            self._selectWidget.setEnabled(True)
-            self._selectWidget.redisplay()
+        # elif tab_index == self._tabWidget.indexOf(self._selectTab):
+        #     self._selectWidget.setEnabled(True)
+        #     self._selectWidget.redisplay()
         elif tab_index == self._tabWidget.indexOf(self._videoStatsTab):
             if self._project["results"].video_statistics is not None:
                 self._videoStatsWidget.setEnabled(True)
                 self._videoStatsWidget.redisplay()
-        elif  tab_index == self._tabWidget.indexOf(self._drawingTab):
-            self._drawingWidget.setEnabled(True)
-            self._drawingWidget.redisplay()
+        # elif  tab_index == self._tabWidget.indexOf(self._drawingTab):
+        #     self._drawingWidget.setEnabled(True)
+        #     self._drawingWidget.redisplay()
 
     def has_project(self):
         """
@@ -261,8 +261,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         clear and reset the video widgets and the frame queue
         """
         self._videoStatsWidget.clear()
-        self._selectWidget.clear()
-        self._drawingWidget.clear()
+        #self._selectWidget.clear()
+        #self._drawingWidget.clear()
 
     def project_created_or_loaded(self):
         """
@@ -651,7 +651,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         try:
             # make the objects
             self._enhanced_video_reader = VideoSource(self._project["enhanced_video"])
-            self._selectWidget.set_video_source(self._enhanced_video_reader)
+            # self._selectWidget.set_video_source(self._enhanced_video_reader)
 
             if self._project["raw_video"] is not None:
                 self._raw_video_reader = VideoSource(self._project["raw_video"])
@@ -663,7 +663,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             if stats is not None and len(stats.frames) > 0:
                 self._videoStatsWidget.display_stats()
 
-            self._drawingWidget.set_video_source(self._enhanced_video_reader)
+            #self._drawingWidget.set_video_source(self._enhanced_video_reader)
 
         except (FileNotFoundError, IOError) as ex:
             message = self.tr("Unexpected error reading {}: {} => {}")

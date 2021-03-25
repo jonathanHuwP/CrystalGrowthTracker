@@ -64,7 +64,7 @@ class VideoBaseWidget(qw.QWidget):
         self._playing = PlayStates.MANUAL
 
         ## the current image
-        self._current_image = None
+        self._current_pixmap = None
 
         ## the currently displayed frame
         self._current_frame = 0
@@ -141,7 +141,7 @@ class VideoBaseWidget(qw.QWidget):
                 pixmap (QPixmap) the image in pixmap form
                 frame_number
         """
-        self._current_image = qg.QImage(pixmap)
+        self._current_pixmap = pixmap
         self._current_frame = frame_number
         self._videoControl.set_frame_currently_displayed(frame_number)
 
@@ -153,12 +153,10 @@ class VideoBaseWidget(qw.QWidget):
         display an image, the image must be a pixmap so that
         it can safely be recieved from another thread
         """
-        if self._current_image is None or self.isHidden():
+        if self._current_pixmap is None or self.isHidden():
             return
 
-        # zoom and display image
-        tmp = self.apply_zoom_to_image(self._current_image)
-        self._video_label.setPixmap(qg.QPixmap(tmp))
+        self._graphicsView.set_pixmap(self._current_pixmap)
 
         # update the controls
         self._videoControl.set_slider_value(self._current_frame)
@@ -185,23 +183,6 @@ class VideoBaseWidget(qw.QWidget):
         """
         pass
 
-    def apply_zoom_to_image(self, image):
-        """
-        apply the current zoom to an image
-            Args:
-                image (Qimage) the image to be resized
-            Returns
-                Qimage resized by current zoom
-        """
-        height = image.height()*self._current_zoom
-        width = image.width()*self._current_zoom
-
-        transform = qt.Qt.SmoothTransformation
-        if self._videoControl.use_fast_transform():
-            transform = qt.Qt.FastTransformation
-
-        return image.scaled(width, height, transformMode=transform)
-
     @qc.pyqtSlot(bool)
     def start_end(self, end):
         """
@@ -226,9 +207,8 @@ class VideoBaseWidget(qw.QWidget):
         """
         a new value for the zoom has been entered
         """
+        self._graphicsView.set_zoom(value)
         self._current_zoom = value
-        self.set_zoom_in_labels(value)
-        self.post_request_frame(self._current_frame)
 
     @qc.pyqtSlot()
     def step_forward(self):
@@ -289,7 +269,7 @@ class VideoBaseWidget(qw.QWidget):
             Returns:
                 deep copy of current image (QImage)
         """
-        return self._current_image.copy()
+        return self._current_pixmap.copy()
 
     def clear(self):
         """
@@ -297,7 +277,7 @@ class VideoBaseWidget(qw.QWidget):
         """
         self._video_source = None
         self._playing = PlayStates.MANUAL
-        self._current_image = None
+        self._current_pixmap = None
         self._current_frame = 0
-        self._current_zoom = 1.0
+        self.zoom_value(1.0)
         self._videoControl.clear()
