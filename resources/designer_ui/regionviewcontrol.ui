@@ -37,7 +37,7 @@
        <item>
         <widget class="QRadioButton" name="_editRegionButton">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="text">
           <string>Edit Region</string>
@@ -51,16 +51,9 @@
         </widget>
        </item>
        <item>
-        <widget class="QComboBox" name="_editComboBox">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QRadioButton" name="_displayMultipleButton">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="text">
           <string>Display Multiple</string>
@@ -71,21 +64,9 @@
         </widget>
        </item>
        <item>
-        <widget class="QComboBox" name="_displayComboBox">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <item>
-          <property name="text">
-           <string>All</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item>
         <widget class="QRadioButton" name="_deleteButton">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="text">
           <string>Delete</string>
@@ -93,18 +74,6 @@
          <attribute name="buttonGroup">
           <string notr="true">_buttonGroup</string>
          </attribute>
-        </widget>
-       </item>
-       <item>
-        <widget class="QComboBox" name="_deleteComboBox">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <item>
-          <property name="text">
-           <string>All</string>
-          </property>
-         </item>
         </widget>
        </item>
        <item>
@@ -116,6 +85,19 @@
           <bool>true</bool>
          </property>
         </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>
@@ -156,22 +138,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>_editComboBox</sender>
-   <signal>currentIndexChanged(int)</signal>
-   <receiver>RegionViewControl</receiver>
-   <slot>edit_combo_changed()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>96</x>
-     <y>121</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>96</x>
-     <y>143</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>_showInstructionsBox</sender>
    <signal>stateChanged(int)</signal>
    <receiver>RegionViewControl</receiver>
@@ -180,38 +146,6 @@
     <hint type="sourcelabel">
      <x>97</x>
      <y>255</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>223</x>
-     <y>144</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>_displayComboBox</sender>
-   <signal>currentIndexChanged(int)</signal>
-   <receiver>RegionViewControl</receiver>
-   <slot>display_combo_changed()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>97</x>
-     <y>156</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>223</x>
-     <y>144</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>_deleteComboBox</sender>
-   <signal>currentIndexChanged(int)</signal>
-   <receiver>RegionViewControl</receiver>
-   <slot>delete_combo_changed()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>97</x>
-     <y>222</y>
     </hint>
     <hint type="destinationlabel">
      <x>223</x>

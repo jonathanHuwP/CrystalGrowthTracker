@@ -45,11 +45,21 @@ class RegionSelectionView(VideoBaseView):
     """
     provides a viewer for a pixmaps
     """
+
+    ## a rectangle needs to be shown
+    show_rect = qc.pyqtSignal(qc.QRectF)
+
+    ## stop showing the rectangle
+    stop_showing_rect = qc.pyqtSignal()
+
     def __init__(self, parent):
         """
         set up the scene graph
         """
         super().__init__(parent)
+
+        ##
+        self._parent = parent
 
         ## the state
         self._state = SelectStates.VIEW
@@ -57,7 +67,16 @@ class RegionSelectionView(VideoBaseView):
         ## the mode the rectangle being drawn
         self._draw_rect = None
 
-        #self.scene().selectionChanged.connect(self.item_selected)
+        ## the store for results
+        self._data_source = None
+
+    def set_data_source(self, data_source):
+        """
+        setter for the results holder
+            Args:
+                data_source (CrystalGrowthTrackerMain) the data source
+        """
+        self._data_source = data_source
 
     def set_state(self, state):
         """
@@ -67,6 +86,12 @@ class RegionSelectionView(VideoBaseView):
         """
         self._state = state
         self._draw_rect = None
+        self.scene().clearSelection()
+        self.stop_showing_rect.emit()
+
+        if self._state == SelectStates.VIEW:
+            self.make_regions_selectable()
+            return
 
         if self._state == SelectStates.EDIT_REGION:
             self.make_regions_selectable()
@@ -91,6 +116,7 @@ class RegionSelectionView(VideoBaseView):
             return
 
         item = items.pop(0)
+        self.show_rect.emit(item.rect())
         mb_reply = qw.QMessageBox.question(self,
                                            self.tr('CrystalGrowthTracker'),
                                            self.tr('Do you wish to delete the selected region?'),
@@ -100,9 +126,8 @@ class RegionSelectionView(VideoBaseView):
         if mb_reply == qw.QMessageBox.Yes:
             item.setSelected(False)
             self.scene().removeItem(item)
-            self._parent.remove_region(item)
-        else:
-            self.scene().clearSelection()
+            self._data_source.remove_region(item)
+            self.stop_showing_rect.emit()
 
     def make_regions_selectable(self, flag=True):
         """
@@ -124,11 +149,11 @@ class RegionSelectionView(VideoBaseView):
         self.test_and_select(event)
 
         if self._state == SelectStates.VIEW:
+            self.display_selected()
             return
 
         if self._state == SelectStates.DELETE_REGION:
             self.delete_selected()
-            return
 
         if self._state == SelectStates.MAKE_REGION:
             self.mouse_down_create(event)
@@ -294,7 +319,7 @@ class RegionSelectionView(VideoBaseView):
         self._draw_rect.graphics_rect.setRect(rect)
         self._draw_rect.graphics_rect.setPen(self._gray_pen)
 
-        self._parent.add_region(self._draw_rect.graphics_rect)
+        self._data_source.append_region(self._draw_rect.graphics_rect)
 
         self._draw_rect = None
 
@@ -311,6 +336,16 @@ class RegionSelectionView(VideoBaseView):
         self._draw_rect.graphics_rect.setPen(self._gray_pen)
         self._draw_rect = None
 
+    def display_selected(self):
+        items = self.scene().selectedItems()
+
+        if len(items) <= 0:
+            self.stop_showing_rect.emit()
+            return
+
+        rect = items[0].rect()
+        self.show_rect.emit(rect)
+
     def test_and_select(self, event):
         """
         test if a mouse event was in a region and if so select the region
@@ -326,3 +361,5 @@ class RegionSelectionView(VideoBaseView):
                 if item.contains(point):
                     item.setSelected(True)
                     return
+
+        self.stop_showing_rect.emit()

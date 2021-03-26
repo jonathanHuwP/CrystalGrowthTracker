@@ -22,26 +22,13 @@
      <widget class="QWidget" name="layoutWidget">
       <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
        <item>
-        <widget class="QScrollArea" name="_videoScrollArea">
+        <widget class="RegionSelectionView" name="_graphicsView">
          <property name="toolTip">
           <string/>
          </property>
          <property name="toolTipDuration">
           <number>-1</number>
          </property>
-         <property name="widgetResizable">
-          <bool>true</bool>
-         </property>
-         <widget class="QWidget" name="scrollAreaWidgetContents">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>545</width>
-            <height>367</height>
-           </rect>
-          </property>
-         </widget>
         </widget>
        </item>
        <item>
@@ -128,7 +115,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>405</width>
+            <width>281</width>
             <height>398</height>
            </rect>
           </property>
@@ -181,6 +168,11 @@
    <header>cgt.gui.cgtvideocontrols</header>
   </customwidget>
   <customwidget>
+   <class>RegionSelectionView</class>
+   <extends>QGraphicsView</extends>
+   <header>cgt.gui.regionselectionview</header>
+  </customwidget>
+  <customwidget>
    <class>RegionViewControl</class>
    <extends>QWidget</extends>
    <header>cgt.gui.regionviewcontrol</header>
@@ -205,14 +197,14 @@
    </hints>
   </connection>
   <connection>
-   <sender>_view_control</sender>
-   <signal>change_edit_region()</signal>
+   <sender>_graphicsView</sender>
+   <signal>show_rect(QRectF)</signal>
    <receiver>VideoRegionSelectionWidget</receiver>
-   <slot>editing_rectangle_changed()</slot>
+   <slot>show_region(QRectF)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>773</x>
-     <y>426</y>
+     <x>349</x>
+     <y>198</y>
     </hint>
     <hint type="destinationlabel">
      <x>495</x>
@@ -221,30 +213,14 @@
    </hints>
   </connection>
   <connection>
-   <sender>_view_control</sender>
-   <signal>change_delete_region()</signal>
+   <sender>_graphicsView</sender>
+   <signal>stop_showing_rect()</signal>
    <receiver>VideoRegionSelectionWidget</receiver>
-   <slot>delete_rectangle_changed()</slot>
+   <slot>stop_showing_region()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>773</x>
-     <y>433</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>495</x>
-     <y>229</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>_view_control</sender>
-   <signal>change_display_region()</signal>
-   <receiver>VideoRegionSelectionWidget</receiver>
-   <slot>display_rectangle_changed()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>773</x>
-     <y>433</y>
+     <x>349</x>
+     <y>198</y>
     </hint>
     <hint type="destinationlabel">
      <x>495</x>

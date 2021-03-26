@@ -155,14 +155,6 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         self.enable_fine_controls()
         self.pause.emit()
 
-    def use_fast_transform(self):
-        """
-        get the users choice of scalling transform
-            Returns:
-                True if fast transform selected, else False
-        """
-        return self._fastSmoothButton.isChecked()
-
     def set_frame_currently_displayed(self, frame_number):
         """
         display the current frame

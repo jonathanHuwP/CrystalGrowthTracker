@@ -92,13 +92,13 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         ## Selection
         ############
-        # tab = self._tabWidget.widget(1)
+        tab = self._tabWidget.widget(1)
 
-        # ## the region selection widget
-        # self._selectWidget = VideoRegionSelectionWidget(tab, self)
-        # self._selectWidget.setup_video_widget()
-        # self._selectWidget.setEnabled(False)
-        # setup_tab(tab, self._selectWidget)
+        ## the region selection widget
+        self._selectWidget = VideoRegionSelectionWidget(tab, self)
+        self._selectWidget.setup_video_widget()
+        self._selectWidget.setEnabled(False)
+        setup_tab(tab, self._selectWidget)
 
         ## Video Statistics
         ###################
@@ -134,15 +134,15 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             return
 
         self._propertiesWidget.setEnabled(False)
-        #self._selectWidget.setEnabled(False)
+        self._selectWidget.setEnabled(False)
         self._videoStatsWidget.setEnabled(False)
         #self._drawingWidget.setEnabled(False)
 
         if tab_index == self._tabWidget.indexOf(self._propertiesTab):
             self._propertiesTab.setEnabled(True)
-        # elif tab_index == self._tabWidget.indexOf(self._selectTab):
-        #     self._selectWidget.setEnabled(True)
-        #     self._selectWidget.redisplay()
+        elif tab_index == self._tabWidget.indexOf(self._selectTab):
+            self._selectWidget.setEnabled(True)
+            self._selectWidget.redisplay()
         elif tab_index == self._tabWidget.indexOf(self._videoStatsTab):
             if self._project["results"].video_statistics is not None:
                 self._videoStatsWidget.setEnabled(True)
@@ -585,13 +585,14 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         self._project["results"].add_region(region)
 
-    def remove_region(self, region_index):
+    def remove_region(self, region):
         """
         remove a region from the results and notify the crystal drawing widget
             Args:
                 region (QRect) the region
         """
-        self._project["results"].remove_region(region_index)
+        index = self._project["results"].regions.index(region)
+        self._project["results"].remove_region(index)
 
     def append_lines(self, region_index, lines):
         """
@@ -651,7 +652,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         try:
             # make the objects
             self._enhanced_video_reader = VideoSource(self._project["enhanced_video"])
-            # self._selectWidget.set_video_source(self._enhanced_video_reader)
+            self._selectWidget.set_video_source(self._enhanced_video_reader)
 
             if self._project["raw_video"] is not None:
                 self._raw_video_reader = VideoSource(self._project["raw_video"])

@@ -23,7 +23,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
-from vb.gui.videobaseview import VideoBaseView
+from cgt.gui.videobaseview import VideoBaseView
 
 class MarkUpView(VideoBaseView):
     """top level application"""

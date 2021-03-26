@@ -32,7 +32,7 @@ import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 import pyqtgraph as pg
 
-from cgt.gui.videobasewidget import VideoBaseWidget, PlayStates
+from cgt.gui.videobasewidget import VideoBaseWidget
 from cgt.gui.Ui_videostatisticswidget import Ui_VideoStatisticsWidget
 
 class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
