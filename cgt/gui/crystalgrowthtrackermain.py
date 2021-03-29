@@ -31,6 +31,7 @@ from shutil import copy2
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
+import PyQt5.Qt as qt
 
 from cgt.model.videoanalysisresultsstore import VideoAnalysisResultsStore
 
@@ -625,6 +626,39 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             name += f": {proj_name}"
 
         self.setWindowTitle(name)
+
+    @qc.pyqtSlot()
+    def set_view_properties(self):
+        msg_box = qw.QMessageBox()
+        msg_box.setText(self.tr("Select Property"))
+        new_line = msg_box.addButton(self.tr("New Line Colour"), qw.QMessageBox.NoRole)
+        old_line = msg_box.addButton(self.tr("Old Line Colour"), qw.QMessageBox.NoRole)
+        line_thickness = msg_box.addButton(self.tr("Line thickness"), qw.QMessageBox.NoRole)
+        msg_box.addButton(self.tr("Cancel"), qw.QMessageBox.NoRole)
+        msg_box.exec()
+
+        if msg_box.clickedButton() == new_line:
+            new_colour = self.get_colour()
+            print(f"new line {new_colour}")
+        elif msg_box.clickedButton() == old_line:
+            old_colour = self.get_colour()
+            print(f"old line {old_colour}")
+        elif msg_box.clickedButton() == line_thickness:
+            thickness = qw.QInputDialog.getInt(self,
+                                               self.tr("Line Thickness"),
+                                               self.tr("Line Thickness"),
+                                               value = 3,
+                                               min = 1,
+                                               max = 15,
+                                               step = 1)
+            print(f"thickness {thickness}")
+
+    def get_colour(self):
+        colour = qw.QColorDialog.getColor(qt.Qt.red, self)
+        if colour.isValid():
+            return colour
+        else:
+            return None
 
     @qc.pyqtSlot()
     def load_video(self):

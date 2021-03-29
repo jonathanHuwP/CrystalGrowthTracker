@@ -112,6 +112,8 @@
     <addaction name="_actionEditVideoProps"/>
     <addaction name="separator"/>
     <addaction name="_actionMakeVideoStats"/>
+    <addaction name="separator"/>
+    <addaction name="_actionProperties"/>
    </widget>
    <addaction name="menuOpen"/>
    <addaction name="menuEdit"/>
@@ -173,6 +175,11 @@
   <action name="_actionMakeVideoStats">
    <property name="text">
     <string>Make Video Statistics </string>
+   </property>
+  </action>
+  <action name="_actionProperties">
+   <property name="text">
+    <string>Properties</string>
    </property>
   </action>
  </widget>
@@ -363,6 +370,22 @@
     <hint type="sourcelabel">
      <x>470</x>
      <y>292</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>470</x>
+     <y>291</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_actionProperties</sender>
+   <signal>triggered()</signal>
+   <receiver>CrystalGrowthTrackerMain</receiver>
+   <slot>set_view_properties()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
     </hint>
     <hint type="destinationlabel">
      <x>470</x>
