@@ -20,6 +20,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = c-extension-no-member
 # pylint: disable = import-error
 # pylint: disable = no-name-in-module
+# pylint: disable = too-many-public-methods
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
@@ -71,6 +72,9 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         self.setupUi(self)
         self.setup_buttons()
 
+        ## indicate if the slider should be frozenset
+        self._frozen = False
+
     def clear(self):
         """
         reset to initial conditions
@@ -97,18 +101,27 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
                 value (int) the new value
         """
         old_slider_state = self._frameSlider.blockSignals(True)
-        self._frameSlider.setValue(value)
+        if not self._frozen:
+            self._frameSlider.setValue(value)
         self._frameSlider.blockSignals(old_slider_state)
 
-    def set_range(self, maximum):
+    def set_range(self, maximum, minimum=0):
         """
         set the slider range to 0 to maximum-1 and the type in to 1 to maximum
             Args:
                 maximum (int) the largest allowed frame number
         """
-        self._frameSlider.setRange(0, maximum-1)
-        self._gotoSpinBox.setRange(1, maximum)
+        self._frameSlider.setRange(minimum, maximum-1)
+        self._gotoSpinBox.setRange(minimum, maximum)
         self._frameSlider.setTickInterval(int(maximum/10))
+
+    def get_range(self):
+        """
+        get the current frame rang of the controls
+            Returns:
+                tuple (min, max)
+        """
+        return (self._frameSlider.minimum(), self._frameSlider.maximum())
 
     def disable_fine_controls(self):
         """
@@ -119,6 +132,7 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         self._frameSlider.setEnabled(False)
         self._stepUpButton.setEnabled(False)
         self._lastFrameButton.setEnabled(False)
+        self._gotoSpinBox.setEnabled(False)
         self._goToButton.setEnabled(False)
         self._zoomSpinBox.setEnabled(False)
 
@@ -132,6 +146,35 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         self._stepUpButton.setEnabled(True)
         self._lastFrameButton.setEnabled(True)
         self._goToButton.setEnabled(True)
+        self._gotoSpinBox.setEnabled(True)
+        self._zoomSpinBox.setEnabled(True)
+        self._frozen = False
+
+    def freeze(self):
+        """
+        disable fine controls and freeze slider
+        """
+        self._frozen = True
+        self.disable_all_but_zoom()
+
+    def disable_all_but_zoom(self):
+        """
+        disable all play controls, but leave zoom working
+        """
+        self.disable_fine_controls()
+        self._backwardButton.setEnabled(False)
+        self._forwardButton.setEnabled(False)
+        self._pauseButton.setEnabled(False)
+        self._zoomSpinBox.setEnabled(True)
+
+    def enable_all(self):
+        """
+        enable all play controls
+        """
+        self.enable_fine_controls()
+        self._backwardButton.setEnabled(True)
+        self._forwardButton.setEnabled(True)
+        self._pauseButton.setEnabled(True)
         self._zoomSpinBox.setEnabled(True)
 
     def play_forwards(self):
@@ -159,8 +202,10 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         """
         display the current frame
         """
-        display_number = frame_number + 1
-        self._gotoSpinBox.setValue(display_number)
+        display_number = frame_number
+        if self._gotoSpinBox.isEnabled():
+            self._gotoSpinBox.setValue(display_number)
+        self.set_slider_value(frame_number)
 
     @qc.pyqtSlot(float)
     def zoom_changed(self, zoom):

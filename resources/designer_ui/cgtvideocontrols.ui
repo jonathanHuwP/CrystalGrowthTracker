@@ -113,7 +113,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QSlider" name="_frameSlider">
+      <widget class="FullDisableSlider" name="_frameSlider">
        <property name="toolTip">
         <string>Jump to frame.</string>
        </property>
@@ -282,6 +282,13 @@
    </item>
   </layout>
  </widget>
+  <customwidgets>
+  <customwidget>
+   <class>FullDisableSlider</class>
+   <extends>QSlider</extends>
+   <header>cgt.gui.fulldisableslider</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>
