@@ -210,6 +210,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
                                                message,
                                                qw.QMessageBox.Yes | qw.QMessageBox.No,
                                                qw.QMessageBox.No)
+
             if mb_reply == qw.QMessageBox.Yes:
                 self._drawing.clear_all()
             else:
@@ -218,7 +219,7 @@ class CrystalDrawingWidget(qw.QWidget, Ui_CrystalDrawingWidget):
                 return
 
         print(f"CDW: region index {region_index}")
-        self.display_image(first_frame, region_index)
+        self.display_image(True, region_index)
 
     def display_image(self, first_frame, region_index):
         """
