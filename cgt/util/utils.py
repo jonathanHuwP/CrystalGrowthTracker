@@ -21,6 +21,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # set up linting conditions
 # pylint: disable = c-extension-no-member
 
+import enum
 import socket
 import datetime
 
@@ -31,6 +32,41 @@ import PyQt5.QtCore as qc
 
 import cv2
 import numpy as np
+
+class MarkerTypes(enum.IntEnum):
+    """
+    define the types of marker used in images
+    """
+    ## mark a line
+    LINE = 1
+
+    ## mark a point
+    POINT = 2
+
+    ## a region
+    REGION=4
+
+    ## not in any other.
+    DECORATOR = 8
+
+class ItemDataTypes(enum.IntEnum):
+    """
+    define the indices for storing data in QGraphicsItem
+    """
+    ## store for the type of data item
+    ITEM_TYPE = 0
+
+    ## store for parent hash code
+    PARENT_HASH = 1
+
+    ## store for the number of the frame in which the artifact was defined
+    FRAME_NUMBER = 2
+
+    ## the index number of the region in which the mark is defined
+    REGION_INDEX = 3
+
+    ## for a cross the centre point
+    CROSS_CENTRE = 4
 
 def memview_3b_to_qpixmap(pixels, width, height):
     """
@@ -292,3 +328,226 @@ def rectangle_to_string(rect):
     top_left = rect.topLeft()
     size = rect.size()
     return f"QRect({top_left.x()}, {top_left.y()}) ({size.width()}, {size.height()})"
+
+def hash_marker(marker):
+    """
+    find hash code for marker
+        Args:
+            marker (QGraphicsItem) the item to hash
+        Returns:
+            hash code or None if not appropriate type
+    """
+    m_type = get_marker_type(marker)
+
+    if m_type == MarkerTypes.LINE:
+        return hash_graphics_line(marker)
+
+    if m_type == MarkerTypes.POINT:
+        return hash_graphics_point(marker)
+
+    return None
+
+def hash_graphics_line(line):
+    """
+    a hash function for QGraphicsLineItem,
+        Args:
+            line (QGraphicsLineItem) the line
+        Returns:
+            hash of tuple (line hash, position hash, frame)
+    """
+    hashes = (hash_qlinef(line.line()),
+                          hash_qpointf(line.pos()),
+                          hash(line.data(ItemDataTypes.FRAME_NUMBER)))
+
+    return hash(hashes)
+
+def hash_graphics_point(point):
+    """
+    a hash function for QGraphicsPathItem,
+        Args:
+            line (QGraphicsPathItem) the line
+        Returns:
+            hash of tuple (centre hash, position hash, frame number)
+    """
+    hashes = (hash_qpointf(point.data(ItemDataTypes.CROSS_CENTRE)),
+              hash_qpointf(point.pos()),
+              hash(point.data(ItemDataTypes.FRAME_NUMBER)))
+
+    return hash(hashes)
+
+def hash_qlinef(line):
+    """
+    a hash function for QLineF,
+        Args:
+            line (QLineF) the line
+        Returns:
+            hash of tuple formed from end point coordinates (x1, x2, y1, y2)
+    """
+    coords = (line.x1(), line.x2(), line.y1(), line.y2())
+    return hash(coords)
+
+def hash_qpointf(point):
+    """
+    a hash function for QPontF,
+        Args:
+            point (QpointF) the point
+        Returns:
+            hash of tuple formed from end point coordinates (x, y)
+    """
+    coords = (point.x(), point.y())
+    return hash(coords)
+
+def get_marker_type(item):
+    """
+    get the type enum of the item
+        Args:
+            item (QGraphicsItem)
+        Returns:
+            the type enum or None
+    """
+    return item.data(ItemDataTypes.ITEM_TYPE)
+
+def get_parent_hash(item):
+    """
+    get the parent hash code of the item
+        Args:
+            item (QGraphicsItem)
+        Returns:
+            the parent hash code (int): 'p' if progenitor, or None
+    """
+    return item.data(ItemDataTypes.PARENT_HASH)
+
+def get_frame(item):
+    """
+    get the frame number of the item
+        Args:
+            item (QGraphicsItem)
+        Returns:
+            the frame number (int), or None
+    """
+    return item.data(ItemDataTypes.FRAME_NUMBER)
+
+def get_region(item):
+    """
+    get the index of the region in which the item is defined
+        Args:
+            item (QGraphicsItem)
+        Returns:
+            the region index (int), or None
+    """
+    return item.data(ItemDataTypes.REGION_INDEX)
+
+def get_point_of_point(item):
+    """
+    get the centre point of a cross
+        Args:
+            item (QGraphicsItem)
+        Returns:
+            the centre point (QPontF), or None
+    """
+    return item.data(ItemDataTypes.CROSS_CENTRE)
+
+def make_cross_path(point):
+    """
+    make the path object corresponding to a cross centred at a scene point
+        Args:
+            point (QPointF) location in scene coordinates
+        Returns:
+            the path (QPainterPath) for the cross
+    """
+    path = qg.QPainterPath()
+
+    up_right = qc.QPointF(10.0, 10.0)
+    up_left = qc.QPointF(-10.0, 10.0)
+
+    path.moveTo(point)
+    path.lineTo(point+up_right)
+    path.moveTo(point)
+    path.lineTo(point+up_left)
+    path.moveTo(point)
+    path.lineTo(point-up_right)
+    path.moveTo(point)
+    path.lineTo(point-up_left)
+
+    return path
+
+def cgt_intersection(centred_normal, clone):
+    """
+    find intersection of centred_normal and clone
+        Args:
+            centred_normal (QLineF) the normal vector
+            clone (QLineF) the clone
+        Returns:
+            intersection (QPointF) the intersection point
+            extensiong (QLineF) the extension to clone if needed, else None
+    """
+    ## based on Graphics Gems III's "Faster Line Segment Intersection"
+    a = centred_normal.p2() - centred_normal.p1()
+    b = clone.p1() - clone.p2()
+    c = centred_normal.p1() - clone.p1()
+
+    # test if parallel
+    denominator = a.y() * b.x() - a.x() * b.y()
+    if denominator == 0 or not math.isfinite(denominator):
+        raise ArithmeticError("Clone line is parallel to parent")
+
+    # find the intersection
+    reciprocal = 1.0 / denominator
+    na = (b.y() * c.x() - b.x() * c.y()) * reciprocal
+    intersection = centred_normal.p1() + (a * na)
+
+    # test if outside clone segmet and assign extension as required
+    nb = (a.x() * c.y() - a.y() * c.x()) * reciprocal
+    extension = None
+    if nb < 0.0:
+        extension = qc.QLineF(clone.p1(), intersection)
+    elif nb > 1.0:
+        extension = qc.QLineF(clone.p2(), intersection)
+
+    return intersection, extension
+
+def make_arrow_head(line, length_cutoff=10):
+    """
+    if line.length() > length_cutoff add a small triangle to the end
+        Args:
+            line (QLineF) the line
+            length_cutoff (float) the minimum length for a head to be added
+        Returns:
+            QPolygon the triangle
+    """
+    if line.length() < length_cutoff:
+        return None
+
+    # make normal based at p2
+    delta_t = (line.length()-10.0)/line.length()
+    normal = line.normalVector()
+    offset = line.pointAt(delta_t)-line.p1()
+    offset_normal = qc.QLineF(normal.p1()+offset, normal.p2()+offset)
+
+    opposit_normal = qc.QLineF(offset_normal.p1(), offset_normal.pointAt(-1.0))
+
+    offset_normal.setLength(5.0)
+    opposit_normal.setLength(5.0)
+
+    return qg.QPolygonF([line.p2(), offset_normal.p2(), opposit_normal.p2()])
+
+def make_arrow(line, clone):
+    """
+    make the arrow line between a line and a parallel clone
+        Args:
+            line (QLineF) the parent line
+            clone (QLineF) the parallel clone line
+        Returns:
+            arrow_line (QLineF) the arrow line (p1, p2) as parent to clone
+            extension (QLineF) the extension to clone, None if not needed
+    """
+    # make normal based at centre of parent line
+    normal = line.normalVector()
+    centre = line.center()
+    offset = centre-line.p1()
+    centred_normal = qc.QLineF(normal.p1()+offset, normal.p2()+offset)
+
+    intersection, extension = cgt_intersection(centred_normal, clone)
+    arrow = qc.QLineF(centre, intersection)
+
+    return arrow, extension
