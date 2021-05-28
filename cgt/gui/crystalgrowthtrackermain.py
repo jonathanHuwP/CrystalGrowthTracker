@@ -52,6 +52,7 @@ from cgt.io.videosource import VideoSource
 from cgt.io.videoanalyser import VideoAnalyser
 from cgt.model.cgtproject import CGTProject
 from cgt.gui.videostatisticswidget import VideoStatisticsWidget
+from cgt.gui.penstore import PenStore
 
 # import UI
 from cgt.gui.Ui_crystalgrowthtrackermain import Ui_CrystalGrowthTrackerMain
@@ -82,6 +83,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         ## the project data structure
         self._project = None
+
+        ## the pens
+        self._pens = PenStore()
 
         ## Properties
         #############
@@ -123,6 +127,14 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self._progressBar.hide()
         self.set_title()
+
+    def get_pens(self):
+        """
+        getter for the pens
+            Returns:
+                (PenStore)
+        """
+        return self._pens
 
     @qc.pyqtSlot(int)
     def tab_changed(self, tab_index):

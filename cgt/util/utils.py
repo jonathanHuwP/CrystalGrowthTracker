@@ -27,6 +27,7 @@ import datetime
 from sys import platform as _platform
 import array as arr
 import PyQt5.QtGui as qg
+import PyQt5.QtCore as qc
 
 import cv2
 import numpy as np
@@ -244,6 +245,33 @@ def qpoint_sepertation_squared(point_a, point_b):
     """
     difference = point_a - point_b
     return difference.x()*difference.x() + difference.y()*difference.y()
+
+def make_positive_rect(corner, opposite_corner):
+    """
+    draw a rectangle with positive size (x, y) from two points
+        Args:
+            corner (QPointF) scene coordinates of a corner
+            opposite_corner (QPointF) scene coordinates of the opposing corner
+    """
+    # get the width and height (strictly positive)
+    width = abs(opposite_corner.x()-corner.x())
+    height = abs(opposite_corner.y()-corner.y())
+
+    # find the top left of the new adjusted rectangle
+    top_left_x = min(opposite_corner.x(), corner.x())
+    top_left_y = min(opposite_corner.y(), corner.y())
+
+    return qc.QRectF(top_left_x, top_left_y, width, height)
+
+def length_squared(point):
+    """
+    square of length from origin of a point
+        Args:
+            point (QPointF) the point
+        Returns
+            square of length
+    """
+    return point.x()*point.x() + point.y()*point.y()
 
 # For debugging
 ################

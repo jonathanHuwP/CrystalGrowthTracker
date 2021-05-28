@@ -156,7 +156,7 @@ class VideoBaseWidget(qw.QWidget):
         if self._current_pixmap is None or self.isHidden():
             return
 
-        self._graphicsView.set_pixmap(self._current_pixmap)
+        self._graphicsView.set_pixmap(self._current_pixmap, self._current_frame)
 
         # update the controls
         self._videoControl.set_slider_value(self._current_frame)

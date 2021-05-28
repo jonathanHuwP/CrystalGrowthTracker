@@ -18,11 +18,10 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 """
 # set up linting conditions
 # pylint: disable = c-extension-no-member
+# pylint: disable = too-many-instance-attributes
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
-import PyQt5.QtCore as qc
-import PyQt5.Qt as qt
 
 class VideoBaseView(qw.QGraphicsView):
     """
@@ -34,38 +33,50 @@ class VideoBaseView(qw.QGraphicsView):
         """
         super().__init__(parent)
 
-        ## pen width in drawing
-        self._pen_width = 3
-
         ## needed as in PyQt5 .parent() only returns the Qt base class
         self._parent = parent
 
         ## the pixmap for video display
         self._pixmap_item = None
 
-        ## red pen
-        self._red_pen = qg.QPen(qt.Qt.red)
-        self._red_pen.setWidth(self._pen_width)
-
-        ## gray pen
-        self._gray_pen = qg.QPen(qt.Qt.darkGray)
-        self._gray_pen.setWidth(self._pen_width)
+        ## the current frame number
+        self._current_frame = None
 
         ## set and connect scene
         self.setScene(qw.QGraphicsScene())
 
-    def set_pixmap(self, pixmap):
+    def clear(self):
+        """
+        clear the scene and reset instance variables
+        """
+        self._pixmap_item = None
+        self._current_frame = None
+        self.scene().clear()
+
+    def set_pixmap(self, pixmap, frame_number):
         """
         set the pixamp
             Args:
                 pixmap (QPixmap) the pixmap
+                frame_number (int) the number of the frame in the video
         """
         if self._pixmap_item is None:
             self._pixmap_item = self.scene().addPixmap(pixmap)
+            self._pixmap_item.setZValue(-1.0)
             rect = self._pixmap_item.boundingRect()
             self.scene().setSceneRect(rect)
         else:
             self._pixmap_item.setPixmap(pixmap)
+
+        self._current_frame = frame_number
+
+    def get_frame_number(self):
+        """
+        getter for the frame number
+            Returns:
+                the frame number
+        """
+        return self._current_frame
 
     def set_zoom(self, zoom_value):
         """
@@ -76,44 +87,24 @@ class VideoBaseView(qw.QGraphicsView):
         self.setTransform(qg.QTransform())
         self.scale(zoom_value, zoom_value)
 
-    def set_pen_width(self, width):
+    def delete_graphics_item(self, item):
         """
-        set the width of the drawing pen
+        delete a graphics item
             Args:
-                width (int) the new width
+                item (QGraphicsItem) the item
         """
-        self._pen_width = width
-        self._red_pen.setWidth(self._pen_width)
-        self._gray_pen.setWidth(self._pen_width)
+        if item is not None:
+            self.scene().removeItem(item)
 
-        for item in self.scene().items():
-            if isinstance(item, qw.QGraphicsRectItem):
-                item.setPen(self._gray_pen)
+    def delete_graphics_items(self, items):
+        """
+        delete a collection of graphics items
+            Args:
+                items (QGraphicsItem) python iterable of items
+        """
+        if items is None or len(items)==0:
+            return
 
-def length_squared(point):
-    """
-    square of length from origin of a point
-        Args:
-            point (QPointF) the point
-        Returns
-            square of length
-    """
-    return point.x()*point.x() + point.y()*point.y()
-
-
-def make_positive_rect(corner, opposite_corner):
-    """
-    draw a rectangle with positive size (x, y) from two points
-        Args:
-            corner (QPointF) scene coordinates of a corner
-            opposite_corner (QPointF) scene coordinates of the opposing corner
-    """
-    # get the width and height (strictly positive)
-    width = abs(opposite_corner.x()-corner.x())
-    height = abs(opposite_corner.y()-corner.y())
-
-    # find the top left of the new adjusted rectangle
-    top_left_x = min(opposite_corner.x(), corner.x())
-    top_left_y = min(opposite_corner.y(), corner.y())
-
-    return qc.QRectF(top_left_x, top_left_y, width, height)
+        for item in items:
+            if item is not None:
+                self.scene().removeItem(item)

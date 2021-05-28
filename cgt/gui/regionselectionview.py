@@ -27,7 +27,8 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
-from cgt.gui.videobaseview import VideoBaseView, make_positive_rect, length_squared
+from cgt.gui.videobaseview import VideoBaseView
+from cgt.util.utils import (make_positive_rect, length_squared)
 
 ## storage for a rectangle being drawn, start point + current rectangle
 UnfinishedRect = namedtuple("UnfinishedRect", ["start_point", "graphics_rect"])
@@ -231,7 +232,8 @@ class RegionSelectionView(VideoBaseView):
         point = self.mapToScene(event.pos())
 
         rect = make_positive_rect(point, point)
-        rect = self.scene().addRect(rect, self._red_pen)
+        pen = self._data_source.get_pens().get_drawing_pen()
+        rect = self.scene().addRect(rect, pen)
         self._draw_rect = UnfinishedRect(point, rect)
 
     def mouseMoveEvent(self, event):
@@ -317,7 +319,8 @@ class RegionSelectionView(VideoBaseView):
         rect = make_positive_rect(self._draw_rect.start_point,
                                   self.mapToScene(event.pos()))
         self._draw_rect.graphics_rect.setRect(rect)
-        self._draw_rect.graphics_rect.setPen(self._gray_pen)
+        pen = self._data_source.get_pens()
+        self._draw_rect.graphics_rect.setPen(pen.get_display_pen())
 
         self._data_source.append_region(self._draw_rect.graphics_rect)
 
