@@ -551,3 +551,10 @@ def make_arrow(line, clone):
     arrow = qc.QLineF(centre, intersection)
 
     return arrow, extension
+
+def perpendicular_dist_to_position(gline):
+    """
+    find the distance to the position of a QGraphicsLine
+    """
+    unit_normal = gline.line().normalVector().unitVector()
+    return gline.pos().x()*unit_normal.dx() + gline.pos().y()*unit_normal.dy()

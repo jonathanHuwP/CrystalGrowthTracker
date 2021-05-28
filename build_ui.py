@@ -44,7 +44,8 @@ ROOT_FILE_NAMES = ["crystaldrawingwidget",
                    "regionviewcontrol",
                    "videostatisticswidget",
                    "artifactmarkupwidget",
-                   "markupwidget"]
+                   "markupwidget",
+                   "resultswidget"]
 
 # relative path to the Qt .ui files
 UI_PATH = "./resources/designer_ui/"

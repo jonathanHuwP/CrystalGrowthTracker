@@ -654,6 +654,9 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
 
         self._regionsBox.setEnabled(True)
 
+    def play_pause(self):
+        print("markupwidget play pause")
+
     @qc.pyqtSlot()
     def display_help(self):
         """
