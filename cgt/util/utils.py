@@ -31,6 +31,7 @@ import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
 import cv2
+import math
 import numpy as np
 
 class MarkerTypes(enum.IntEnum):
