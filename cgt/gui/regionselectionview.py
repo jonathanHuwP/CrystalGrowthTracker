@@ -212,6 +212,9 @@ class RegionSelectionView(VideoBaseView):
         diff = rect.bottomRight() - item_point
         if length_squared(diff) < limit:
             self.new_draw_rect(rect.topLeft(), item_point)
+            return
+
+        self._draw_rect = None
 
     def new_draw_rect(self, start_point, moving_point):
         """
