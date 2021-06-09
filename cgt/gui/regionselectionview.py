@@ -118,6 +118,7 @@ class RegionSelectionView(VideoBaseView):
 
         item = items.pop(0)
         self.show_rect.emit(item.rect())
+
         mb_reply = qw.QMessageBox.question(self,
                                            self.tr('CrystalGrowthTracker'),
                                            self.tr('Do you wish to delete the selected region?'),
@@ -223,8 +224,7 @@ class RegionSelectionView(VideoBaseView):
         self._draw_rect.graphics_rect.setRect(rect)
         self._draw_rect = UnfinishedRect(start_point, self._draw_rect.graphics_rect)
 
-        self.show_rect.emit(self._draw_rect.graphics_rect)
-        print(f"emited {self._draw_rect.graphics_rect}")
+        self.show_rect.emit(self._draw_rect.graphics_rect.rect())
 
     def mouse_down_create(self, event):
         """
@@ -238,6 +238,7 @@ class RegionSelectionView(VideoBaseView):
         pen = self._data_source.get_pens().get_drawing_pen()
         rect = self.scene().addRect(rect, pen)
         self._draw_rect = UnfinishedRect(point, rect)
+        self.show_rect.emit(rect.rect())
 
     def mouseMoveEvent(self, event):
         """
@@ -288,6 +289,7 @@ class RegionSelectionView(VideoBaseView):
         rect = make_positive_rect(self._draw_rect.start_point,
                                   self.mapToScene(event.pos()))
         self._draw_rect.graphics_rect.setRect(rect)
+        self.show_rect.emit(rect)
 
     def mouseReleaseEvent(self, event):
         """
