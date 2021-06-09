@@ -116,12 +116,17 @@
     <addaction name="_actionEditNotes"/>
     <addaction name="_actionEditVideoProps"/>
     <addaction name="separator"/>
-    <addaction name="_actionMakeVideoStats"/>
-    <addaction name="separator"/>
     <addaction name="_actionProperties"/>
+   </widget>
+   <widget class="QMenu" name="menuCalculate">
+    <property name="title">
+     <string>Calculate</string>
+    </property>
+    <addaction name="_actionMakeVideoStats"/>
    </widget>
    <addaction name="menuOpen"/>
    <addaction name="menuEdit"/>
+   <addaction name="menuCalculate"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="_actionNewProject">
@@ -177,14 +182,14 @@
     <string>Edit Video Props</string>
    </property>
   </action>
-  <action name="_actionMakeVideoStats">
-   <property name="text">
-    <string>Make Video Statistics </string>
-   </property>
-  </action>
   <action name="_actionProperties">
    <property name="text">
     <string>Properties</string>
+   </property>
+  </action>
+  <action name="_actionMakeVideoStats">
+   <property name="text">
+    <string>Make video statistics</string>
    </property>
   </action>
  </widget>

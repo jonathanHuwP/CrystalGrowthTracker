@@ -722,7 +722,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 self._videoStatsWidget.set_video_source(self._enhanced_video_reader)
 
             stats = self.get_results().video_statistics
-            print(f"Len stats {len(stats.frames)}")
             if stats is not None and len(stats.frames) > 0:
                 self._videoStatsWidget.display_stats()
 

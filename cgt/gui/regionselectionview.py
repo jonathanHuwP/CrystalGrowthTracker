@@ -223,6 +223,9 @@ class RegionSelectionView(VideoBaseView):
         self._draw_rect.graphics_rect.setRect(rect)
         self._draw_rect = UnfinishedRect(start_point, self._draw_rect.graphics_rect)
 
+        self.show_rect.emit(self._draw_rect.graphics_rect)
+        print(f"emited {self._draw_rect.graphics_rect}")
+
     def mouse_down_create(self, event):
         """
          down event in MAKE_REGION mode
@@ -336,10 +339,12 @@ class RegionSelectionView(VideoBaseView):
             return
 
         self.mouse_event_edit(event)
-        self._draw_rect.graphics_rect.setPen(self._gray_pen)
         self._draw_rect = None
 
     def display_selected(self):
+        """
+        if a rectangle is selected, emit the rectangl using the show_rect signal
+        """
         items = self.scene().selectedItems()
 
         if len(items) <= 0:
