@@ -830,6 +830,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         analyser.frames_analysed.connect(self._progressBar.setValue)
         self._progressBar.show()
 
+        # TODO put this into a separate thread
         self._project["results"].set_video_statistics(analyser.stats_whole_film())
         self._progressBar.hide()
 
