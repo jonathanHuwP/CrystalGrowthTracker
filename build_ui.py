@@ -25,8 +25,7 @@ import argparse
 import pathlib
 
 # a list of the modules that the package requires
-ROOT_FILE_NAMES = ["crystaldrawingwidget",
-                   "crystalgrowthtrackermain",
+ROOT_FILE_NAMES = ["crystalgrowthtrackermain",
                    "editnotesdialog",
                    "projectpropertieswidget",
                    "projectstartdialog",
