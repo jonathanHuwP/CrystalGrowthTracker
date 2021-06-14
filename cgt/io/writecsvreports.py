@@ -88,7 +88,8 @@ def save_csv_growth_rates(project, results):
     """
     regions_array = []
 
-    for index, region in enumerate(results.regions):
+    for index, region_graph_item in enumerate(results.regions):
+        region = region_graph_item.rect()
         regions_array.append([index,
                               region.top(),
                               region.left(),

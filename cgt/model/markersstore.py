@@ -158,7 +158,7 @@ class MarkersStore():
         if get_parent_hash(point) == "p":
             self._points.append([point])
             self.add_key_frame(get_region(point), get_frame(point))
-            self._owner.new_result()
+            #self._owner.new_result()
             return None
 
         index = self.find_list_for_new_point(point)
@@ -168,7 +168,7 @@ class MarkersStore():
         self._points[index].append(point)
         self._points[index].sort(key=get_frame)
         self.add_key_frame(get_region(point), get_frame(point))
-        self._owner.new_result()
+        #self._owner.new_result()
 
         tmp = self._points[index].index(point)
         if tmp > 0:
@@ -187,7 +187,7 @@ class MarkersStore():
         if get_parent_hash(line) == "p":
             self._lines.append([line])
             self.add_key_frame(get_region(line), get_frame(line))
-            self._owner.new_result()
+            #self._owner.new_result()
             return None
 
         index = self.find_list_for_new_line(line)
@@ -197,7 +197,7 @@ class MarkersStore():
         self._lines[index].append(line)
         self._lines[index].sort(key=get_frame)
         self.add_key_frame(get_region(line), get_frame(line))
-        self._owner.new_result()
+        #self._owner.new_result()
 
         tmp = self._lines[index].index(line)
         if tmp > 0:
@@ -321,12 +321,12 @@ class MarkersStore():
         if m_type == MarkerTypes.LINE:
             index = self.find_list_for_old_line(marker)
             del self._lines[index]
-            self._owner.new_result()
+            #self._owner.new_result()
 
         if m_type == MarkerTypes.POINT:
             index = self.find_list_for_old_point(marker)
             del self._points[index]
-            self._owner.new_result()
+            #self._owner.new_result()
 
     def remove_point(self, hash_code):
         """
@@ -349,7 +349,7 @@ class MarkersStore():
             return None
 
         del self._points[point_index][marker_index]
-        self._owner.new_result()
+        #self._owner.new_result()
 
         if len(self._points[point_index]) == 0:
             del self._points[point_index]
@@ -378,7 +378,7 @@ class MarkersStore():
             return None
 
         del self._lines[line_index][marker_index]
-        self._owner.new_result()
+        #self._owner.new_result()
 
         if len(self._lines[line_index]) == 0:
             del self._lines[line_index]
@@ -398,7 +398,7 @@ class MarkersStore():
         if get_parent_hash(line) == 'p':
             if len(self._lines[index]) == 1:
                 del self._lines[index]
-                self._owner.new_result()
+                #self._owner.new_result()
                 return
 
             root_hash = 'p'
@@ -418,7 +418,7 @@ class MarkersStore():
                 child.setData(ItemDataTypes.PARENT_HASH, p_hash)
 
         self._lines[index].remove(line)
-        self._owner.new_result()
+        #self._owner.new_result()
 
     def delete_point(self, point, index):
         """
@@ -432,7 +432,7 @@ class MarkersStore():
         if get_parent_hash(point) == 'p':
             if len(self._points[index]) == 1:
                 del self._points[index]
-                self._owner.new_result()
+                #self._owner.new_result()
                 return
 
             root_hash = 'p'
@@ -452,4 +452,4 @@ class MarkersStore():
                 child.setData(ItemDataTypes.PARENT_HASH, p_hash)
 
         self._points[index].remove(point)
-        self._owner.new_result()
+        #self._owner.new_result()

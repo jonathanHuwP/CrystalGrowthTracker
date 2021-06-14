@@ -36,7 +36,8 @@ from cgt.util.utils import (hash_graphics_line,
                             get_marker_type,
                             MarkerTypes,
                             ItemDataTypes,
-                            make_cross_path)
+                            make_cross_path,
+                            hash_marker)
 
 ## containger of moving a marker
 class MarkerInMotion():

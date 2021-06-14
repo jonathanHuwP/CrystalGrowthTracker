@@ -25,9 +25,11 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 import os
 import csv
 from pathlib import Path
+from PyQt5.QtWidgets import QGraphicsItem
 import numpy as np
 
-from PyQt5.QtCore import QRect, QPoint
+import PyQt5.QtCore as qc
+import PyQt5.QtWidgets as qw
 
 from cgt.model.videoanalysisresultsstore import VideoAnalysisResultsStore
 from cgt.model.line import Line
@@ -191,16 +193,16 @@ def store_regions(store, regions_data):
             None
     '''
     for region in regions_data:
-        top = int(region["Top"])
-        left = int(region["Left"])
-        bottom = int(region["Bottom"])
-        right = int(region["Right"])
+        top = float(region["Top"])
+        left = float(region["Left"])
+        bottom = float(region["Bottom"])
+        right = float(region["Right"])
 
-        point_tl = QPoint(left, top)
-        point_br = QPoint(right, bottom)
-        tmp_region = QRect(point_tl, point_br)
+        point_tl = qc.QPointF(left, top)
+        point_br = qc.QPointF(right, bottom)
+        tmp_region = qc.QRectF(point_tl, point_br)
 
-        store.add_region(tmp_region)
+        store.add_region(qw.QGraphicsRectItem(tmp_region))
 
 def read_argb_numpy_images(dirpath, i):
     """

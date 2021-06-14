@@ -289,6 +289,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._videoStatsWidget.clear()
         #self._selectWidget.clear()
         #self._drawingWidget.clear()
+        self._drawingWidget.set_regions(self._project["results"])
 
     def project_created_or_loaded(self):
         """

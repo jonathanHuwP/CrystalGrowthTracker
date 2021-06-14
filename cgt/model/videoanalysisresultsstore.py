@@ -237,6 +237,9 @@ class VideoAnalysisResultsStore:
         self._region_line_association.add_association(region_index, line_index)
         self.set_changed()
 
+    def get_regions(self):
+        return self._regions
+
 class RegionLineAssociation(list):
     """
     array of pairs associating regions, with lines, each line

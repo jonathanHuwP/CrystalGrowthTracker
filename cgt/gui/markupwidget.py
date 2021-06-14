@@ -79,6 +79,8 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         super().__init__(parent)
         self.setupUi(self)
 
+        self._regions_store = None
+
         ## a proxy for the data store
         self._results_proxy = ResultsStoreProxy(data_store,
                                                 self._entryView,
@@ -116,6 +118,10 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
 
         self.make_connections()
 
+    def set_regions(self, region_data):
+        self._regions_store = region_data
+        self.setup_regions_combobox()
+
     def setup_video_widget(self):
         """
         do what?
@@ -151,10 +157,15 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         """
         add list of regions to combobox
         """
-        self._regionsBox.blockSignals(True)
+        if self._regions_store is None:
+            return
 
-        for i in range(len(self._results_proxy.get_regions())):
+        self._regionsBox.blockSignals(True)
+        all_regions = self._regions_store.get_regions()
+
+        for i in range(len(all_regions)):
             self._regionsBox.addItem(f"Region {i}")
+            print(f"Region: {all_regions[i].rect()}")
         self._regionsBox.blockSignals(False)
 
         self.region_changed()
@@ -249,10 +260,11 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         display the current pixmap
         """
         pixmap = self._current_pixmap
-        regions = self._results_proxy.get_regions()
+        regions = self._regions_store.get_regions()
         if len(regions) > 0:
             index = self._regionsBox.currentIndex()
-            pixmap = self._current_pixmap.copy(regions[index])
+            region = regions[index].rect()
+            pixmap = self._current_pixmap.copy(region.toRect())
 
         if self._base_key_frame is None:
             self._entryView.set_pixmap(pixmap, self._current_frame, index)
@@ -309,6 +321,7 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         if enabled and self._video_source is not None:
             super().setEnabled(True)
             self._video_source.connect_viewer(self)
+            print("markup connected")
             self.redisplay()
         elif not enabled:
             super().setEnabled(False)
