@@ -43,7 +43,6 @@ ROOT_FILE_NAMES = ["crystaldrawingwidget",
                    "cgtvideocontrols",
                    "regionviewcontrol",
                    "videostatisticswidget",
-                   "artifactmarkupwidget",
                    "markupwidget",
                    "resultswidget"]
 
