@@ -238,6 +238,9 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
                 pixmap (QPixmap) the pixmap to be displayed
                 frame_number (int) the frame number of the video
         """
+        if self._regionsBox.count() < 1:
+            return
+
         self._current_pixmap = pixmap
         self._current_frame = frame_number
 
@@ -273,9 +276,16 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
 
         self._cloneView.set_pixmap(pixmap, self._current_frame, index)
 
-    def request_current_frame(self):
+    def redisplay(self):
         """
-        force the object to emit a frame request for its current frame
+        emit the current frame
+        """
+        self.post_request_frame(self._current_frame)
+
+    @qc.pyqtSlot(int)
+    def post_request_frame(self, frame_number):
+        """
+        a specific frame should be displayed
         """
         self.request_frame.emit(self._current_frame)
 
@@ -342,9 +352,6 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         viewer.clear_queue.connect(self.clear)
         viewer.set_length(self._video_reader.get_length())
 
-    def redisplay(self):
-        print("markupwidget redisplay")
-
     @qc.pyqtSlot()
     def play_video(self):
         """
@@ -395,7 +402,7 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
             Args:
                 frame (int) the frame number for the jump
         """
-        self.request_frame.emit(frame)
+        self.post_request_frame(frame)
 
     @qc.pyqtSlot(bool)
     def start_or_end(self, start):
@@ -405,9 +412,9 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
                 start (bool) if true first frame else last
         """
         if start:
-            self.request_frame.emit(self._video_num_frames-1)
+            self.post_request_frame(self._video_num_frames-1)
         else:
-            self.request_frame.emit(0)
+            self.post_request_frame(0)
 
     @qc.pyqtSlot(int)
     def jump_to_key_frame(self, index):
@@ -473,9 +480,9 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
                 upper_limit = current_range[1]
 
         if self._current_frame < upper_limit-1:
-            self.request_frame.emit(self._current_frame+1)
+            self.post_request_frame(self._current_frame+1)
         else:
-            self.request_frame.emit(lower_limit)
+            self.post_request_frame(lower_limit)
 
     def decrament_frame(self):
         """
@@ -492,9 +499,9 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
                 upper_limit = current_range[1]
 
         if self._current_frame > lower_limit:
-            self.request_frame.emit(self._current_frame-1)
+            self.post_request_frame(self._current_frame-1)
         else:
-            self.request_frame.emit(upper_limit-1)
+            self.post_request_frame(upper_limit-1)
 
     def add_point(self, point):
         """

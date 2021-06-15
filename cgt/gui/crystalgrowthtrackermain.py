@@ -168,14 +168,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self._propertiesTab.setEnabled(True)
         elif tab_index == self._tabWidget.indexOf(self._selectTab):
             self._selectWidget.setEnabled(True)
-            self._selectWidget.redisplay()
         elif tab_index == self._tabWidget.indexOf(self._videoStatsTab):
             if self._project["results"].video_statistics is not None:
                 self._videoStatsWidget.setEnabled(True)
-                self._videoStatsWidget.redisplay()
         elif  tab_index == self._tabWidget.indexOf(self._drawingTab):
               self._drawingWidget.setEnabled(True)
-              self._drawingWidget.redisplay()
 
     def has_project(self):
         """
