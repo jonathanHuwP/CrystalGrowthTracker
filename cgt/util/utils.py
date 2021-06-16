@@ -34,6 +34,8 @@ import cv2
 import math
 import numpy as np
 
+import cgt.util.debugtools
+
 class MarkerTypes(enum.IntEnum):
     """
     define the types of marker used in images
@@ -200,7 +202,7 @@ def find_hostname_and_ip():
         # Windows
         operating_system = 'Windows'
     elif _platform == "win64":
-    # Windows 64-bit
+        # Windows 64-bit
         operating_system = 'Windows'
 
     return host, ip_address, operating_system
@@ -309,26 +311,6 @@ def length_squared(point):
             square of length
     """
     return point.x()*point.x() + point.y()*point.y()
-
-# For debugging
-################
-
-def qtransform_to_string(trans):
-    """
-    print out matrix
-    """
-    row1 = f"|{trans.m11():+.2f} {trans.m12():+.2f} {trans.m13():+.2f}|\n"
-    row2 = f"|{trans.m21():+.2f} {trans.m22():+.2f} {trans.m23():+.2f}|\n"
-    row3 = f"|{trans.m31():+.2f} {trans.m32():+.2f} {trans.m33():+.2f}|"
-    return row1 + row2 + row3
-
-def rectangle_to_string(rect):
-    """
-    print out rect
-    """
-    top_left = rect.topLeft()
-    size = rect.size()
-    return f"QRect({top_left.x()}, {top_left.y()}) ({size.width()}, {size.height()})"
 
 def hash_marker(marker):
     """
