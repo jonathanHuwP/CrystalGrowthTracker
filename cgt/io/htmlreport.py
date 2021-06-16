@@ -21,9 +21,6 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 import os
 import sys
 from pathlib import Path
-from cgt.results_print_demo import make_test_result
-
-
 
 def save_html_report1(project, time_stamp):
     '''
