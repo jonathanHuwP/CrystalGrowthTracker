@@ -33,8 +33,13 @@ class PlayStates(Enum):
     """
     enumeration of video playing states
     """
+    ## use fine stepping controls
     MANUAL        = 1
+
+    ## continusly play forward
     PLAY_FORWARD  = 2
+
+    ## continusly play backward
     PLAY_BACKWARD = 3
 
 class VideoBaseWidget(qw.QWidget):

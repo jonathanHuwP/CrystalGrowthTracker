@@ -31,28 +31,17 @@ import enum
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
+import PyQt5.QtGui as qg
 
 from cgt.gui.markupview import MarkUpStates
 from cgt.gui.resultsstoreproxy import ResultsStoreProxy
+from cgt.gui.videobasewidget import PlayStates
 from cgt.util.utils import (get_region,
                             get_frame,
                             hash_marker)
 
 # import UI
 from cgt.gui.Ui_markupwidget import Ui_MarkUpWidget
-
-class PlayStates(enum.Enum):
-    """
-    enumeration of video playing states
-    """
-    ## use fine stepping controls
-    MANUAL        = 1
-
-    ## continusly play forward
-    PLAY_FORWARD  = 2
-
-    ## continusly play backward
-    PLAY_BACKWARD = 3
 
 class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
     """
@@ -65,6 +54,7 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
     ## signal that the queue should be cleared
     clear_queue = qc.pyqtSignal()
 
+    # TODO is this needed?
     ## signal a new result
     new_result = qc.pyqtSignal()
 
@@ -124,9 +114,8 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
 
     def setup_video_widget(self):
         """
-        do what?
+        connect up the control widgets
         """
-        print("markupwidget setup_video")
         self.make_connections()
 
     def make_connections(self):
@@ -165,7 +154,6 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
 
         for i in range(len(all_regions)):
             self._regionsBox.addItem(f"Region {i}")
-            print(f"Region: {all_regions[i].rect()}")
         self._regionsBox.blockSignals(False)
 
         self.region_changed()
@@ -231,6 +219,8 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         self._cloneControls.disable_all_but_zoom()
         self._cloneControls.set_range(self._video_num_frames, 0)
 
+
+    @qc.pyqtSlot(qg.QPixmap, int)
     def display_image(self, pixmap, frame_number):
         """
         callback function to display an image from a source
@@ -331,26 +321,16 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         if enabled and self._video_source is not None:
             super().setEnabled(True)
             self._video_source.connect_viewer(self)
-            print("markup connected")
             self.redisplay()
         elif not enabled:
             super().setEnabled(False)
-            #self.play_pause()
+            self.play_pause()
 
     def set_video_source(self, video_source):
         self._video_source = video_source
-
-    def connect_viewer(self, viewer):
-        """
-        connect the VideoBuffer's 'display_image' signal
-        to the viewer object's 'display_image' slot
-            Args:
-                viewer (QObject) object with display_image(QPixmap, int) slot
-        """
-        self._video_reader.display_image.connect(viewer.display_image)
-        viewer.request_frame.connect(self.request_frame)
-        viewer.clear_queue.connect(self.clear)
-        viewer.set_length(self._video_reader.get_length())
+        self._cloneControls.set_range(video_source.get_length())
+        self._entryControls.set_range(video_source.get_length())
+        self.set_length(video_source.get_length())
 
     @qc.pyqtSlot()
     def play_video(self):
@@ -674,8 +654,13 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
 
         self._regionsBox.setEnabled(True)
 
+    @qc.pyqtSlot()
     def play_pause(self):
-        print("markupwidget play pause")
+        """
+        pause the playing
+        """
+        self.clear_queue.emit()
+        self._playing = PlayStates.MANUAL
 
     @qc.pyqtSlot()
     def display_help(self):
