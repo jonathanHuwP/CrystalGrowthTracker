@@ -287,7 +287,7 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         """
         a specific frame should be displayed
         """
-        self.request_frame.emit(self._current_frame)
+        self.request_frame.emit(frame_number)
 
     def set_key_frame_combo(self):
         """
