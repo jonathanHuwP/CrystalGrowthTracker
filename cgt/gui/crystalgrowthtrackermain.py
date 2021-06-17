@@ -123,7 +123,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         ## the crystal drawing widget
         # TODO combine with existing data store
-        marker_store = MarkersStore(self)
+        marker_store = MarkersStore()
         self._drawingWidget = MarkUpWidget(tab, marker_store, self._pens)
         self._drawingWidget.setup_video_widget()
         self._drawingWidget.setEnabled(False)
@@ -169,7 +169,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         elif tab_index == self._tabWidget.indexOf(self._selectTab):
             self._selectWidget.setEnabled(True)
         elif tab_index == self._tabWidget.indexOf(self._videoStatsTab):
-            if self._project["results"].video_statistics is not None:
+            if self._project["results"].get_video_statistics() is not None:
                 self._videoStatsWidget.setEnabled(True)
         elif  tab_index == self._tabWidget.indexOf(self._drawingTab):
               self._drawingWidget.setEnabled(True)
