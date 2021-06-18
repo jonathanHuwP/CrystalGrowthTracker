@@ -248,4 +248,4 @@ def store_lines(store, lines, segments):
         line_segment = ImageLineSegment(ImagePoint(start_x, start_y),
                                         ImagePoint(end_x, end_y))
         line_index = int(row["Line Index"])
-        store.lines[line_index].add_line_segment(frame, line_segment)
+        store.get_lines()[line_index].add_line_segment(frame, line_segment)

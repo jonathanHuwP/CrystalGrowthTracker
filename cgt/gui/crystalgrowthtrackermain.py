@@ -615,8 +615,13 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Args:
                 region (QRect) the region
         """
-        index = self._project["results"].regions.index(region)
-        self._project["results"].remove_region(index)
+        index = self._project["results"].get_regions().index(region)
+        try:
+            self._project["results"].remove_region(index)
+        except ValueError:
+            message = f"The region has associated markers, that must be deleted before the region."
+            qw.QMessageBox.critical(self, "Error: Region has markers", message)
+
 
     def append_lines(self, region_index, lines):
         """
@@ -719,7 +724,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             else:
                 self._videoStatsWidget.set_video_source(self._enhanced_video_reader)
 
-            stats = self.get_results().video_statistics
+            stats = self.get_results().get_video_statistics()
             if stats is not None and len(stats.frames) > 0:
                 self._videoStatsWidget.display_stats()
 
@@ -746,7 +751,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             return
 
         print("Results\n=======")
-        for line in self._project["results"].lines:
+        for line in self._project["results"].get_lines():
             if line.number_of_frames > 1:
                 print(line)
                 differences = line.get_differences()

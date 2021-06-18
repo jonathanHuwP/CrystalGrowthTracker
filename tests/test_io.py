@@ -28,10 +28,10 @@ def test_io(path):
 
     results = proj["results"]
     print("Regions\n=======")
-    for region in results.regions:
+    for region in results.get_regions():
         print(region)
     print("\nLines\n======")
-    for line in results.lines:
+    for line in results.get_lines():
         print(line)
         for key in line.keys():
             print(f"\tFrame {key} => {line[key]}")

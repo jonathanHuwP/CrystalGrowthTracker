@@ -22,6 +22,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = too-many-arguments
 
 import PyQt5.QtCore as qc
+import bisect
 
 from cgt.util.utils import (ItemDataTypes,
                             MarkerTypes,
@@ -121,8 +122,13 @@ class VideoAnalysisResultsStore:
             Throws:
                 IndexError: pop index out of range
         """
+        lines = self.get_lines_for_region(index)
+        points = self.get_points_for_region(index)
+
+        if not (x is None for x in [lines, points]):
+            raise ValueError
+
         self._regions.pop(index)
-        self._region_line_association.removed_region(index)
         self.set_changed()
 
 
@@ -510,3 +516,44 @@ class VideoAnalysisResultsStore:
                 child.setData(ItemDataTypes.PARENT_HASH, p_hash)
 
         self._points[index].remove(point)
+
+# ADDED
+##############
+
+    def get_lines_for_region(self, index):
+        """
+        get a list of lines associated with a region
+            Args:
+                index (int) array index of region
+            Returns:
+                list of lines [line], or None if none found
+        """
+        tmp = []
+
+        for line in self._lines:
+            if get_region(line) == index:
+                tmp.append(line)
+
+        if len(tmp) > 0:
+            return tmp
+
+        return None
+
+    def get_points_for_region(self, index):
+        """
+        get a list of points associated with a region
+            Args:
+                index (int) array index of region
+            Returns:
+                list of points [points], or None if none found
+        """
+        tmp = []
+
+        for point in self._points:
+            if get_region(point) == index:
+                tmp.append(point)
+
+        if len(tmp) > 0:
+            return tmp
+
+        return None
