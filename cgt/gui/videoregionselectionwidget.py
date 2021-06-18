@@ -149,10 +149,12 @@ class VideoRegionSelectionWidget(VideoBaseWidget, Ui_VideoRegionSelectionWidget)
         """
         return self._data_source
 
+    def redisplay_regions(self):
+        self._graphicsView.redisplay_regions()
+
     def clear(self):
         """
         reset to initial conditions
         """
-        self._video_label.clear()
         self._subimage_label.clear()
         super().clear()

@@ -79,6 +79,17 @@ class RegionSelectionView(VideoBaseView):
         """
         self._data_source = data_source
 
+        if self._data_source.get_results() is not None:
+            self.redisplay_regions()
+
+    def redisplay_regions(self):
+        # TODO clear old regions
+        for region in self._data_source.get_results().get_regions():
+            print(f"\t{region}")
+            pen = self._data_source.get_pens().get_display_pen()
+            region.setPen(pen)
+            self.scene().addItem(region)
+
     def set_state(self, state):
         """
         setter for the operating state

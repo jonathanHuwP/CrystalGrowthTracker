@@ -284,7 +284,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         clear and reset the video widgets and the frame queue
         """
         self._videoStatsWidget.clear()
-        #self._selectWidget.clear()
+        self._selectWidget.clear()
         #self._drawingWidget.clear()
         self._drawingWidget.set_regions(self._project["results"])
 
@@ -302,6 +302,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self.display_properties()
         self.set_title()
         self.load_video()
+        self._selectWidget.redisplay_regions()
 
         if self._project["latest_report"] is not None:
             if self._project["latest_report"] != "":
@@ -812,7 +813,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         if self._tabWidget.currentWidget() != self._videoStatsTab:
             return
 
-        if self._project["results"].video_statistics is not None:
+        if self._project["results"].get_video_statistics() is not None:
             message = self.tr("You already have statistics for this video. Replace?")
             mb_reply = qw.QMessageBox.question(self,
                                               'CrystalGrowthTracker',
@@ -846,7 +847,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 video stats array
         """
-        return self._project["results"].video_statistics
+        return self._project["results"].get_video_statistics()
 
     @qc.pyqtSlot()
     def closeEvent(self, event):
