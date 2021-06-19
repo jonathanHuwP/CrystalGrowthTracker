@@ -48,3 +48,16 @@ class ReportWidget(qw.QWidget, Ui_ReportWidget):
         self._view = qe.QWebEngineView()
         self._scrollArea.setWidget(self._view)
         self._scrollArea.setWidgetResizable(True)
+
+        self.set_bbc()
+
+    def set_bbc(self):
+        reply = qw.QInputDialog.getText(self,
+                                        "Project Name",
+                                        "Proj Name",
+                                        qw.QLineEdit.Normal,
+                                        "https://www.bbc.co.uk/news")
+        if not reply[1]:
+            return
+
+        self._scrollArea.widget().setUrl(qc.QUrl(reply[0]))
