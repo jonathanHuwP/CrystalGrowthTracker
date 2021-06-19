@@ -34,7 +34,7 @@ class ResultsWidget(qw.QDialog, Ui_ResultsWidget):
         initalize an object
             Args:
                 parent widget (QWidget) must act as a data source for results
-                data_source (MarkerStore) the supplier of raw data
+                data_source (VideoAnalysisResultsStore) the supplier of raw data
         """
         super().__init__(parent)
         self.setupUi(self)

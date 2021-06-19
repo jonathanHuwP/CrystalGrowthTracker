@@ -54,7 +54,6 @@ from cgt.io.videoanalyser import VideoAnalyser
 from cgt.model.cgtproject import CGTProject
 from cgt.gui.videostatisticswidget import VideoStatisticsWidget
 from cgt.gui.penstore import PenStore
-from cgt.model.markersstore import MarkersStore
 
 # import UI
 from cgt.gui.Ui_crystalgrowthtrackermain import Ui_CrystalGrowthTrackerMain
@@ -122,9 +121,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         tab =self._tabWidget.widget(3)
 
         ## the crystal drawing widget
-        # TODO combine with existing data store
-        marker_store = MarkersStore()
-        self._drawingWidget = MarkUpWidget(tab, marker_store, self._pens)
+
+        self._drawingWidget = MarkUpWidget(tab, self)
         self._drawingWidget.setup_video_widget()
         self._drawingWidget.setEnabled(False)
         setup_tab(tab, self._drawingWidget)
@@ -286,7 +284,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._videoStatsWidget.clear()
         self._selectWidget.clear()
         #self._drawingWidget.clear()
-        self._drawingWidget.set_regions(self._project["results"])
+        self._drawingWidget.set_results(self._project["results"])
 
     def project_created_or_loaded(self):
         """
@@ -885,6 +883,24 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         else:
             # dispose of the event in the approved way
             event.ignore()
+
+    @qc.pyqtSlot()
+    def calculate_results(self):
+        from cgt.model.velocitiescalculator import VelocitiesCalculator
+
+        calculator = VelocitiesCalculator(self.get_results())
+        calculator.process_latest_data()
+        average_speeds = calculator.get_average_speeds()
+        print(f"{average_speeds}")
+
+        for item in average_speeds:
+                id_item = str(item.ID)
+                type_item = item.m_type.name
+                speed_item = str(item.speed)
+                print(f"{id_item}\t{type_item}\t{speed_item}")
+
+# support functions
+###################
 
 def setup_tab(tab, widget):
     """

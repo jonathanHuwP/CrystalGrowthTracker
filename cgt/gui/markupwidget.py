@@ -58,23 +58,21 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
     ## signal a new result
     new_result = qc.pyqtSignal()
 
-    def __init__(self, parent, data_store, pens):
+    def __init__(self, parent, data_source):
         """
         the object initalization function
             Args:
                 parent (QObject): the parent QObject for this widget
-                data_store (MarkerStore) results store
-                pens (PenStore) the drawing pens
+                data_store (CrystalGrowthTrackeMain) the main GUI
         """
         super().__init__(parent)
         self.setupUi(self)
 
-        self._regions_store = None
+        # pointer to the main gui
+        self._data_source = data_source
 
         ## a proxy for the data store
-        self._results_proxy = ResultsStoreProxy(data_store,
-                                                self._entryView,
-                                                self._cloneView)
+        self._results_proxy = None
 
         ## the current frame of the video
         self._current_frame = 0
@@ -100,16 +98,21 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         ## pointer for the video source
         self._video_source = None
 
-        self.setup_regions_combobox()
-
-        self._entryView.set_parent_and_pens(self, pens)
-        self._cloneView.set_parent_and_pens(self, pens)
+        self._entryView.set_parent_and_pens(self, self._data_source.get_pens())
+        self._cloneView.set_parent_and_pens(self, self._data_source.get_pens())
         self._cloneView.assign_state(MarkUpStates.CLONE_ITEM)
 
         self.make_connections()
 
-    def set_regions(self, region_data):
-        self._regions_store = region_data
+    def set_results(self, results_store):
+        """
+        set a new results object
+            Args:
+                results_store (VideoAnalysisResultsStore) the store
+        """
+        self._results_proxy = ResultsStoreProxy(results_store,
+                                                self._entryView,
+                                                self._cloneView)
         self.setup_regions_combobox()
 
     def setup_video_widget(self):
@@ -146,11 +149,11 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         """
         add list of regions to combobox
         """
-        if self._regions_store is None:
+        if self._results_proxy is None:
             return
 
         self._regionsBox.blockSignals(True)
-        all_regions = self._regions_store.get_regions()
+        all_regions = self._results_proxy.get_regions()
 
         for i in range(len(all_regions)):
             self._regionsBox.addItem(f"Region {i}")
@@ -253,7 +256,7 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         display the current pixmap
         """
         pixmap = self._current_pixmap
-        regions = self._regions_store.get_regions()
+        regions = self._results_proxy.get_regions()
         if len(regions) > 0:
             index = self._regionsBox.currentIndex()
             region = regions[index].rect()
@@ -679,3 +682,11 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         self._help.setDocumentTitle(self.tr("Feature Tracking Help"))
         self._help.setText(text)
         self._help.show()
+
+    def clear(self):
+        """
+        empyt scene graphs and results proxy
+        """
+        self._cloneView.scene().clear()
+        self._entryView.scene().clear()
+        self._results_proxy = None

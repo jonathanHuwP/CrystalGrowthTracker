@@ -123,6 +123,7 @@
      <string>Calculate</string>
     </property>
     <addaction name="_actionMakeVideoStats"/>
+    <addaction name="_actionDisplayResults"/>
    </widget>
    <addaction name="menuOpen"/>
    <addaction name="menuEdit"/>
@@ -190,6 +191,11 @@
   <action name="_actionMakeVideoStats">
    <property name="text">
     <string>Make video statistics</string>
+   </property>
+  </action>
+  <action name="_actionDisplayResults">
+   <property name="text">
+    <string>Display results</string>
    </property>
   </action>
  </widget>
@@ -392,6 +398,22 @@
    <signal>triggered()</signal>
    <receiver>CrystalGrowthTrackerMain</receiver>
    <slot>set_view_properties()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>470</x>
+     <y>291</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_actionDisplayResults</sender>
+   <signal>triggered()</signal>
+   <receiver>CrystalGrowthTrackerMain</receiver>
+   <slot>calculate_results()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>

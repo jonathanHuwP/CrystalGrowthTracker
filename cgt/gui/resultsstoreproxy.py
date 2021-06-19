@@ -44,7 +44,7 @@ class ResultsStoreProxy():
         """
         initalize the object:
             Args:
-                results_store (MarkersStore) the true store
+                results_store (VideoAnalysisResultsStore) the true store
                 entry_view (MarkUpView) the left hand view
                 clone_view (MarkUpView) ther right hand view
         """
