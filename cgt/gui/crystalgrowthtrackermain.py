@@ -43,6 +43,7 @@ from cgt.gui.videoparametersdialog import VideoParametersDialog
 from cgt.gui.videoregionselectionwidget import VideoRegionSelectionWidget
 from cgt.gui.editnotesdialog import EditNotesDialog
 from cgt.gui.markupwidget import MarkUpWidget
+from cgt.gui.reportwidget import ReportWidget
 
 from cgt.io import htmlreport
 from cgt.io import writecsvreports
@@ -131,8 +132,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         tab = self._tabWidget.widget(4)
 
         ## the results widget
-        self._resultWidget = None #ResultsWidget(tab)
-        setup_tab(tab, None)
+        self._resultWidget = ReportWidget(tab, self)
+        setup_tab(tab, self._resultWidget)
 
         self._progressBar.hide()
         self.set_title()

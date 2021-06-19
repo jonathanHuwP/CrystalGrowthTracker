@@ -30,7 +30,7 @@ ROOT_FILE_NAMES = ["crystalgrowthtrackermain",
                    "projectpropertieswidget",
                    "projectstartdialog",
                    "regionselectionwidget",
-                   "reportviewwidget",
+                   "reportwidget",
                    "videocontrolwidget",
                    "VideoOverviewWindow",
                    "videoparametersdialog",
@@ -39,8 +39,7 @@ ROOT_FILE_NAMES = ["crystalgrowthtrackermain",
                    "cgtvideocontrols",
                    "regionviewcontrol",
                    "videostatisticswidget",
-                   "markupwidget",
-                   "resultswidget"]
+                   "markupwidget"]
 
 # relative path to the Qt .ui files
 UI_PATH = "./resources/designer_ui/"
