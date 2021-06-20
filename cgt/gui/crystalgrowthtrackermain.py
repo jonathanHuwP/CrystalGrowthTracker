@@ -64,11 +64,12 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     data-structures required to implement the intended behaviour
     """
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, project=None):
         """
         the object initalization function
             Args:
                 parent (QObject): the parent QObject for this window
+                project (string): path to the directory of the project to be opened on start
         """
         super().__init__(parent)
         self.setupUi(self)
@@ -137,6 +138,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self._progressBar.hide()
         self.set_title()
+
+        if project is not None:
+             self.read_project_directory(project)
+
+        self._tabWidget.setCurrentIndex(0)
 
     def get_pens(self):
         """
@@ -262,6 +268,14 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         if dir_name == '':
             return
 
+        self.read_project_directory(dir_name)
+
+    def read_project_directory(self, dir_name):
+        """
+        read a project directory
+            Args:
+                dir_name (string): path to the direcrory
+        """
         project = CGTProject()
         try:
             readcsvreports.read_csv_project(dir_name, project)

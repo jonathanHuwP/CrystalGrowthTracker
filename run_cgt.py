@@ -17,8 +17,21 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 @author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 """
 import sys
+import argparse
 
 from cgt.cgt_app import CGTApp
 
+def get_project():
+    """
+    set up to read project name from command line
+        Returns:
+            (string) the project name
+    """
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-p", "--project", type=str, required=False, help="project directory path")
+    args = parser.parse_args()
+    return args.project
+
 if __name__ == "__main__":
-    application = CGTApp(sys.argv)
+    project = get_project()
+    application = CGTApp(sys.argv, project)

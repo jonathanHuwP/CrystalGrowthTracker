@@ -33,23 +33,29 @@ class CGTApp(qw.QApplication):
     the application that runs the main window
     """
 
-    def __init__(self, args):
+    def __init__(self, args, project_dir=None):
+        """
+        initalize and run main window
+            Args:
+                args [string] the command line arguments
+                project_dir (string) the directory path of the start project
+         """
         super().__init__(args)
         self.setApplicationName("CrystalGrowthTracker")
         self.setApplicationVersion("B0.1")
         self.setOrganizationName("School of Computer Science, University of Leeds, Leeds, UK")
         self.setOrganizationDomain("leeds.ac.uk")
         self.setAttribute(qc.Qt.AA_EnableHighDpiScaling)
-        
+
         translators = select_translator()
-        
+
         if translators is None:
             return
-            
+
         for translator in translators:
             qc.QCoreApplication.installTranslator(translator)
 
-        window = CrystalGrowthTrackerMain()
+        window = CrystalGrowthTrackerMain(project=project_dir)
         window.show()
 
         self.exec_()    # enter event loop
