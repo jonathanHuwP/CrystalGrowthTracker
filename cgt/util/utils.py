@@ -541,3 +541,60 @@ def perpendicular_dist_to_position(gline):
     """
     unit_normal = gline.line().normalVector().unitVector()
     return gline.pos().x()*unit_normal.dx() + gline.pos().y()*unit_normal.dy()
+
+def rect_to_tuple(rect):
+    """
+    convert a qrectangl to a tuple
+        Args:
+            rect (QRect)
+        Returns:
+            ((left, top, width, height))
+    """
+    array = []
+
+    array.append(rect.left())
+    array.append(rect.top())
+    array.append(rect.width())
+    array.append(rect.height())
+
+    return array
+
+def g_point_to_tuple(point):
+    """
+    convert the data in a QGraphicsPathItem reprsenting a point to a tuple
+        Args:
+            point (QGraphicsPathItem) the point for conversion
+        Returns:
+            list [x1, y1, px, py, frame]
+    """
+    array = []
+    centre = point.data(ItemDataTypes.CROSS_CENTRE)
+    position = point.pos()
+    array.append(centre.x())
+    array.append(centre.y())
+    array.append(position.x())
+    array.append(position.y())
+    array.append(point.data(ItemDataTypes.FRAME_NUMBER))
+    array.append(point.data(ItemDataTypes.REGION_INDEX))
+
+    return array
+
+def g_line_to_tuple(line):
+    """
+    convert the data in a QGraphicsLineItem to a tuple
+        Args:
+            line (QGraphicsLineItem) the line
+        Returns:
+            list [x1, y1, x2, y2, px, py, frame]
+    """
+    array = []
+    array.append(line.line().x1())
+    array.append(line.line().y1())
+    array.append(line.line().x2())
+    array.append(line.line().y2())
+    array.append(line.pos().x())
+    array.append(line.pos().y())
+    array.append(line.data(ItemDataTypes.FRAME_NUMBER))
+    array.append(line.data(ItemDataTypes.REGION_INDEX))
+
+    return array

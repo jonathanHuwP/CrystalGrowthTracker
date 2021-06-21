@@ -22,7 +22,9 @@ import pathlib
 import csv
 import numpy as np
 
-from cgt.util.utils import nparray_to_qimage
+from cgt.util.utils import (rect_to_tuple,
+                            g_point_to_tuple,
+                            g_line_to_tuple)
 
 def save_csv_project(project):
     """
@@ -55,10 +57,10 @@ def save_csv_results(project):
     if results is None:
         return
 
-    if results.video_statistics is not None:
-        save_csv_video_statistics(project, results.video_statistics)
+    if results.get_video_statistics() is not None:
+        save_csv_video_statistics(project, results.get_video_statistics())
 
-    save_csv_growth_rates(project, results)
+    save_csv_growth_rates(project)
 
 def save_csv_video_statistics(project, stats):
     """
@@ -80,68 +82,13 @@ def save_csv_video_statistics(project, stats):
             array.extend(item.bin_counts)
             writer.writerow(array)
 
-def save_csv_growth_rates(project, results):
+def save_csv_growth_rates(project):
     """
     save everything except the video statistics
         Args:
-            results (VideoAnalysisResultsStore)
+            project (CGTProject) the project object
     """
-    regions_array = []
-
-    for index, region_graph_item in enumerate(results.get_regions()):
-        region = region_graph_item.rect()
-        regions_array.append([index,
-                              region.top(),
-                              region.left(),
-                              region.bottom(),
-                              region.right()])
-
-    lines_array = []
-    line_segments_array = []
-    line_to_region = results.region_lines_association
-
-    for index, line in enumerate(results.get_lines()):
-        region_index = line_to_region.get_region(index)
-        lines_array.append([index, line.note, region_index])
-        keys = line.frame_numbers
-        for key in keys:
-            segment = line[key]
-            line_segments_array.append([key,
-                                        int(segment.start.x),
-                                        int(segment.start.y),
-                                        int(segment.end.x),
-                                        int(segment.end.y),
-                                        index])
-
-    title = r"_project_regions.csv"
-    header = ("Region index", "Top", "Left", "Bottom", "Right")
-    save_array_cvs(project, title, header, regions_array)
-
-    title = r"_project_lines.csv"
-    header = ("Index", "Note", "Region Index")
-    save_array_cvs(project, title, header, lines_array)
-
-    title = r"_project_line_segments.csv"
-    header = ["Frame", "Start x", "Start y", "End x", "End y", "Line Index"]
-    save_array_cvs(project, title, header, line_segments_array)
-
-def save_array_cvs(info, title, header, data_array):
-    """
-    writes an array into a commer seperated values files
-        Args:
-            info (CGTProject) the project object holding the paths
-            title (string) the end of the file name
-            header (array(string)) array of column headers
-            data_array (array) the array to be written
-    """
-    path = pathlib.Path(info["proj_full_path"])
-    csv_outfile_name = info["prog"] + r"_" + info["proj_name"] + title
-
-    with open(path.joinpath(csv_outfile_name), "w") as fout:
-        writer = csv.writer(fout, delimiter=',', lineterminator='\n')
-        writer.writerow(header)
-        for row in data_array:
-            writer.writerow(row)
+    save_csv_regions(project)
 
 def save_csv_info(info):
     '''Creates the csv report file for info.
@@ -162,3 +109,62 @@ def save_csv_info(info):
         writer = csv.writer(fout, delimiter=',', lineterminator='\n')
         for key, value in info.items():
             writer.writerow([key, value])
+
+# NEW
+#############################################
+
+def save_csv_regions(project):
+    """
+    print regions to csv
+        Args:
+            project (CGTProject) the project object
+    """
+    path = pathlib.Path(project["proj_full_path"])
+    csv_outfile_name = project["prog"] + r"_" + project["proj_name"] + r"_regions.csv"
+    results = project["results"]
+
+    headers = ["ID", "Left", "Top", "Width", "Height"]
+    with open(path.joinpath(csv_outfile_name), 'w') as fout:
+        writer = csv.writer(fout, delimiter=',', lineterminator='\n')
+        writer.writerow(headers)
+
+        for i, region in enumerate(results.get_regions()):
+            region_data = rect_to_tuple(region.rect())
+            region_data = [i] + region_data
+            writer.writerow(region_data)
+
+def save_csv_points(results):
+    """
+    print out points to csv file
+        Args:
+            results (VideoAnalysisResultsStore) the results
+    """
+    headers = ["ID", "x", "y", "pos_x", "pos_y", "frame", "region"]
+    with open("points.csv", 'w') as fout:
+        writer = csv.writer(fout, delimiter=',', lineterminator='\n')
+        writer.writerow(headers)
+
+        for i, points_array in enumerate(results._data_store.get_points()):
+            for point in points_array:
+                point_data = g_point_to_tuple(point)
+                point_data = [i] + point_data
+
+                writer.writerow(point_data)
+
+def save_csv_lines(results):
+    """
+    print out the lines to csv file
+        Args:
+            results (VideoAnalysisResultsStore) the results
+    """
+    headers = ["ID", "x1", "y1", "x2", "y2", "pos_x", "pos_y", "frame", "region"]
+    with open("lines.csv", 'w') as fout:
+        writer = csv.writer(fout, delimiter=',', lineterminator='\n')
+        writer.writerow(headers)
+
+        for i, line_array in enumerate(results._data_store.get_lines()):
+            for line in line_array:
+                line_data = g_line_to_tuple(line)
+                line_data = [i] + line_data
+
+                writer.writerow(line_data)

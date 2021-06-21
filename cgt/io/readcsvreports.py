@@ -74,7 +74,7 @@ def read_csv_project(results_dir, new_project):
             elif "project_lines" in file:
                 line_data = readcsv2listofdicts(file, dirpath)
                 lines_flag = True
-            elif "project_regions" in file:
+            elif "regions" in file:
                 region_data = readcsv2listofdicts(file, dirpath)
                 region_flag = True
             elif "video_statistics" in file:
@@ -195,12 +195,10 @@ def store_regions(store, regions_data):
     for region in regions_data:
         top = float(region["Top"])
         left = float(region["Left"])
-        bottom = float(region["Bottom"])
-        right = float(region["Right"])
+        width = float(region["Width"])
+        height = float(region["Height"])
 
-        point_tl = qc.QPointF(left, top)
-        point_br = qc.QPointF(right, bottom)
-        tmp_region = qc.QRectF(point_tl, point_br)
+        tmp_region = qc.QRectF(left, top, width, height)
 
         store.add_region(qw.QGraphicsRectItem(tmp_region))
 
@@ -232,20 +230,21 @@ def store_lines(store, lines, segments):
             lines ([[string]]) the data rows of the lines csv file
             segments ([[string]]) the data rows of the lines_segments csv file
     """
-    for row in lines:
-        note = row["Note"]
-        region_index = int(row["Region Index"])
+    pass
+    # for row in lines:
+    #   note = row["Note"]
+    #     region_index = int(row["Region Index"])
 
-        line = Line(note)
-        store.add_line(region_index, line)
+    #     line = Line(None)
+    #     store.add_line(region_index, line)
 
-    for row in segments:
-        frame = int(row["Frame"])
-        start_x = int(row["Start x"])
-        start_y = int(row["Start y"])
-        end_x = int(row["End x"])
-        end_y = int(row["End y"])
-        line_segment = ImageLineSegment(ImagePoint(start_x, start_y),
-                                        ImagePoint(end_x, end_y))
-        line_index = int(row["Line Index"])
-        store.get_lines()[line_index].add_line_segment(frame, line_segment)
+    # for row in segments:
+    #     frame = int(row["Frame"])
+    #     start_x = int(row["Start x"])
+    #     start_y = int(row["Start y"])
+    #     end_x = int(row["End x"])
+    #     end_y = int(row["End y"])
+    #     line_segment = ImageLineSegment(ImagePoint(start_x, start_y),
+    #                                     ImagePoint(end_x, end_y))
+    #     line_index = int(row["Line Index"])
+    #     store.get_lines()[line_index].add_line_segment(frame, line_segment)
