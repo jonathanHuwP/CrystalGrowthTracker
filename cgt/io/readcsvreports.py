@@ -1,3 +1,4 @@
+## -*- coding: utf-8 -*-
 '''
 readcsvreports.py
 
@@ -21,20 +22,16 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = no-name-in-module
 # pylint: disable = too-many-locals
 # pylint: disable = too-many-branches
+# pylint: disable = c-extension-no-member
 
-import os
 import csv
-from pathlib import Path
-from PyQt5.QtWidgets import QGraphicsItem
+import pathlib
 import numpy as np
 
 import PyQt5.QtCore as qc
 import PyQt5.QtWidgets as qw
 
 from cgt.model.videoanalysisresultsstore import VideoAnalysisResultsStore
-from cgt.model.line import Line
-from cgt.model.imagepoint import ImagePoint
-from cgt.model.imagelinesegment import ImageLineSegment
 from cgt.util.framestats import FrameStats, VideoIntensityStats
 
 def read_csv_project(results_dir, new_project):
@@ -42,136 +39,40 @@ def read_csv_project(results_dir, new_project):
     Args:
         results_dir (str): name of results directory
         new_project (CGTProject):  An empty project data structure.
-    Returns:
-        None
     Throws:
         IOException if error reading files
     '''
-    files = []
-    dirpath = ""
-    for (dirpath, _, filenames) in os.walk(results_dir):
-        files.extend(filenames)
-        break
+    results_path = pathlib.Path(results_dir)
+    files = [x for x in results_path.iterdir() if x.is_file()]
+    if len(files) < 1:
+        raise IOError(f"Directory {results_path} contains no files.")
 
-    line_seg_data = []
-    line_data = []
-    region_data = []
+    read_csv_info(new_project, files, results_path)
 
-    segments_flag = False
-    info_flag = False
-    lines_flag = False
-    region_flag = False
-    video_stats = None
+    new_project["results"] = VideoAnalysisResultsStore()
+    read_csv_video_statistics(new_project["results"], files, results_path)
 
-    for file in files:
-        if file.endswith('.csv'):
-            if "project_line_segments" in file:
-                line_seg_data = readcsv2listofdicts(file, dirpath)
-                segments_flag = True
-            elif "project_info" in file:
-                readcsvinfo2dict(new_project, file, dirpath)
-                info_flag = True
-            elif "project_lines" in file:
-                line_data = readcsv2listofdicts(file, dirpath)
-                lines_flag = True
-            elif "regions" in file:
-                region_data = readcsv2listofdicts(file, dirpath)
-                region_flag = True
-            elif "video_statistics" in file:
-                video_stats = readcsv2videostats(file, dirpath)
-
-
-    if not segments_flag:
-        raise IOError(f"no project_line_segments file found in {dirpath}")
-    if not region_flag:
-        raise IOError(f"no project_regions file found in {dirpath}")
-    if not lines_flag:
-        raise IOError(f"no project_lines file found in {dirpath}")
-    if not info_flag:
-        raise IOError(f"no project_info file found in {dirpath}")
-
-    store = VideoAnalysisResultsStore()
-    if video_stats is not None:
-        store.set_video_statistics(video_stats)
-    store_regions(store, region_data)
-    store_lines(store, line_data, line_seg_data)
-    new_project["results"] = store
     new_project.ensure_numeric()
 
-def readcsv2videostats(file, dirpath):
-    '''
-    Reads a video statistics file
+def read_csv_info(new_project, files, path):
+    """
+    read the project information file.
         Args:
-                file (str) the file name
-                dirpath (str) the path to the directory holding the file
-            Returns:
-                data (framestats.VideoIntensityStats)
-            Throws:
-                IOError, OSError, EOFError if reaing error
-    '''
-    dir_in = Path(dirpath)
-    file_to_open = dir_in / file
-    stats = None
+            new_project (CGTProject): the project object
+            files ([pathlib.Path]): list of files in directory
+            path (pathlib.Path): the working directory
+        Throws:
+            IOException if error reading file
+    """
+    tmp = [x for x in files if str(x).endswith("project_info.csv")]
 
-    with open(file_to_open, 'r') as file_in:
-        reader = csv.reader(file_in)
-        row = next(reader)
-        bins = []
-        for item in row:
-            if bin is not None:
-                bins.append(np.float64(item))
+    if len(tmp) < 1:
+        raise FileNotFoundError(f"Directory {path} has no project_info.csv file.")
 
-        stats = VideoIntensityStats(bins)
+    if len(tmp) > 1:
+        raise IOError(f"Directory {path} has more than one project_info.csv file.")
 
-        for row in reader:
-            mean = np.float64(row.pop(0))
-            std_dev = np.float64(row.pop(0))
-            bin_counts = [np.float64(i) for i in row]
-            stats.append_frame(FrameStats(mean, std_dev, bin_counts))
-
-    return stats
-
-def readcsv2listofdicts(file, dirpath):
-    '''Reads regions, crystals and lines csv reports created by the Crystal Growth Tracker
-       as a list of dictionaries.
-       This means varaibles are read with the header as a pair so can be for searched
-       by its semantic meaning.
-            Args:
-                file (str) directory name in which results are to be saved
-            Returns:
-                data (list(dictionary)) list each item of which is a one field dictionary
-            Throws:
-                IOError, OSError, EOFError if reaing error
-    '''
-    dir_in = Path(dirpath)
-    file_to_open = dir_in / file
-
-    data = []
-
-    with open(file_to_open, 'r') as file_in:
-        reader = csv.DictReader(file_in)
-        for row in reader:
-            data.append(row)
-
-    return data
-
-def readcsvinfo2dict(new_project, file, dirpath):
-    '''
-    Read a csv file holding project info as a dictionary, so varibles are
-    read with the header as a pair so can be searched by its semantic meaning.
-        Args:
-            new_project (CGTProject):  An empty project data structure.
-            file (str):                file name
-            dirpath (str):             directory holding file
-        Returns:
-            None
-        Throws
-            IOError is problem reading file
-    '''
-    dir_in = Path(dirpath)
-    file_to_open = dir_in / file
-
-    with open(file_to_open, 'r') as file_in:
+    with tmp[0].open('r') as file_in:
         reader = csv.reader(file_in)
         for row in reader:
             if len(row) == 2:
@@ -182,69 +83,5 @@ def readcsvinfo2dict(new_project, file, dirpath):
                 else:
                     new_project[key] = value
 
-def store_regions(store, regions_data):
-    '''
-    convert string lists to regions and adds them to a
-    Crystal Growth Tracker to a results object.
-        Args:
-            store:    A results class object.
-            regions_data ([dict]): list of dictionarys read in from csv
-        Returns:
-            None
-    '''
-    for region in regions_data:
-        top = float(region["Top"])
-        left = float(region["Left"])
-        width = float(region["Width"])
-        height = float(region["Height"])
-
-        tmp_region = qc.QRectF(left, top, width, height)
-
-        store.add_region(qw.QGraphicsRectItem(tmp_region))
-
-def read_argb_numpy_images(dirpath, i):
-    """
-    read the start end numpy images for region number i from directory.
-        Args:
-            dirpath (string) the full path to the directory.
-            i (int) the array index of the region.
-        Returns:
-            a pair of numpy.images in ARGB (uint8) format
-        Throws:
-            FileNotFound
-    """
-    name = f"Region_{i}.npz"
-    path = Path(dirpath)
-    path = path.joinpath("images", name)
-
-    tmp = np.load(path)
-    start_end = (tmp["start"], tmp["end"])
-
-    return start_end
-
-def store_lines(store, lines, segments):
-    """
-    combine the lines and segments and store the
-        Args:
-            store (VideoAnalysisResultsStore) the results object to be filled
-            lines ([[string]]) the data rows of the lines csv file
-            segments ([[string]]) the data rows of the lines_segments csv file
-    """
+def read_csv_video_statistics(new_project, files, results_path):
     pass
-    # for row in lines:
-    #   note = row["Note"]
-    #     region_index = int(row["Region Index"])
-
-    #     line = Line(None)
-    #     store.add_line(region_index, line)
-
-    # for row in segments:
-    #     frame = int(row["Frame"])
-    #     start_x = int(row["Start x"])
-    #     start_y = int(row["Start y"])
-    #     end_x = int(row["End x"])
-    #     end_y = int(row["End y"])
-    #     line_segment = ImageLineSegment(ImagePoint(start_x, start_y),
-    #                                     ImagePoint(end_x, end_y))
-    #     line_index = int(row["Line Index"])
-    #     store.get_lines()[line_index].add_line_segment(frame, line_segment)
