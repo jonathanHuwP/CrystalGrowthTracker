@@ -132,9 +132,7 @@ class VelocitiesCalculator():
         get and convert the marker lines to displacements
         """
         self._line_displacements = []
-        print(f"make lines data_source{type(self._data_source)}")
         for marker in self._data_source.get_lines():
-            print(f"got line {marker}")
             previous = marker[0]
             marker_displacements = []
 

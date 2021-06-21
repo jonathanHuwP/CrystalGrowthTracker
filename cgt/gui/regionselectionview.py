@@ -85,7 +85,6 @@ class RegionSelectionView(VideoBaseView):
     def redisplay_regions(self):
         # TODO clear old regions
         for region in self._data_source.get_results().get_regions():
-            print(f"\t{region}")
             pen = self._data_source.get_pens().get_display_pen()
             region.setPen(pen)
             self.scene().addItem(region)

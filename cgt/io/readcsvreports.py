@@ -37,7 +37,8 @@ from cgt.model.videoanalysisresultsstore import VideoAnalysisResultsStore
 from cgt.util.framestats import FrameStats, VideoIntensityStats
 from cgt.util.utils import (get_region,
                             get_frame,
-                            list_to_g_point)
+                            list_to_g_point,
+                            list_to_g_line)
 
 def read_csv_project(results_dir, new_project, pens):
     '''Coordinates the reading of a selection of csv reports.
@@ -61,7 +62,7 @@ def read_csv_project(results_dir, new_project, pens):
 
     if read_csv_regions(new_project, files, results_path):
         read_csv_points(new_project, files, results_path, pens)
-        read_csv_lines(new_project, files, results_path)
+        read_csv_lines(new_project, files, results_path, pens)
         extract_key_frames(new_project["results"])
 
     new_project.ensure_numeric()
@@ -203,13 +204,14 @@ def read_csv_points(new_project, files, path, pens):
 
         new_project["results"].insert_point_marker(g_marker)
 
-def read_csv_lines(new_project, files, path):
+def read_csv_lines(new_project, files, path, pens):
     """
     read the lines file, if it exists
         Args:
             new_project (CGTProject): the project object
             files ([pathlib.Path]): list of files in directory
             path (pathlib.Path): the working directory
+            pens (PenStore): the current pens set
         Throws:
             IOException if error reading file
     """
@@ -220,6 +222,26 @@ def read_csv_lines(new_project, files, path):
 
     if len(tmp) > 1:
         raise IOError(f"Directory {path} has more than one regions.csv file.")
+
+    with tmp[0].open('r') as file_in:
+        reader = csv.reader(file_in)
+        next(reader) # remove headers
+        rows = []
+        for row in reader:
+            tmp = [int(row[0])]
+            tmp += [float(x) for x in row[1:7]]
+            tmp += [int(x) for x in row[7:]]
+            rows.append(tmp)
+
+    rows.sort(key=operator.itemgetter(8, 7))
+
+    for _, marker in itertools.groupby(rows, operator.itemgetter(8)):
+        g_marker = []
+        for item in marker:
+            g_marker.append(list_to_g_line(item,
+                                           pens.get_display_pen()))
+
+        new_project["results"].insert_line_marker(g_marker)
 
 def extract_key_frames(results):
     """

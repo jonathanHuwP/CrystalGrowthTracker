@@ -631,3 +631,33 @@ def list_to_g_point(point, pen):
     item.setZValue(1.0)
 
     return item
+
+def list_to_g_line(line, pen):
+    """
+    convert the data in a list to a graphics line
+        Args:
+            line (list [ID, x1, y1, x2, y2, pos_x, pos_y, frame, region]) the line as list
+            pen (QPen) the drawing pen
+        Returns:
+            QGraphicsLineItem
+    """
+    x1 = float(line[1])
+    y1 = float(line[2])
+    x2 = float(line[3])
+    y2 = float(line[4])
+    position_x = float(line[5])
+    position_y = float(line[6])
+    frame = int(line[7])
+    region = int(line[8])
+
+    position = qc.QPointF(position_x, position_y)
+
+    item = qw.QGraphicsLineItem(x1, y1, x2, y2)
+    item.setPos(position)
+    item.setData(ItemDataTypes.ITEM_TYPE, MarkerTypes.LINE)
+    item.setData(ItemDataTypes.FRAME_NUMBER, frame)
+    item.setData(ItemDataTypes.REGION_INDEX, region)
+    item.setPen(pen)
+    item.setZValue(1.0)
+
+    return item

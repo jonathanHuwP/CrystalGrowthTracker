@@ -130,18 +130,6 @@ class VideoAnalysisResultsStore:
 
         self._regions.pop(index)
         self.set_changed()
-        print(f"region removed {len(self._regions)} are left")
-
-
-
-
-
-
-
-
-
-# NEW
-##########################
 
     def get_regions(self):
         """
@@ -229,7 +217,6 @@ class VideoAnalysisResultsStore:
                 region (QRect) the region
         """
         self._regions.append(region)
-        print(f"Added {region}")
 
     def add_point(self, point):
         """
