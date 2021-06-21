@@ -26,6 +26,8 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 
 import csv
 import pathlib
+import operator
+import itertools
 import numpy as np
 
 import PyQt5.QtCore as qc
@@ -33,17 +35,22 @@ import PyQt5.QtWidgets as qw
 
 from cgt.model.videoanalysisresultsstore import VideoAnalysisResultsStore
 from cgt.util.framestats import FrameStats, VideoIntensityStats
+from cgt.util.utils import (get_region,
+                            get_frame,
+                            list_to_g_point)
 
-def read_csv_project(results_dir, new_project):
+def read_csv_project(results_dir, new_project, pens):
     '''Coordinates the reading of a selection of csv reports.
     Args:
         results_dir (str): name of results directory
         new_project (CGTProject):  An empty project data structure.
+        pens (PenStore): the current set of pens
     Throws:
         IOException if error reading files
     '''
     results_path = pathlib.Path(results_dir)
     files = [x for x in results_path.iterdir() if x.is_file()]
+
     if len(files) < 1:
         raise IOError(f"Directory {results_path} contains no files.")
 
@@ -51,6 +58,11 @@ def read_csv_project(results_dir, new_project):
 
     new_project["results"] = VideoAnalysisResultsStore()
     read_csv_video_statistics(new_project, files, results_path)
+
+    if read_csv_regions(new_project, files, results_path):
+        read_csv_points(new_project, files, results_path, pens)
+        read_csv_lines(new_project, files, results_path)
+        extract_key_frames(new_project["results"])
 
     new_project.ensure_numeric()
 
@@ -118,3 +130,118 @@ def read_csv_video_statistics(new_project, files, path):
             stats.append_frame(FrameStats(mean, std_dev, bin_counts))
 
     new_project["results"].set_video_statistics(stats)
+
+def read_csv_regions(new_project, files, path):
+    """
+    read the video regions, if it exists
+        Args:
+            new_project (CGTProject): the project object
+            files ([pathlib.Path]): list of files in directory
+            path (pathlib.Path): the working directory
+        Returns:
+            True if regions found and read
+        Throws:
+            IOException if error reading file
+    """
+    tmp = [x for x in files if str(x).endswith("regions.csv")]
+
+    if len(tmp) < 1:
+        return
+
+    if len(tmp) > 1:
+        raise IOError(f"Directory {path} has more than one regions.csv file.")
+
+    flag = False
+    with tmp[0].open('r') as file_in:
+            reader = csv.reader(file_in)
+            next(reader) # remove headers
+            for row in reader:
+                tmp = [float(x) for x in row]
+                rect = qc.QRectF(tmp[1], tmp[2], tmp[3], tmp[4])
+                new_project["results"].add_region(qw.QGraphicsRectItem(rect))
+                if not flag:
+                    flag = True
+
+    return flag
+
+def read_csv_points(new_project, files, path, pens):
+    """
+    read the points file, if it exists
+        Args:
+            new_project (CGTProject): the project object
+            files ([pathlib.Path]): list of files in directory
+            path (pathlib.Path): the working directory
+        Throws:
+            IOException if error reading file
+    """
+    tmp = [x for x in files if str(x).endswith("points.csv")]
+
+    if len(tmp) < 1:
+        return
+
+    if len(tmp) > 1:
+        raise IOError(f"Directory {path} has more than one points.csv file.")
+
+    rows = []
+    with tmp[0].open('r') as file_in:
+        reader = csv.reader(file_in)
+        next(reader) # remove headers
+        for row in reader:
+            tmp = [int(row[0])]
+            tmp += [float(x) for x in row[1:5]]
+            tmp += [int(x) for x in row[5:]]
+            rows.append(tmp)
+
+    rows.sort(key=operator.itemgetter(6, 5))
+
+    for _, marker in itertools.groupby(rows, operator.itemgetter(6)):
+        g_marker = []
+        for item in marker:
+            # set up parent hash ?
+            g_marker.append(list_to_g_point(item,
+                                            pens.get_display_pen()))
+
+        new_project["results"].insert_point_marker(g_marker)
+
+def read_csv_lines(new_project, files, path):
+    """
+    read the lines file, if it exists
+        Args:
+            new_project (CGTProject): the project object
+            files ([pathlib.Path]): list of files in directory
+            path (pathlib.Path): the working directory
+        Throws:
+            IOException if error reading file
+    """
+    tmp = [x for x in files if str(x).endswith("lines.csv")]
+
+    if len(tmp) < 1:
+        return
+
+    if len(tmp) > 1:
+        raise IOError(f"Directory {path} has more than one regions.csv file.")
+
+def extract_key_frames(results):
+    """
+    fill the region to key-frame map from the lines
+        Args:
+            results (VideoAnalysisResultsStore) the results object
+    """
+
+    frames = []
+
+    for line_set in results.get_lines():
+        for line in line_set:
+            frames.append((get_region(line), get_frame(line)))
+
+    for point_set in results.get_points():
+        for point in point_set:
+            frames.append((get_region(point), get_frame(point)))
+
+    frames.sort(key=operator.itemgetter(0))
+
+    for region, group in itertools.groupby(frames, operator.itemgetter(0)):
+        tmp = list(group)
+        tmp.sort(key=operator.itemgetter(1))
+        for key_frame, _ in itertools.groupby(tmp, operator.itemgetter(1)):
+            results.add_key_frame(region, key_frame)

@@ -27,8 +27,10 @@ import datetime
 
 from sys import platform as _platform
 import array as arr
+
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
+import PyQt5.QtWidgets as qw
 
 import cv2
 import math
@@ -598,3 +600,34 @@ def g_line_to_tuple(line):
     array.append(line.data(ItemDataTypes.REGION_INDEX))
 
     return array
+
+def list_to_g_point(point, pen):
+    """
+    convert the data in a list to a graphics point
+        Args:
+            point (list [ID, x, y, pos_x, pos_y, frame, region]) the point as list
+            pen (QPen) the drawing pen
+        Returns:
+            QGraphicsPathItem
+    """
+    centre_x = float(point[1])
+    centre_y = float(point[2])
+    position_x = float(point[3])
+    position_y = float(point[4])
+    frame = int(point[5])
+    region = int(point[6])
+
+    centre = qc.QPointF(centre_x, centre_y)
+    position = qc.QPointF(position_x, position_y)
+
+    path = make_cross_path(centre)
+    item = qw.QGraphicsPathItem(path)
+    item.setPos(position)
+    item.setData(ItemDataTypes.ITEM_TYPE, MarkerTypes.POINT)
+    item.setData(ItemDataTypes.FRAME_NUMBER, frame)
+    item.setData(ItemDataTypes.REGION_INDEX, region)
+    item.setData(ItemDataTypes.CROSS_CENTRE, centre)
+    item.setPen(pen)
+    item.setZValue(1.0)
+
+    return item

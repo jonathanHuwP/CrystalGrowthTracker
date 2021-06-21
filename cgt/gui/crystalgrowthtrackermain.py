@@ -278,7 +278,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         project = CGTProject()
         try:
-            readcsvreports.read_csv_project(dir_name, project)
+            readcsvreports.read_csv_project(dir_name, project, self.get_pens())
         except (IOError, OSError, EOFError, FileNotFoundError) as exp:
             message = f"Could not load project: {exp}"
             qw.QMessageBox.warning(self,
