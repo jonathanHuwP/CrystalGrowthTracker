@@ -50,7 +50,7 @@ def read_csv_project(results_dir, new_project):
     read_csv_info(new_project, files, results_path)
 
     new_project["results"] = VideoAnalysisResultsStore()
-    read_csv_video_statistics(new_project["results"], files, results_path)
+    read_csv_video_statistics(new_project, files, results_path)
 
     new_project.ensure_numeric()
 
@@ -83,5 +83,38 @@ def read_csv_info(new_project, files, path):
                 else:
                     new_project[key] = value
 
-def read_csv_video_statistics(new_project, files, results_path):
-    pass
+def read_csv_video_statistics(new_project, files, path):
+    """
+    read the video statistics, if it exists
+        Args:
+            new_project (CGTProject): the project object
+            files ([pathlib.Path]): list of files in directory
+            path (pathlib.Path): the working directory
+        Throws:
+            IOException if error reading file
+    """
+    tmp = [x for x in files if str(x).endswith("video_statistics.csv")]
+
+    if len(tmp) < 1:
+        return
+
+    if len(tmp) > 1:
+        raise IOError(f"Directory {path} has more than one video_statistics.csv file.")
+
+    with tmp[0].open('r') as file_in:
+        reader = csv.reader(file_in)
+        row = next(reader)
+        bins = []
+        for item in row:
+            if bin is not None:
+                bins.append(np.float64(item))
+
+        stats = VideoIntensityStats(bins)
+
+        for row in reader:
+            mean = np.float64(row.pop(0))
+            std_dev = np.float64(row.pop(0))
+            bin_counts = [np.float64(i) for i in row]
+            stats.append_frame(FrameStats(mean, std_dev, bin_counts))
+
+    new_project["results"].set_video_statistics(stats)
