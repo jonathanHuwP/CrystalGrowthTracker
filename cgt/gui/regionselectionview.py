@@ -83,7 +83,13 @@ class RegionSelectionView(VideoBaseView):
             self.redisplay_regions()
 
     def redisplay_regions(self):
-        # TODO clear old regions
+        """
+        remove old regions and redisplay current
+        """
+        for item in self.scene().items():
+            if isinstance(item, qw.QGraphicsRectItem):
+                self.scene().removeItem(item)
+
         for region in self._data_source.get_results().get_regions():
             pen = self._data_source.get_pens().get_display_pen()
             region.setPen(pen)

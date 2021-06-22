@@ -27,16 +27,14 @@ import datetime
 
 from sys import platform as _platform
 import array as arr
+import math
 
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 import PyQt5.QtWidgets as qw
 
 import cv2
-import math
 import numpy as np
-
-import cgt.util.debugtools
 
 class MarkerTypes(enum.IntEnum):
     """

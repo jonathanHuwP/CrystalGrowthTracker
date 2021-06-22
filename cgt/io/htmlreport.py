@@ -19,7 +19,6 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 @author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 '''
 import os
-import sys
 from pathlib import Path
 
 def save_html_report1(project, time_stamp):

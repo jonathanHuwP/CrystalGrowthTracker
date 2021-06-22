@@ -27,7 +27,6 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = invalid-name
 # pylint: disable = import-error
 # pylint: disable = unnecessary-comprehension
-import enum
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
@@ -53,10 +52,6 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
 
     ## signal that the queue should be cleared
     clear_queue = qc.pyqtSignal()
-
-    # TODO is this needed?
-    ## signal a new result
-    new_result = qc.pyqtSignal()
 
     def __init__(self, parent, data_source):
         """
@@ -330,6 +325,11 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
             self.play_pause()
 
     def set_video_source(self, video_source):
+        """
+        set the video_source object, set length for controls
+            Args:
+                video_source (VideoSource): the source object
+        """
         self._video_source = video_source
         self._cloneControls.set_range(video_source.get_length())
         self._entryControls.set_range(video_source.get_length())

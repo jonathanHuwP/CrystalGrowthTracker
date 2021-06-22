@@ -145,23 +145,23 @@ def read_csv_regions(new_project, files, path):
             IOException if error reading file
     """
     tmp = [x for x in files if str(x).endswith("regions.csv")]
+    flag = False
 
     if len(tmp) < 1:
-        return
+        return flag
 
     if len(tmp) > 1:
         raise IOError(f"Directory {path} has more than one regions.csv file.")
 
-    flag = False
     with tmp[0].open('r') as file_in:
-            reader = csv.reader(file_in)
-            next(reader) # remove headers
-            for row in reader:
-                tmp = [float(x) for x in row]
-                rect = qc.QRectF(tmp[1], tmp[2], tmp[3], tmp[4])
-                new_project["results"].add_region(qw.QGraphicsRectItem(rect))
-                if not flag:
-                    flag = True
+        reader = csv.reader(file_in)
+        next(reader) # remove headers
+        for row in reader:
+            tmp = [float(x) for x in row]
+            rect = qc.QRectF(tmp[1], tmp[2], tmp[3], tmp[4])
+            new_project["results"].add_region(qw.QGraphicsRectItem(rect))
+            if not flag:
+                flag = True
 
     return flag
 

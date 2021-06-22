@@ -21,7 +21,6 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 '''
 import pathlib
 import csv
-import numpy as np
 
 from cgt.util.utils import (rect_to_tuple,
                             g_point_to_tuple,

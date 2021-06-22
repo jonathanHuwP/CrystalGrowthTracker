@@ -16,11 +16,10 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 @copyright 2020
 @author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 """
-import sys
+# set up linting conditions
+# pylint: disable = c-extension-no-member
 
 import PyQt5.QtWidgets as qw
-import PyQt5.QtGui as qg
-import PyQt5.QtCore as qc
 
 # import UI
 from cgt.gui.Ui_projectpropertieswidget import Ui_ProjectPropertiesWidget
@@ -85,24 +84,7 @@ class ProjectPropertiesWidget(qw.QWidget, Ui_ProjectPropertiesWidget):
         self._propertiesBrowser.append(text)
 
     def show_top_text(self):
+        """
+        set to top of text
+        """
         self._propertiesBrowser.verticalScrollBar().setValue(0)
-
-#####################################
-
-def run_main():
-    """
-    use a local function to make an isolated the QApplication object
-        Returns:
-            None
-    """
-
-    app = qw.QApplication(sys.argv)
-    window = ProjectPropertiesWidget()
-    window.clear_and_display_text("This is some <b>text</b>")
-    window.append_text("<p>More text</p>")
-    window.show()
-    app.exec_()
-
-
-if __name__ == "__main__":
-    run_main()

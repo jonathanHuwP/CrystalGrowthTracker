@@ -40,16 +40,30 @@ class VideoIntensityStats():
         ## the bins used in the bin counts
         self._bins = bins
 
+    # TODO remove property
     @property
     def bins(self):
+        """
+        getter for the bins
+        """
         return self._bins
 
+    # TODO remove property
     @property
     def frames(self):
+        """
+        getter for the frames
+        """
         return self._frames
 
     def append_frame(self, frame):
+        """
+        add a frame
+        """
         self._frames.append(frame)
 
     def set_bins(self, bins):
+        """
+        setter for the bins
+        """
         self._bins = bins

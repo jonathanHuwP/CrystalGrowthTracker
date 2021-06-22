@@ -16,12 +16,10 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 @copyright 2020
 @author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 """
-
 # set up linting conditions
 # pylint: disable = too-many-public-methods
 # pylint: disable = too-many-arguments
 
-import PyQt5.QtCore as qc
 import bisect
 
 from cgt.util.utils import (ItemDataTypes,

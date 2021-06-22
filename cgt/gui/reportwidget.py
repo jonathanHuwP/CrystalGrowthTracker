@@ -16,9 +16,10 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 @copyright 2021
 @author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 """
+# set up linting conditions
+# pylint: disable = c-extension-no-member
 
 import PyQt5.QtWidgets as qw
-import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 import PyQt5.QtWebEngineWidgets as qe
 
@@ -52,4 +53,7 @@ class ReportWidget(qw.QWidget, Ui_ReportWidget):
         self.set_bbc()
 
     def set_bbc(self):
+        """
+        for test set bbc new website
+        """
         self._scrollArea.widget().setUrl(qc.QUrl("https://www.bbc.co.uk/news"))

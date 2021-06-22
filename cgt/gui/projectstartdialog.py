@@ -25,8 +25,6 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 import sys
 import os
 from pathlib import Path
-import random
-import string
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
@@ -145,11 +143,11 @@ class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
             raw_video = Path(text)
             if not raw_video.exists():
                 message = self.tr(f"Source file \"{raw_video}\" does not exist!")
-                #message = message.format(raw_video)
                 qw.QMessageBox.critical(self, "Error", message)
                 return
             if raw_video == enhanced_video:
-                message = self.tr(f"Enhanced video file \"{enhanced_video}\" and raw video file \"{raw_video}\" are the same!")
+                message = self.tr(f"Enhanced video file \"{enhanced_video}\" ")
+                message += self.tr("and raw video file \"{raw_video}\" are the same!")
                 qw.QMessageBox.critical(self, "Error", message)
                 return
         else:

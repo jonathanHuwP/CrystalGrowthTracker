@@ -29,8 +29,6 @@ import PyQt5.QtCore as qc
 
 from cgt.gui.Ui_editnotesdialog import Ui_EditNotesDialog
 
-# TODO upgrade to Dialog
-
 class EditNotesDialog(qw.QDialog, Ui_EditNotesDialog):
     """
     a qDialog the allowing the user to view and edit the project notes
@@ -104,7 +102,3 @@ def run_main():
     window = EditNotesDialog()
     window.show()
     app.exec_()
-
-
-if __name__ == "__main__":
-    run_main()

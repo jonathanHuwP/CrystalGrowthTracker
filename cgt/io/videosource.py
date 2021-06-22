@@ -96,7 +96,7 @@ class VideoSource(qc.QObject):
                 viewer (QObject) if None the source is disconnected from any previous connections
         """
         self.disconnect_viewer()
-        if viewer == None:
+        if viewer is None:
             return
 
         viewer.play_pause()
@@ -112,7 +112,7 @@ class VideoSource(qc.QObject):
         disconnect the VideoBuffer's 'display_image' signal
         from the viewer object's 'display_image' slot
         """
-        if not self._current_viewer == None:
+        if self._current_viewer is not None:
             self._video_reader.display_image.disconnect(self._current_viewer.display_image)
             self._current_viewer.request_frame.disconnect(self.request_frame)
             self._current_viewer.clear_queue.disconnect(self.clear)

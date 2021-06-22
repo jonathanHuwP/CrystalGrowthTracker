@@ -27,7 +27,6 @@ from enum import Enum
 import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
-import PyQt5.Qt as qt
 
 class PlayStates(Enum):
     """

@@ -27,11 +27,10 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = too-many-public-methods
 
 import PyQt5.QtWidgets as qw
-import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
 from cgt.gui.videobasewidget import VideoBaseWidget
-from cgt.gui.regionselectionview import RegionSelectionView, SelectStates
+from cgt.gui.regionselectionview import SelectStates
 
 # import UI
 from cgt.gui.Ui_videoregionselectionwidget import Ui_VideoRegionSelectionWidget
@@ -150,6 +149,9 @@ class VideoRegionSelectionWidget(VideoBaseWidget, Ui_VideoRegionSelectionWidget)
         return self._data_source
 
     def redisplay_regions(self):
+        """
+        force a resdisplay of the current set of regions
+        """
         self._graphicsView.redisplay_regions()
 
     def clear(self):

@@ -33,8 +33,6 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
 import PyQt5.Qt as qt
 
-from cgt.model.videoanalysisresultsstore import VideoAnalysisResultsStore
-
 import cgt.util.utils as utils
 
 from cgt.gui.projectstartdialog import ProjectStartDialog
@@ -44,16 +42,18 @@ from cgt.gui.videoregionselectionwidget import VideoRegionSelectionWidget
 from cgt.gui.editnotesdialog import EditNotesDialog
 from cgt.gui.markupwidget import MarkUpWidget
 from cgt.gui.reportwidget import ReportWidget
+from cgt.gui.videostatisticswidget import VideoStatisticsWidget
+from cgt.gui.penstore import PenStore
 
 from cgt.io import htmlreport
 from cgt.io import writecsvreports
 from cgt.io import readcsvreports
 from cgt.io.videosource import VideoSource
-
 from cgt.io.videoanalyser import VideoAnalyser
+
 from cgt.model.cgtproject import CGTProject
-from cgt.gui.videostatisticswidget import VideoStatisticsWidget
-from cgt.gui.penstore import PenStore
+from cgt.model.velocitiescalculator import VelocitiesCalculator
+from cgt.model.videoanalysisresultsstore import VideoAnalysisResultsStore
 
 # import UI
 from cgt.gui.Ui_crystalgrowthtrackermain import Ui_CrystalGrowthTrackerMain
@@ -140,7 +140,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self.set_title()
 
         if project is not None:
-             self.read_project_directory(project)
+            self.read_project_directory(project)
 
         self._tabWidget.setCurrentIndex(0)
 
@@ -175,7 +175,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             if self._project["results"].get_video_statistics() is not None:
                 self._videoStatsWidget.setEnabled(True)
         elif  tab_index == self._tabWidget.indexOf(self._drawingTab):
-              self._drawingWidget.setEnabled(True)
+            self._drawingWidget.setEnabled(True)
 
     def has_project(self):
         """
@@ -631,7 +631,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         try:
             self._project["results"].remove_region(index)
         except ValueError:
-            message = f"The region has associated markers, that must be deleted before the region."
+            message = "The region has associated markers, that must be deleted before the region."
             qw.QMessageBox.critical(self, "Error: Region has markers", message)
 
 
@@ -669,6 +669,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
     @qc.pyqtSlot()
     def set_view_properties(self):
+        """
+        get display properties from the user
+        """
         msg_box = qw.QMessageBox()
         msg_box.setText(self.tr("Select Property"))
         new_line = msg_box.addButton(self.tr("New Line Colour"), qw.QMessageBox.NoRole)
@@ -694,11 +697,14 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             print(f"thickness {thickness}")
 
     def get_colour(self):
+        """
+        get a colour from the user
+        """
         colour = qw.QColorDialog.getColor(qt.Qt.red, self)
         if colour.isValid():
             return colour
-        else:
-            return None
+
+        return None
 
     @qc.pyqtSlot()
     def load_video(self):
@@ -899,18 +905,19 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
     @qc.pyqtSlot()
     def calculate_results(self):
-        from cgt.model.velocitiescalculator import VelocitiesCalculator
-
+        """
+        calculate and print the velocities
+        """
         calculator = VelocitiesCalculator(self.get_results())
         calculator.process_latest_data()
         average_speeds = calculator.get_average_speeds()
         print(f"{average_speeds}")
 
         for item in average_speeds:
-                id_item = str(item.ID)
-                type_item = item.m_type.name
-                speed_item = str(item.speed)
-                print(f"{id_item}\t{type_item}\t{speed_item}")
+            id_item = str(item.ID)
+            type_item = item.m_type.name
+            speed_item = str(item.speed)
+            print(f"{id_item}\t{type_item}\t{speed_item}")
 
 # support functions
 ###################
