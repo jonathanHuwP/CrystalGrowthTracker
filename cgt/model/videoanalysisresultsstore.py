@@ -22,6 +22,8 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 
 import bisect
 
+import PyQt5.QtCore as qc
+
 from cgt.util.utils import (ItemDataTypes,
                             MarkerTypes,
                             get_parent_hash,
@@ -31,14 +33,20 @@ from cgt.util.utils import (ItemDataTypes,
                             get_region,
                             get_marker_type)
 
-class VideoAnalysisResultsStore:
+class VideoAnalysisResultsStore(qc.QObject):
     """
     a storage class that records the results of a video analysis
     """
-    def __init__(self):
+
+    ## signal to indicate that the contents has changed
+    data_changed = qc.pyqtSignal()
+
+    def __init__(self, parent):
         """
         initalize an object
         """
+        super().__init__(parent)
+
         ## store of lines
         self._lines = []
 
@@ -82,7 +90,9 @@ class VideoAnalysisResultsStore:
             Returns:
                 None
         """
+        self.data_changed.emit()
         self._changed = True
+        print("data_changed emitted")
 
     def get_video_statistics(self):
         """
@@ -111,6 +121,7 @@ class VideoAnalysisResultsStore:
                 IndexError: pop index out of range
         """
         self._regions[index] = region
+        self.set_changed()
 
     def remove_region(self, index):
         """
@@ -120,6 +131,7 @@ class VideoAnalysisResultsStore:
             Throws:
                 IndexError: pop index out of range
         """
+        print("in remove_region")
         lines = self.get_lines_for_region(index)
         points = self.get_points_for_region(index)
 
@@ -203,10 +215,12 @@ class VideoAnalysisResultsStore:
         """
         if region_index not in self._key_frames.keys():
             self._key_frames[region_index] = [frame_number]
+            self.set_changed()
             return
 
         if frame_number not in self._key_frames[region_index]:
             bisect.insort(self._key_frames[region_index], frame_number)
+            self.set_changed()
 
     def add_region(self, region):
         """
@@ -215,6 +229,7 @@ class VideoAnalysisResultsStore:
                 region (QRect) the region
         """
         self._regions.append(region)
+        self.set_changed()
 
     def add_point(self, point):
         """
@@ -225,6 +240,7 @@ class VideoAnalysisResultsStore:
         if get_parent_hash(point) == "p":
             self._points.append([point])
             self.add_key_frame(get_region(point), get_frame(point))
+            self.set_changed()
             return None
 
         index = self.find_list_for_new_point(point)
@@ -234,6 +250,7 @@ class VideoAnalysisResultsStore:
         self._points[index].append(point)
         self._points[index].sort(key=get_frame)
         self.add_key_frame(get_region(point), get_frame(point))
+        self.set_changed()
 
         tmp = self._points[index].index(point)
         if tmp > 0:
@@ -250,6 +267,7 @@ class VideoAnalysisResultsStore:
         if get_parent_hash(line) == "p":
             self._lines.append([line])
             self.add_key_frame(get_region(line), get_frame(line))
+            self.set_changed()
             return None
 
         index = self.find_list_for_new_line(line)
@@ -259,6 +277,7 @@ class VideoAnalysisResultsStore:
         self._lines[index].append(line)
         self._lines[index].sort(key=get_frame)
         self.add_key_frame(get_region(line), get_frame(line))
+        self.set_changed()
 
         tmp = self._lines[index].index(line)
         if tmp > 0:
@@ -379,10 +398,12 @@ class VideoAnalysisResultsStore:
         if m_type == MarkerTypes.LINE:
             index = self.find_list_for_old_line(marker)
             del self._lines[index]
+            self.set_changed()
 
         if m_type == MarkerTypes.POINT:
             index = self.find_list_for_old_point(marker)
             del self._points[index]
+            self.set_changed()
 
     def remove_point(self, hash_code):
         """
@@ -405,6 +426,7 @@ class VideoAnalysisResultsStore:
             return None
 
         del self._points[point_index][marker_index]
+        self.set_changed()
 
         if len(self._points[point_index]) == 0:
             del self._points[point_index]
@@ -433,6 +455,7 @@ class VideoAnalysisResultsStore:
             return None
 
         del self._lines[line_index][marker_index]
+        self.set_changed()
 
         if len(self._lines[line_index]) == 0:
             del self._lines[line_index]
@@ -471,6 +494,7 @@ class VideoAnalysisResultsStore:
                 child.setData(ItemDataTypes.PARENT_HASH, p_hash)
 
         self._lines[index].remove(line)
+        self.set_changed()
 
     def delete_point(self, point, index):
         """
@@ -503,9 +527,7 @@ class VideoAnalysisResultsStore:
                 child.setData(ItemDataTypes.PARENT_HASH, p_hash)
 
         self._points[index].remove(point)
-
-# ADDED
-##############
+        self.set_changed()
 
     def get_lines_for_region(self, index):
         """
@@ -518,7 +540,7 @@ class VideoAnalysisResultsStore:
         tmp = []
 
         for line in self._lines:
-            if get_region(line) == index:
+            if get_region(line[0]) == index:
                 tmp.append(line)
 
         if len(tmp) > 0:
@@ -537,10 +559,26 @@ class VideoAnalysisResultsStore:
         tmp = []
 
         for point in self._points:
-            if get_region(point) == index:
+            if get_region(point[0]) == index:
                 tmp.append(point)
 
         if len(tmp) > 0:
             return tmp
 
         return None
+
+    def region_has_markers(self, index):
+        """
+        find if a region has associated markers defined.
+            Args:
+                index (int): the index of the region
+            Returns:
+                True if markers defined else False
+        """
+        if len(self.get_points_for_region(index)) > 0:
+            return True
+
+        if len(self.get_lines_for_region(index)) > 0:
+            return True
+
+        return False

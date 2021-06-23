@@ -50,7 +50,13 @@ class ReportWidget(qw.QWidget, Ui_ReportWidget):
         self._scrollArea.setWidget(self._view)
         self._scrollArea.setWidgetResizable(True)
 
-        self.set_bbc()
+        #self.set_bbc()
+
+    def set_report(self, text):
+        """
+        set a html report
+        """
+        self._scrollArea.widget().setHtml(text)
 
     def set_bbc(self):
         """

@@ -33,7 +33,6 @@ import numpy as np
 import PyQt5.QtCore as qc
 import PyQt5.QtWidgets as qw
 
-from cgt.model.videoanalysisresultsstore import VideoAnalysisResultsStore
 from cgt.util.framestats import FrameStats, VideoIntensityStats
 from cgt.util.utils import (get_region,
                             get_frame,
@@ -57,13 +56,14 @@ def read_csv_project(results_dir, new_project, pens):
 
     read_csv_info(new_project, files, results_path)
 
-    new_project["results"] = VideoAnalysisResultsStore()
+    old_signal_state = new_project["results"].blockSignals(True)
     read_csv_video_statistics(new_project, files, results_path)
 
     if read_csv_regions(new_project, files, results_path):
         read_csv_points(new_project, files, results_path, pens)
         read_csv_lines(new_project, files, results_path, pens)
         extract_key_frames(new_project["results"])
+    new_project["results"].blockSignals(old_signal_state)
 
     new_project.ensure_numeric()
 
@@ -130,6 +130,8 @@ def read_csv_video_statistics(new_project, files, path):
             bin_counts = [np.float64(i) for i in row]
             stats.append_frame(FrameStats(mean, std_dev, bin_counts))
 
+    tmp = new_project["results"]
+    print(f"results {type(tmp)}")
     new_project["results"].set_video_statistics(stats)
 
 def read_csv_regions(new_project, files, path):

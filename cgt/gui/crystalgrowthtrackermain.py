@@ -95,7 +95,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         ## the properties listing widget
         self._propertiesWidget = ProjectPropertiesWidget(tab, self)
-        setup_tab(tab, self._propertiesWidget)
+        self.setup_tab(tab, self._propertiesWidget)
 
         ## Selection
         ############
@@ -105,7 +105,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._selectWidget = VideoRegionSelectionWidget(tab, self)
         self._selectWidget.setup_video_widget()
         self._selectWidget.setEnabled(False)
-        setup_tab(tab, self._selectWidget)
+        self.setup_tab(tab, self._selectWidget)
 
         ## Video Statistics
         ###################
@@ -115,7 +115,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._videoStatsWidget = VideoStatisticsWidget(tab, self)
         self._videoStatsWidget.setup_video_widget()
         self._videoStatsWidget.setEnabled(False)
-        setup_tab(tab, self._videoStatsWidget)
+        self.setup_tab(tab, self._videoStatsWidget)
 
         ## User drawing
         ###############
@@ -126,7 +126,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._drawingWidget = MarkUpWidget(tab, self)
         self._drawingWidget.setup_video_widget()
         self._drawingWidget.setEnabled(False)
-        setup_tab(tab, self._drawingWidget)
+        self.setup_tab(tab, self._drawingWidget)
 
         ## Report results
         #################
@@ -134,7 +134,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         ## the results widget
         self._resultWidget = ReportWidget(tab, self)
-        setup_tab(tab, self._resultWidget)
+        self.setup_tab(tab, self._resultWidget)
 
         self._progressBar.hide()
         self.set_title()
@@ -277,6 +277,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 dir_name (string): path to the direcrory
         """
         project = CGTProject()
+        project["results"] = VideoAnalysisResultsStore(self)
+        project["results"].data_changed.connect(self.data_changed)
         try:
             readcsvreports.read_csv_project(dir_name, project, self.get_pens())
         except (IOError, OSError, EOFError, FileNotFoundError) as exp:
@@ -287,6 +289,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             return
 
         self._project = project
+        self._project["results"].data_changed.connect(self.data_changed)
         self._project.reset_changed()
         self.project_created_or_loaded()
 
@@ -538,12 +541,20 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             project['raw_video_no_path'] = raw_video.name
             project['raw_video_no_extension'] = raw_video.stem
 
-        project["results"] = VideoAnalysisResultsStore()
+        project["results"] = VideoAnalysisResultsStore(self)
+        project["results"].data_changed.connect(self.data_changed)
 
         self._project = project
         self.set_video_scale_parameters()
         self.save_project()
         self.project_created_or_loaded()
+
+    @qc.pyqtSlot()
+    def data_changed(self):
+        """
+        notify all widgets of a change in the data
+        """
+        self.calculate_results()
 
     @qc.pyqtSlot()
     def set_video_scale_parameters(self):
@@ -913,22 +924,24 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         average_speeds = calculator.get_average_speeds()
         print(f"{average_speeds}")
 
+        html_tabel = ["<table style=\"width:100%\">"]
         for item in average_speeds:
             id_item = str(item.ID)
             type_item = item.m_type.name
             speed_item = str(item.speed)
-            print(f"{id_item}\t{type_item}\t{speed_item}")
+            html_tabel.append(f"<tr><th>{id_item}</th><th>{type_item}</th><th>{speed_item}</th></tr>")
 
-# support functions
-###################
+        html_tabel.append("</table>")
+        self._resultWidget.set_report('\n'.join(html_tabel))
 
-def setup_tab(tab, widget):
-    """
-    connect widget to tab via layout (allows resizing)
-        Args:
-            tab (QWidget) the page widget from a tab
-            widget (QWidget) the widget to be added
-    """
-    layout = qw.QVBoxLayout()
-    layout.addWidget(widget)
-    tab.setLayout(layout)
+    @staticmethod
+    def setup_tab(tab, widget):
+        """
+        connect widget to tab via layout (allows resizing)
+            Args:
+                tab (QWidget) the page widget from a tab
+                widget (QWidget) the widget to be added
+        """
+        layout = qw.QVBoxLayout()
+        layout.addWidget(widget)
+        tab.setLayout(layout)

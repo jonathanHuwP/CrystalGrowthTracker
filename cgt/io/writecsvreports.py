@@ -109,7 +109,8 @@ def save_csv_info(info):
     with open(path.joinpath(csv_outfile_name), "w") as fout:
         writer = csv.writer(fout, delimiter=',', lineterminator='\n')
         for key, value in info.items():
-            writer.writerow([key, value])
+            if not key == "results":
+                writer.writerow([key, value])
 
 def save_csv_regions(project):
     """
