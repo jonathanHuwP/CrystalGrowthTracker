@@ -18,17 +18,17 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 @copyright 2020
 @author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 '''
-import os
-from pathlib import Path
+import pathlib
+from datetime import datetime
 
-def save_html_report1(project, time_stamp):
+from cgt.model.velocitiescalculator import VelocitiesCalculator
+
+def save_html_report(project):
     '''
-    Creates and coo-ordinates the html report file creation and on the file handle to
+    Creates and co-ordinates the html report file creation and on the file handle to
     other functions that write/create the relevant sections.
         Args:
             project (CGTProject): The project we are reporting.
-            time_stamp (str):     The time the report was request to go in the reports
-                                  directory name.
         Returns:
             error_code (int):      An error code is returned a 0 (zero) values means all
                                    file were read while a 1 (one) value means 1 or more
@@ -36,42 +36,38 @@ def save_html_report1(project, time_stamp):
         Throws:
             Error if the report directory cannot be made, or file cannot be opened
     '''
-    print("hi from save_html_report1")
+    report_dir = pathlib.Path(project["proj_full_path"]).joinpath("report")
 
+    if not report_dir.exists():
+        report_dir.mkdir()
 
+    html_outfile = report_dir.joinpath("report.html")
 
-    results_dir = Path(project["proj_full_path"]).joinpath(time_stamp)
-    path = os.path.abspath(os.path.realpath(results_dir))
+    calculator = VelocitiesCalculator(project["results"])
+    calculator.process_latest_data()
+    average_speeds = calculator.get_average_speeds()
 
-    try:
-        os.makedirs(path)
-    except (IOError, OSError, EOFError) as exception:
-        print(exception)
+    html_tabel = ["<table border=\"1\" width=\"100%\">",
+                  "<tr><th>ID</th><th>Type</th><th>Speed</th></tr>"]
+    for item in average_speeds:
+        id_item = str(item.ID)
+        type_item = item.m_type.name
+        speed_item = str(item.speed)
+        html_tabel.append(f"<tr><th>{id_item}</th><th>{type_item}</th><th>{speed_item}</th></tr>")
 
-    prog = project["prog"]
-
-
-    report_file = "{}_report.html".format(prog)
-    html_outfile = results_dir.joinpath(report_file)
-
-    results = project["results"]
+    html_tabel.append("</table>")
 
     try:
         with open(html_outfile, "w") as fout:
-            fout = write_html_report_start1(fout, project)
-            fout = write_html_overview(fout, results)
-            # removed to fix report JHP
-            # fout = write_html_crystals(fout, project, results)
+            write_html_report_start(fout)
+            fout.write('\n'.join(html_tabel))
             write_html_report_end(fout)
     except (IOError, OSError, EOFError) as exception:
         print(exception)
     finally:
-        print("Read file: ", html_outfile)
+        print(f"Read file: {html_outfile}")
 
-    return results_dir
-
-
-
+    return html_outfile
 
 def write_html_report_start1(fout, project):
     '''
@@ -358,12 +354,27 @@ def write_table(fout, results, crystal):
 
     return fout
 
+def write_html_report_start(fout):
+    '''
+    start a html report.
+        Args:
+            fout (file): the output file
+    '''
+    fout.write("<body>\n")
+    fout.write("<html>\n")
+    timestamp = datetime.now()
+    month = timestamp.strftime("%B") # language given by local
+    date = f"{timestamp.date().day}-{month}-{timestamp.date().year}"
+    time = f"{timestamp.time().hour}:{timestamp.time().minute}:{timestamp.time().second}"
 
+    fout.write(f"<p>Report generated on: {date} at {time}<\p>")
 
 def write_html_report_end(fout):
-    '''Ends and closes an html report.
     '''
+    Ends and closes a html report.
+        Args:
+            fout (file): the output file
+    '''
+    fout.write("</font>")
     fout.write("</body>\n")
     fout.write("</html>\n")
-
-    fout.close()

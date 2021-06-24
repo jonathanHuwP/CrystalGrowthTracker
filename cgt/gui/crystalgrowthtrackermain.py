@@ -45,9 +45,9 @@ from cgt.gui.reportwidget import ReportWidget
 from cgt.gui.videostatisticswidget import VideoStatisticsWidget
 from cgt.gui.penstore import PenStore
 
-from cgt.io import htmlreport
-from cgt.io import writecsvreports
-from cgt.io import readcsvreports
+import cgt.io.htmlreport as htmlreport
+import cgt.io.writecsvreports as writecsvreports
+import cgt.io.readcsvreports as readcsvreports
 from cgt.io.videosource import VideoSource
 from cgt.io.videoanalyser import VideoAnalyser
 
@@ -133,8 +133,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         tab = self._tabWidget.widget(4)
 
         ## the results widget
-        self._resultWidget = ReportWidget(tab, self)
-        self.setup_tab(tab, self._resultWidget)
+        self._reportWidget = ReportWidget(tab)
+        self.setup_tab(tab, self._reportWidget)
 
         self._progressBar.hide()
         self.set_title()
@@ -418,7 +418,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     def save_report(self):
         """
         generate and save a report of the current state of the project
-
             Returns:
                 None
         """
@@ -554,7 +553,14 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         notify all widgets of a change in the data
         """
-        self.calculate_results()
+        self.make_report()
+
+    def make_report(self):
+        """
+        make a html report
+        """
+        report_file = htmlreport.save_html_report(self._project)
+        self._reportWidget.load_html(report_file)
 
     @qc.pyqtSlot()
     def set_video_scale_parameters(self):
@@ -644,7 +650,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         except ValueError:
             message = "The region has associated markers, that must be deleted before the region."
             qw.QMessageBox.critical(self, "Error: Region has markers", message)
-
 
     def append_lines(self, region_index, lines):
         """
@@ -922,7 +927,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         calculator = VelocitiesCalculator(self.get_results())
         calculator.process_latest_data()
         average_speeds = calculator.get_average_speeds()
-        print(f"{average_speeds}")
 
         html_tabel = ["<table style=\"width:100%\">"]
         for item in average_speeds:
@@ -932,7 +936,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             html_tabel.append(f"<tr><th>{id_item}</th><th>{type_item}</th><th>{speed_item}</th></tr>")
 
         html_tabel.append("</table>")
-        self._resultWidget.set_report('\n'.join(html_tabel))
+        self._reportWidget.set_report('\n'.join(html_tabel))
 
     @staticmethod
     def setup_tab(tab, widget):

@@ -21,7 +21,9 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
+import PyQt5.QtGui as qg
 import PyQt5.QtWebEngineWidgets as qe
+import PyQt5.QtPrintSupport as qp
 
 # import UI
 from cgt.gui.Ui_reportwidget import Ui_ReportWidget
@@ -31,7 +33,7 @@ class ReportWidget(qw.QWidget, Ui_ReportWidget):
     a widget for viewing the current HTML report
     """
 
-    def __init__(self, parent, data_source):
+    def __init__(self, parent):
         """
         the object initalization function
 
@@ -43,23 +45,74 @@ class ReportWidget(qw.QWidget, Ui_ReportWidget):
 
         self.setupUi(self)
 
-        ## the main window
-        self._data_source = data_source
+        ## the document to display
+        self._document = qg.QTextDocument()
 
-        self._view = qe.QWebEngineView()
-        self._scrollArea.setWidget(self._view)
+        ## the display device
+        view = qe.QWebEngineView()
+        self._scrollArea.setWidget(view)
         self._scrollArea.setWidgetResizable(True)
+        defaults = qe.QWebEngineSettings.globalSettings()
+        defaults.setFontSize(qe.QWebEngineSettings.MinimumFontSize, 24)
+
+        font_database = qg.QFontDatabase()
+        standard_font=font_database.font("Arial", "", 24)
+        defaults.setFontFamily(qe.QWebEngineSettings.StandardFont,
+                               standard_font.family());
 
         #self.set_bbc()
 
-    def set_report(self, text):
+    def load_html(self, path):
         """
-        set a html report
+        display a html report
+            Args:
+                path (pathlib.Path): path to html
         """
-        self._scrollArea.widget().setHtml(text)
+        self._document.clear()
+
+        with path.open('r') as in_file:
+            self._document.setHtml(in_file.read())
+
+        self._scrollArea.widget().setHtml(self._document.toHtml(),
+                                          qc.QUrl(str(path.parent)))
+
+    def has_content(self):
+        """
+        test if the document has any contents
+            Returns:
+                True if the document has content, else False
+        """
+        return not self._document.isEmpty()
 
     def set_bbc(self):
         """
-        for test set bbc new website
+        for test use bbc news website
         """
         self._scrollArea.widget().setUrl(qc.QUrl("https://www.bbc.co.uk/news"))
+
+    def save_doc_pdf(self, file_path):
+        """
+        print the current document as a PDF file
+            Args:
+                file_path (string): the output file
+        """
+        printer = qp.QPrinter(qp.QPrinter.PrinterResolution)
+        printer.setOutputFormat(qp.QPrinter.PdfFormat)
+        printer.setPaperSize(qp.QPrinter.A4)
+        printer.setOutputFileName(file_path)
+
+        self._document.print(printer)
+
+    def save_doc_html(self, file_path):
+        """
+        print the current document as a PDF file
+            Args:
+                file_path (string): the output file
+        """
+        utf = 'utf-8'
+
+        # construct a python byte array out of sting "utf-8" using "utf-8" as encoding
+        encoding = qc.QByteArray(bytearray(utf, utf))
+
+        with open(file_path, 'w') as out_file:
+            out_file.write(self._document.toHtml(encoding))
