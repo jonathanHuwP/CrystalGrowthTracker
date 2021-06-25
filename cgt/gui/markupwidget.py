@@ -690,3 +690,27 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         self._cloneView.scene().clear()
         self._entryView.scene().clear()
         self._results_proxy = None
+
+    def save_clone_image(self, file_name):
+        """
+        grab the image in the clone view
+            Args:
+                file_name (string): name (and path) of imgage file
+        """
+        # WYSIWYG
+        return self._cloneView.viewport().grab().save(file_name)
+
+    def save_entry_image(self, file_name):
+        """
+        grab the image in the clone view
+            Args:
+                file_name (string): name (and path) of imgage file
+        """
+        # full image
+        image =  qg.QImage(self._cloneView.scene().itemsBoundingRect().size().toSize(),
+                           qg.QImage.Format_ARGB32)
+        image.fill(qc.Qt.white)
+        painter = qg.QPainter(image)
+        self._cloneView.render(painter)
+        del painter
+        image.save(file_name)

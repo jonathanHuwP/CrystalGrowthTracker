@@ -367,7 +367,7 @@ def write_html_report_start(fout):
     date = f"{timestamp.date().day}-{month}-{timestamp.date().year}"
     time = f"{timestamp.time().hour}:{timestamp.time().minute}:{timestamp.time().second}"
 
-    fout.write(f"<p>Report generated on: {date} at {time}<\p>")
+    fout.write(f"<p>Report generated on: {date} at {time}</p>")
 
 def write_html_report_end(fout):
     '''

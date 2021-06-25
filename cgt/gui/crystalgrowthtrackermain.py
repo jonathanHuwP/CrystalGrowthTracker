@@ -777,22 +777,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         print out the results
         """
-        scale = self._project["resolution"]
-        fps = self._project["frame_rate"]
-
-        if isinstance(scale, (str)) or isinstance(fps, (str)):
-            print("Error scale or fps still string")
+        if not self._tabWidget.currentWidget() == self._drawingTab:
             return
 
-        print("Results\n=======")
-        for line in self._project["results"].get_lines():
-            if line.number_of_frames > 1:
-                print(line)
-                differences = line.get_differences()
-                for diff in differences:
-                    distance = diff[1].average*scale
-                    time = diff[0]/fps
-                    print(f"\t{distance/time}")
+        self._drawingWidget.save_clone_image("CLONE.jpg")
+        self._drawingWidget.save_entry_image("ENTRY.jpg")
 
     def has_unsaved_data(self):
         """
@@ -918,25 +907,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         else:
             # dispose of the event in the approved way
             event.ignore()
-
-    @qc.pyqtSlot()
-    def calculate_results(self):
-        """
-        calculate and print the velocities
-        """
-        calculator = VelocitiesCalculator(self.get_results())
-        calculator.process_latest_data()
-        average_speeds = calculator.get_average_speeds()
-
-        html_tabel = ["<table style=\"width:100%\">"]
-        for item in average_speeds:
-            id_item = str(item.ID)
-            type_item = item.m_type.name
-            speed_item = str(item.speed)
-            html_tabel.append(f"<tr><th>{id_item}</th><th>{type_item}</th><th>{speed_item}</th></tr>")
-
-        html_tabel.append("</table>")
-        self._reportWidget.set_report('\n'.join(html_tabel))
 
     @staticmethod
     def setup_tab(tab, widget):

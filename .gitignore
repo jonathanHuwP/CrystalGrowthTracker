@@ -12,3 +12,4 @@ Ui_*
 *.bak
 .vscode
 LINT.txt
+*.jpg
