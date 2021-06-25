@@ -702,15 +702,18 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
 
     def save_entry_image(self, file_name):
         """
-        grab the image in the clone view
+        grab the image in the entry view
             Args:
-                file_name (string): name (and path) of imgage file
+                file_name (string): name (and path) of image file
         """
-        # full image
-        image =  qg.QImage(self._cloneView.scene().itemsBoundingRect().size().toSize(),
-                           qg.QImage.Format_ARGB32)
+        size = self._entryView.scene().itemsBoundingRect().size().toSize()
+
+        image =  qg.QImage(size, qg.QImage.Format_ARGB32)
         image.fill(qc.Qt.white)
-        painter = qg.QPainter(image)
-        self._cloneView.render(painter)
+        painter = qg.QPainter(painter=image)
+                             #target=,
+                             #source =)
+        self._entryView.render(painter)
+        # avoid error if pixmap is garbage collected before painter
         del painter
         image.save(file_name)
