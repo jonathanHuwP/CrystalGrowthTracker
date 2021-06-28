@@ -693,27 +693,30 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
 
     def save_clone_image(self, file_name):
         """
-        grab the image in the clone view
+        save what part of the clone view is visible to the user.
             Args:
                 file_name (string): name (and path) of imgage file
         """
         # WYSIWYG
-        return self._cloneView.viewport().grab().save(file_name)
+        self._cloneView.viewport().grab().save(file_name)
 
     def save_entry_image(self, file_name):
         """
-        grab the image in the entry view
+        Save the whole entry view contents.
             Args:
                 file_name (string): name (and path) of image file
         """
-        size = self._entryView.scene().itemsBoundingRect().size().toSize()
+        bound_rect = self._entryView.scene().itemsBoundingRect()
 
-        image =  qg.QImage(size, qg.QImage.Format_ARGB32)
+        image =  qg.QImage(bound_rect.size().toSize(),
+                           qg.QImage.Format_ARGB32)
+
+        top_left = self._entryView.mapFromScene(bound_rect.toAlignedRect().topLeft())
+        bottom_right = self._entryView.mapFromScene(bound_rect.toAlignedRect().bottomRight())
+
         image.fill(qc.Qt.white)
-        painter = qg.QPainter(painter=image)
-                             #target=,
-                             #source =)
-        self._entryView.render(painter)
+        painter = qg.QPainter(image)
+        self._entryView.render(painter, source=qc.QRect(top_left, bottom_right))
         # avoid error if pixmap is garbage collected before painter
         del painter
         image.save(file_name)
