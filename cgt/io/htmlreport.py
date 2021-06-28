@@ -42,25 +42,14 @@ def save_html_report(project):
         report_dir.mkdir()
 
     html_outfile = report_dir.joinpath("report.html")
-
     calculator = VelocitiesCalculator(project["results"])
-    calculator.process_latest_data()
-    average_speeds = calculator.get_average_speeds()
-
-    html_tabel = ["<table border=\"1\" width=\"100%\">",
-                  "<tr><th>ID</th><th>Type</th><th>Speed</th></tr>"]
-    for item in average_speeds:
-        id_item = str(item.ID)
-        type_item = item.m_type.name
-        speed_item = str(item.speed)
-        html_tabel.append(f"<tr><th>{id_item}</th><th>{type_item}</th><th>{speed_item}</th></tr>")
-
-    html_tabel.append("</table>")
+    html_table = make_html_speeds_table(calculator)
 
     try:
         with open(html_outfile, "w") as fout:
             write_html_report_start(fout)
-            fout.write('\n'.join(html_tabel))
+
+            fout.write(html_table)
             write_html_report_end(fout)
     except (IOError, OSError, EOFError) as exception:
         print(exception)
@@ -68,6 +57,27 @@ def save_html_report(project):
         print(f"Read file: {html_outfile}")
 
     return html_outfile
+
+def make_html_speeds_table(calculator):
+    """
+    make a table of results
+    """
+    calculator.process_latest_data()
+    average_speeds = calculator.get_average_speeds()
+
+    html_table = ["<table border=\"1\" width=\"100%\">"]
+    html_table.append("""<caption style=\"caption-side:bottom\"><em>Speeds of the markers.</em></caption>\n""")
+
+    html_table.append("<tr><th>ID</th><th>Type</th><th>Speed</th></tr>")
+    for item in average_speeds:
+        id_item = str(item.ID)
+        type_item = item.m_type.name
+        speed_item = str(item.speed)
+        html_table.append(f"<tr><th>{id_item}</th><th>{type_item}</th><th>{speed_item}</th></tr>")
+
+    html_table.append("</table>")
+
+    return '\n'.join(html_table)
 
 def write_html_report_start1(fout, project):
     '''

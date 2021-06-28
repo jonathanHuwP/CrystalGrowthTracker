@@ -780,8 +780,17 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         if not self._tabWidget.currentWidget() == self._drawingTab:
             return
 
-        self._drawingWidget.save_clone_image("CLONE.jpg")
-        self._drawingWidget.save_entry_image("ENTRY.jpg")
+        clone_image_u = self._drawingWidget.grab_clone_image()
+        clone_image_w = self._drawingWidget.get_clone_image()
+
+        entry_image_u = self._drawingWidget.grab_entry_image()
+        entry_image_w = self._drawingWidget.get_entry_image()
+
+        clone_image_u.save("CLONE_user.jpg")
+        clone_image_w.save("CLONE_whole.jpg")
+
+        entry_image_u.save("ENTRY_user.jpg")
+        entry_image_w.save("ENTRY_whole.jpg")
 
     def has_unsaved_data(self):
         """

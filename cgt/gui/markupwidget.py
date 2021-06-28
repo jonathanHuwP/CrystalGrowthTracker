@@ -691,32 +691,58 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         self._entryView.scene().clear()
         self._results_proxy = None
 
-    def save_clone_image(self, file_name):
+    def grab_clone_image(self):
         """
-        save what part of the clone view is visible to the user.
-            Args:
-                file_name (string): name (and path) of imgage file
+        save what part of the clone view is visible to the user (WYSIWYG).
+            Returns:
+                QPixmap holding the visible part of the view
         """
-        # WYSIWYG
-        self._cloneView.viewport().grab().save(file_name)
+        return self._cloneView.viewport().grab()
 
-    def save_entry_image(self, file_name):
+    def grab_entry_image(self):
+        """
+        save what part of the entry view is visible to the user (WYSIWYG).
+            Returns:
+                QPixmap holding the visible part of the view
+        """
+        return self._entryView.viewport().grab()
+
+    def get_clone_image(self):
+        """
+        Save the whole clone view contents.
+            Returns:
+                QImage holding image of everything within the scene-graph's bounding rectangle
+        """
+        return self.get_scene_image(self._cloneView)
+
+    def get_entry_image(self):
         """
         Save the whole entry view contents.
-            Args:
-                file_name (string): name (and path) of image file
+            Returns:
+                QImage holding image of everything within the scene-graph's bounding rectangle
         """
-        bound_rect = self._entryView.scene().itemsBoundingRect()
+        return self.get_scene_image(self._entryView)
+
+    @staticmethod
+    def get_scene_image(view):
+        """
+        get an image of a whole scene
+            Args:
+                view (QGraphicsView) the view holding the scene
+            Returns:
+                QImage holding image of everything within the scene-graph's bounding rectangle
+        """
+        bound_rect = view.scene().itemsBoundingRect()
 
         image =  qg.QImage(bound_rect.size().toSize(),
                            qg.QImage.Format_ARGB32)
 
-        top_left = self._entryView.mapFromScene(bound_rect.toAlignedRect().topLeft())
-        bottom_right = self._entryView.mapFromScene(bound_rect.toAlignedRect().bottomRight())
+        top_left = view.mapFromScene(bound_rect.toAlignedRect().topLeft())
+        bottom_right = view.mapFromScene(bound_rect.toAlignedRect().bottomRight())
 
         image.fill(qc.Qt.white)
         painter = qg.QPainter(image)
-        self._entryView.render(painter, source=qc.QRect(top_left, bottom_right))
+        view.render(painter, source=qc.QRect(top_left, bottom_right))
         # avoid error if pixmap is garbage collected before painter
         del painter
-        image.save(file_name)
+        return image
