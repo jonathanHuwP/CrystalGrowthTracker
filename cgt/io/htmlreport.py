@@ -47,8 +47,9 @@ def save_html_report(project):
 
     try:
         with open(html_outfile, "w") as fout:
-            write_html_report_start(fout)
-
+            write_html_report_start(fout, project)
+            write_html_overview(fout, project["results"])
+            write_html_regions(fout, project["results"])
             fout.write(html_table)
             write_html_report_end(fout, report_dir)
     except (IOError, OSError, EOFError) as exception:
@@ -79,19 +80,13 @@ def make_html_speeds_table(calculator):
 
     return '\n'.join(html_table)
 
-def write_html_report_start1(fout, project):
+def write_html_report_start(fout, project):
     '''
     Creates the start of a generic html report.
         Args:
             fout (file handler): The file handler allows this function to write out.
             project (CGTProject): The project we are reporting.
-        Returns:
-            fout (file handler): The file handler is passed back so that other parts of
-                                 the report can be written by different functions.
     '''
-
-    print("Hi from write_html_report_start1")
-
     fout.write("<!DOCTYPE html>\n")
 
     fout.write("<html>\n")
@@ -107,60 +102,38 @@ def write_html_report_start1(fout, project):
     fout.write("}\n")
     fout.write("</style>\n")
 
-    title = "<title>Report on {} Produced by the Crystal Growth Tracker ({}) Software</title>\n"
-    title = title.format(project['enhanced_video_path'], project['prog'])
-
-    fout.write(title)
-
+    enhanced_path = project['enhanced_video_path']
+    title = f"Crystal Growth Tracker Report on {enhanced_path}"
+    fout.write(f"<title>{title}</title>\n")
     fout.write("</head>\n")
     fout.write("\n<body>\n")
+    fout.write(f"<h1 align=\"center\">{title}</h1>")
 
-    title2 = ("<h1 align=\"center\">Report on {} Produced by the"
-              " Crystal Growth Tracker ({}) Software</h1>\n")
-    title2 = title2.format(project['enhanced_video'], project['prog'])
-    fout.write(title2)
+    timestamp = datetime.now()
+    date, time = to_date_and_time(timestamp)
+    fout.write(f"<p>Report generated on: {date} at {time}</p>")
 
-    program_info = '<p><i>{}</i>: {}</p>\n'.format(project['prog'], project['description'])
-    fout.write(program_info)
-
-    report_info = (r"<p>This project was started at "+project['start_datetime']+r" on the "
-                   +project['host']+r" host system with the "+project['operating_system']
-                   +" operating system. The video file, "+str(project['enhanced_video_no_path'])
+    report_info = (r"<p>This project was started at "+project['start_datetime']+r" on machine "
+                   +project['host']+r".</p>"
+                   +r"<p>The video file, "+str(project['enhanced_video_no_path'])
                    +r" was analysed and has a frame rate of "+str(project['frame_rate'])
-                   +" and resolution of " +str(project['resolution'])
-                   +" "+str(project['resolution_units'])+" per pixel. A note of caution "
-                   +"is needed here because sometimes the frame rate and resolution "
+                   +" frames per second, and a resolution of " +str(project['resolution'])
+                   +str(project['resolution_units'])+" per pixel. Pixels are assumed to be square.</p>"
+                   + "<p>Caution: sometimes the frame rate and resolution "
                    +"are changed in the video header when the video is being "
-                   +"pre-processed so in this report we always give results in pixels "
-                   +"and frames as well as SI units where possible. This report provides "
-                   +"images and information on experimental X-ray videos created at "
-                   +"Diamond Light Source.</p>\n")
+                   +"pre-processed.</p>\n")
 
     fout.write(report_info)
 
-    return fout
-
 def write_html_overview(fout, results):
-    '''Creates the overview section of the html report.
+    '''
+    Creates the overview section of the html report.
     Args:
         fout (file handler): The file handler allows this function to write out.
         results:              The project results data
-    Returns:
-       fout (file handler): The file handler is passed back so that other parts of
-                            the report can be written by different functions.
     '''
-
     header2_line = ("<h2 align=\"left\">Overview</h2>\n")
     fout.write(header2_line)
-
-    # removed to fix report JPH
-    # line = ("<p>The number of crystals analyzed:  *** </p>\n")
-    # line = line.replace("***", str(len(results.crystals)))
-    # fout.write(line)
-
-    line = ("<p>The number of crystals that formed closed polygons:  *** </p>\n")
-    line = line.replace("***", str("TO BE ADDED!"))
-    fout.write(line)
 
     fout.write("<p align=\"center\"> An image will go here the caption is below</p>")
 
@@ -180,104 +153,35 @@ def write_html_overview(fout, results):
                " against the frame number. The gray boxed areas represent the time limits"
                " of each region containing a crystal.</i></p>")
 
-    return fout
-
-
-
-def write_html_crystals(fout, project, results):
-    '''Creates the section for each crystal in the html report.
-    Args:
-        fout (file handler): The file handler allows this function to write out.
-        project (CGTProject): The project we are reporting.
-        results:              The project results data
-    Returns:
-       fout (file handler): The file handler is passed back so that other parts of
-                            the report can be written by different functions.
-    '''
-    print("Hello from write_html_crystal")
-
-
-    for i, crystal in enumerate(results.crystals):
-        print("i: ", i)
-        print("crystal: ", crystal)
-        header2_line = ("<h2 align=\"left\">Crystal: *** </h2>\n")
-        header2_line = header2_line.replace("***", str(i))
-        fout.write(header2_line)
-
-        fout = write_html_region(fout, results, i)
-
-        line = ("<p><b>Number of recorded faces</b>:  *** </p>\n")
-        line = line.replace("***", str("Should be in table"))
-        fout.write(line)
-
-        line = ("<p><b>Closed Polygon formed</b>:  *** </p>\n")
-        line = line.replace("***", str("TO BE ADDED!"))
-        fout.write(line)
-
-        line = ("<p><b>Number of times measured</b>:  *** </p>\n")
-        line = line.replace("***", str(crystal.number_of_frames_held))
-        fout.write(line)
-
-        line = ("<p><b>Frame Rate</b>:  *** </p>\n")
-        line = line.replace("***", str(project['frame_rate']))
-        fout.write(line)
-
-       # write_frame_table(fout, results, crystal)
-        #write_table(fout, results, crystal)
-
-
-
-    return fout
-
-
-
+def write_html_regions(fout, results):
+    """
+    write out the results for the regions to file
+        Args:
+            fout (TextIOWrapper): output file stream
+            results (VideoAnalysisResultsStore): The project results data
+    """
+    fout.write("<h2 align=\"left\">Motion Results</h2>\n")
+    fout.write("<p>Results for each region are summerised below.</p>")
+    for index in range(len(results.get_regions())):
+        write_html_region(fout, results, index)
 
 def write_html_region(fout, results, i):
-    '''Creates the section for each region in the html report.
-
-    Args:
-        fout (file handler): The file handler allows this function to write out.
-        results:              The project results data
-        i (int):             The index for the crystal that is being reported.
-
-
-    Returns:
-       fout (file handler): The file handler is passed back so that other parts of
-                            the report can be written by different functions.
     '''
+    Creates the section for each region in the html report.
+        Args:
+            fout (TextIOWrapper): output file stream
+            results (VideoAnalysisResultsStore): The project results data
+            i (int): The index for the crystal that is being reported.
+    '''
+    fout.write(f"<h3 align=\"left\">Region {i}:</h3>\n")
+    region = results.get_regions()[i]
+    rect = region.rect()
+    position = region.pos()
+    top_left = f"({rect.topLeft().x():.1f}, {rect.topLeft().y():.1f})"
+    bottom_right = f"({rect.bottomRight().x():.1f}, {rect.bottomRight().x():.1f})"
+    pos = f"({position.x()}, { position.y()})"
 
-    region, r_index = results.get_region(i)
-    #print(results.get_region(i))
-    header3_line = ("<h3 align=\"left\">Region ***:</h3>\n")
-    header3_line = header3_line.replace("***", str(r_index))
-    fout.write(header3_line)
-
-    line = ("<p>Top:  *** </p>\n")
-    line = line.replace("***", str(region.top))
-    fout.write(line)
-
-    line = ("<p>Left:  *** </p>\n")
-    line = line.replace("***", str(region.left))
-    fout.write(line)
-
-    line = ("<p>Bottom:  *** </p>\n")
-    line = line.replace("***", str(region.bottom))
-    fout.write(line)
-
-    line = ("<p>Right:  *** </p>\n")
-    line = line.replace("***", str(region.right))
-    fout.write(line)
-
-    line = ("<p>Start Frame:  *** </p>\n")
-    line = line.replace("***", str(region.start_frame))
-    fout.write(line)
-
-    line = ("<p>End Frame:  *** </p>\n")
-    line = line.replace("***", str(region.end_frame))
-    fout.write(line)
-
-    return fout
-
+    fout.write(f"<p>Rectangle: top left {top_left} bottom right {bottom_right}; Position {pos}</p>")
 
 def write_frame_table(fout, results, crystal):
     '''Creates a table for each time the faces are recorded for a region/crytal.
@@ -361,21 +265,6 @@ def write_table(fout, results, crystal):
 
     return fout
 
-def write_html_report_start(fout):
-    '''
-    start a html report.
-        Args:
-            fout (file): the output file
-    '''
-    fout.write("<body>\n")
-    fout.write("<html>\n")
-    timestamp = datetime.now()
-    month = timestamp.strftime("%B") # language given by local
-    date = f"{timestamp.date().day}-{month}-{timestamp.date().year}"
-    time = f"{timestamp.time().hour}:{timestamp.time().minute}:{timestamp.time().second}"
-
-    fout.write(f"<p>Report generated on: {date} at {time}</p>")
-
 def write_html_report_end(fout, report_dir):
     '''
     Ends and closes a html report.
@@ -385,7 +274,7 @@ def write_html_report_end(fout, report_dir):
     '''
     report_dir = report_dir.joinpath("images/CLONE_whole.jpg")
 
-    fout.write(f"<img src=\"{str(report_dir)}\" alt=\"Missing Image\">")
+    fout.write(f"<img src=\"{report_dir}\" alt=\"Missing Image\">")
 
     fout.write("""<p>Crystal Growht Tracker was developed by
     JH Pickering & J Leng at the University of Leeds, Leeds UK,
@@ -398,3 +287,17 @@ def write_html_report_end(fout, report_dir):
     fout.write("</font>")
     fout.write("</body>\n")
     fout.write("</html>\n")
+
+def to_date_and_time(timestamp):
+    """
+    convert a timestamp to date and time fields to
+        Args:
+            timestame (datetime.datetime) the initial timestamp of
+        Returns
+            date (string) date in day month year format.
+            time (string) time is hour minutes seconds format
+    """
+    month = timestamp.strftime("%B") # language given by local
+    date = f"{timestamp.date().day}-{month}-{timestamp.date().year}"
+    time = f"{timestamp.time().hour}:{timestamp.time().minute}:{timestamp.time().second}"
+    return date, time
