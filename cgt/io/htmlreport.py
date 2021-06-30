@@ -53,7 +53,7 @@ def save_html_report(project):
 
     return html_outfile
 
-def make_html_speeds_table(calculator):
+def make_html_speeds_table(calculator, units):
     """
     make a table of results
     """
@@ -63,7 +63,7 @@ def make_html_speeds_table(calculator):
     html_table = ["<table border=\"1\" width=\"100%\">"]
     html_table.append("""<caption style=\"caption-side:bottom\"><em>Speeds of the markers.</em></caption>\n""")
 
-    html_table.append("<tr><th>ID</th><th>Type</th><th>Speed</th></tr>")
+    html_table.append(f"<tr><th>ID</th><th>Type</th><th>Speed ({units} s<sup>-1</sup>)</th></tr>")
     for item in average_speeds:
         html_table.append(f"<tr><th>{item.ID}</th><th>{item.m_type.name}</th><th>{item.speed:.2f}</th></tr>")
 
@@ -93,7 +93,7 @@ def write_html_report_start(fout, project):
     fout.write("}\n")
     fout.write("</style>\n")
 
-    enhanced_path = project['enhanced_video_path']
+    enhanced_path = project['enhanced_video_no_path']
     title = f"Crystal Growth Tracker Report on {enhanced_path}"
     fout.write(f"<title>{title}</title>\n")
     fout.write("</head>\n")
@@ -155,9 +155,14 @@ def write_html_regions(fout, project):
     fout.write("<h2 align=\"left\">Motion Results</h2>\n")
     fout.write("<p>Results for each region are summerised below.</p>")
     for index in range(len(results.get_regions())):
-        write_html_region(fout, results, index, project["frame_rate"], project["resolution"])
+        write_html_region(fout,
+                          results,
+                          index,
+                          project["frame_rate"],
+                          project["resolution"],
+                          project["resolution_units"])
 
-def write_html_region(fout, results, index, fps, scale):
+def write_html_region(fout, results, index, fps, scale, units):
     '''
     Creates the section for each region in the html report.
         Args:
@@ -193,89 +198,7 @@ def write_html_region(fout, results, index, fps, scale):
     calculator = VelocitiesCalculator(lines, points, fps, scale)
     counts = calculator.number_markers()
     if counts[0] > 0 or counts[1] > 0:
-        fout.write(make_html_speeds_table(calculator))
-
-def write_frame_table(fout, results, crystal):
-    '''Creates a table for each time the faces are recorded for a region/crytal.
-    Args:
-        fout (file handler): The file handler allows this function to write out.
-        results:              The project results data
-        crystal (cgt.model.crystal.Crystal): The crystal data structure.
-
-    Returns:
-       fout (file handler): The file handler is passed back so that other parts of
-                            the report can be written by different functions.
-    '''
-
-    fout.write("<table>\n")
-    fout.write("<caption style=\"caption-side:bottom\"><em>The frame numbers, "
-               "number of faces recorded and elapsed times of the frames in "
-               "which measurements were made</em></caption>\n")
-    fout.write("   <tr>\n")
-    fout.write("     <th>Frame Number</th>\n")
-    fout.write("     <th>Number of Recorded Faces</th>\n")
-    fout.write("     <th>Elapsed Time (s)</th>\n")
-    fout.write("     <th>Time Difference Previous (s)</th>\n")
-    fout.write("   </tr>\n")
-
-    last_frame_number = 0
-    for frame in crystal.list_of_frame_numbers:
-        print("last_frame_number: ", last_frame_number)
-        faces = crystal.faces_in_frame(frame)
-        print("faces:", len(faces))
-#         video = results.video
-#         print("video: ", video)
-        elapsed_time = frame / results.video.frame_rate
-        print("elapsed_time: ", elapsed_time)
-        time_difference = (frame - last_frame_number) / results.video.frame_rate
-        print("time_difference: ", time_difference)
-        last_frame_number = frame
-        fout.write('   <tr> <td> %d </td> <td> %d </td> <td> %.2f </td> <td> %.2f </td> </tr>\n'
-                   %(50, len(faces), elapsed_time, time_difference))
-                   #%(frame, len(faces), elapsed_time, time_difference))
-#                   '</td> </tr> \n' %(frame, faces, elapsed_time, time_difference))
-
-    fout.write("</table>\n")
-    fout.write("<p></p>\n")
-
-    return fout
-
-
-
-def write_table(fout, results, crystal):
-    '''Creates a table for demonstration purposes.
-    Args:
-        fout (file handler): The file handler allows this function to write out.
-        results:              The project results data
-        crystal (cgt.model.crystal.Crystal): The crystal data structure.
-
-    Returns:
-       fout (file handler): The file handler is passed back so that other parts of
-                            the report can be written by different functions.
-    '''
-
-    fout.write("<table>\n")
-    fout.write("<caption style=\"caption-side:bottom\"><em>The Table "
-               "demonstrates it is possible to table data, perhaps of a moving "
-               "face</em></caption>\n")
-    fout.write("   <tr>\n")
-    fout.write("     <th>Frame Number</th>\n")
-    fout.write("     <th>Number of Recorded Faces</th>\n")
-    fout.write("     <th>Elapsed Time (s)</th>\n")
-    fout.write("     <th>Time Difference Previous (s)</th>\n")
-    fout.write("   </tr>\n")
-
-    last_frame_number = 0
-    data = [[250, 3, 31.2567, 0.00000], [[320, 4, 40.267398, 4.621]]]
-    for frame in data:
-        fout.write('   <tr> <td> %d </td> <td> %d </td> <td> %.2f </td> <td> %.2f </td> </tr>\n'
-                   %(frame[0], frame[1], frame[2], frame[3]))
-
-
-    fout.write("</table>\n")
-    fout.write("<p></p>\n")
-
-    return fout
+        fout.write(make_html_speeds_table(calculator, units))
 
 def write_html_report_end(fout, report_dir):
     '''
