@@ -50,7 +50,7 @@ def save_html_report(project):
             write_html_report_start(fout)
 
             fout.write(html_table)
-            write_html_report_end(fout)
+            write_html_report_end(fout, report_dir)
     except (IOError, OSError, EOFError) as exception:
         print(exception)
     finally:
@@ -376,14 +376,25 @@ def write_html_report_start(fout):
 
     fout.write(f"<p>Report generated on: {date} at {time}</p>")
 
-def write_html_report_end(fout):
+def write_html_report_end(fout, report_dir):
     '''
     Ends and closes a html report.
         Args:
             fout (file): the output file
+            report_dir (pathlib.Path) directory holding the report
     '''
-    fout.write("""<p>Crystal Growht Tracker was developed by JH Pickering & J Leng at the University of Leeds, Leeds UK, funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1). The software is freely available from <a href=\"https://github.com/jonathanHuwP/CrystalGrowthTracker\">GitHub</a>, under the <a href=\"http://www.apache.org/licenses/LICENSE-2.0\">Apache License, Version 2.0</a></p>
-<p>Source code and this report format are copyright University of Leeds, 2020.</p>""")
+    report_dir = report_dir.joinpath("images/CLONE_whole.jpg")
+
+    fout.write(f"<img src=\"{str(report_dir)}\" alt=\"Missing Image\">")
+
+    fout.write("""<p>Crystal Growht Tracker was developed by
+    JH Pickering & J Leng at the University of Leeds, Leeds UK,
+    funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1).
+    The software is freely available from
+    <a href=\"https://github.com/jonathanHuwP/CrystalGrowthTracker\">GitHub</a>,
+    under the <a href=\"http://www.apache.org/licenses/LICENSE-2.0\">Apache License, Version 2.0</a></p>
+    <p>Source code and this report format are copyright University of Leeds, 2020.</p>""")
+
     fout.write("</font>")
     fout.write("</body>\n")
     fout.write("</html>\n")

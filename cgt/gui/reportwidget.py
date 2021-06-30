@@ -22,7 +22,6 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
 import PyQt5.QtGui as qg
-import PyQt5.QtWebEngineWidgets as qe
 import PyQt5.QtPrintSupport as qp
 
 # import UI
@@ -48,20 +47,6 @@ class ReportWidget(qw.QWidget, Ui_ReportWidget):
         ## the document to display
         self._document = qg.QTextDocument()
 
-        ## the display device
-        view = qe.QWebEngineView()
-        self._scrollArea.setWidget(view)
-        self._scrollArea.setWidgetResizable(True)
-        defaults = qe.QWebEngineSettings.globalSettings()
-        defaults.setFontSize(qe.QWebEngineSettings.MinimumFontSize, 24)
-
-        font_database = qg.QFontDatabase()
-        standard_font=font_database.font("Arial", "", 24)
-        defaults.setFontFamily(qe.QWebEngineSettings.StandardFont,
-                               standard_font.family());
-
-        #self.set_bbc()
-
     def load_html(self, path):
         """
         display a html report
@@ -73,8 +58,7 @@ class ReportWidget(qw.QWidget, Ui_ReportWidget):
         with path.open('r') as in_file:
             self._document.setHtml(in_file.read())
 
-        self._scrollArea.widget().setHtml(self._document.toHtml(),
-                                          qc.QUrl(str(path.parent)))
+        self._textBrowser.setHtml(self._document.toHtml())
 
     def has_content(self):
         """
@@ -83,12 +67,6 @@ class ReportWidget(qw.QWidget, Ui_ReportWidget):
                 True if the document has content, else False
         """
         return not self._document.isEmpty()
-
-    def set_bbc(self):
-        """
-        for test use bbc news website
-        """
-        self._scrollArea.widget().setUrl(qc.QUrl("https://www.bbc.co.uk/news"))
 
     def save_doc_pdf(self, file_path):
         """
