@@ -553,7 +553,13 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         make a html report
         """
-        report_file = htmlreport.save_html_report(self._project)
+        try:
+            report_file = htmlreport.save_html_report(self._project)
+        except (IOError, OSError, EOFError) as exception:
+            qw.QMessageBox.error(self,
+                                 self.tr("Auto Save Report"),
+                                 str(exception))
+            return
         self._reportWidget.load_html(report_file)
 
     @qc.pyqtSlot()

@@ -42,14 +42,12 @@ def save_html_report(project):
         report_dir.mkdir()
 
     html_outfile = report_dir.joinpath("report.html")
-    try:
-        with open(html_outfile, "w") as fout:
-            write_html_report_start(fout, project)
-            write_html_overview(fout, project["results"])
-            write_html_regions(fout, project)
-            write_html_report_end(fout, report_dir)
-    except (IOError, OSError, EOFError) as exception:
-        print(exception)
+
+    with open(html_outfile, "w") as fout:
+        write_html_report_start(fout, project)
+        write_html_overview(fout, project["results"])
+        write_html_regions(fout, project)
+        write_html_report_end(fout, report_dir)
 
     return html_outfile
 
