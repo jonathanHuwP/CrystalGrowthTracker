@@ -140,9 +140,6 @@ def write_html_report_start1(fout, project):
 
     return fout
 
-
-
-
 def write_html_overview(fout, results):
     '''Creates the overview section of the html report.
     Args:
@@ -385,6 +382,8 @@ def write_html_report_end(fout):
         Args:
             fout (file): the output file
     '''
+    fout.write("""<p>Crystal Growht Tracker was developed by JH Pickering & J Leng at the University of Leeds, Leeds UK, funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1). The software is freely available from <a href=\"https://github.com/jonathanHuwP/CrystalGrowthTracker\">GitHub</a>, under the <a href=\"http://www.apache.org/licenses/LICENSE-2.0\">Apache License, Version 2.0</a></p>
+<p>Source code and this report format are copyright University of Leeds, 2020.</p>""")
     fout.write("</font>")
     fout.write("</body>\n")
     fout.write("</html>\n")
