@@ -52,7 +52,6 @@ from cgt.io.videosource import VideoSource
 from cgt.io.videoanalyser import VideoAnalyser
 
 from cgt.model.cgtproject import CGTProject
-from cgt.model.velocitiescalculator import VelocitiesCalculator
 from cgt.model.videoanalysisresultsstore import VideoAnalysisResultsStore
 
 # import UI
@@ -433,24 +432,19 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                                    "Please save the data before printing a report!")
             return
 
-        if self._project["proj_full_path"] is not None:
-            time_stamp = utils.timestamp()
-            try:
-                self._project["latest_report"] = htmlreport.save_html_report1(self._project, time_stamp)
-            except OSError as err:
-                message = "Problem creating report directory and file: {}".format(err)
-                qw.QMessageBox.warning(self,
-                                       "Report Error",
-                                       message)
+        file_types = "PDF (*.pdf)"
+        file_path, _ = qw.QFileDialog.getSaveFileName(self,
+                                                     "Enter/select file for save",
+                                                     os.path.expanduser('~'),
+                                                     file_types)
+        if file_path is None or file_path == '':
+            return
 
-            # read back in to the reports tab
-            try:
-                self._reportWidget.read_report(self._project["latest_report"])
-            except OSError as err:
-                message = "Could not open report file for reading: {}".format(err)
-                qw.QMessageBox.warning(self,
-                                       "Report Error",
-                                       message)
+        self._reportWidget.save_doc_pdf(file_path)
+
+        qw.QMessageBox.info(self,
+                            self.tr("Save Report"),
+                            self.tr(f"Report saved to {file_path}"))
 
     def start_project(self,
                       enhanced_video,
