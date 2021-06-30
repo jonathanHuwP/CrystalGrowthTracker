@@ -42,20 +42,14 @@ def save_html_report(project):
         report_dir.mkdir()
 
     html_outfile = report_dir.joinpath("report.html")
-    calculator = VelocitiesCalculator(project["results"])
-    html_table = make_html_speeds_table(calculator)
-
     try:
         with open(html_outfile, "w") as fout:
             write_html_report_start(fout, project)
             write_html_overview(fout, project["results"])
-            write_html_regions(fout, project["results"])
-            fout.write(html_table)
+            write_html_regions(fout, project)
             write_html_report_end(fout, report_dir)
     except (IOError, OSError, EOFError) as exception:
         print(exception)
-    finally:
-        print(f"Read file: {html_outfile}")
 
     return html_outfile
 
@@ -71,10 +65,7 @@ def make_html_speeds_table(calculator):
 
     html_table.append("<tr><th>ID</th><th>Type</th><th>Speed</th></tr>")
     for item in average_speeds:
-        id_item = str(item.ID)
-        type_item = item.m_type.name
-        speed_item = str(item.speed)
-        html_table.append(f"<tr><th>{id_item}</th><th>{type_item}</th><th>{speed_item}</th></tr>")
+        html_table.append(f"<tr><th>{item.ID}</th><th>{item.m_type.name}</th><th>{item.speed:.2f}</th></tr>")
 
     html_table.append("</table>")
 
@@ -153,28 +144,32 @@ def write_html_overview(fout, results):
                " against the frame number. The gray boxed areas represent the time limits"
                " of each region containing a crystal.</i></p>")
 
-def write_html_regions(fout, results):
+def write_html_regions(fout, project):
     """
     write out the results for the regions to file
         Args:
             fout (TextIOWrapper): output file stream
-            results (VideoAnalysisResultsStore): The project results data
+            project (CGTProject): The project data
     """
+    results = project["results"]
     fout.write("<h2 align=\"left\">Motion Results</h2>\n")
     fout.write("<p>Results for each region are summerised below.</p>")
     for index in range(len(results.get_regions())):
-        write_html_region(fout, results, index)
+        write_html_region(fout, results, index, project["frame_rate"], project["resolution"])
 
-def write_html_region(fout, results, i):
+def write_html_region(fout, results, index, fps, scale):
     '''
     Creates the section for each region in the html report.
         Args:
             fout (TextIOWrapper): output file stream
             results (VideoAnalysisResultsStore): The project results data
-            i (int): The index for the crystal that is being reported.
+            index (int): The index for the crystal that is being reported.
+            fps (np.float64): the number of frames per second
+            scale (np.float64): the size of a pixel
     '''
-    fout.write(f"<h3 align=\"left\">Region {i}:</h3>\n")
-    region = results.get_regions()[i]
+    from cgt.util.utils import (get_region)
+    fout.write(f"<h3 align=\"left\">Region {index}:</h3>\n")
+    region = results.get_regions()[index]
     rect = region.rect()
     position = region.pos()
     top_left = f"({rect.topLeft().x():.1f}, {rect.topLeft().y():.1f})"
@@ -182,6 +177,23 @@ def write_html_region(fout, results, i):
     pos = f"({position.x()}, { position.y()})"
 
     fout.write(f"<p>Rectangle: top left {top_left} bottom right {bottom_right}; Position {pos}</p>")
+
+    lines = []
+    for marker in results.get_lines():
+        if get_region(marker[0]) == index:
+            print(f"Region {index} line {marker[0]}")
+            lines.append(marker)
+
+    points = []
+    for marker in results.get_points():
+        if get_region(marker[0]) == index:
+            print(f"Region {index} point {marker[0]}")
+            points.append(marker)
+
+    calculator = VelocitiesCalculator(lines, points, fps, scale)
+    counts = calculator.number_markers()
+    if counts[0] > 0 or counts[1] > 0:
+        fout.write(make_html_speeds_table(calculator))
 
 def write_frame_table(fout, results, crystal):
     '''Creates a table for each time the faces are recorded for a region/crytal.

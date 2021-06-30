@@ -30,12 +30,13 @@ from cgt.util.utils import (MarkerTypes,
 class ScreenDisplacement():
     """data type for a single marker displacement"""
 
-    def __init__(self, start_frame, end_frame, length):
+    def __init__(self, start_frame, end_frame, fps, length):
         """
         initalize the object
             Args:
                 start_frame (int) frame number of the first frame
                 end_frame (int) frame number of the end frame
+                fps (float) the number of frames per second
                 length (int/float) the length in pixels
         """
         ## first frame of the interval
@@ -46,6 +47,9 @@ class ScreenDisplacement():
 
         ## the length of the displacement
         self._length = length
+
+        ## the number of frames per second
+        self._fps = fps
 
         if start_frame < end_frame:
             self._start_frame = start_frame
@@ -72,7 +76,8 @@ class ScreenDisplacement():
             Returns
                 (float) the speed
         """
-        raw_speed = (float(self._length))/(float(self._end_frame)-float(self._start_frame))
+        time_interval = (float(self._end_frame)-float(self._start_frame))/self._fps
+        raw_speed = (float(self._length))/time_interval
         return abs(raw_speed)
 
 ## data type for the speed of a marker
@@ -83,15 +88,21 @@ class VelocitiesCalculator():
     calculate the velocities of the marker objects
     """
 
-    def __init__(self, data_source):
+    def __init__(self, lines, points, fps, scale):
         """
             initialize object
                 Args:
-                    data_source the supplier of raw data
+                    lines ([]): array of line markers
+                    points ([]): array of point markers
+                    fps (float): the number of frames per second
+                    scale (float): the size of a pixel
         """
 
         ## the store of markers
-        self._data_source = data_source
+        self._lines = lines
+        self._points = points
+        self._frames_per_second = fps
+        self._scale = scale
 
         ## the velocities of the lines
         self._line_displacements = None
@@ -117,8 +128,8 @@ class VelocitiesCalculator():
             Returns:
                 tuple (number lines, number points)
         """
-        return (len(self._data_source.get_lines()),
-                len(self._data_source.get_points()))
+        return (len(self._lines),
+                len(self._points))
 
     def process_latest_data(self):
         """
@@ -132,7 +143,7 @@ class VelocitiesCalculator():
         get and convert the marker lines to displacements
         """
         self._line_displacements = []
-        for marker in self._data_source.get_lines():
+        for marker in self._lines:
             previous = marker[0]
             marker_displacements = []
 
@@ -140,13 +151,13 @@ class VelocitiesCalculator():
                 current = marker[i]
 
                 if not (current.line().dx() == 0.0 and current.line().dy() == 0.0):
-                    previous_dist = perpendicular_dist_to_position(previous)
-                    current_dist = perpendicular_dist_to_position(current)
+                    previous_dist = perpendicular_dist_to_position(previous, self._scale)
+                    current_dist = perpendicular_dist_to_position(current, self._scale)
                     distance = current_dist - previous_dist
 
                     start = get_frame(previous)
                     end = get_frame(current)
-                    displacement = ScreenDisplacement(start, end, distance)
+                    displacement = ScreenDisplacement(start, end, distance, self._frames_per_second)
                     marker_displacements.append(displacement)
 
                     previous = current
@@ -160,7 +171,7 @@ class VelocitiesCalculator():
         """
         self._point_displacements = []
 
-        for marker in self._data_source.get_points():
+        for marker in self._points:
             previous = marker[0]
             marker_displacements = []
 
@@ -170,11 +181,14 @@ class VelocitiesCalculator():
                 end = get_point_of_point(current) + current.pos()
                 seperation =  start - end
 
-                length = sqrt(seperation.x()*seperation.x() + seperation.y()*seperation.y())
+                del_x = seperation.x()*self._scale
+                del_y = seperation.y()*self._scale
+
+                length = sqrt(del_x*del_x + del_y*del_y)
                 start = get_frame(previous)
                 end = get_frame(current)
 
-                displacement = ScreenDisplacement(start, end, length)
+                displacement = ScreenDisplacement(start, end, length, self._frames_per_second)
                 marker_displacements.append(displacement)
 
                 previous = current

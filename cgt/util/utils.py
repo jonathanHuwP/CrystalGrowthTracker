@@ -535,12 +535,19 @@ def make_arrow(line, clone):
 
     return arrow, extension
 
-def perpendicular_dist_to_position(gline):
+def perpendicular_dist_to_position(gline, scale):
     """
     find the distance to the position of a QGraphicsLine
+        Args:
+            gline (QGraphicsLine): the line
+            scale (float): the pixel scale
     """
+    from math import sqrt
     unit_normal = gline.line().normalVector().unitVector()
-    return gline.pos().x()*unit_normal.dx() + gline.pos().y()*unit_normal.dy()
+    del_x = gline.pos().x()*unit_normal.dx()*scale
+    del_y = gline.pos().y()*unit_normal.dy()*scale
+
+    return sqrt(del_x*del_x + del_y*del_y)
 
 def rect_to_tuple(rect):
     """
