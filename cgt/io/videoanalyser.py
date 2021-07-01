@@ -25,7 +25,7 @@ import PyQt5.QtCore as qc
 import numpy as np
 import cv2 as cv
 
-from cgt.model.videostats import FrameStats, VideoIntensityStats
+from cgt.util.framestats import FrameStats, VideoIntensityStats
 
 class VideoAnalyser(qc.QObject):
     """

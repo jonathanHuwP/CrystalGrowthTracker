@@ -380,6 +380,28 @@ def hash_qpointf(point):
     coords = (point.x(), point.y())
     return hash(coords)
 
+def hash_framestats(stats):
+    """
+    get a hash code for the statistics of one frame of video
+        Return:
+            (int) hash code
+    """
+    items = []
+    items.append(hash(stats.mean))
+    items.append(hash(stats.std_deviation))
+    for count in stats.bin_counts:
+        items.append(hash(count))
+
+    return hash(items)
+
+def hash_videointensitystats(stats):
+    """
+    get hashcode for a complet set of video stats
+        Return:
+            (int) hash code
+    """
+    pass
+
 def get_marker_type(item):
     """
     get the type enum of the item

@@ -133,14 +133,14 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         stats = self._data_source.get_video_stats()
 
         # use only lower limits of bins
-        plot_bins = stats.bins[:len(stats.bins)-1]
+        plot_bins = stats.get_bins()[:len(stats.get_bins())-1]
 
         # visible width 7/8 of full bin width
-        width = stats.bins[1] - stats.bins[0]
+        width = stats.get_bins()[1] - stats.get_bins()[0]
         width -= width/8.0
 
         self._histogram.addItem(pg.BarGraphItem(x=plot_bins,
-                                                height=stats.frames[self._current_frame].bin_counts,
+                                                height=stats.get_frames()[self._current_frame].bin_counts,
                                                 width=width,
                                                 brush='g'))
 
@@ -158,8 +158,8 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
 
         levels = np.linspace(0.2, 1, 5)
         stats = self._data_source.get_video_stats()
-        means = [x.mean for x in stats.frames]
-        std_dev = [x.std_deviation for x in stats.frames]
+        means = [x.mean for x in stats.get_frames()]
+        std_dev = [x.std_deviation for x in stats.get_frames()]
 
         means_plus = []
         means_minus = []
@@ -176,7 +176,7 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         self._graph.getAxis('bottom').setTickFont(tick_font)
         self._graph.setYRange(0, 260)
 
-        x_axis = range(1, len(stats.frames)+1)
+        x_axis = range(1, len(stats.get_frames())+1)
         self._graph.addLegend()
         m_plot = self._graph.plot(x_axis, means, pen='b', name="Mean")
         up_plot = self._graph.plot(x_axis, means_plus, pen='r', name="Std Dev up")
@@ -186,7 +186,7 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         self._graph.addItem(pg.FillBetweenItem(m_plot, down_plot, levels[3]))
 
         self._frame_line = pg.InfiniteLine(angle=90, movable=False)
-        self._frame_line.setBounds([0, len(stats.frames)])
+        self._frame_line.setBounds([0, len(stats.get_frames())])
         self._graph.addItem(self._frame_line)
 
     def display_extra(self):

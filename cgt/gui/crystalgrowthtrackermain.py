@@ -759,7 +759,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 self._videoStatsWidget.set_video_source(self._enhanced_video_reader)
 
             stats = self.get_results().get_video_statistics()
-            if stats is not None and len(stats.frames) > 0:
+            if stats is not None and len(stats.get_frames()) > 0:
                 self._videoStatsWidget.display_stats()
 
         except (FileNotFoundError, IOError) as ex:
