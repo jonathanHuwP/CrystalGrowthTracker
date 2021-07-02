@@ -723,6 +723,15 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         """
         return self.get_scene_image(self._entryView)
 
+    def update_data_display(self):
+        """
+        data changed reload regions
+        """
+        # TODO
+        # update regions combo
+        # update displayed region
+        pass
+
     @staticmethod
     def get_scene_image(view):
         """

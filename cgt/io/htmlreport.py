@@ -210,10 +210,6 @@ def write_html_report_end(fout, report_dir):
             fout (file): the output file
             report_dir (pathlib.Path) directory holding the report
     '''
-    report_dir = report_dir.joinpath("images/CLONE_whole.jpg")
-
-    fout.write(f"<img src=\"{report_dir}\" alt=\"Missing Image\">")
-
     fout.write("""<p>Crystal Growht Tracker was developed by
     JH Pickering & J Leng at the University of Leeds, Leeds UK,
     funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1).

@@ -47,7 +47,8 @@ def pylint_file(file_name):
     """
     result = subprocess.run(['pylint', '-f', 'json', file_name],
                             stdout=subprocess.PIPE,
-                            check=True)
+                            check=False)
+
     output = str(result.stdout.decode('utf-8'))#.splitlines()
     return json.loads(output)
 

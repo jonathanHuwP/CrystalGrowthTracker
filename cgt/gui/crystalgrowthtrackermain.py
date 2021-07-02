@@ -553,7 +553,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         notify all widgets of a change in the data
         """
-        print("Data changed")
+        self._drawingWidget.update_data_display()
 
     def uptodate_report_exists(self):
         """

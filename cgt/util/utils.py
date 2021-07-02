@@ -28,6 +28,7 @@ import pathlib
 
 from sys import platform as _platform
 import array as arr
+from math import sqrt
 import math
 
 import PyQt5.QtGui as qg
@@ -405,8 +406,8 @@ def hash_videointensitystats(stats):
     for stat in stats.get_frames():
         items.append(hash_framestats(stat))
 
-    for bin in stats.get_bins():
-        items.append(hash(bin))
+    for s_bin in stats.get_bins():
+        items.append(hash(s_bin))
 
     return hash(tuple(items))
 
@@ -606,7 +607,6 @@ def perpendicular_dist_to_position(gline, scale):
             gline (QGraphicsLine): the line
             scale (float): the pixel scale
     """
-    from math import sqrt
     unit_normal = gline.line().normalVector().unitVector()
     del_x = gline.pos().x()*unit_normal.dx()*scale
     del_y = gline.pos().y()*unit_normal.dy()*scale
