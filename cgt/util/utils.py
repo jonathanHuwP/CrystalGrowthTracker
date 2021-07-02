@@ -24,6 +24,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 import enum
 import socket
 import datetime
+import pathlib
 
 from sys import platform as _platform
 import array as arr
@@ -387,12 +388,12 @@ def hash_framestats(stats):
             (int) hash code
     """
     items = []
-    items.append(hash(stats.mean))
-    items.append(hash(stats.std_deviation))
+    items.append(stats.mean)
+    items.append(stats.std_deviation)
     for count in stats.bin_counts:
-        items.append(hash(count))
+        items.append(count)
 
-    return hash(items)
+    return hash(tuple(items))
 
 def hash_videointensitystats(stats):
     """
@@ -400,7 +401,48 @@ def hash_videointensitystats(stats):
         Return:
             (int) hash code
     """
-    pass
+    items = []
+    for stat in stats.get_frames():
+        items.append(hash_framestats(stat))
+
+    for bin in stats.get_bins():
+        items.append(hash(bin))
+
+    return hash(tuple(items))
+
+def hash_graphics_region(region):
+    """
+    get hash code for a QGraphicsRectItem
+        Args:
+            region (QGraphicsRectItem): the region
+        Returns:
+            (int) hash code
+    """
+    rect = region.rect()
+    tmp = (hash_qpointf(rect.topLeft()), hash_qpointf(rect.bottomRight()))
+    return hash(tmp)
+
+def hash_results(results):
+    """
+    find hash of results store
+        Return:
+            (int) hash code
+    """
+    items = []
+    items.append(hash_videointensitystats(results.get_video_statistics()))
+
+    for marker in results.get_lines():
+        for line in marker:
+            items.append(hash_graphics_line(line))
+
+    for marker in results.get_points():
+        for point in marker:
+            items.append(hash_graphics_point(point))
+
+    for region in results.get_regions():
+        items.append(hash_graphics_region(region))
+
+    return hash(tuple(items))
 
 def get_marker_type(item):
     """
@@ -688,3 +730,19 @@ def list_to_g_line(line, pen):
     item.setZValue(1.0)
 
     return item
+
+def make_report_file_names(proj_full_path):
+    """
+    make the directory and file names for a report
+        Args:
+            proj_full_path (string): the path of the results directory
+        Returns:
+            report_dir (pathlib.Path)
+            html_outfile (pathlib.Path)
+            hash_file (pathlib.Path)
+    """
+    report_dir = pathlib.Path(proj_full_path).joinpath("report")
+    html_outfile = report_dir.joinpath("report.html")
+    hash_file = report_dir.joinpath("results_hash.json")
+
+    return (report_dir, html_outfile, hash_file)

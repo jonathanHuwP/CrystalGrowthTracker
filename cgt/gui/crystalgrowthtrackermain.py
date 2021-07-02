@@ -27,6 +27,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = invalid-name
 
 import os
+import json
 from shutil import copy2
 
 import PyQt5.QtWidgets as qw
@@ -165,6 +166,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._selectWidget.setEnabled(False)
         self._videoStatsWidget.setEnabled(False)
         self._drawingWidget.setEnabled(False)
+        self._reportWidget.setEnabled(False)
 
         if tab_index == self._tabWidget.indexOf(self._propertiesTab):
             self._propertiesTab.setEnabled(True)
@@ -173,8 +175,12 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         elif tab_index == self._tabWidget.indexOf(self._videoStatsTab):
             if self._project["results"].get_video_statistics() is not None:
                 self._videoStatsWidget.setEnabled(True)
-        elif  tab_index == self._tabWidget.indexOf(self._drawingTab):
+        elif tab_index == self._tabWidget.indexOf(self._drawingTab):
             self._drawingWidget.setEnabled(True)
+        elif tab_index == self._tabWidget.indexOf(self._reportTab):
+            if not self.uptodate_report_exists():
+                self.make_report()
+            self._reportWidget.setEnabled(True)
 
     def has_project(self):
         """
@@ -547,7 +553,29 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         notify all widgets of a change in the data
         """
-        self.make_report()
+        print("Data changed")
+
+    def uptodate_report_exists(self):
+        """
+        test if there exists a current report
+            Retruns:
+                True if report exists and is current, else False
+        """
+        report_dir, html_outfile, hash_file = utils.make_report_file_names(self._project["proj_full_path"])
+
+        if not report_dir.exists() or not html_outfile.exists() or not hash_file.exists():
+            return False
+
+        data = None
+        with hash_file.open('r') as fin:
+            data = json.load(fin)
+
+        if data is not None:
+            if "results_hash" in data:
+                if data["results_hash"] == utils.hash_results(self._project["results"]):
+                    return True
+
+        return False
 
     def make_report(self):
         """
@@ -777,20 +805,22 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         print out the results
         """
-        if not self._tabWidget.currentWidget() == self._drawingTab:
-            return
+        results = self._project["results"]
+        print(f"Results Hash {utils.hash_results(results)}")
+        # if not self._tabWidget.currentWidget() == self._drawingTab:
+        #     return
 
-        clone_image_u = self._drawingWidget.grab_clone_image()
-        clone_image_w = self._drawingWidget.get_clone_image()
+        # clone_image_u = self._drawingWidget.grab_clone_image()
+        # clone_image_w = self._drawingWidget.get_clone_image()
 
-        entry_image_u = self._drawingWidget.grab_entry_image()
-        entry_image_w = self._drawingWidget.get_entry_image()
+        # entry_image_u = self._drawingWidget.grab_entry_image()
+        # entry_image_w = self._drawingWidget.get_entry_image()
 
-        clone_image_u.save("CLONE_user.jpg")
-        clone_image_w.save("CLONE_whole.jpg")
+        # clone_image_u.save("CLONE_user.jpg")
+        # clone_image_w.save("CLONE_whole.jpg")
 
-        entry_image_u.save("ENTRY_user.jpg")
-        entry_image_w.save("ENTRY_whole.jpg")
+        # entry_image_u.save("ENTRY_user.jpg")
+        # entry_image_w.save("ENTRY_whole.jpg")
 
     def has_unsaved_data(self):
         """

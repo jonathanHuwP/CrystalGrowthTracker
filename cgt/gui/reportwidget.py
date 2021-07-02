@@ -18,6 +18,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 """
 # set up linting conditions
 # pylint: disable = c-extension-no-member
+import pathlib
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
@@ -54,11 +55,14 @@ class ReportWidget(qw.QWidget, Ui_ReportWidget):
                 path (pathlib.Path): path to html
         """
         self._document.clear()
+        inc_path = qc.QUrl("file:///"+str(path.parent))
+        print(inc_path)
+        self._document.setBaseUrl(inc_path)
 
         with path.open('r') as in_file:
             self._document.setHtml(in_file.read())
 
-        self._textBrowser.setHtml(self._document.toHtml())
+        self._textBrowser.setDocument(self._document)
 
     def has_content(self):
         """

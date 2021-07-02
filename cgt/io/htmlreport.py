@@ -18,10 +18,12 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 @copyright 2020
 @author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 '''
-import pathlib
+import json
 from datetime import datetime
 
 from cgt.model.velocitiescalculator import VelocitiesCalculator
+
+from cgt.util.utils import (hash_results, make_report_file_names)
 
 def save_html_report(project):
     '''
@@ -36,18 +38,21 @@ def save_html_report(project):
         Throws:
             Error if the report directory cannot be made, or file cannot be opened
     '''
-    report_dir = pathlib.Path(project["proj_full_path"]).joinpath("report")
+    report_dir, html_outfile, hash_file = make_report_file_names(project["proj_full_path"])
 
     if not report_dir.exists():
         report_dir.mkdir()
-
-    html_outfile = report_dir.joinpath("report.html")
 
     with open(html_outfile, "w") as fout:
         write_html_report_start(fout, project)
         write_html_overview(fout, project["results"])
         write_html_regions(fout, project)
         write_html_report_end(fout, report_dir)
+
+    with open(hash_file, 'w') as fout:
+        hash = hash_results(project["results"])
+        data = {"results_hash": hash}
+        json.dump(data, fout)
 
     return html_outfile
 
