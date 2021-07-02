@@ -32,9 +32,7 @@ def save_html_report(project):
         Args:
             project (CGTProject): The project we are reporting.
         Returns:
-            error_code (int):      An error code is returned a 0 (zero) values means all
-                                   file were read while a 1 (one) value means 1 or more
-                                   files were not read.
+            the report file (pathlib.Path)
         Throws:
             Error if the report directory cannot be made, or file cannot be opened
     '''

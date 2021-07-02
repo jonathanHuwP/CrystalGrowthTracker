@@ -180,6 +180,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         elif tab_index == self._tabWidget.indexOf(self._reportTab):
             if not self.uptodate_report_exists():
                 self.make_report()
+
+            _, report_file, _ = utils.make_report_file_names(self._project["proj_full_path"])
+            if report_file.exists():
+                self._reportWidget.load_html(report_file)
             self._reportWidget.setEnabled(True)
 
     def has_project(self):
