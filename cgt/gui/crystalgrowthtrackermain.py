@@ -52,6 +52,7 @@ import cgt.io.writecsvreports as writecsvreports
 import cgt.io.readcsvreports as readcsvreports
 from cgt.io.videosource import VideoSource
 from cgt.io.videoanalyser import VideoAnalyser
+from cgt.io.offscreenrender import OffScreenRender
 
 from cgt.model.cgtproject import CGTProject
 from cgt.model.videoanalysisresultsstore import VideoAnalysisResultsStore
@@ -180,8 +181,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self._drawingWidget.setEnabled(True)
         elif tab_index == self._tabWidget.indexOf(self._reportTab):
             if not self.uptodate_report_exists():
-                self.make_report()
-                # TODO renderer goes here
+                renderer = OffScreenRender(self._project)
+                region_image_paths = renderer.render_region_images()
+                self.make_report(region_image_paths)
+
 
             _, report_file, _ = utils.make_report_file_names(self._project["proj_full_path"])
             if report_file.exists():
@@ -609,12 +612,12 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         return False
 
-    def make_report(self):
+    def make_report(self, region_image_paths):
         """
         make a html report
         """
         try:
-            report_file = htmlreport.save_html_report(self._project)
+            report_file = htmlreport.save_html_report(self._project, region_image_paths)
         except (IOError, OSError, EOFError) as exception:
             qw.QMessageBox.error(self,
                                  self.tr("Auto Save Report"),

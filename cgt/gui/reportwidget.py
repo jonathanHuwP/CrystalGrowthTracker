@@ -56,7 +56,8 @@ class ReportWidget(qw.QWidget, Ui_ReportWidget):
         """
         self._document.clear()
         # set base for includes to directory holding report.html
-        self._document.setBaseUrl(qc.QUrl("file:///"+str(path.parent)))
+        url = qc.QUrl.fromLocalFile(str(path.parent)+"/")
+        self._document.setBaseUrl(url)
 
         with path.open('r') as in_file:
             self._document.setHtml(in_file.read())

@@ -20,17 +20,19 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 '''
 import json
 from datetime import datetime
+import pathlib
 
 from cgt.model.velocitiescalculator import VelocitiesCalculator
 
 from cgt.util.utils import (hash_results, make_report_file_names)
 
-def save_html_report(project):
+def save_html_report(project, region_image_paths):
     '''
     Creates and co-ordinates the html report file creation and on the file handle to
     other functions that write/create the relevant sections.
         Args:
             project (CGTProject): The project we are reporting.
+            region_image_paths ([pathlib.Path]): paths to the region images
         Returns:
             the report file (pathlib.Path)
         Throws:
@@ -43,7 +45,7 @@ def save_html_report(project):
 
     with open(html_outfile, "w") as fout:
         write_html_report_start(fout, project)
-        write_html_overview(fout, project["results"])
+        write_html_overview(fout, project["results"], region_image_paths)
         write_html_regions(fout, project)
         write_html_report_end(fout, report_dir)
 
@@ -118,15 +120,21 @@ def write_html_report_start(fout, project):
 
     fout.write(report_info)
 
-def write_html_overview(fout, results):
+def write_html_overview(fout, results, region_image_paths):
     '''
     Creates the overview section of the html report.
     Args:
         fout (file handler): The file handler allows this function to write out.
         results:              The project results data
     '''
-    header2_line = ("<h2 align=\"left\">Overview</h2>\n")
-    fout.write(header2_line)
+    fout.write("<h2 align=\"left\">Overview</h2>\n")
+
+    for file in region_image_paths:
+        parts = file.parts
+        file_name = pathlib.Path(parts[-2])
+        file_name = file_name.joinpath(parts[-1])
+
+        fout.write(f"<img src=\"{file_name}\">\n")
 
     fout.write("<p align=\"center\"> An image will go here the caption is below</p>")
 
