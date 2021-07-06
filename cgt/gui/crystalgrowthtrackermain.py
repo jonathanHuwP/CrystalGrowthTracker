@@ -26,6 +26,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = line-too-long
 # pylint: disable = invalid-name
 
+from cgt.io.videobuffer import VideoBuffer
 import os
 import json
 from shutil import copy2
@@ -180,6 +181,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         elif tab_index == self._tabWidget.indexOf(self._reportTab):
             if not self.uptodate_report_exists():
                 self.make_report()
+                # TODO renderer goes here
 
             _, report_file, _ = utils.make_report_file_names(self._project["proj_full_path"])
             if report_file.exists():
@@ -308,6 +310,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         self._videoStatsWidget.clear()
         self._selectWidget.clear()
+        # TODO check this out
         #self._drawingWidget.clear()
         self._drawingWidget.set_results(self._project["results"])
 
@@ -325,11 +328,36 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self.display_properties()
         self.set_title()
         self.load_video()
+        self.save_region_frames()
         self._selectWidget.redisplay_regions()
 
-        if self._project["latest_report"] is not None:
-            if self._project["latest_report"] != "":
-                self._reportWidget.read_report(self._project["latest_report"])
+        if self._project["latest_report"] is not None and self._project["latest_report"] != "":
+            self._reportWidget.read_report(self._project["latest_report"])
+
+    def save_region_frames(self):
+        """
+        save pixmaps of the first, last
+        """
+        report_dir, _, _ = utils.make_report_file_names(self._project["proj_full_path"])
+        buffer = self._enhanced_video_reader.get_buffer()
+        last = self._enhanced_video_reader.get_length()-1
+        middel = int(last/2)
+
+        images_dir = report_dir.joinpath("images")
+        if not report_dir.exists():
+            report_dir.mkdir()
+
+        if not images_dir.exists():
+            images_dir.mkdir()
+
+        file_name = str(images_dir.joinpath("regions")) + "_{}.ppm"
+
+        pixmap = buffer.get_pixmap(0)
+        pixmap.save(file_name.format(0))
+        pixmap = buffer.get_pixmap(middel)
+        pixmap.save(file_name.format(middel))
+        pixmap = buffer.get_pixmap(last)
+        pixmap.save(file_name.format(last))
 
     def stop_video(self):
         """
@@ -778,7 +806,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             return
 
         try:
-            # TODO check all this is corrct
             # make the objects
             self._enhanced_video_reader = VideoSource(self._project["enhanced_video"])
             self._selectWidget.set_video_source(self._enhanced_video_reader)

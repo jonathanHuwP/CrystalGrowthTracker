@@ -52,6 +52,7 @@ def save_html_report(project):
         data = {"results_hash": hash}
         json.dump(data, fout)
 
+    project["latest_report"] = str(html_outfile)
     return html_outfile
 
 def make_html_speeds_table(calculator, units):

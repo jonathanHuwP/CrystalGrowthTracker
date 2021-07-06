@@ -73,6 +73,14 @@ class VideoSource(qc.QObject):
         # start the thread
         self._video_thread.start()
 
+    def get_buffer(self):
+        """
+        getter for the video buffer
+            Returns:
+                (VideoBuffer)
+        """
+        return self._video_reader
+
     def get_length(self):
         """
         getter for the lenght

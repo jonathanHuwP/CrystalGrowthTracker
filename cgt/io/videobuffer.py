@@ -82,16 +82,14 @@ class VideoBuffer(qc.QObject):
             if not self._queue_holder.get_frame_queue().is_empty():
                 self.make_frame()
 
-    def make_frame(self):
+    def get_pixmap(self, frame):
         """
-        pop the frame numbers queue, get the frame, convert it
-        to a qpixmap and call the display_pixmap function of regions view
-
+        get a frame as a QPixmap
+            Args:
+                frame (int): the frame number
             Returns:
-                None
+                (QPixmap) the image
         """
-        frame = self._queue_holder.get_frame_queue().pop()
-
         # get cv2 image green/red/blue
         self._video_reader.set(cv2.CAP_PROP_POS_FRAMES, frame)
         flag, img = self._video_reader.read()
@@ -104,7 +102,21 @@ class VideoBuffer(qc.QObject):
         image = nparray_to_qimage(img, True)
 
         # call the region viewing object with the image pixamp and frame number
-        self.display_image.emit(qg.QPixmap.fromImage(image), frame)
+        return qg.QPixmap.fromImage(image)
+
+    def make_frame(self):
+        """
+        pop the frame numbers queue, get the frame, convert it
+        to a qpixmap and call the display_pixmap function of regions view
+
+            Returns:
+                None
+        """
+        frame = self._queue_holder.get_frame_queue().pop()
+        pixmap = self.get_pixmap(frame)
+
+        # call the region viewing object with the image pixamp and frame number
+        self.display_image.emit(pixmap, frame)
 
     def stop(self):
         """
