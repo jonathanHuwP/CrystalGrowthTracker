@@ -76,8 +76,7 @@ class OffScreenRender():
                 file_path (pathlib.Path): file path
                 regions ([QGrapicsRectItem]): the regions of
         """
-        for item in self._view.scene().items():
-            self._view.scene().removeItem(item)
+        self.safe_clear()
 
         file_name = str(file_path)
         pixmap = qg.QPixmap()
@@ -96,9 +95,18 @@ class OffScreenRender():
         head, _, tail = file_name.rpartition(".ppm")
         out_name = head + ".png" + tail
         image.save(out_name)
+        self.safe_clear()
+
         print(f"Written {out_name}")
 
         return pathlib.Path(out_name)
+
+    def safe_clear(self):
+        """
+        clear the scene without deleting the items
+        """
+        for item in self._view.scene().items():
+            self._view.scene().removeItem(item)
 
     def make_image(self):
         """
