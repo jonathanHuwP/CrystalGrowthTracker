@@ -335,7 +335,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._selectWidget.redisplay_regions()
 
         if self._project["latest_report"] is not None and self._project["latest_report"] != "":
-            self._reportWidget.read_report(self._project["latest_report"])
+            self._reportWidget.load_html(self._project["latest_report"])
 
     def save_region_frames(self):
         """
