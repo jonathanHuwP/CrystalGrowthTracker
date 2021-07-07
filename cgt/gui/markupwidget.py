@@ -149,9 +149,14 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
 
         self._regionsBox.blockSignals(True)
         all_regions = self._results_proxy.get_regions()
+        index = self._regionsBox.currentIndex()
+        self._regionsBox.clear()
 
         for i in range(len(all_regions)):
             self._regionsBox.addItem(f"Region {i}")
+
+        if index > -1:
+            self._regionsBox.setCurrentIndex(index)
         self._regionsBox.blockSignals(False)
 
         self.region_changed()
@@ -727,10 +732,7 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         """
         data changed reload regions
         """
-        # TODO
-        # update regions combo
-        # update displayed region
-        pass
+        self.setup_regions_combobox()
 
     @staticmethod
     def get_scene_image(view):
