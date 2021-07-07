@@ -483,9 +483,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self._reportWidget.save_doc_pdf(file_path)
 
-        qw.QMessageBox.info(self,
-                            self.tr("Save Report"),
-                            self.tr(f"Report saved to {file_path}"))
+        message = self.tr("Report saved to {}")
+        qw.QMessageBox.information(self,
+                                   self.tr("Save Report"),
+                                   message.format(file_path))
 
     def start_project(self,
                       enhanced_video,

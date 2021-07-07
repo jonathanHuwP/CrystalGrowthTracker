@@ -129,17 +129,16 @@ def write_html_overview(fout, results, region_image_paths):
     '''
     fout.write("<h2 align=\"left\">Overview</h2>\n")
 
+    fout.write("<figure><br>")
     for file in region_image_paths:
         parts = file.parts
         file_name = pathlib.Path(parts[-2])
         file_name = file_name.joinpath(parts[-1])
 
-        fout.write(f"<img src=\"{file_name}\">\n")
+        fout.write(f"<img src=\"{file_name}\" width=\"300\">\n")
 
-    fout.write("<p align=\"center\"> An image will go here the caption is below</p>")
-
-    fout.write("<p align=\"center\"><i>The final frame of the video showing the regions"
-               " in which crystals were analyzed as highlighted boxes.</i></p>")
+    fout.write("<br><figcaption><i>First, middel and last frames showing the regions.</i></figcaption>")
+    fout.write("</figure>")
 
     header3_line = ("<h3 align=\"left\">Image Statistics from the Raw Video</h3>\n")
     fout.write(header3_line)

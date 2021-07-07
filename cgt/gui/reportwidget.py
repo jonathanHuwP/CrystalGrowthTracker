@@ -39,14 +39,9 @@ class ReportWidget(qw.QWidget, Ui_ReportWidget):
 
             Args:
                 parent (QObject): the parent QObject for this window
-                data_source (QObject): the object holding the data
         """
         super().__init__(parent)
-
         self.setupUi(self)
-
-        ## the document to display
-        self._document = qg.QTextDocument()
 
     def load_html(self, path):
         """
@@ -54,15 +49,8 @@ class ReportWidget(qw.QWidget, Ui_ReportWidget):
             Args:
                 path (pathlib.Path): path to html
         """
-        self._document.clear()
-        # set base for includes to directory holding report.html
-        url = qc.QUrl.fromLocalFile(str(path.parent)+"/")
-        self._document.setBaseUrl(url)
-
-        with path.open('r') as in_file:
-            self._document.setHtml(in_file.read())
-
-        self._textBrowser.setDocument(self._document)
+        url = qc.QUrl.fromLocalFile(str(path))
+        self._textBrowser.setSource(url)
 
     def has_content(self):
         """
@@ -70,7 +58,7 @@ class ReportWidget(qw.QWidget, Ui_ReportWidget):
             Returns:
                 True if the document has content, else False
         """
-        return not self._document.isEmpty()
+        return not self._textBrowser.document().isEmpty()
 
     def save_doc_pdf(self, file_path):
         """
@@ -83,7 +71,7 @@ class ReportWidget(qw.QWidget, Ui_ReportWidget):
         printer.setPaperSize(qp.QPrinter.A4)
         printer.setOutputFileName(file_path)
 
-        self._document.print(printer)
+        self._textBrowser.document().print(printer)
 
     def save_doc_html(self, file_path):
         """
@@ -97,4 +85,4 @@ class ReportWidget(qw.QWidget, Ui_ReportWidget):
         encoding = qc.QByteArray(bytearray(utf, utf))
 
         with open(file_path, 'w') as out_file:
-            out_file.write(self._document.toHtml(encoding))
+            out_file.write(self._textBrowser.document().toHtml(encoding))
