@@ -96,6 +96,7 @@ class OffScreenRender():
         head, _, tail = file_name.rpartition(".ppm")
         out_name = head + ".png" + tail
         image.save(out_name)
+        print(f"Written {out_name}")
 
         return pathlib.Path(out_name)
 
