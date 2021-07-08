@@ -21,9 +21,9 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QTextBrowser" name="_textBrowser">
-     <property name="readOnly">
-      <bool>false</bool>
+    <widget class="QScrollArea" name="_scrollArea">
+     <property name="widgetResizable">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
