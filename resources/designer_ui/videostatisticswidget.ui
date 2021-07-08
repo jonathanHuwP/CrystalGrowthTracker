@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Video Intensity Statistics</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3">
+  <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1">
    <item>
     <widget class="QSplitter" name="splitter">
      <property name="orientation">

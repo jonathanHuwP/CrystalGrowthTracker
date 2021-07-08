@@ -149,9 +149,11 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         draw the statistics graph
         """
         if self._data_source.get_project()["raw_video_path"] is None:
-            self._videoTypeLabel.setText("Enhanced video")
+            text = self._data_source.get_project()["enhanced_video_no_path"]
         else:
-            self._videoTypeLabel.setText("Raw video")
+            text = self._data_source.get_project()["raw_video_no_path"]
+
+        self._videoTypeLabel.setText(text)
 
         tick_font = qg.QFont()
         tick_font.setBold(True)
