@@ -166,11 +166,11 @@ class VideoBaseWidget(qw.QWidget):
         self._videoControl.set_slider_value(self._current_frame)
 
         # display the current frame number and time
-        display_number = self._current_frame+1
+        #display_number = self._current_frame+1
         fps, _ = self._data_source.get_fps_and_resolution()
-        time = display_number/fps
+        time = self._current_frame/fps
         message =   "Frame {:0>5d} of {:0>5d}, approx {:0>5.1f} seconds video time"
-        self._frameLabel.setText(message.format(display_number,
+        self._frameLabel.setText(message.format(self._current_frame,
                                                 self._video_source.get_length(),
                                                 time))
 

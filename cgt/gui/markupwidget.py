@@ -99,6 +99,11 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
 
         self.make_connections()
 
+        font = qg.QFont( "Monospace", 8, qg.QFont.DemiBold)
+        self._frameLabel.setFont(font)
+        self._frameLabel_2.setFont(font)
+        self._videoNameLabel.setFont(font)
+
     def set_results(self, results_store):
         """
         set a new results object
@@ -196,7 +201,6 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
 
         self._cloneControls.enable_all()
         self._entryControls.freeze()
-        self._entryFrameNumber.display(self._base_key_frame)
 
         if self._entry_forward:
             self._cloneControls.set_range(self._video_num_frames, self._base_key_frame)
@@ -239,10 +243,14 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
 
         self.display_pixmap()
         self.set_key_frame_combo()
-        if self._base_key_frame is None:
-            self._entryFrameNumber.display(self._current_frame)
 
-        self._cloneFrameNumber.display(self._current_frame)
+        fps, _ = self._data_source.get_fps_and_resolution()
+        time = self._current_frame/fps
+        message =   f"Frame {self._current_frame:0>5d} of {self._video_source.get_length():0>5d}, approx {time:0>5.1f} seconds video time"
+        self._frameLabel_2.setText(message)
+        if self._base_key_frame is None:
+            self._frameLabel.setText(message)
+
         self._entryControls.set_frame_currently_displayed(self._current_frame)
         self._cloneControls.set_frame_currently_displayed(self._current_frame)
 
@@ -757,3 +765,11 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         # avoid error if pixmap is garbage collected before painter
         del painter
         return image
+
+    def display_video_file_name(self):
+        """
+        dispaly the name of the video
+        """
+        name = self._data_source.get_project()["enhanced_video_no_path"]
+        if name is not None:
+            self._videoNameLabel.setText(name)
