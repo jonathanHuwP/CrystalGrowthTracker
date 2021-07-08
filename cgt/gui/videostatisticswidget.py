@@ -70,7 +70,7 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         self.make_plots()
 
         font = qg.QFont( "Monospace", 8, qg.QFont.DemiBold)
-        self._videoTypeLabel.setFont(font)
+        self._videoNameLabel.setFont(font)
 
     def set_video_source(self, video_source):
         """
@@ -153,7 +153,7 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         else:
             text = self._data_source.get_project()["raw_video_no_path"]
 
-        self._videoTypeLabel.setText(text)
+        self._videoNameLabel.setText(text)
 
         tick_font = qg.QFont()
         tick_font.setBold(True)
@@ -210,6 +210,10 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         clear the current contents
         """
         self._frame_line = None
-        self._videoTypeLabel.setText(self.tr("Video"))
+        self._videoNameLabel.setText(self.tr("Video"))
         self.make_plots()
         super().clear()
+
+    @qc.pyqtSlot()
+    def make_stats(self):
+        self._data_source.make_video_statistics()

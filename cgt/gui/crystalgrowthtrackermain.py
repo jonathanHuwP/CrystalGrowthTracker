@@ -333,6 +333,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self.load_video()
         self.save_region_frames()
         self._selectWidget.redisplay_regions()
+        self._selectWidget.display_video_file_name()
 
         if self._project["latest_report"] is not None and self._project["latest_report"] != "":
             self._reportWidget.load_html(self._project["latest_report"])
@@ -903,6 +904,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         calculate the intensity statistics for the video
         """
+        print("make stats")
         if self._project is None:
             return
 

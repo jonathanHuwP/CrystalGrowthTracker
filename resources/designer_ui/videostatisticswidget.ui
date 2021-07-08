@@ -20,7 +20,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <widget class="QWidget" name="layoutWidget">
-      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0,0">
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0,0,0">
        <item>
         <widget class="VideoBaseView" name="_graphicsView">
          <property name="toolTip">
@@ -47,7 +47,7 @@
           </spacer>
          </item>
          <item>
-          <widget class="QLabel" name="_videoTypeLabel">
+          <widget class="QLabel" name="_videoNameLabel">
            <property name="text">
             <string>Video</string>
            </property>
@@ -138,6 +138,33 @@
          </item>
         </layout>
        </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <property name="spacing">
+          <number>4</number>
+         </property>
+         <item>
+          <widget class="QPushButton" name="_makeStatsButton">
+           <property name="text">
+            <string>Make Statistics</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_10">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="layoutWidget">
@@ -195,5 +222,22 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>_makeStatsButton</sender>
+   <signal>clicked()</signal>
+   <receiver>VideoStatisticsWidget</receiver>
+   <slot>make_stats()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>71</x>
+     <y>563</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>453</x>
+     <y>297</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

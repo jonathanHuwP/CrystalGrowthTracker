@@ -28,6 +28,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
+import PyQt5.QtGui as qg
 
 from cgt.gui.videobasewidget import VideoBaseWidget
 from cgt.gui.regionselectionview import SelectStates
@@ -65,6 +66,9 @@ class VideoRegionSelectionWidget(VideoBaseWidget, Ui_VideoRegionSelectionWidget)
         self._mode = SelectStates.MAKE_REGION
         self._graphicsView.set_state(self._mode)
         self._graphicsView.set_data_source(self._data_source)
+
+        font = qg.QFont( "Monospace", 8, qg.QFont.DemiBold)
+        self._videoNameLabel.setFont(font)
 
     def get_operating_mode(self):
         """
@@ -146,6 +150,13 @@ class VideoRegionSelectionWidget(VideoBaseWidget, Ui_VideoRegionSelectionWidget)
                 pointer to holder of results (CrystalGrowthTrackerMain)
         """
         return self._data_source
+
+    def display_video_file_name(self):
+        """
+        force the dispaly of the video file name
+        """
+        name = self._data_source.get_project()["enhanced_video_no_path"]
+        self._videoNameLabel.setText(name)
 
     def redisplay_regions(self):
         """
