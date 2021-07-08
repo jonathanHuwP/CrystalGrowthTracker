@@ -58,10 +58,6 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
         <p>To adjust the size left click on a <b>corner</b> and drag.</P>
         """)
 
-        self._inst_display = self.tr("""
-        <p>Review your work.</p><p>Select regions to view contents in side panel.</p>
-        """)
-
         self._inst_delete = self.tr("""
         <p>Left mouse button to select for delete. Click "yes" on pop-up to complete.</p>
         <p>This is not reversable.</p>
@@ -80,8 +76,6 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
             self.state_change.emit(states.MAKE_REGION)
         elif button == self._editRegionButton:
             self.state_change.emit(states.EDIT_REGION)
-        elif button == self._displayMultipleButton:
-            self.state_change.emit(states.VIEW)
         elif button == self._deleteButton:
             self.state_change.emit(states.DELETE_REGION)
 
@@ -111,7 +105,5 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
             self._instructionsBrowser.append(self._inst_create)
         elif self._editRegionButton.isChecked():
             self._instructionsBrowser.append(self._ints_edit)
-        elif self._displayMultipleButton.isChecked():
-            self._instructionsBrowser.append(self._inst_display)
         elif self._deleteButton.isChecked():
             self._instructionsBrowser.append(self._inst_delete)

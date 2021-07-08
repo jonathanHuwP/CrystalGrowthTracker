@@ -51,19 +51,6 @@
         </widget>
        </item>
        <item>
-        <widget class="QRadioButton" name="_displayMultipleButton">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="text">
-          <string>Display Multiple</string>
-         </property>
-         <attribute name="buttonGroup">
-          <string notr="true">_buttonGroup</string>
-         </attribute>
-        </widget>
-       </item>
-       <item>
         <widget class="QRadioButton" name="_deleteButton">
          <property name="enabled">
           <bool>true</bool>
