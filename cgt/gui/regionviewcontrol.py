@@ -55,7 +55,7 @@ class RegionViewControl(qw.QWidget, Ui_RegionViewControl):
         <p>To draw a region, left click down then drag.</p>""")
 
         self._ints_edit = self.tr("""
-        <p>Left click and drag on corners to adjust size</P>
+        <p>To adjust the size left click on a <b>corner</b> and drag.</P>
         """)
 
         self._inst_display = self.tr("""

@@ -40,7 +40,6 @@ class VideoRegionSelectionWidget(VideoBaseWidget, Ui_VideoRegionSelectionWidget)
     The implementation of the GUI, all the functions and
     data-structures required to implement the intended behaviour
     """
-
     def __init__(self, parent, data_source):
         """
         the object initalization function
