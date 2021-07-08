@@ -27,8 +27,49 @@
      </property>
     </widget>
    </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="_returnButton">
+       <property name="text">
+        <string>Return</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>_returnButton</sender>
+   <signal>clicked()</signal>
+   <receiver>ReportWidget</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>69</x>
+     <y>604</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>403</x>
+     <y>317</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
