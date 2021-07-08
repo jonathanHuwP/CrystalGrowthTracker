@@ -90,8 +90,8 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         style = qw.QCommonStyle()
         self._lastFrameButton.setIcon(style.standardIcon(style.SP_MediaSkipForward))
         self._firstFrameButton.setIcon(style.standardIcon(style.SP_MediaSkipBackward))
-        self._stepUpButton.setIcon(style.standardIcon(style.SP_ArrowForward))
-        self._stepDownButton.setIcon(style.standardIcon(style.SP_ArrowBack))
+        self._forwardButton.setIcon(style.standardIcon(style.SP_ArrowForward))
+        self._backwardButton.setIcon(style.standardIcon(style.SP_ArrowBack))
         self._pauseButton.setIcon(style.standardIcon(style.SP_MediaPause))
 
     def set_slider_value(self, value):

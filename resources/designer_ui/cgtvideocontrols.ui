@@ -32,10 +32,13 @@
      <item>
       <widget class="QPushButton" name="_backwardButton">
        <property name="toolTip">
-        <string>Play video backwards.</string>
+        <string>Play backwards.</string>
        </property>
        <property name="text">
-        <string>Play Backward</string>
+        <string/>
+       </property>
+       <property name="autoRepeat">
+        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -52,10 +55,16 @@
      <item>
       <widget class="QPushButton" name="_forwardButton">
        <property name="toolTip">
-        <string>Play video forwards.</string>
+        <string>Play forwards.</string>
        </property>
        <property name="text">
-        <string>Play Forward</string>
+        <string/>
+       </property>
+       <property name="autoRepeat">
+        <bool>false</bool>
+       </property>
+       <property name="autoRepeatInterval">
+        <number>100</number>
        </property>
       </widget>
      </item>
@@ -102,13 +111,10 @@
      <item>
       <widget class="QPushButton" name="_stepDownButton">
        <property name="toolTip">
-        <string>Reverse one frame.</string>
+        <string>One frame backwards.</string>
        </property>
        <property name="text">
-        <string/>
-       </property>
-       <property name="autoRepeat">
-        <bool>false</bool>
+        <string>Step Down</string>
        </property>
       </widget>
      </item>
@@ -131,16 +137,10 @@
      <item>
       <widget class="QPushButton" name="_stepUpButton">
        <property name="toolTip">
-        <string>Advance one frame.</string>
+        <string>One frame forwards.</string>
        </property>
        <property name="text">
-        <string/>
-       </property>
-       <property name="autoRepeat">
-        <bool>false</bool>
-       </property>
-       <property name="autoRepeatInterval">
-        <number>100</number>
+        <string>Step Up</string>
        </property>
       </widget>
      </item>
@@ -282,7 +282,7 @@
    </item>
   </layout>
  </widget>
-  <customwidgets>
+ <customwidgets>
   <customwidget>
    <class>FullDisableSlider</class>
    <extends>QSlider</extends>
@@ -324,10 +324,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>_stepUpButton</sender>
+   <sender>_forwardButton</sender>
    <signal>clicked()</signal>
    <receiver>CGTVideoControls</receiver>
-   <slot>step_up()</slot>
+   <slot>play_forwards()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>489</x>
@@ -340,10 +340,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>_stepDownButton</sender>
+   <sender>_backwardButton</sender>
    <signal>clicked()</signal>
    <receiver>CGTVideoControls</receiver>
-   <slot>step_down()</slot>
+   <slot>play_backwards()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>235</x>
@@ -404,10 +404,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>_backwardButton</sender>
+   <sender>_stepDownButton</sender>
    <signal>clicked()</signal>
    <receiver>CGTVideoControls</receiver>
-   <slot>play_backwards()</slot>
+   <slot>step_down()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>273</x>
@@ -420,10 +420,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>_forwardButton</sender>
+   <sender>_stepUpButton</sender>
    <signal>clicked()</signal>
    <receiver>CGTVideoControls</receiver>
-   <slot>play_forwards()</slot>
+   <slot>step_up()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>450</x>
