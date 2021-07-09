@@ -135,7 +135,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         tab = self._tabWidget.widget(4)
 
         ## the results widget
-        self._reportWidget = ReportWidget(tab)
+        self._reportWidget = ReportWidget(tab, self)
         self.setup_tab(tab, self._reportWidget)
 
         self._progressBar.hide()
@@ -455,40 +455,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         message = "Project saved to: {}".format(self._project["proj_full_path"])
         qw.QMessageBox.information(self, "CGT File", message)
-
-    @qc.pyqtSlot()
-    def save_report(self):
-        """
-        generate and save a report of the current state of the project
-            Returns:
-                None
-        """
-        if self._project is None:
-            qw.QMessageBox.warning(self,
-                                   "CGT Error",
-                                   "You do not have a project to report!")
-            return
-
-        if self.has_unsaved_data():
-            qw.QMessageBox.warning(self,
-                                   "CGT Error",
-                                   "Please save the data before printing a report!")
-            return
-
-        file_types = "PDF (*.pdf)"
-        file_path, _ = qw.QFileDialog.getSaveFileName(self,
-                                                     "Enter/select file for save",
-                                                     os.path.expanduser('~'),
-                                                     file_types)
-        if file_path is None or file_path == '':
-            return
-
-        self._reportWidget.save_doc_pdf(file_path)
-
-        message = self.tr("Report saved to {}")
-        qw.QMessageBox.information(self,
-                                   self.tr("Save Report"),
-                                   message.format(file_path))
 
     def start_project(self,
                       enhanced_video,

@@ -101,7 +101,6 @@
     <addaction name="_actionLoadProject"/>
     <addaction name="separator"/>
     <addaction name="_actionSaveProject"/>
-    <addaction name="_actionSaveReport"/>
     <addaction name="_actionSaveImage"/>
     <addaction name="_actionSaveReults"/>
     <addaction name="separator"/>
@@ -246,22 +245,6 @@
    <signal>triggered()</signal>
    <receiver>CrystalGrowthTrackerMain</receiver>
    <slot>load_project()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>470</x>
-     <y>291</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>_actionSaveReport</sender>
-   <signal>triggered()</signal>
-   <receiver>CrystalGrowthTrackerMain</receiver>
-   <slot>save_report()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>

@@ -32,7 +32,14 @@
      <item>
       <widget class="QPushButton" name="_returnButton">
        <property name="text">
-        <string>Return</string>
+        <string>Report return</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pdfButton">
+       <property name="text">
+        <string>Print pdf</string>
        </property>
       </widget>
      </item>
@@ -59,10 +66,26 @@
    <sender>_returnButton</sender>
    <signal>clicked()</signal>
    <receiver>ReportWidget</receiver>
-   <slot>close()</slot>
+   <slot>load_url()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>69</x>
+     <y>604</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>403</x>
+     <y>317</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pdfButton</sender>
+   <signal>clicked()</signal>
+   <receiver>ReportWidget</receiver>
+   <slot>save_pdf()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>190</x>
      <y>604</y>
     </hint>
     <hint type="destinationlabel">

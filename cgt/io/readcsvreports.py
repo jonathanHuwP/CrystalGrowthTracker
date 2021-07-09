@@ -131,7 +131,6 @@ def read_csv_video_statistics(new_project, files, path):
             stats.append_frame(FrameStats(mean, std_dev, bin_counts))
 
     tmp = new_project["results"]
-    print(f"results {type(tmp)}")
     new_project["results"].set_video_statistics(stats)
 
 def read_csv_regions(new_project, files, path):
