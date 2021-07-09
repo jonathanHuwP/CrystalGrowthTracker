@@ -135,7 +135,7 @@ def write_html_overview(fout, results, region_image_paths):
         file_name = pathlib.Path(parts[-2])
         file_name = file_name.joinpath(parts[-1])
 
-        fout.write(f"<img src=\"{file_name}\" width=\"300\">\n")
+        fout.write(f"<img src=\"{file_name}\" width=\"30%\">\n")
 
     fout.write("<br><figcaption><i>First, middel and last frames showing the regions.</i></figcaption>")
     fout.write("</figure>")

@@ -24,6 +24,7 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
 import PyQt5.QtGui as qg
 import PyQt5.QtPrintSupport as qp
+import PyQt5.QtWebEngineWidgets as qe
 
 # import UI
 from cgt.gui.Ui_reportwidget import Ui_ReportWidget
@@ -42,6 +43,10 @@ class ReportWidget(qw.QWidget, Ui_ReportWidget):
         """
         super().__init__(parent)
         self.setupUi(self)
+        self._scrollArea.setWidget(qe.QWebEngineView())
+
+        ## the url of the report
+        self._url = None
 
     def load_html(self, path):
         """
@@ -49,16 +54,14 @@ class ReportWidget(qw.QWidget, Ui_ReportWidget):
             Args:
                 path (pathlib.Path): path to html
         """
-        url = qc.QUrl.fromLocalFile(str(path))
-        self._textBrowser.setSource(url)
+        self._url = qc.QUrl.fromLocalFile(str(path))
+        self.load_url()
 
-    def has_content(self):
+    def load_url(self):
         """
-        test if the document has any contents
-            Returns:
-                True if the document has content, else False
+        load and display the current ur
         """
-        return not self._textBrowser.document().isEmpty()
+        self._scrollArea.widget().setUrl(self._url)
 
     def save_doc_pdf(self, file_path):
         """
@@ -66,23 +69,4 @@ class ReportWidget(qw.QWidget, Ui_ReportWidget):
             Args:
                 file_path (string): the output file
         """
-        printer = qp.QPrinter(qp.QPrinter.PrinterResolution)
-        printer.setOutputFormat(qp.QPrinter.PdfFormat)
-        printer.setPaperSize(qp.QPrinter.A4)
-        printer.setOutputFileName(file_path)
-
-        self._textBrowser.document().print(printer)
-
-    def save_doc_html(self, file_path):
-        """
-        print the current document as a PDF file
-            Args:
-                file_path (string): the output file
-        """
-        utf = 'utf-8'
-
-        # construct a python byte array out of sting "utf-8" using "utf-8" as encoding
-        encoding = qc.QByteArray(bytearray(utf, utf))
-
-        with open(file_path, 'w') as out_file:
-            out_file.write(self._textBrowser.document().toHtml(encoding))
+        self._scrollArea.widget().page().printToPdf(file_path)
