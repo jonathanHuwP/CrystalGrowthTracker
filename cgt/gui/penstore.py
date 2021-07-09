@@ -31,8 +31,8 @@ class PenStore():
         """
         initalize the class
         """
-        DEFAULT_WIDTH = 4
-        NARROW_WIDTH = 2
+        DEFAULT_WIDTH = 8
+        NARROW_WIDTH = 3
 
         ## pen for drawing artifacts
         self._drawing_pen = qg.QPen(qt.Qt.red)

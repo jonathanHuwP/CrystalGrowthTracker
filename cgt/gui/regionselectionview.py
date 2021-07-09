@@ -46,7 +46,6 @@ class RegionSelectionView(VideoBaseView):
     """
     provides a viewer for a pixmaps
     """
-
     ## a rectangle needs to be shown
     show_rect = qc.pyqtSignal(qc.QRectF)
 
@@ -200,7 +199,7 @@ class RegionSelectionView(VideoBaseView):
         if self._draw_rect is None:
             return
 
-        sensitivity = 8
+        sensitivity = 20
         limit = sensitivity*sensitivity
 
         # get the event location in scene and rectangle coordinates
