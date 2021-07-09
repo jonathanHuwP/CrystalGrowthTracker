@@ -92,7 +92,6 @@ class VideoAnalysisResultsStore(qc.QObject):
         """
         self.data_changed.emit()
         self._changed = True
-        print("data_changed emitted")
 
     def get_video_statistics(self):
         """
@@ -131,14 +130,15 @@ class VideoAnalysisResultsStore(qc.QObject):
             Throws:
                 IndexError: pop index out of range
         """
-        print("in remove_region")
-        lines = self.get_lines_for_region(index)
-        points = self.get_points_for_region(index)
-
-        if not (x is None for x in [lines, points]):
-            raise ValueError
+        markers = []
+        markers.append(self.get_lines_for_region(index))
+        markers.append(self.get_points_for_region(index))
+        markers = [x for x in markers if x is not None]
 
         self._regions.pop(index)
+        for marker in markers:
+            self.delete_marker(marker)
+
         self.set_changed()
 
     def get_regions(self):

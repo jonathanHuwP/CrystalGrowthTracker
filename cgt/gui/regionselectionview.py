@@ -134,6 +134,11 @@ class RegionSelectionView(VideoBaseView):
         item = items.pop(0)
         self.show_rect.emit(item.rect())
 
+        if self._data_source.region_has_markers(item):
+            message = "The region has associated markers, that must be deleted before the region."
+            qw.QMessageBox.critical(self, "Error: Region has markers", message)
+            return
+
         mb_reply = qw.QMessageBox.question(self,
                                            self.tr('CrystalGrowthTracker'),
                                            self.tr('Do you wish to delete the selected region?'),

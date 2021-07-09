@@ -677,11 +677,27 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 region (QRect) the region
         """
         index = self._project["results"].get_regions().index(region)
-        try:
-            self._project["results"].remove_region(index)
-        except ValueError:
-            message = "The region has associated markers, that must be deleted before the region."
-            qw.QMessageBox.critical(self, "Error: Region has markers", message)
+        self._project["results"].remove_region(index)
+
+    def region_has_markers(self, region):
+        """
+        check if a region has markers
+            Args:
+                region (QGraphicsRectItem) the region
+            Returns:
+                True if has marker else false
+        """
+        index = self._project["results"].get_regions().index(region)
+        markers = []
+        markers.append(self._project["results"].get_lines_for_region(index))
+        markers.append(self._project["results"].get_points_for_region(index))
+        markers = [x for x in markers if x is not None]
+
+        print(f"Markers for region {index}")
+        for marker in markers:
+            print(f"\t{marker}")
+
+        return len(markers)>0
 
     def append_lines(self, region_index, lines):
         """
