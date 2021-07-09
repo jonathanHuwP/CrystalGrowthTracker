@@ -113,8 +113,10 @@ class VideoBuffer(qc.QObject):
                 None
         """
         frame = self._queue_holder.get_frame_queue().pop()
-        pixmap = self.get_pixmap(frame)
+        if frame is None:
+            return
 
+        pixmap = self.get_pixmap(frame)
         # call the region viewing object with the image pixamp and frame number
         self.display_image.emit(pixmap, frame)
 
