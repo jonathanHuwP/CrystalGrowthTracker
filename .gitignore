@@ -13,3 +13,4 @@ Ui_*
 .vscode
 LINT.txt
 *.jpg
+tmp/
