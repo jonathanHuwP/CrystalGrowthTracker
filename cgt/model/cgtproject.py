@@ -116,6 +116,9 @@ class CGTProject(dict):
         # the file extension of the raw_video video file
         self['raw_video_no_extension'] = None
 
+        # when raw and enhanced vidoes supplied calc stats using enhanced
+        self["stats_from_enhanced"] = False
+
         # the user who stated the project
         self['start_user'] = None
 

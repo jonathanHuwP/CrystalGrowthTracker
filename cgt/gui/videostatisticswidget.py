@@ -217,3 +217,11 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
     @qc.pyqtSlot()
     def make_stats(self):
         self._data_source.make_video_statistics()
+
+    @qc.pyqtSlot(bool)
+    def setEnabled(self, enabled):
+        self._videoControl.setEnabled(enabled)
+        self._graphicsView.setEnabled(enabled)
+        self._graphScrollArea.setEnabled(enabled)
+        self._histogramScrollArea.setEnabled(enabled)
+        self._makeStatsButton.setEnabled(True)

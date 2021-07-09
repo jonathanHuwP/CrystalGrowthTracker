@@ -182,7 +182,8 @@ class ProjectStartDialog(qw.QDialog, Ui_ProjectStartDialog):
                 proj_dir,
                 proj_name,
                 notes,
-                self._copyCheckBox.isChecked())
+                self._copyCheckBox.isChecked(),
+                self._statisticsFromEnhancedVideo.isChecked())
 
             self.close()
         else:
