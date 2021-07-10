@@ -222,22 +222,5 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections>
-  <connection>
-   <sender>_makeStatsButton</sender>
-   <signal>clicked()</signal>
-   <receiver>VideoStatisticsWidget</receiver>
-   <slot>make_stats()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>71</x>
-     <y>563</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>453</x>
-     <y>297</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

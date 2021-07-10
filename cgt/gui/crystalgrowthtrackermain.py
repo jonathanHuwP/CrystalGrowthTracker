@@ -106,7 +106,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         ## the region selection widget
         self._selectWidget = VideoRegionSelectionWidget(tab, self)
         self._selectWidget.setup_video_widget()
-        self._selectWidget.setEnabled(False)
+        self._selectWidget.enable_and_connect(False)
         self.setup_tab(tab, self._selectWidget)
 
         ## Video Statistics
@@ -116,7 +116,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         ## the region selection widget
         self._videoStatsWidget = VideoStatisticsWidget(tab, self)
         self._videoStatsWidget.setup_video_widget()
-        self._videoStatsWidget.setEnabled(False)
+        self._videoStatsWidget.enable_and_connect(False)
         self.setup_tab(tab, self._videoStatsWidget)
 
         ## User drawing
@@ -165,18 +165,18 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             return
 
         self._propertiesWidget.setEnabled(False)
-        self._selectWidget.setEnabled(False)
-        self._videoStatsWidget.setEnabled(False)
+        self._selectWidget.enable_and_connect(False)
+        self._videoStatsWidget.enable_and_connect(False)
         self._drawingWidget.setEnabled(False)
         self._reportWidget.setEnabled(False)
 
         if tab_index == self._tabWidget.indexOf(self._propertiesTab):
             self._propertiesTab.setEnabled(True)
         elif tab_index == self._tabWidget.indexOf(self._selectTab):
-            self._selectWidget.setEnabled(True)
+            self._selectWidget.enable_and_connect(True)
         elif tab_index == self._tabWidget.indexOf(self._videoStatsTab):
             if self._project["results"].get_video_statistics() is not None:
-                self._videoStatsWidget.setEnabled(True)
+                self._videoStatsWidget.enable_and_connect(True)
         elif tab_index == self._tabWidget.indexOf(self._drawingTab):
             self._drawingWidget.setEnabled(True)
         elif tab_index == self._tabWidget.indexOf(self._reportTab):
@@ -919,7 +919,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._progressBar.hide()
 
         self._videoStatsWidget.display_stats()
-        self._videoStatsWidget.setEnabled(True)
+        self._videoStatsWidget.enable_and_connect(True)
 
     def get_video_stats(self):
         """

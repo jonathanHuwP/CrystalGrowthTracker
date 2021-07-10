@@ -67,6 +67,8 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         ## the plot widget for for the histogram
         self._histogram = None
 
+        self._makeStatsButton.clicked.connect(data_source.make_video_statistics)
+
         self.make_plots()
 
         font = qg.QFont( "Monospace", 8, qg.QFont.DemiBold)
@@ -77,6 +79,7 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         override base with drawing the graphs
             video_source (VideoSource): a source of video frames
         """
+        print("set_video_source")
         self.clear()
         super().set_video_source(video_source)
 
@@ -214,14 +217,16 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         self.make_plots()
         super().clear()
 
-    @qc.pyqtSlot()
-    def make_stats(self):
-        self._data_source.make_video_statistics()
-
-    @qc.pyqtSlot(bool)
-    def setEnabled(self, enabled):
+    def enable_and_connect(self, enabled):
+        """
+        enable/disable widget on enable the source
+        is connected on disable play is paused
+            Args:
+                enabled (bool): if true connect and enable else, disable and pause
+        """
+        self._makeStatsButton.setEnabled(True)
         self._videoControl.setEnabled(enabled)
         self._graphicsView.setEnabled(enabled)
         self._graphScrollArea.setEnabled(enabled)
         self._histogramScrollArea.setEnabled(enabled)
-        self._makeStatsButton.setEnabled(True)
+        self.connect_video(enabled)
