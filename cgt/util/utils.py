@@ -430,7 +430,9 @@ def hash_results(results):
             (int) hash code
     """
     items = []
-    items.append(hash_videointensitystats(results.get_video_statistics()))
+    stats = results.get_video_statistics()
+    if stats is not None:
+        items.append(hash_videointensitystats(stats))
 
     for marker in results.get_lines():
         for line in marker:

@@ -76,17 +76,26 @@ class VideoBaseWidget(qw.QWidget):
         ## the current value of the zoom
         self._current_zoom = 1.0
 
-    def setEnabled(self, enabled):
+    def enable_and_connect(self, enabled):
         """
         enable/disable widget on enable the source
         is connected on disable play is paused
+            Args:
+                enabled (bool): if true connect and enable else, disable and pause
         """
-        if enabled and self._video_source is not None:
-            super().setEnabled(True)
+        super().setEnabled(enabled)
+        self.connect_video(enabled)
+
+    def connect_video(self, connect):
+        """
+        connect/disconnect the video source
+            Args:
+                connect (bool): if true connect else, pause
+        """
+        if connect and self._video_source is not None:
             self._video_source.connect_viewer(self)
             self.redisplay()
-        elif not enabled:
-            super().setEnabled(False)
+        elif not connect:
             self.play_pause()
 
     def setup_video_widget(self):
