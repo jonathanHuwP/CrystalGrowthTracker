@@ -186,11 +186,9 @@ def write_html_region(fout, results, index, fps, scale, units):
     region = results.get_regions()[index]
     rect = region.rect()
     position = region.pos()
-    top_left = f"({rect.topLeft().x():.1f}, {rect.topLeft().y():.1f})"
-    bottom_right = f"({rect.bottomRight().x():.1f}, {rect.bottomRight().x():.1f})"
-    pos = f"({position.x()}, { position.y()})"
-
-    fout.write(f"<p>Rectangle: top left {top_left} bottom right {bottom_right}; Position {pos}</p>")
+    top_left = f"({rect.topLeft().x()+position.x():.1f}, {rect.topLeft().y()+position.y():.1f})"
+    bottom_right = f"({rect.bottomRight().x()+position.x():.1f}, {rect.bottomRight().y()+position.y():.1f})"
+    fout.write(f"<p>Rectangle: top left {top_left} bottom right {bottom_right}</p>")
 
     lines = []
     for marker in results.get_lines():
