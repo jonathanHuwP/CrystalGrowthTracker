@@ -204,6 +204,7 @@ class VideoRegionSelectionWidget(VideoBaseWidget, Ui_VideoRegionSelectionWidget)
             rect = region.rect().toAlignedRect()
             shape = (rect.width(), rect.height())
             self._writers.append((cv2.VideoWriter(str(file), fourcc, 20.0, shape), region))
+
         self.write_video_files()
 
     def finish_writing(self):
@@ -214,6 +215,7 @@ class VideoRegionSelectionWidget(VideoBaseWidget, Ui_VideoRegionSelectionWidget)
             writer[0].release()
 
         self._writers.clear()
+        self._videoControl.enable_all()
 
     def write_video_files(self):
         """
@@ -222,6 +224,7 @@ class VideoRegionSelectionWidget(VideoBaseWidget, Ui_VideoRegionSelectionWidget)
         self.play_pause()
         self._video_source.clear()
         frames = [i for i in range(self._video_source.get_length())]
+        self._videoControl.disable_all_but_zoom()
         self._video_source.request_frames(frames)
 
     def output_frame_of_region(self, writer):
