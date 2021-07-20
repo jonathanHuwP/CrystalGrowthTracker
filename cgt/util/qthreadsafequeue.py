@@ -47,6 +47,16 @@ class QThreadSafeQueue(qc.QObject):
         self._list.append(item)
         self._mutex.unlock()
 
+    def add(self, items):
+        """
+        add list of items to end of queue
+            Args:
+                items ([object]) the item to add
+        """
+        self._mutex.lock()
+        self._list += items
+        self._mutex.unlock()
+
     def pop(self):
         """
         remove item from head of queue

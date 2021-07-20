@@ -134,6 +134,15 @@ class VideoSource(qc.QObject):
         """
         self._frame_queue.push(frame_number)
 
+    def request_frames(self, frames):
+        """
+        request a list of frames
+            Args:
+                frames ([int]) list of fame number
+        """
+        self._frame_queue.add(frames)
+
+
     @qc.pyqtSlot()
     def clear(self):
         """

@@ -131,14 +131,12 @@ def nparray_to_qimage(array, brg=False):
 def qimage_to_nparray(image):
     """
     convert a QImage (Qt editing type) to an np array
-
         Args:
             image (QImage) the image, assumed to be RGB
-
         Returns:
             np array (uint8) the array
     """
-    if image.format() != qg.QImage.Format.Format_RGB32:
+    if image.format() != qg.QImage.Format_RGB32:
         message = f"QImage not in Format_RGB32, actual {image.format()}"
         raise ValueError(message)
         #image = image.convertToFormat(qg.QImage.Format.Format_RGB32)
