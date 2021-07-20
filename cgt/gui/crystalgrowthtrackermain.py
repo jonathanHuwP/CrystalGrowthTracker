@@ -820,9 +820,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             return
 
     qc.pyqtSlot()
-    def print_results(self):
+    def save_region_videos(self):
         """
-        print out the results
+        save videos of the regions
         """
         results = self._project["results"]
         if len(results.get_regions()) < 1:

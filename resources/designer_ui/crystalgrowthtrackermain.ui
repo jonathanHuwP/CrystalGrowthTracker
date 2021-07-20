@@ -103,8 +103,7 @@
     <addaction name="_actionSaveProject"/>
     <addaction name="_actionSaveImage"/>
     <addaction name="_actionSaveReults"/>
-    <addaction name="separator"/>
-    <addaction name="_actionPrintResults"/>
+    <addaction name="_actionSaveRegionVids"/>
     <addaction name="separator"/>
     <addaction name="_actionExit"/>
    </widget>
@@ -146,9 +145,9 @@
     <string>Save Report</string>
    </property>
   </action>
-  <action name="_actionPrintResults">
+  <action name="_actionSaveRegionVids">
    <property name="text">
-    <string>Print Results</string>
+    <string>Save Region Videos</string>
    </property>
   </action>
   <action name="_actionSaveImage">
@@ -257,10 +256,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>_actionPrintResults</sender>
+   <sender>_actionSaveRegionVids</sender>
    <signal>triggered()</signal>
    <receiver>CrystalGrowthTrackerMain</receiver>
-   <slot>print_results()</slot>
+   <slot>save_region_videos()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
