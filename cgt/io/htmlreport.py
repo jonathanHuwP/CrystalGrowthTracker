@@ -24,7 +24,9 @@ import pathlib
 
 from cgt.model.velocitiescalculator import VelocitiesCalculator
 
-from cgt.util.utils import (hash_results, make_report_file_names)
+from cgt.util.utils import (hash_results,
+                            make_report_file_names,
+                            get_region)
 
 def save_html_report(project, region_image_paths):
     '''
@@ -163,6 +165,22 @@ def write_html_regions(fout, project):
     results = project["results"]
     fout.write("<h2 align=\"left\">Motion Results</h2>\n")
     fout.write("<p>Results for each region are summerised below.</p>")
+
+    html_table = ["<table border=\"1\" width=\"100%\">"]
+    html_table.append("""<caption style=\"caption-side:bottom\"><em>Summary of the regions.</em></caption>\n""")
+
+    html_table.append(f"<tr><th>ID</th><th>Top Left(pixels)</th><th>Bottom Right (pixels)</th></tr>")
+    for i, region in enumerate(results.get_regions()):
+        rect = region.rect()
+        position = region.pos()
+        top_left = f"({rect.topLeft().x()+position.x():.1f}, {rect.topLeft().y()+position.y():.1f})"
+        bottom_right = f"({rect.bottomRight().x()+position.x():.1f}, {rect.bottomRight().y()+position.y():.1f})"
+        html_table.append(f"<tr><th>{i}</th><th>{top_left}</th><th>{bottom_right}</th></tr>")
+
+    html_table.append("</table>")
+
+    fout.write('\n'.join(html_table))
+
     for index in range(len(results.get_regions())):
         write_html_region(fout,
                           results,
@@ -181,14 +199,7 @@ def write_html_region(fout, results, index, fps, scale, units):
             fps (np.float64): the number of frames per second
             scale (np.float64): the size of a pixel
     '''
-    from cgt.util.utils import (get_region)
     fout.write(f"<h3 align=\"left\">Region {index}:</h3>\n")
-    region = results.get_regions()[index]
-    rect = region.rect()
-    position = region.pos()
-    top_left = f"({rect.topLeft().x()+position.x():.1f}, {rect.topLeft().y()+position.y():.1f})"
-    bottom_right = f"({rect.bottomRight().x()+position.x():.1f}, {rect.bottomRight().y()+position.y():.1f})"
-    fout.write(f"<p>Rectangle: top left {top_left} bottom right {bottom_right}</p>")
 
     lines = []
     for marker in results.get_lines():
