@@ -96,6 +96,12 @@ def read_csv_info(new_project, files, path):
                 else:
                     new_project[key] = value
 
+    if new_project["stats_from_enhanced"] == "True":
+        new_project["stats_from_enhanced"] = True
+    else:
+        new_project["stats_from_enhanced"] = False
+
+
 def read_csv_video_statistics(new_project, files, path):
     """
     read the video statistics, if it exists

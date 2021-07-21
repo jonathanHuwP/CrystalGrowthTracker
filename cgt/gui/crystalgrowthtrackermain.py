@@ -462,7 +462,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                       proj_dir,
                       proj_name,
                       notes,
-                      copy_files):
+                      copy_files,
+                      stats_from_enhanced):
         """
         function for starting a new project
             Args
@@ -472,6 +473,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 proj_name (string) the name of project, will be directory name
                 notes (string) project notes
                 copy_files (bool) if true video files are copied to project dir
+                stats_from_enhanced (bool) if true & raw video included, do stats on enhanced
         """
         # make the full project path
         path = proj_dir.joinpath(proj_name)
@@ -543,6 +545,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             project['raw_video_path'] = raw_video.parent
             project['raw_video_no_path'] = raw_video.name
             project['raw_video_no_extension'] = raw_video.stem
+
+        if stats_from_enhanced:
+            project["stats_from_enhanced"] = True
+        else:
+            project["stats_from_enhanced"] = False
 
         project["results"] = VideoAnalysisResultsStore(self)
         project["results"].data_changed.connect(self.data_changed)
@@ -800,8 +807,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self._drawingWidget.set_video_source(self._enhanced_video_reader)
 
             if self._project["raw_video"] is not None:
-                self._raw_video_reader = VideoSource(self._project["raw_video"])
-                self._videoStatsWidget.set_video_source(self._raw_video_reader)
+                if self._project["stats_from_enhanced"]:
+                    self._videoStatsWidget.set_video_source(self._enhanced_video_reader)
+                else:
+                    self._raw_video_reader = VideoSource(self._project["raw_video"])
+                    self._videoStatsWidget.set_video_source(self._raw_video_reader)
             else:
                 self._videoStatsWidget.set_video_source(self._enhanced_video_reader)
 
