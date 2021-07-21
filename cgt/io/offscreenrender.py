@@ -89,24 +89,16 @@ class OffScreenRender():
         self._view.scene().setSceneRect(rect)
 
         for region in regions:
-            self._view.scene().addItem(region)
+            self._view.scene().addRect(region.rect(), region.pen(), region.brush())
 
         image = self.make_image()
         head, _, tail = file_name.rpartition(".ppm")
         out_name = head + ".png" + tail
         image.save(out_name)
-        self.safe_clear()
 
-        print(f"Written {out_name}")
+        print(f"Report written {out_name}")
 
         return pathlib.Path(out_name)
-
-    def safe_clear(self):
-        """
-        clear the scene without deleting the items
-        """
-        for item in self._view.scene().items():
-            self._view.scene().removeItem(item)
 
     def make_image(self):
         """
