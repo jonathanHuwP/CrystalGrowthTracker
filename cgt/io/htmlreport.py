@@ -48,6 +48,7 @@ def save_html_report(project, region_image_paths):
     with open(html_outfile, "w") as fout:
         write_html_report_start(fout, project)
         write_html_overview(fout, project["results"], region_image_paths)
+        write_html_stats(fout, report_dir)
         write_html_regions(fout, project)
         write_html_report_end(fout, report_dir)
 
@@ -58,6 +59,22 @@ def save_html_report(project, region_image_paths):
 
     project["latest_report"] = str(html_outfile)
     return html_outfile
+
+def write_html_stats(fout, report_dir):
+    """
+    write the statistics section
+        Args:
+            fout (file): the open output file
+            report_dir (string): path to report dir
+    """
+    fout.write("<h2>Image Statistics</h2>\n")
+    path = pathlib.Path(report_dir).joinpath("images")
+    path = path.joinpath("stats_graph.png")
+    if not path.exists():
+        fout.write("<p>Not available</p>")
+    else:
+        fout.write(f"<img src=\"{path}\" width=\"80%\">\n")
+        fout.write("<p>Graph of image intensit statistics against frame number.</p>")
 
 def make_html_speeds_table(calculator, units):
     """

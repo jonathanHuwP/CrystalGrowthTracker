@@ -185,6 +185,11 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         pixmap.save(str(path))
 
     def make_plot(self, plot_widget):
+        """
+        make a plot of the the evolution of the statistics graph
+            Args:
+                plot_widget (PlotWidget) the plotting widget in use
+        """
         tick_font = qg.QFont()
         tick_font.setBold(True)
 
