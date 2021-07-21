@@ -559,12 +559,15 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self.save_project()
         self.project_created_or_loaded()
 
-    @qc.pyqtSlot()
-    def data_changed(self):
+    @qc.pyqtSlot(int)
+    def data_changed(self, value):
         """
         notify all widgets of a change in the data
+            Args:
+                value (int) code for type of data changed, 0: any 1: region
         """
-        self._drawingWidget.update_data_display()
+        if value == 1:
+            self._drawingWidget.update_data_display()
 
     def uptodate_report_exists(self):
         """

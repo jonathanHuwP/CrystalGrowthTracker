@@ -19,7 +19,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # set up linting conditions
 # pylint: disable = too-many-public-methods
 # pylint: disable = too-many-arguments
-
+import enum
 import bisect
 
 import PyQt5.QtCore as qc
@@ -33,13 +33,32 @@ from cgt.util.utils import (ItemDataTypes,
                             get_region,
                             get_marker_type)
 
+class DataTypes(enum.IntEnum):
+    """
+    define the types of data stored
+    """
+    ## a line
+    LINE = 0
+
+    ## a point
+    POINT = 1
+
+    ## a region
+    REGION = 2
+
+    ## a key frame
+    KEY_FRAME = 3
+
+
 class VideoAnalysisResultsStore(qc.QObject):
     """
     a storage class that records the results of a video analysis
     """
 
     ## signal to indicate that the contents has changed
-    data_changed = qc.pyqtSignal()
+    ## 0 any
+    ## 1 Region added
+    data_changed = qc.pyqtSignal(int)
 
     def __init__(self, parent):
         """
@@ -83,14 +102,14 @@ class VideoAnalysisResultsStore(qc.QObject):
         """
         self._changed = False
 
-    def set_changed(self):
+    def set_changed(self, value=0):
         """
         set the changed status to true
 
             Returns:
                 None
         """
-        self.data_changed.emit()
+        self.data_changed.emit(value)
         self._changed = True
 
     def get_video_statistics(self):
@@ -120,7 +139,7 @@ class VideoAnalysisResultsStore(qc.QObject):
                 IndexError: pop index out of range
         """
         self._regions[index] = region
-        self.set_changed()
+        self.set_changed(1)
 
     def remove_region(self, index):
         """
@@ -139,7 +158,7 @@ class VideoAnalysisResultsStore(qc.QObject):
         for marker in markers:
             self.delete_marker(marker)
 
-        self.set_changed()
+        self.set_changed(1)
 
     def get_regions(self):
         """
@@ -229,7 +248,7 @@ class VideoAnalysisResultsStore(qc.QObject):
                 region (QRect) the region
         """
         self._regions.append(region)
-        self.set_changed()
+        self.set_changed(1)
 
     def add_point(self, point):
         """
