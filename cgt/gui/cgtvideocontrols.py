@@ -112,7 +112,7 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
                 maximum (int) the largest allowed frame number
         """
         self._frameSlider.setRange(minimum, maximum-1)
-        self._gotoSpinBox.setRange(minimum, maximum)
+        self._gotoSpinBox.setRange(minimum, maximum-1)
         self._frameSlider.setTickInterval(int(maximum/10))
 
     def get_range(self):
@@ -259,4 +259,4 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         """
         jump to typed in frame
         """
-        self.frame_changed.emit(self._gotoSpinBox.value()-1)
+        self.frame_changed.emit(self._gotoSpinBox.value())

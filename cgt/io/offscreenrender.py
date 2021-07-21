@@ -76,7 +76,7 @@ class OffScreenRender():
                 file_path (pathlib.Path): file path
                 regions ([QGrapicsRectItem]): the regions of
         """
-        self.safe_clear()
+        self._view.scene().clear()
 
         file_name = str(file_path)
         pixmap = qg.QPixmap()
