@@ -26,11 +26,15 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = no-member
 # pylint: disable = too-many-public-methods
 import numpy as np
+import pathlib
 
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
+import PyQt5.QtWidgets as qw
 import pyqtgraph as pg
+import pyqtgraph.exporters as exporters
 
+import cgt.util.utils as utils
 from cgt.gui.videobasewidget import VideoBaseWidget
 from cgt.gui.Ui_videostatisticswidget import Ui_VideoStatisticsWidget
 
@@ -158,6 +162,29 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
 
         self._videoNameLabel.setText(text)
 
+        # off screen render
+        pi = pg.PlotWidget(title="<b>Intensity</b>")
+        pi.setBackground('w')
+
+        # make plots
+        self.make_plot(pi)
+        frame_count = self.make_plot(self._graph)
+
+        # at current frame line to GUI plot
+        self._frame_line = pg.InfiniteLine(angle=90, movable=False)
+        self._frame_line.setBounds([0, frame_count])
+        self._graph.addItem(self._frame_line)
+
+        # save off screen render
+        pi.setFixedWidth(800)
+        pi.setFixedHeight(600)
+        pixmap = pi.grab()
+        rpt_dir, _, _ = utils.make_report_file_names(self._data_source.get_project()["proj_full_path"])
+        path = pathlib.Path(rpt_dir).joinpath("images")
+        path = path.joinpath("stats_graph.png")
+        pixmap.save(str(path))
+
+    def make_plot(self, plot_widget):
         tick_font = qg.QFont()
         tick_font.setBold(True)
 
@@ -173,26 +200,24 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
             means_plus.append(mean + std_dev[i])
             means_minus.append(mean - std_dev[i])
 
-        self._graph.getAxis('left').setLabel("Intensity (Level)",
+        plot_widget.getAxis('left').setLabel("Intensity (Level)",
                                              **VideoStatisticsWidget.label_style)
-        self._graph.getAxis('left').setTickFont(tick_font)
-        self._graph.getAxis('bottom').setLabel("Frame (number)",
+        plot_widget.getAxis('left').setTickFont(tick_font)
+        plot_widget.getAxis('bottom').setLabel("Frame (number)",
                                                **VideoStatisticsWidget.label_style)
-        self._graph.getAxis('bottom').setTickFont(tick_font)
-        self._graph.setYRange(0, 260)
+        plot_widget.getAxis('bottom').setTickFont(tick_font)
+        plot_widget.setYRange(0, 260)
 
         x_axis = range(1, len(stats.get_frames())+1)
-        self._graph.addLegend()
-        m_plot = self._graph.plot(x_axis, means, pen='b', name="Mean")
-        up_plot = self._graph.plot(x_axis, means_plus, pen='r', name="Std Dev up")
-        down_plot = self._graph.plot(x_axis, means_minus, pen='r', name="Std Dev down")
+        plot_widget.addLegend()
+        m_plot = plot_widget.plot(x_axis, means, pen='b', name="Mean")
+        up_plot = plot_widget.plot(x_axis, means_plus, pen='r', name="Std Dev up")
+        down_plot = plot_widget.plot(x_axis, means_minus, pen='r', name="Std Dev down")
 
-        self._graph.addItem(pg.FillBetweenItem(m_plot, up_plot, levels[3]))
-        self._graph.addItem(pg.FillBetweenItem(m_plot, down_plot, levels[3]))
+        plot_widget.addItem(pg.FillBetweenItem(m_plot, up_plot, levels[3]))
+        plot_widget.addItem(pg.FillBetweenItem(m_plot, down_plot, levels[3]))
 
-        self._frame_line = pg.InfiniteLine(angle=90, movable=False)
-        self._frame_line.setBounds([0, len(stats.get_frames())])
-        self._graph.addItem(self._frame_line)
+        return len(stats.get_frames())
 
     def display_extra(self):
         """
