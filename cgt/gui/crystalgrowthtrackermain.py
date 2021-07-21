@@ -820,26 +820,26 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             return
 
     qc.pyqtSlot()
-    def print_results(self):
+    def save_region_videos(self):
         """
-        print out the results
+        save videos of the regions
         """
         results = self._project["results"]
-        print(f"Results Hash {utils.hash_results(results)}")
-        # if not self._tabWidget.currentWidget() == self._drawingTab:
-        #     return
+        if len(results.get_regions()) < 1:
+            error_title = self.tr("CGT Error")
+            message = self.tr("You must have at least one region.")
+            qw.QMessageBox.warning(self,
+                                   error_title,
+                                   message)
+            return
 
-        # clone_image_u = self._drawingWidget.grab_clone_image()
-        # clone_image_w = self._drawingWidget.get_clone_image()
+        self._tabWidget.setCurrentIndex(1)
+        dir_name = qw.QFileDialog.getExistingDirectory(
+            self,
+            self.tr("Select the directory for output."),
+            os.path.expanduser('~'))
 
-        # entry_image_u = self._drawingWidget.grab_entry_image()
-        # entry_image_w = self._drawingWidget.get_entry_image()
-
-        # clone_image_u.save("CLONE_user.jpg")
-        # clone_image_w.save("CLONE_whole.jpg")
-
-        # entry_image_u.save("ENTRY_user.jpg")
-        # entry_image_w.save("ENTRY_whole.jpg")
+        self._selectWidget.save_videos(dir_name)
 
     def has_unsaved_data(self):
         """
