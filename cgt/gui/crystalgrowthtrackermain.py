@@ -748,27 +748,33 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         msg_box = qw.QMessageBox()
         msg_box.setText(self.tr("Select Property"))
-        new_line = msg_box.addButton(self.tr("New Line Colour"), qw.QMessageBox.NoRole)
-        old_line = msg_box.addButton(self.tr("Old Line Colour"), qw.QMessageBox.NoRole)
-        line_thickness = msg_box.addButton(self.tr("Line thickness"), qw.QMessageBox.NoRole)
+        new_line = msg_box.addButton(self.tr("Drawing Line Colour"), qw.QMessageBox.NoRole)
+        old_line = msg_box.addButton(self.tr("Display Line Colour"), qw.QMessageBox.NoRole)
+        line_width = msg_box.addButton(self.tr("Line Width"), qw.QMessageBox.NoRole)
         msg_box.addButton(self.tr("Cancel"), qw.QMessageBox.NoRole)
         msg_box.exec()
 
         if msg_box.clickedButton() == new_line:
-            new_colour = self.get_colour()
-            print(f"new line {new_colour}")
+            drawing_colour = self.get_colour()
+            print(f"new line {drawing_colour}")
+            if drawing_colour is not None:
+                self._pens.set_drawing_colour(drawing_colour)
         elif msg_box.clickedButton() == old_line:
-            old_colour = self.get_colour()
-            print(f"old line {old_colour}")
-        elif msg_box.clickedButton() == line_thickness:
-            thickness = qw.QInputDialog.getInt(self,
-                                               self.tr("Line Thickness"),
-                                               self.tr("Line Thickness"),
-                                               value = 3,
-                                               min = 1,
-                                               max = 15,
-                                               step = 1)
-            print(f"thickness {thickness}")
+            dispaly_colour = self.get_colour()
+            print(f"old line {dispaly_colour}")
+            if dispaly_colour is not None:
+                self._pens.set_display_colour(dispaly_colour)
+        elif msg_box.clickedButton() == line_width:
+            width = qw.QInputDialog.getInt(self,
+                                           self.tr("Line Width"),
+                                           self.tr("Line Width"),
+                                           value = 3,
+                                           min = 1,
+                                           max = 15,
+                                           step = 1)
+            print(f"new line width {width}")
+            if width[1]:
+                self._pens.set_drawing_and_display_width(width[0])
 
     def get_colour(self):
         """

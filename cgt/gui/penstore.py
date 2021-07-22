@@ -47,6 +47,15 @@ class PenStore():
         self._highlight_pen.setWidth(NARROW_WIDTH)
         self._highlight_brush = qt.QBrush(qt.Qt.blue)
 
+    def set_drawing_and_display_width(self, width):
+        """
+        setter for the width of the drawing and display lines
+            Args:
+                width (int>0) the new width
+        """
+        self._drawing_pen.setWidth(width)
+        self._display_pen.setWidth(width)
+
     def set_drawing_width(self, width):
         """
         setter for the width of the drawing line

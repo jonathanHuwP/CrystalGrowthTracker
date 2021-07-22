@@ -83,7 +83,6 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         override base with drawing the graphs
             video_source (VideoSource): a source of video frames
         """
-        print("set_video_source")
         self.clear()
         super().set_video_source(video_source)
 
