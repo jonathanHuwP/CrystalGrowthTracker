@@ -773,3 +773,9 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         name = self._data_source.get_project()["enhanced_video_no_path"]
         if name is not None:
             self._videoNameLabel.setText(name)
+
+    def change_entry_pens(self):
+        """
+        force redraw of view
+        """
+        self._entryView.change_display_pen(self._data_source.get_pens())

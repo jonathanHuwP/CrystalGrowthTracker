@@ -601,3 +601,17 @@ class VideoAnalysisResultsStore(qc.QObject):
             return True
 
         return False
+
+    def change_marker_props(self, pens):
+        """
+        change the pen of exisiting items
+            Args:
+                pens (PenStore): the holder of the pens
+        """
+        for marker in self._lines:
+            for line in marker:
+                line.setPen(pens.get_display_pen())
+
+        for marker in self._points:
+            for point in marker:
+                point.sePen(pens.get_display_pen())

@@ -572,3 +572,13 @@ class MarkUpView(VideoBaseView):
                     return True
 
         return False
+
+    def change_display_pen(self, pens):
+        """
+        change the display pen of all items
+            Args:
+                pens (PenStore)
+        """
+        for item in self.scene().items():
+            if isinstance(item, qw.QGraphicsLineItem) or isinstance(item, qw.QGraphicsPathItem):
+                item.setPen(pens.get_display_pen())

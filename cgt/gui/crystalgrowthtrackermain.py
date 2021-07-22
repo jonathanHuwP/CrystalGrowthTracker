@@ -756,14 +756,14 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         if msg_box.clickedButton() == new_line:
             drawing_colour = self.get_colour()
-            print(f"new line {drawing_colour}")
             if drawing_colour is not None:
                 self._pens.set_drawing_colour(drawing_colour)
+                self.redraw_markers()
         elif msg_box.clickedButton() == old_line:
             dispaly_colour = self.get_colour()
-            print(f"old line {dispaly_colour}")
             if dispaly_colour is not None:
                 self._pens.set_display_colour(dispaly_colour)
+                self.redraw_markers()
         elif msg_box.clickedButton() == line_width:
             width = qw.QInputDialog.getInt(self,
                                            self.tr("Line Width"),
@@ -772,9 +772,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                                            min = 1,
                                            max = 15,
                                            step = 1)
-            print(f"new line width {width}")
             if width[1]:
                 self._pens.set_drawing_and_display_width(width[0])
+                self.redraw_markers()
 
     def get_colour(self):
         """
@@ -947,6 +947,13 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 video stats array
         """
         return self._project["results"].get_video_statistics()
+
+    def redraw_markers(self):
+        """
+        redraw all the markers with new colour/width
+        """
+        self._project["results"].change_marker_props(self._pens)
+        self._drawingWidget.change_entry_pens()
 
     @qc.pyqtSlot()
     def closeEvent(self, event):
