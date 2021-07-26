@@ -768,7 +768,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             width = qw.QInputDialog.getInt(self,
                                            self.tr("Line Width"),
                                            self.tr("Line Width"),
-                                           value = 3,
+                                           value = PenStore.DEFAULT_WIDTH,
                                            min = 1,
                                            max = 15,
                                            step = 1)
