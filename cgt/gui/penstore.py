@@ -26,25 +26,25 @@ class PenStore():
     """
     provides a set of pens for use in drawing, adjustable colour and thickness
     """
+    DEFAULT_WIDTH = 8
+    NARROW_WIDTH = 3
 
     def __init__(self):
         """
         initalize the class
         """
-        DEFAULT_WIDTH = 8
-        NARROW_WIDTH = 3
 
         ## pen for drawing artifacts
         self._drawing_pen = qg.QPen(qt.Qt.red)
-        self._drawing_pen.setWidth(DEFAULT_WIDTH)
+        self._drawing_pen.setWidth(PenStore.DEFAULT_WIDTH)
 
         ## pen for displaying artifacts
         self._display_pen = qg.QPen(qt.Qt.green)
-        self._display_pen.setWidth(DEFAULT_WIDTH)
+        self._display_pen.setWidth(PenStore.DEFAULT_WIDTH)
 
         ## pen and brush for arrows
         self._highlight_pen = qt.QPen(qt.Qt.blue)
-        self._highlight_pen.setWidth(NARROW_WIDTH)
+        self._highlight_pen.setWidth(PenStore.NARROW_WIDTH)
         self._highlight_brush = qt.QBrush(qt.Qt.blue)
 
     def set_drawing_and_display_width(self, width):
