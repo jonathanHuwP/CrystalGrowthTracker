@@ -46,6 +46,7 @@ from cgt.gui.markupwidget import MarkUpWidget
 from cgt.gui.reportwidget import ReportWidget
 from cgt.gui.videostatisticswidget import VideoStatisticsWidget
 from cgt.gui.penstore import PenStore
+from cgt.gui.resultswidget import ResultsWidget
 
 import cgt.io.htmlreport as htmlreport
 import cgt.io.writecsvreports as writecsvreports
@@ -91,7 +92,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         ## the pens
         self._pens = PenStore()
 
-        ## Properties
+        # Properties
         #############
         tab = self._tabWidget.widget(0)
 
@@ -99,7 +100,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._propertiesWidget = ProjectPropertiesWidget(tab, self)
         self.setup_tab(tab, self._propertiesWidget)
 
-        ## Selection
+        # Selection
         ############
         tab = self._tabWidget.widget(1)
 
@@ -109,7 +110,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._selectWidget.enable_and_connect(False)
         self.setup_tab(tab, self._selectWidget)
 
-        ## Video Statistics
+        # Video Statistics
         ###################
         tab = self._tabWidget.widget(2)
 
@@ -119,22 +120,30 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._videoStatsWidget.enable_and_connect(False)
         self.setup_tab(tab, self._videoStatsWidget)
 
-        ## User drawing
+        # User drawing
         ###############
         tab =self._tabWidget.widget(3)
 
         ## the crystal drawing widget
-
         self._drawingWidget = MarkUpWidget(tab, self)
         self._drawingWidget.setup_video_widget()
         self._drawingWidget.setEnabled(False)
         self.setup_tab(tab, self._drawingWidget)
 
-        ## Report results
-        #################
+        # Results
+        ###########
         tab = self._tabWidget.widget(4)
 
-        ## the results widget
+        ## results widget
+        self._resultsWidget = ResultsWidget(tab, self)
+        self.setup_tab(tab, self._resultsWidget)
+
+
+        # Report results
+        #################
+        tab = self._tabWidget.widget(5)
+
+        ## the report widget
         self._reportWidget = ReportWidget(tab, self)
         self.setup_tab(tab, self._reportWidget)
 
