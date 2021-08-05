@@ -26,6 +26,9 @@ import PyQt5.QtGui as qg
 
 import pyqtgraph as pg
 
+from cgt.model.velocitiescalculator import VelocitiesCalculator
+from cgt.util.utils import get_region
+
 from cgt.gui.Ui_resultswidget import Ui_ResultsWidget
 
 class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
@@ -55,6 +58,18 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
 
         self.setup_display()
 
+    def setEnabled(self, enabled):
+        """
+        enable/disable widget on enable the source
+        is connected on disable play is paused
+        """
+        if enabled:
+            super().setEnabled(True)
+            self.setup_display()
+        elif not enabled:
+            super().setEnabled(False)
+
+
     def setup_display(self):
         """
         initalize the display
@@ -69,7 +84,7 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
         for i in range(len(results.get_regions())):
             self._regionBox.addItem(str(i))
 
-        if self._data_source.length_results() > 0:
+        if len(results.get_regions()) > 0:
             self.fill_tree()
 
             if old_index >=0:
@@ -79,21 +94,28 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
         """
         fill the tree widget
         """
+        print("fill tree")
+        results = self._data_source.get_results()
+
         headers = ["Region", "Marker Type", "Interval", "Speed"]
         self._resultsTree.setColumnCount(3)
         self._resultsTree.setHeaderLabels(headers)
 
-        for i, result in enumerate(self._data_source.get_results()):
+        for i, _ in enumerate(results.get_regions()):
+            calc = self.calculate_speeds(i)
             region_item = qw.QTreeWidgetItem(self._resultsTree)
             region_item.setText(0, str(i))
+            lines = calc.get_line_displacements()
 
-            for marker in result:
+            for line in lines:
                 marker_item = qw.QTreeWidgetItem(region_item)
-                marker_item.setText(1, marker[0])
-                for interval in marker[1]:
-                    interval_item = qw.QTreeWidgetItem(marker_item)
-                    interval_item.setText(2, str(interval[0]))
-                    interval_item.setText(3, str(interval[1]))
+                marker_item.setText(1, self.tr("Line"))
+                print(f"dis type is {type(line)}")
+
+                # for line in marker:
+                #     interval_item = qw.QTreeWidgetItem(marker_item)
+                #     interval_item.setText(2, "hi")
+                #     interval_item.setText(3, "ho")
 
     @qc.pyqtSlot(int)
     def draw_graph_of_region(self, index):
@@ -102,22 +124,49 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
             Args:
                 index (int): the array index of the region
         """
-        label_style = {'font-weight': 'bold'}
-        result = self._data_source.get_results()[index]
+        print("draw")
 
-        tick_font = qg.QFont()
-        tick_font.setBold(True)
+        # label_style = {'font-weight': 'bold'}
+        # result = self._data_source.get_results()[index]
 
-        self._graph.getAxis('left').setLabel("Speed (Level)", **label_style)
-        self._graph.getAxis('left').setTickFont(tick_font)
-        self._graph.getAxis('bottom').setLabel("Interval (number)", **label_style)
-        self._graph.getAxis('bottom').setTickFont(tick_font)
+        # tick_font = qg.QFont()
+        # tick_font.setBold(True)
 
-        x_axis = [1, 2]
+        # self._graph.getAxis('left').setLabel("Speed (Level)", **label_style)
+        # self._graph.getAxis('left').setTickFont(tick_font)
+        # self._graph.getAxis('bottom').setLabel("Interval (number)", **label_style)
+        # self._graph.getAxis('bottom').setTickFont(tick_font)
 
-        for marker in result:
-            speeds = []
-            for speed in marker[1]:
-                speeds.append(speed[1])
+        # x_axis = [1, 2]
 
-            self._graph.plot(x_axis, speeds, pen='b', name="Speed")
+        # for marker in result:
+        #     speeds = []
+        #     for speed in marker[1]:
+        #         speeds.append(speed[1])
+
+        #     self._graph.plot(x_axis, speeds, pen='b', name="Speed")
+
+    def calculate_speeds(self, index):
+        """
+        carry out speeds calculation
+            Args:
+                index (int) the region
+        """
+        results = self._data_source.get_results()
+        lines = []
+        for marker in results.get_lines():
+            if get_region(marker[0]) == index:
+                print(f"Region {index} line {marker[0]}")
+                lines.append(marker)
+
+        points = []
+        for marker in results.get_points():
+            if get_region(marker[0]) == index:
+                print(f"Region {index} point {marker[0]}")
+                points.append(marker)
+
+        fps = self._data_source.get_project()["frame_rate"]
+        scale = self._data_source.get_project()["resolution"]
+        calculator = VelocitiesCalculator(lines, points, fps, scale)
+        calculator.process_latest_data()
+        return calculator

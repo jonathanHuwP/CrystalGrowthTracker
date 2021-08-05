@@ -138,7 +138,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._resultsWidget = ResultsWidget(tab, self)
         self.setup_tab(tab, self._resultsWidget)
 
-
         # Report results
         #################
         tab = self._tabWidget.widget(5)
@@ -177,6 +176,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._selectWidget.enable_and_connect(False)
         self._videoStatsWidget.enable_and_connect(False)
         self._drawingWidget.setEnabled(False)
+        self._resultsWidget.setEnabled(False)
         self._reportWidget.setEnabled(False)
 
         if tab_index == self._tabWidget.indexOf(self._propertiesTab):
@@ -188,12 +188,13 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 self._videoStatsWidget.enable_and_connect(True)
         elif tab_index == self._tabWidget.indexOf(self._drawingTab):
             self._drawingWidget.setEnabled(True)
+        elif tab_index == self._tabWidget.indexOf(self._resultsTab):
+            self._resultsWidget.setEnabled(True)
         elif tab_index == self._tabWidget.indexOf(self._reportTab):
             if not self.uptodate_report_exists():
                 renderer = OffScreenRender(self._project)
                 region_image_paths = renderer.render_region_images()
                 self.make_report(region_image_paths)
-
 
             _, report_file, _ = utils.make_report_file_names(self._project["proj_full_path"])
             if report_file.exists():
