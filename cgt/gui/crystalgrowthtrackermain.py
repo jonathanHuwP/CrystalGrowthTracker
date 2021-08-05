@@ -983,7 +983,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             # the event must be accepted
             event.accept()
 
-            # to get rid tell the event-loop to schedul for deleteion
+            # to get rid tell the event-loop to schedule for deleteion
             # do not destroy as a pointer may survive in event-loop
             # which will trigger errors if it recieves a queued signal
             self.deleteLater()
