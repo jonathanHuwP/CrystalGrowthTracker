@@ -200,16 +200,19 @@ def read_csv_points(new_project, files, path, pens):
             tmp += [int(x) for x in row[5:]]
             rows.append(tmp)
 
-    rows.sort(key=operator.itemgetter(6, 5))
+    rows.sort(key=operator.itemgetter(6))
 
-    for _, marker in itertools.groupby(rows, operator.itemgetter(6)):
-        g_marker = []
-        for item in marker:
-            # set up parent hash ?
-            g_marker.append(list_to_g_point(item,
-                                            pens.get_display_pen()))
+    for _, region_iterator in itertools.groupby(rows, operator.itemgetter(6)):
+        region_group = [x for x in region_iterator]
+        region_group.sort(key=operator.itemgetter(0))
+        for _, point_iterator in itertools.groupby(region_group, operator.itemgetter(0)):
+            point_group = [x for x in point_iterator]
+            point_group.sort(key=operator.itemgetter(5))
+            g_marker = []
+            for row in point_group:
+                g_marker.append(list_to_g_point(row, pens.get_display_pen()))
 
-        new_project["results"].insert_point_marker(g_marker)
+            new_project["results"].insert_point_marker(g_marker)
 
 def read_csv_lines(new_project, files, path, pens):
     """
@@ -240,15 +243,19 @@ def read_csv_lines(new_project, files, path, pens):
             tmp += [int(x) for x in row[7:]]
             rows.append(tmp)
 
-    rows.sort(key=operator.itemgetter(8, 7))
+    rows.sort(key=operator.itemgetter(8))
 
-    for _, marker in itertools.groupby(rows, operator.itemgetter(8)):
-        g_marker = []
-        for item in marker:
-            g_marker.append(list_to_g_line(item,
-                                           pens.get_display_pen()))
+    for _, region_iterator in itertools.groupby(rows, operator.itemgetter(8)):
+        region_group = [x for x in region_iterator]
+        region_group.sort(key=operator.itemgetter(0))
+        for _, line_iterator in itertools.groupby(region_group, operator.itemgetter(0)):
+            line_group = [x for x in line_iterator]
+            line_group.sort(key=operator.itemgetter(7))
+            g_marker = []
+            for row in line_group:
+                g_marker.append(list_to_g_line(row, pens.get_display_pen()))
 
-        new_project["results"].insert_line_marker(g_marker)
+            new_project["results"].insert_line_marker(g_marker)
 
 def extract_key_frames(results):
     """
