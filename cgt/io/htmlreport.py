@@ -221,13 +221,11 @@ def write_html_region(fout, results, index, fps, scale, units):
     lines = []
     for marker in results.get_lines():
         if get_region(marker[0]) == index:
-            print(f"Region {index} line {marker[0]}")
             lines.append(marker)
 
     points = []
     for marker in results.get_points():
         if get_region(marker[0]) == index:
-            print(f"Region {index} point {marker[0]}")
             points.append(marker)
 
     calculator = VelocitiesCalculator(lines, points, fps, scale)

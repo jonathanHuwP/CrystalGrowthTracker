@@ -96,8 +96,6 @@ class OffScreenRender():
         out_name = head + ".png" + tail
         image.save(out_name)
 
-        print(f"Report written {out_name}")
-
         return pathlib.Path(out_name)
 
     def make_image(self):

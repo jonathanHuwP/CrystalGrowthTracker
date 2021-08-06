@@ -713,10 +713,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         markers.append(self._project["results"].get_points_for_region(index))
         markers = [x for x in markers if x is not None]
 
-        print(f"Markers for region {index}")
-        for marker in markers:
-            print(f"\t{marker}")
-
         return len(markers)>0
 
     def append_lines(self, region_index, lines):
@@ -916,7 +912,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         calculate the intensity statistics for the video
         """
-        print("make stats")
         if self._project is None:
             return
 

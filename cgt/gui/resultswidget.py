@@ -138,8 +138,6 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
             Args:
                 index (int): the array index of the region
         """
-        print("draw")
-
         self._graph.clear()
 
         label_style = {'font-weight': 'bold'}
@@ -187,13 +185,11 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
         lines = []
         for marker in results.get_lines():
             if get_region(marker[0]) == index:
-                print(f"Region {index} line {marker[0]}")
                 lines.append(marker)
 
         points = []
         for marker in results.get_points():
             if get_region(marker[0]) == index:
-                print(f"Region {index} point {marker[0]}")
                 points.append(marker)
 
         fps = self._data_source.get_project()["frame_rate"]

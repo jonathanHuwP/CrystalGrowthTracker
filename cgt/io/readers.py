@@ -32,10 +32,7 @@ def read_video_frame(frame_number, filename, outpath):
     '''
     start = timer()
 
-    print("hi read_video_frame")
     file_name = filename
-    print(file_name)
-    print("frame_number: ", frame_number)
 
     try:
         video = get_reader(file_name, 'ffmpeg')
@@ -71,6 +68,5 @@ def read_video_frame(frame_number, filename, outpath):
     #filename_histogram = str(outpath)+'/HistogramFrame'+number+'.png'
     end = timer()
     time = str(timedelta(seconds=(end-start)))
-    print("The time to read and process the video was: ", time) # Time in seconds
 
     return filename_frame, filename_histogram
