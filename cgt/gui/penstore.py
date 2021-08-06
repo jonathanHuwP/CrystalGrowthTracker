@@ -34,18 +34,23 @@ class PenStore():
         initalize the class
         """
 
+        # brush for the pens
+        brush = qt.QBrush(qt.Qt.red)
+
         ## pen for drawing artifacts
-        self._drawing_pen = qg.QPen(qt.Qt.red)
-        self._drawing_pen.setWidth(PenStore.DEFAULT_WIDTH)
+        self._drawing_pen = qt.QPen(brush, PenStore.DEFAULT_WIDTH, qt.Qt.SolidLine)
 
+        brush = qt.QBrush(qt.Qt.green)
         ## pen for displaying artifacts
-        self._display_pen = qg.QPen(qt.Qt.green)
-        self._display_pen.setWidth(PenStore.DEFAULT_WIDTH)
+        self._display_pen = qt.QPen(brush, PenStore.DEFAULT_WIDTH, qt.Qt.SolidLine)
 
-        ## pen and brush for arrows
-        self._highlight_pen = qt.QPen(qt.Qt.blue)
-        self._highlight_pen.setWidth(PenStore.NARROW_WIDTH)
+        ## brush for the arrows
         self._highlight_brush = qt.QBrush(qt.Qt.blue)
+
+        ## pen for arrows
+        self._highlight_pen = qt.QPen(self._highlight_brush,
+                                      PenStore.NARROW_WIDTH,
+                                      qt.Qt.SolidLine)
 
     def set_drawing_and_display_width(self, width):
         """
@@ -148,3 +153,6 @@ class PenStore():
                 (QPen) the highlight brush
         """
         return self._highlight_brush
+
+    def get_plotting_pen(self, index):
+        return self._plotting_pens[index%5]

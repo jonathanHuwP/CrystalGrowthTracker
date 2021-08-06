@@ -153,6 +153,7 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
         self._graph.getAxis('bottom').setLabel("Frame (number)", **label_style)
         self._graph.getAxis('bottom').setTickFont(tick_font)
 
+        pen = 0
         for i, marker in enumerate(lines):
             displacements = [0.0]
             frames = [0]
@@ -161,7 +162,8 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
                 displacements.append(new_dis)
                 frames.append(dis.get_end())
 
-            self._graph.plot(frames, displacements, pen='b', name=f"Line {i}")
+            self._graph.plot(frames, displacements, pen=(pen, 5), name=f"Line {i}")
+            pen += 1
 
         for i, marker in enumerate(points):
             displacements = [0.0]
@@ -171,7 +173,8 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
                 displacements.append(new_dis)
                 frames.append(dis.get_end())
 
-            self._graph.plot(frames, displacements, pen='b', name=f"Point {i}")
+            self._graph.plot(frames, displacements, pen=(pen, 5), name=f"Point {i}")
+            pen += 1
 
         self._graph.addLegend()
 
