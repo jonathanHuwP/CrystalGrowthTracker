@@ -52,7 +52,7 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
         ## the graph of the results
         self._graph = None
 
-        self._graph = pg.PlotWidget(title="<b>Marker Speeds</b>")
+        self._graph = pg.PlotWidget(title="<b>Marker Displacments</b>")
         self._graph.setBackground('w')
         self._graphScrollArea.setWidget(self._graph)
 
@@ -85,39 +85,53 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
             self._regionBox.addItem(str(i))
 
         if len(results.get_regions()) > 0:
-            self.fill_tree()
+            if old_index < 0:
+                old_index = 0
+            self.show_results(old_index)
 
-            if old_index >=0:
-                self.draw_graph_of_region(old_index)
+    @qc.pyqtSlot(int)
+    def show_results(self, index):
+        """
+        show the table and graph
+            Args:
+                index (int): the index of the region
+        """
+        self.fill_table(index)
+        self.draw_graph_of_region(index)
 
-    def fill_tree(self):
+    def fill_table(self, index):
         """
         fill the tree widget
         """
-        print("fill tree")
-        results = self._data_source.get_results()
+        self._resultsTable.clear()
 
-        headers = ["Region", "Marker Type", "Interval", "Speed"]
-        self._resultsTree.setColumnCount(3)
-        self._resultsTree.setHeaderLabels(headers)
+        headers = ["Marker", "Start Frame", "End Frame", "Displacement"]
+        self._resultsTable.setColumnCount(4)
+        self._resultsTable.setHorizontalHeaderLabels(headers)
 
-        for i, _ in enumerate(results.get_regions()):
-            calc = self.calculate_speeds(i)
-            region_item = qw.QTreeWidgetItem(self._resultsTree)
-            region_item.setText(0, str(i))
-            lines = calc.get_line_displacements()
+        self._resultsTable.setRowCount(10)
 
-            for line in lines:
-                marker_item = qw.QTreeWidgetItem(region_item)
-                marker_item.setText(1, self.tr("Line"))
-                print(f"dis type is {type(line)}")
+        calc = self.calculate_speeds(index)
+        lines = calc.get_line_displacements()
+        points = calc.get_point_displacements()
 
-                # for line in marker:
-                #     interval_item = qw.QTreeWidgetItem(marker_item)
-                #     interval_item.setText(2, "hi")
-                #     interval_item.setText(3, "ho")
+        row = 0
+        for j, line in enumerate(lines):
+            for displacement in line:
+                self._resultsTable.setItem(row, 0, qw.QTableWidgetItem(self.tr(f"Line {j}")))
+                self._resultsTable.setItem(row, 1, qw.QTableWidgetItem(str(displacement.get_start())))
+                self._resultsTable.setItem(row, 2, qw.QTableWidgetItem(str(displacement.get_end())))
+                self._resultsTable.setItem(row, 3, qw.QTableWidgetItem( f"{displacement.get_length():.2f}"))
+                row += 1
 
-    @qc.pyqtSlot(int)
+        for j, point in enumerate(points):
+            for displacement in point:
+                self._resultsTable.setItem(row, 0, qw.QTableWidgetItem(self.tr(f"Point {j}")))
+                self._resultsTable.setItem(row, 1, qw.QTableWidgetItem(str(displacement.get_start())))
+                self._resultsTable.setItem(row, 2, qw.QTableWidgetItem(str(displacement.get_end())))
+                self._resultsTable.setItem(row, 3, qw.QTableWidgetItem( f"{displacement.get_length():.2f}"))
+                row += 1
+
     def draw_graph_of_region(self, index):
         """
         callback for change of region
@@ -126,25 +140,42 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
         """
         print("draw")
 
-        # label_style = {'font-weight': 'bold'}
-        # result = self._data_source.get_results()[index]
+        self._graph.clear()
 
-        # tick_font = qg.QFont()
-        # tick_font.setBold(True)
+        label_style = {'font-weight': 'bold'}
+        calc = self.calculate_speeds(index)
+        lines = calc.get_line_displacements()
+        points = calc.get_point_displacements()
 
-        # self._graph.getAxis('left').setLabel("Speed (Level)", **label_style)
-        # self._graph.getAxis('left').setTickFont(tick_font)
-        # self._graph.getAxis('bottom').setLabel("Interval (number)", **label_style)
-        # self._graph.getAxis('bottom').setTickFont(tick_font)
+        tick_font = qg.QFont()
+        tick_font.setBold(True)
 
-        # x_axis = [1, 2]
+        self._graph.getAxis('left').setLabel("Displacement (micron)", **label_style)
+        self._graph.getAxis('left').setTickFont(tick_font)
+        self._graph.getAxis('bottom').setLabel("Frame (number)", **label_style)
+        self._graph.getAxis('bottom').setTickFont(tick_font)
 
-        # for marker in result:
-        #     speeds = []
-        #     for speed in marker[1]:
-        #         speeds.append(speed[1])
+        for i, marker in enumerate(lines):
+            displacements = [0.0]
+            frames = [0]
+            for dis in marker:
+                new_dis = displacements[-1] + dis.get_length()
+                displacements.append(new_dis)
+                frames.append(dis.get_end())
 
-        #     self._graph.plot(x_axis, speeds, pen='b', name="Speed")
+            self._graph.plot(frames, displacements, pen='b', name=f"Line {i}")
+
+        for i, marker in enumerate(points):
+            displacements = [0.0]
+            frames = [0]
+            for dis in marker:
+                new_dis = displacements[-1] + dis.get_length()
+                displacements.append(new_dis)
+                frames.append(dis.get_end())
+
+            self._graph.plot(frames, displacements, pen='b', name=f"Point {i}")
+
+        self._graph.addLegend()
 
     def calculate_speeds(self, index):
         """

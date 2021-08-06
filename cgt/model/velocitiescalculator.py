@@ -70,6 +70,12 @@ class ScreenDisplacement():
         """
         return self._end_frame
 
+    def get_length(self):
+        """
+        getter for the length
+        """
+        return self._length
+
     def get_speed(self):
         """
         find the speed of the motion (length/(end-start))
@@ -157,7 +163,8 @@ class VelocitiesCalculator():
 
                     start = get_frame(previous)
                     end = get_frame(current)
-                    displacement = ScreenDisplacement(start, end, distance, self._frames_per_second)
+                    # start_frame, end_frame, fps, length
+                    displacement = ScreenDisplacement(start, end, self._frames_per_second, distance)
                     marker_displacements.append(displacement)
 
                     previous = current
@@ -188,7 +195,8 @@ class VelocitiesCalculator():
                 start = get_frame(previous)
                 end = get_frame(current)
 
-                displacement = ScreenDisplacement(start, end, length, self._frames_per_second)
+                # start_frame, end_frame, fps, length
+                displacement = ScreenDisplacement(start, end, self._frames_per_second, length)
                 marker_displacements.append(displacement)
 
                 previous = current

@@ -13,19 +13,13 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
    <item>
     <widget class="QSplitter" name="splitter">
      <property name="orientation">
-      <enum>Qt::Vertical</enum>
+      <enum>Qt::Horizontal</enum>
      </property>
-     <widget class="QTreeWidget" name="_resultsTree">
-      <column>
-       <property name="text">
-        <string notr="true">1</string>
-       </property>
-      </column>
-     </widget>
+     <widget class="QTableWidget" name="_resultsTable"/>
      <widget class="QScrollArea" name="_graphScrollArea">
       <property name="widgetResizable">
        <bool>true</bool>
@@ -35,8 +29,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>902</width>
-         <height>343</height>
+         <width>105</width>
+         <height>586</height>
         </rect>
        </property>
       </widget>
@@ -78,7 +72,7 @@
    <sender>_regionBox</sender>
    <signal>currentIndexChanged(int)</signal>
    <receiver>ResultsWidget</receiver>
-   <slot>draw_graph_of_region(int)</slot>
+   <slot>show_results(int)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>117</x>
