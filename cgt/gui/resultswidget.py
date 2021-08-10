@@ -26,6 +26,7 @@ import PyQt5.QtGui as qg
 
 import pyqtgraph as pg
 
+from cgt.gui.markupview import MarkUpView
 from cgt.model.velocitiescalculator import VelocitiesCalculator
 from cgt.util.utils import get_region
 
@@ -69,7 +70,6 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
         elif not enabled:
             super().setEnabled(False)
 
-
     def setup_display(self):
         """
         initalize the display
@@ -98,6 +98,31 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
         """
         self.fill_table(index)
         self.draw_graph_of_region(index)
+        self.display_region(index)
+
+    def display_region(self, index):
+        """
+        display the selected region
+            Args:
+                index (int): array index of the region
+        """
+        from cgt.util.utils import (get_frame, get_point_of_point)
+
+        # get image first key frame
+        # display image plus initial markers plus numbers
+        results = self._data_source.get_results()
+        region = results.get_regions()[index]
+        line_markers = results.get_lines_for_region(index)
+        point_markers = results.get_points_for_region(index)
+
+        print(f"Region {region.rect()}\n======")
+        for marker in line_markers:
+            # get first for each
+            print(f"\tLine: {marker[0].line()} {get_frame(marker[0])}")
+        for marker in point_markers:
+            # get first for each
+            print(f"\tPoint: {get_point_of_point(marker[0])} {get_frame(marker[0])}")
+
 
     def fill_table(self, index):
         """

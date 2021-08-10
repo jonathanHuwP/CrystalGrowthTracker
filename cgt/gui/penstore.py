@@ -34,13 +34,15 @@ class PenStore():
         initalize the class
         """
 
-        # brush for the pens
+        # red brush for drawing
         brush = qt.QBrush(qt.Qt.red)
 
         ## pen for drawing artifacts
         self._drawing_pen = qt.QPen(brush, PenStore.DEFAULT_WIDTH, qt.Qt.SolidLine)
 
+        # green brush for displaying
         brush = qt.QBrush(qt.Qt.green)
+
         ## pen for displaying artifacts
         self._display_pen = qt.QPen(brush, PenStore.DEFAULT_WIDTH, qt.Qt.SolidLine)
 
