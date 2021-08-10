@@ -115,6 +115,25 @@ class VideoSource(qc.QObject):
 
         self._current_viewer = viewer
 
+    def simple_connect_viewer(self, viewer):
+        """
+        connect the VideoBuffer's 'display_image' signal and the
+        viewers 'request_frame', any
+        previous connections are disconnected. No pause i
+            Args:
+                viewer (QObject) if None the source is disconnected from any previous connections
+        """
+        self.disconnect_viewer()
+        if viewer is None:
+            return
+
+        self._video_reader.display_image.connect(viewer.display_image)
+        viewer.request_frame.connect(self.request_frame)
+        viewer.clear_queue.connect(self.clear)
+        self.clear()
+
+        self._current_viewer = viewer
+
     def disconnect_viewer(self):
         """
         disconnect the VideoBuffer's 'display_image' signal

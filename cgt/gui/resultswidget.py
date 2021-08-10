@@ -26,9 +26,14 @@ import PyQt5.QtGui as qg
 
 import pyqtgraph as pg
 
-from cgt.gui.markupview import MarkUpView
 from cgt.model.velocitiescalculator import VelocitiesCalculator
-from cgt.util.utils import get_region
+from cgt.util.utils import (ItemDataTypes,
+                            MarkerTypes,
+                            get_region,
+                            hash_graphics_line,
+                            hash_graphics_point,
+                            get_frame,
+                            get_region)
 
 from cgt.gui.Ui_resultswidget import Ui_ResultsWidget
 
@@ -36,6 +41,12 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
     """
     class for display of results
     """
+
+    ## signal that a frame is required
+    request_frame = qc.pyqtSignal(int)
+
+    ## signal that the queue should be cleared
+    clear_queue = qc.pyqtSignal()
 
     def __init__(self, parent, data_source):
         """
@@ -53,6 +64,21 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
         ## the graph of the results
         self._graph = None
 
+        ## pointer for the video source
+        self._video_source = None
+
+        ## the region in use
+        self._current_region = None
+
+        # the start lines
+        self._lines = None
+
+        # the start points
+        self._points = None
+
+        # ensure view has a scene graph
+        self._regionView.setScene(qw.QGraphicsScene())
+
         self._graph = pg.PlotWidget(title="<b>Marker Displacments</b>")
         self._graph.setBackground('w')
         self._graphScrollArea.setWidget(self._graph)
@@ -67,7 +93,11 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
         if enabled:
             super().setEnabled(True)
             self.setup_display()
+            self._video_source.simple_connect_viewer(self)
+            self.show_results(self._regionBox.currentIndex())
         elif not enabled:
+            for item in self._regionView.scene().items():
+                self._regionView.scene().removeItem(item)
             super().setEnabled(False)
 
     def setup_display(self):
@@ -106,23 +136,53 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
             Args:
                 index (int): array index of the region
         """
-        from cgt.util.utils import (get_frame, get_point_of_point)
-
-        # get image first key frame
-        # display image plus initial markers plus numbers
         results = self._data_source.get_results()
-        region = results.get_regions()[index]
+        self._current_region = results.get_regions()[index]
         line_markers = results.get_lines_for_region(index)
         point_markers = results.get_points_for_region(index)
 
-        print(f"Region {region.rect()}\n======")
-        for marker in line_markers:
-            # get first for each
-            print(f"\tLine: {marker[0].line()} {get_frame(marker[0])}")
-        for marker in point_markers:
-            # get first for each
-            print(f"\tPoint: {get_point_of_point(marker[0])} {get_frame(marker[0])}")
+        self._lines = []
+        self._points = []
+        if line_markers is not None:
+            for marker in line_markers:
+                self._lines.append(marker[0])
 
+        if point_markers is not None:
+            for marker in point_markers:
+                self._points.append(marker[0])
+
+        self.post_request_frame(0)
+
+    @qc.pyqtSlot(qg.QPixmap, int)
+    def display_image(self, pixmap, frame_number):
+        """
+        callback function to display an image from a source
+            Args:
+                pixmap (QPixmap) the pixmap to be displayed
+                frame_number (int) the frame number of the video
+        """
+        scene = self._regionView.scene()
+        for item in scene.items():
+            scene.removeItem(item)
+
+        rect = self._current_region.rect().toRect()
+        pixmap = pixmap.copy(rect)
+        scene.addPixmap(pixmap)
+        pen = self._data_source.get_pens().get_display_pen()
+        for line in self._lines:
+            scene.addItem(clone_line(line, pen))
+        for point in self._points:
+            scene.addItem(clone_point(point, pen))
+
+    @qc.pyqtSlot(float)
+    def zoom_changed(self, value):
+        """
+        callback for change of zoom
+            Args:
+                value (float): the new zoom
+        """
+        self._regionView.setTransform(qg.QTransform())
+        self._regionView.scale(value, value)
 
     def fill_table(self, index):
         """
@@ -225,3 +285,51 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
         calculator = VelocitiesCalculator(lines, points, fps, scale)
         calculator.process_latest_data()
         return calculator
+
+    def set_video_source(self, video_source):
+        """
+        set the video_source object, set length for controls
+            Args:
+                video_source (VideoSource): the source object
+        """
+        self._video_source = video_source
+
+    def post_request_frame(self, frame_number):
+        """
+        a specific frame should be displayed
+        """
+        self.request_frame.emit(frame_number)
+
+def clone_line(marker, pen):
+    """
+    clone a line or cross
+        Args:
+            line (QGraphicsLineItem) the item to clone
+        Returns:
+            if item is Line or path a clone else None
+    """
+    line = marker.line()
+    graph_line = qw.QGraphicsLineItem(line)
+    graph_line.setPos(marker.pos())
+    graph_line.setPen(pen)
+
+    graph_line.setData(ItemDataTypes.ITEM_TYPE, MarkerTypes.LINE)
+    graph_line.setData(ItemDataTypes.PARENT_HASH, hash_graphics_line(marker))
+    graph_line.setData(ItemDataTypes.FRAME_NUMBER, get_frame(marker))
+    graph_line.setData(ItemDataTypes.REGION_INDEX, get_region(marker))
+    return graph_line
+
+def clone_point(marker, pen):
+
+    path = marker.path()
+    centre = marker.data(ItemDataTypes.CROSS_CENTRE)
+    graph_path = qw.QGraphicsPathItem(path)
+    graph_path.setPos(marker.pos())
+    graph_path.setPen(pen)
+
+    graph_path.setData(ItemDataTypes.ITEM_TYPE, MarkerTypes.POINT)
+    graph_path.setData(ItemDataTypes.PARENT_HASH, hash_graphics_point(marker))
+    graph_path.setData(ItemDataTypes.FRAME_NUMBER, get_frame(marker))
+    graph_path.setData(ItemDataTypes.REGION_INDEX, get_region(marker))
+    graph_path.setData(ItemDataTypes.CROSS_CENTRE, centre)
+    return graph_path

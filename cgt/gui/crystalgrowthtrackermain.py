@@ -820,6 +820,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self._enhanced_video_reader = VideoSource(self._project["enhanced_video"])
             self._selectWidget.set_video_source(self._enhanced_video_reader)
             self._drawingWidget.set_video_source(self._enhanced_video_reader)
+            self._resultsWidget.set_video_source(self._enhanced_video_reader)
 
             if self._project["raw_video"] is not None:
                 if self._project["stats_from_enhanced"]:

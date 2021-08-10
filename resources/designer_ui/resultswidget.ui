@@ -34,13 +34,13 @@
           <x>0</x>
           <y>0</y>
           <width>105</width>
-          <height>392</height>
+          <height>305</height>
          </rect>
         </property>
        </widget>
       </widget>
      </widget>
-     <widget class="QWidget" name="">
+     <widget class="QWidget" name="layoutWidget">
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
         <layout class="QVBoxLayout" name="verticalLayout">
@@ -82,26 +82,38 @@
              </property>
             </spacer>
            </item>
+           <item>
+            <widget class="QLabel" name="label_2">
+             <property name="text">
+              <string>Zoom</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="_zoomSpinBox">
+             <property name="decimals">
+              <number>1</number>
+             </property>
+             <property name="minimum">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>99.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>1.000000000000000</double>
+             </property>
+            </widget>
+           </item>
           </layout>
          </item>
         </layout>
        </item>
        <item>
-        <widget class="QScrollArea" name="_regionScrollArea">
-         <property name="widgetResizable">
-          <bool>true</bool>
-         </property>
-         <widget class="QWidget" name="scrollAreaWidgetContents">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>444</width>
-            <height>219</height>
-           </rect>
-          </property>
-         </widget>
-        </widget>
+        <widget class="QGraphicsView" name="_regionView"/>
        </item>
       </layout>
      </widget>
@@ -120,6 +132,22 @@
     <hint type="sourcelabel">
      <x>117</x>
      <y>623</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>464</x>
+     <y>324</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>_zoomSpinBox</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>ResultsWidget</receiver>
+   <slot>zoom_changed(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>429</x>
+     <y>621</y>
     </hint>
     <hint type="destinationlabel">
      <x>464</x>
