@@ -163,8 +163,7 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
                 frame_number (int) the frame number of the video
         """
         scene = self._regionView.scene()
-        for item in scene.items():
-            scene.removeItem(item)
+        scene.clear()
 
         rect = self._current_region.rect().toRect()
         pixmap = pixmap.copy(rect)
