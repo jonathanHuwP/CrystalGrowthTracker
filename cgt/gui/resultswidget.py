@@ -23,6 +23,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
 import PyQt5.QtGui as qg
+import PyQt5.Qt as qt
 
 import pyqtgraph as pg
 
@@ -239,6 +240,7 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
         self._graph.getAxis('bottom').setTickFont(tick_font)
 
         pen = 0
+        pens = len(lines) + len(points)
         for i, marker in enumerate(lines):
             displacements = [0.0]
             frames = [0]
@@ -247,7 +249,7 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
                 displacements.append(new_dis)
                 frames.append(dis.get_end())
 
-            self._graph.plot(frames, displacements, pen=(pen, 5), name=f"Line {i}")
+            self._graph.plot(frames, displacements, pen=(pen, pens), name=f"Line {i}")
             pen += 1
 
         for i, marker in enumerate(points):
@@ -258,7 +260,7 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
                 displacements.append(new_dis)
                 frames.append(dis.get_end())
 
-            self._graph.plot(frames, displacements, pen=(pen, 5), name=f"Point {i}")
+            self._graph.plot(frames, displacements, pen=(pen, pens), name=f"Point {i}")
             pen += 1
 
         self._graph.addLegend()
