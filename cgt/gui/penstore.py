@@ -19,7 +19,6 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # set up linting conditions
 # pylint: disable = c-extension-no-member
 
-import PyQt5.QtGui as qg
 import PyQt5.Qt as qt
 
 class PenStore():
@@ -155,6 +154,3 @@ class PenStore():
                 (QPen) the highlight brush
         """
         return self._highlight_brush
-
-    def get_plotting_pen(self, index):
-        return self._plotting_pens[index%5]

@@ -32,8 +32,7 @@ from cgt.util.utils import (ItemDataTypes,
                             get_region,
                             hash_graphics_line,
                             hash_graphics_point,
-                            get_frame,
-                            get_region)
+                            get_frame)
 
 from cgt.gui.Ui_resultswidget import Ui_ResultsWidget
 
@@ -115,8 +114,7 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
             self._regionBox.addItem(str(i))
 
         if len(results.get_regions()) > 0:
-            if old_index < 0:
-                old_index = 0
+            old_index = max(old_index, 0)
             self.show_results(old_index)
 
     @qc.pyqtSlot(int)
@@ -154,12 +152,11 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
         self.post_request_frame(0)
 
     @qc.pyqtSlot(qg.QPixmap, int)
-    def display_image(self, pixmap, frame_number):
+    def display_image(self, pixmap):
         """
         callback function to display an image from a source
             Args:
                 pixmap (QPixmap) the pixmap to be displayed
-                frame_number (int) the frame number of the video
         """
         scene = self._regionView.scene()
         scene.clear()
@@ -302,11 +299,11 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
 
 def clone_line(marker, pen):
     """
-    clone a line or cross
+    clone a line
         Args:
-            line (QGraphicsLineItem) the item to clone
+            marker (QGraphicsLineItem) the item to clone
         Returns:
-            if item is Line or path a clone else None
+            (QGraphicsLineItem): clone of input
     """
     line = marker.line()
     graph_line = qw.QGraphicsLineItem(line)
@@ -320,7 +317,13 @@ def clone_line(marker, pen):
     return graph_line
 
 def clone_point(marker, pen):
-
+    """
+    clone a cross
+        Args:
+            marker (QGraphicsPathItem) the item to clone
+        Returns:
+            (QGraphicsPathItem): clone of input
+    """
     path = marker.path()
     centre = marker.data(ItemDataTypes.CROSS_CENTRE)
     graph_path = qw.QGraphicsPathItem(path)

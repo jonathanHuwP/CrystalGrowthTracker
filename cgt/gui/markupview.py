@@ -580,5 +580,5 @@ class MarkUpView(VideoBaseView):
                 pens (PenStore)
         """
         for item in self.scene().items():
-            if isinstance(item, qw.QGraphicsLineItem) or isinstance(item, qw.QGraphicsPathItem):
+            if isinstance(item, (qw.QGraphicsLineItem, qw.QGraphicsPathItem)):
                 item.setPen(pens.get_display_pen())

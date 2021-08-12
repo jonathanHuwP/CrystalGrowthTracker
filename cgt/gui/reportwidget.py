@@ -22,8 +22,6 @@ import os
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
-import PyQt5.QtGui as qg
-import PyQt5.QtPrintSupport as qp
 import PyQt5.QtWebEngineWidgets as qe
 
 # import UI
