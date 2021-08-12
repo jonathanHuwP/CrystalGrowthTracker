@@ -92,6 +92,20 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         ## the pens
         self._pens = PenStore()
 
+        self.setup_tabs()
+
+        self._progressBar.hide()
+        self.set_title()
+
+        if project is not None:
+            self.read_project_directory(project)
+
+        self._tabWidget.setCurrentIndex(0)
+
+    def setup_tabs(self):
+        """
+        setup the tabs
+        """
         # Properties
         #############
         tab = self._tabWidget.widget(0)
@@ -109,6 +123,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._selectWidget.setup_video_widget()
         self._selectWidget.enable_and_connect(False)
         self.setup_tab(tab, self._selectWidget)
+        return
 
         # Video Statistics
         ###################
@@ -146,14 +161,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._reportWidget = ReportWidget(tab, self)
         self.setup_tab(tab, self._reportWidget)
 
-        self._progressBar.hide()
-        self.set_title()
-
-        if project is not None:
-            self.read_project_directory(project)
-
-        self._tabWidget.setCurrentIndex(0)
-
     def get_pens(self):
         """
         getter for the pens
@@ -174,10 +181,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self._propertiesWidget.setEnabled(False)
         self._selectWidget.enable_and_connect(False)
-        self._videoStatsWidget.enable_and_connect(False)
-        self._drawingWidget.setEnabled(False)
-        self._resultsWidget.setEnabled(False)
-        self._reportWidget.setEnabled(False)
+        # HACK
+        # self._videoStatsWidget.enable_and_connect(False)
+        # self._drawingWidget.setEnabled(False)
+        # self._resultsWidget.setEnabled(False)
+        # self._reportWidget.setEnabled(False)
 
         if tab_index == self._tabWidget.indexOf(self._propertiesTab):
             self._propertiesTab.setEnabled(True)
@@ -344,10 +352,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self.save_region_frames()
         self._selectWidget.redisplay_regions()
         self._selectWidget.display_video_file_name()
-        self._drawingWidget.display_video_file_name()
+        # HACK
+        # self._drawingWidget.display_video_file_name()
 
-        if self._project["latest_report"] is not None and self._project["latest_report"] != "":
-            self._reportWidget.load_html(self._project["latest_report"])
+        # if self._project["latest_report"] is not None and self._project["latest_report"] != "":
+        #     self._reportWidget.load_html(self._project["latest_report"])
 
     def save_region_frames(self):
         """
@@ -393,7 +402,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 None
         """
-        self.reset_video_widgets()
+        # HACK
+        #self.reset_video_widgets()
         self._propertiesWidget.clear()
 
     @qc.pyqtSlot()
@@ -576,8 +586,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Args:
                 value (int) code for type of data changed, 0: any 1: region
         """
-        if value == 1:
-            self._drawingWidget.update_data_display()
+        # HACK
+        pass
+        # if value == 1:
+        #     self._drawingWidget.update_data_display()
 
     def uptodate_report_exists(self):
         """
@@ -819,21 +831,22 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             # make the objects
             self._enhanced_video_reader = VideoSource(self._project["enhanced_video"])
             self._selectWidget.set_video_source(self._enhanced_video_reader)
-            self._drawingWidget.set_video_source(self._enhanced_video_reader)
-            self._resultsWidget.set_video_source(self._enhanced_video_reader)
+            # HACK
+            #self._drawingWidget.set_video_source(self._enhanced_video_reader)
+            #self._resultsWidget.set_video_source(self._enhanced_video_reader)
 
-            if self._project["raw_video"] is not None:
-                if self._project["stats_from_enhanced"]:
-                    self._videoStatsWidget.set_video_source(self._enhanced_video_reader)
-                else:
-                    self._raw_video_reader = VideoSource(self._project["raw_video"])
-                    self._videoStatsWidget.set_video_source(self._raw_video_reader)
-            else:
-                self._videoStatsWidget.set_video_source(self._enhanced_video_reader)
+            # if self._project["raw_video"] is not None:
+            #     if self._project["stats_from_enhanced"]:
+            #         self._videoStatsWidget.set_video_source(self._enhanced_video_reader)
+            #     else:
+            #         self._raw_video_reader = VideoSource(self._project["raw_video"])
+            #         self._videoStatsWidget.set_video_source(self._raw_video_reader)
+            # else:
+            #     self._videoStatsWidget.set_video_source(self._enhanced_video_reader)
 
-            stats = self.get_results().get_video_statistics()
-            if stats is not None and len(stats.get_frames()) > 0:
-                self._videoStatsWidget.display_stats()
+            # stats = self.get_results().get_video_statistics()
+            # if stats is not None and len(stats.get_frames()) > 0:
+            #     self._videoStatsWidget.display_stats()
 
         except (FileNotFoundError, IOError) as ex:
             message = self.tr("Unexpected error reading {}: {} => {}")
