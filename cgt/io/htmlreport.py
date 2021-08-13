@@ -53,8 +53,8 @@ def save_html_report(project, region_image_paths):
         write_html_report_end(fout, report_dir)
 
     with open(hash_file, 'w') as fout:
-        hash = hash_results(project["results"])
-        data = {"results_hash": hash}
+        hash_code = hash_results(project["results"])
+        data = {"results_hash": hash_code}
         json.dump(data, fout)
 
     project["latest_report"] = str(html_outfile)
