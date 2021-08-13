@@ -66,8 +66,8 @@ class FrameTime():
         self._current_time += self._time_step
         self._current_frame += 1
         if not self._current_time < self._video_length:
-                self._current_time = 0.0
-                self._current_frame = 0
+            self._current_time = 0.0
+            self._current_frame = 0
 
         return self._current_time, self._current_frame
 
@@ -78,8 +78,8 @@ class FrameTime():
         self._current_time -= self._time_step
         self._current_frame -= 1
         if not self._current_time > 0.0:
-                self._current_time = self._video_length-self._time_step
-                self._current_frame = self._video_length
+            self._current_time = self._video_length-self._time_step
+            self._current_frame = self._video_length
 
         return self._current_time, self._current_frame
 

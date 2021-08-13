@@ -25,8 +25,6 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = c-extension-no-member
 # pylint: disable = line-too-long
 # pylint: disable = invalid-name
-
-from cgt.io.videobuffer import VideoBuffer
 import os
 import json
 from shutil import copy2
@@ -35,7 +33,7 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
 import PyQt5.Qt as qt
 
-import cgt.util.utils as utils
+from cgt.util import utils
 
 from cgt.gui.projectstartdialog import ProjectStartDialog
 from cgt.gui.projectpropertieswidget import ProjectPropertiesWidget
@@ -48,9 +46,10 @@ from cgt.gui.videostatisticswidget import VideoStatisticsWidget
 from cgt.gui.penstore import PenStore
 from cgt.gui.resultswidget import ResultsWidget
 
-import cgt.io.htmlreport as htmlreport
-import cgt.io.writecsvreports as writecsvreports
-import cgt.io.readcsvreports as readcsvreports
+from cgt.io import (htmlreport, writecsvreports, readcsvreports)
+#from cgt.io import writecsvreports
+#from cgt.io import readcsvreports
+
 from cgt.io.videosource import VideoSource
 from cgt.io.videoanalyser import VideoAnalyser
 from cgt.io.offscreenrender import OffScreenRender
