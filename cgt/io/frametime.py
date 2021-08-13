@@ -17,12 +17,6 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 @author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 """
 # set up linting conditions
-# pylint: disable = c-extension-no-member
-# pylint: disable = import-error
-
-import PyQt5.QtWidgets as qw
-import PyQt5.QtCore as qc
-import PyQt5.QtGui as qg
 
 class FrameTime():
     """
@@ -88,3 +82,31 @@ class FrameTime():
                 self._current_frame = self._video_length
 
         return self._current_time, self._current_frame
+
+    def move_to_time(self, time):
+        """
+        move the video to the specified time, clamping if outside range
+            Args:
+                time (float): the target time
+        """
+        if time < 0.0:
+            self.set_zero()
+        elif time >= self._video_length:
+            self.set_end()
+        else:
+            self._current_time = time
+            self._current_frame = int(time/self._time_step)
+
+    def set_zero(self):
+        """
+        set time to zero
+        """
+        self._current_time = 0.0
+        self._current_frame = 0
+
+    def set_end(self):
+        """
+        set time to end of video
+        """
+        self._current_time = self._video_length - self._time_step
+        self._current_frame = int(self._current_time/self._time_step)
