@@ -26,9 +26,9 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = import-error
 
 import PyQt5.QtCore as qc
+import ffmpeg
 
-from cgt.util.qthreadsafequeue import QThreadSafeQueue
-from cgt.io.videobuffer import VideoBuffer
+from cgt.io.videodata import make_video_data
 
 class VideoSource(qc.QObject):
     """
@@ -36,64 +36,63 @@ class VideoSource(qc.QObject):
     a reader in a seperate thread.
     """
 
+    ## the pixel format and number of bytes
+    PIX_FMT = ('rgb24', 3)
+
     def __init__(self, file_name):
         """
         set up the object
         """
         super().__init__()
+
+        ## file name
+        self._file_name = file_name
+
+        ## video data
+        self._video_data = {}
+
         ## the queue of video frames to be displayed
-        self._frame_queue = QThreadSafeQueue()
-
-        ## the thread for the VideoBuffer
-        self._video_thread = None
-
-        ## a pointer for the video buffered reader
-        self._video_reader = None
+        self._frame_queue = []
 
         ## the viewer currently connected
         self._current_viewer = None
 
-        self.start_player(file_name)
+        self.probe_video(file_name)
 
-    def start_player(self, file_name):
+    def probe_video(self, file_path):
         """
-        start the video player
+        load a video file
             Args:
-                file_name (string) the video file to be read
+                file_path (string) the file
         """
-        self._video_thread = qc.QThread()
-        self._video_reader = VideoBuffer(file_name, self)
-        self._length = self._video_reader.get_length()
-        self._video_reader.moveToThread(self._video_thread)
+        self._video_data = None
+        try:
+            probe = ffmpeg.probe(file_path)
+            video_info = next(s for s in probe['streams'] if s['codec_type'] == 'video')
 
-        # connections
-        self._video_thread.started.connect(self._video_reader.make_frames)
-        self._video_thread.finished.connect(self._video_thread.deleteLater)
+            print("Video Data\n========")
+            for key in video_info.keys():
+                print(f"\t{key} => {video_info[key]} {type(video_info[key])}")
+            print("\n")
 
-        # start the thread
-        self._video_thread.start()
+            self._video_data = make_video_data(file_path,
+                                              video_info["width"],
+                                              video_info["height"],
+                                              video_info["duration_ts"],
+                                              video_info["duration"],
+                                              VideoSource.PIX_FMT[1])
+        except ffmpeg.Error as error:
+            self.display_error(f"File {file_path} cannot be probed: {error}")
+            return False
+        except StopIteration:
+            self.display_error(f"File {file_path} does not appear to contain video information")
+            self._video_data = None
+            return False
+        except KeyError as exception:
+            self.display_error(f"Probe video data error: unknown key {exception}")
+            return False
 
-    def get_buffer(self):
-        """
-        getter for the video buffer
-            Returns:
-                (VideoBuffer)
-        """
-        return self._video_reader
-
-    def get_length(self):
-        """
-        getter for the lenght
-            Returns:
-                the number of frams in video (int)
-        """
-        return self._length
-
-    def get_frame_queue(self):
-        """
-        getter for the queue of frames to be read
-        """
-        return self._frame_queue
+        return True
 
     def connect_viewer(self, viewer):
         """
