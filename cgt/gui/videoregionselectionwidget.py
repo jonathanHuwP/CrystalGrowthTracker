@@ -25,9 +25,8 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = too-many-instance-attributes
 # pylint: disable = no-member
 # pylint: disable = too-many-public-methods
-import cv2
 import pathlib
-import math
+import cv2
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
@@ -223,7 +222,7 @@ class VideoRegionSelectionWidget(VideoBaseWidget, Ui_VideoRegionSelectionWidget)
         """
         self.play_pause()
         self._video_source.clear()
-        frames = [i for i in range(self._video_source.get_length())]
+        frames = list(range(self._video_source.get_length()))
         self._videoControl.disable_all_but_zoom()
         self._video_source.request_frames(frames)
 
