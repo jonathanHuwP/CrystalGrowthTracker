@@ -29,6 +29,7 @@ import PyQt5.QtCore as qc
 import PyQt5.QtGui as qg
 
 import ffmpeg
+import subprocess
 
 from cgt.io.videodata import VideoData
 
@@ -57,12 +58,6 @@ class VideoSource(qc.QObject):
 
         ## video data
         self._video_data = None
-
-        ## the queue of video frames to be displayed
-        self._frame_queue = []
-
-        ## the viewer currently connected
-        self._current_viewer = None
 
         self.probe_video(file_name, user_frame_rate)
 
@@ -99,81 +94,46 @@ class VideoSource(qc.QObject):
 
         self._video_data = VideoData(frame_data, frame_rates, VideoSource.PIX_FMT[1])
 
-    def connect_viewer(self, viewer):
-        """
-        connect the VideoBuffer's 'display_image' signal and the
-        viewers 'request_frame' and 'clear_queue' signals, any
-        previous connections are disconnected.
-            Args:
-                viewer (QObject) if None the source is disconnected from any previous connections
-        """
-        self.disconnect_viewer()
-        if viewer is None:
-            return
-
-        viewer.play_pause()
-        self.display_image.connect(viewer.display_image)
-        viewer.request_frame.connect(self.request_frame)
-        viewer.clear_queue.connect(self.clear)
-        self.clear()
-
-        self._current_viewer = viewer
-
-    def simple_connect_viewer(self, viewer):
-        """
-        connect the VideoBuffer's 'display_image' signal and the
-        viewers 'request_frame', any
-        previous connections are disconnected. No pause i
-            Args:
-                viewer (QObject) if None the source is disconnected from any previous connections
-        """
-        self.disconnect_viewer()
-        if viewer is None:
-            return
-
-        self._video_reader.display_image.connect(viewer.display_image)
-        viewer.request_frame.connect(self.request_frame)
-        viewer.clear_queue.connect(self.clear)
-        self.clear()
-
-        self._current_viewer = viewer
-
-    def disconnect_viewer(self):
-        """
-        disconnect the VideoBuffer's 'display_image' signal
-        from the viewer object's 'display_image' slot
-        """
-        if self._current_viewer is not None:
-            self._video_reader.display_image.disconnect(self._current_viewer.display_image)
-            self._current_viewer.request_frame.disconnect(self.request_frame)
-            self._current_viewer.clear_queue.disconnect(self.clear)
-
-    @qc.pyqtSlot(int)
-    def request_frame(self, frame_number):
-        """
-        request a frame from the video
-            Args:
-                frame_number (int) the frame to be read
-        """
-        self._frame_queue.append(frame_number)
-
-    def request_frames(self, frames):
-        """
-        request a list of frames
-            Args:
-                frames ([int]) list of fame number
-        """
-        self._frame_queue += frames
-
     def get_pixmap(self, time):
         """
         getter for the pixmap at a given time (user frame rate):
             Args:
-                time (float): the time
+                time (float): the time in video internal time
             Returns:
-                (QPixmap) of frame
+                (QPixmap): the frame
         """
+        args = (ffmpeg
+                .input(self._file_name, ss=time)
+                .output('pipe:', format='rawvideo', pix_fmt=VideoSource.PIX_FMT[0], vframes=1)
+                .compile())
+
+        in_bytes = 0
+        # create ffmpeg process with piped output and read output
+        with subprocess.Popen(args, stdout=subprocess.PIPE) as process:
+            in_bytes = process.stdout.read(self._video_data.get_frame_size())
+
+        if not in_bytes == 0:
+            return self.make_pixmap(in_bytes)
+
         return None
+
+    def make_pixmap(self, image_bytes):
+        """
+        convert bytes to QPixmap
+            Args:
+                image_bytes (bytes): bytes read from file
+            Returns:
+                (QPixmap): the pixmap
+        """
+        im_format = qg.QImage.Format_RGB888
+
+        image = qg.QImage(image_bytes,
+                          self._video_data.get_width(),
+                          self._video_data.get_height(),
+                          self._video_data.get_bytes_per_line(),
+                          im_format)
+
+        return image.pixmap()
 
     def get_length(self):
         """
@@ -183,16 +143,3 @@ class VideoSource(qc.QObject):
             return self._video_data.get_time_duration_actual()
 
         return 0.0
-
-    @qc.pyqtSlot()
-    def clear(self):
-        """
-        clear the frame queue
-        """
-        self._frame_queue.clear()
-
-    def stop(self):
-        """
-        stop the thread
-        """
-        pass

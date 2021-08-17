@@ -40,6 +40,9 @@ class VideoData():
         ## number of frames in video
         self._frame_count = frame_data[2]
 
+        ## the number of bytes in a pixel
+        self._bytes_per_pixel = bytes_per_pixel
+
         ## the actual frame rate supplied by user
         self._frame_rate_actual = frame_rates[0]
 
@@ -52,8 +55,8 @@ class VideoData():
         ## the duration of video based on source file frame rate
         self._time_duration_codec = self._frame_rate_codec*self._frame_count
 
-        ## the size of a fram in bytes
-        self._frame_size = self._width*self._height*bytes_per_pixel
+        ## the size of a frame in bytes
+        self._frame_size = self._width*self._height*self._bytes_per_pixel
 
     def get_width(self):
         """
@@ -102,3 +105,9 @@ class VideoData():
         getter for the size in bytes of a frame
         """
         return self._frame_size
+
+    def get_bytes_per_line(self):
+        """
+        getter for the number of bytes in a line (needed by Qt QImage)
+        """
+        return self._width * self._bytes_per_pixel
