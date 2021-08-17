@@ -26,7 +26,6 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = no-member
 # pylint: disable = too-many-public-methods
 import pathlib
-import cv2
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
@@ -196,15 +195,16 @@ class VideoRegionSelectionWidget(VideoBaseWidget, Ui_VideoRegionSelectionWidget)
             return
 
         path = pathlib.Path(dir_name)
-        self._writers.clear()
-        fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        for i, region in enumerate(regions):
-            file = path.joinpath(f"region_{i}.avi")
-            rect = region.rect().toAlignedRect()
-            shape = (rect.width(), rect.height())
-            self._writers.append((cv2.VideoWriter(str(file), fourcc, 20.0, shape), region))
+        # HACK
+        # self._writers.clear()
+        # fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        # for i, region in enumerate(regions):
+        #     file = path.joinpath(f"region_{i}.avi")
+        #     rect = region.rect().toAlignedRect()
+        #     shape = (rect.width(), rect.height())
+        #     self._writers.append((cv2.VideoWriter(str(file), fourcc, 20.0, shape), region))
 
-        self.write_video_files()
+        # self.write_video_files()
 
     def finish_writing(self):
         """
@@ -235,5 +235,6 @@ class VideoRegionSelectionWidget(VideoBaseWidget, Ui_VideoRegionSelectionWidget)
         rect = writer[1].rect().toAlignedRect()
         image = qg.QImage(self._current_pixmap.copy(rect))
         array = qimage_to_nparray(image)
-        rgb_out = cv2.cvtColor(array, cv2.COLOR_RGBA2RGB)
-        writer[0].write(rgb_out)
+        # HACK
+        # rgb_out = cv2.cvtColor(array, cv2.COLOR_RGBA2RGB)
+        # writer[0].write(rgb_out)

@@ -1,4 +1,4 @@
-name: cgt-dev
+name: cgt-ffmpeg
 channels:
   - defaults
   - conda-forge
@@ -7,6 +7,6 @@ dependencies:
   - python=3.8
   - pyqt
   - pyqtgraph
-  - opencv
   - doxygen
   - pylint
+  - ffmpeg-python

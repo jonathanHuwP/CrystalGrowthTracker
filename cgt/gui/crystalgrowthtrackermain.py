@@ -27,11 +27,13 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = invalid-name
 import os
 import json
+import pathlib
 from shutil import copy2
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
 import PyQt5.Qt as qt
+import ffmpeg
 
 from cgt.util import utils
 
@@ -47,8 +49,6 @@ from cgt.gui.penstore import PenStore
 from cgt.gui.resultswidget import ResultsWidget
 
 from cgt.io import (htmlreport, writecsvreports, readcsvreports)
-#from cgt.io import writecsvreports
-#from cgt.io import readcsvreports
 
 from cgt.io.videosource import VideoSource
 from cgt.io.videoanalyser import VideoAnalyser
@@ -362,9 +362,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         save pixmaps of the first, last
         """
         report_dir, _, _ = utils.make_report_file_names(self._project["proj_full_path"])
-        buffer = self._enhanced_video_reader.get_buffer()
-        last = self._enhanced_video_reader.get_length()-1
-        middel = int(last/2)
+        last = self._enhanced_video_reader.get_length()
+        middel = float(last/2)
 
         images_dir = report_dir.joinpath("images")
         if not report_dir.exists():
@@ -375,12 +374,13 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         file_name = str(images_dir.joinpath("regions")) + "_{}.ppm"
 
-        pixmap = buffer.get_pixmap(0)
-        pixmap.save(file_name.format(0))
-        pixmap = buffer.get_pixmap(middel)
-        pixmap.save(file_name.format(middel))
-        pixmap = buffer.get_pixmap(last)
-        pixmap.save(file_name.format(last))
+        # HACK
+        # pixmap = self._enhanced_video_reader.get_pixmap(0.0)
+        # pixmap.save(file_name.format(0))
+        # pixmap = self._enhanced_video_readerffer.get_pixmap(middel)
+        # pixmap.save(file_name.format(middel))
+        # pixmap = self._enhanced_video_reader.get_pixmap(last)
+        # pixmap.save(file_name.format(last))
 
     def stop_video(self):
         """
@@ -826,9 +826,18 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                                    message)
             return
 
+        video_file = pathlib.Path(self._project["enhanced_video"])
+        if not video_file.exists():
+            message = self.tr("Can't find file {}")
+            message = message.format(self._project["enhanced_video"])
+            qw.QMessageBox.warning(self,
+                                   error_title,
+                                   message)
+            return
+
         try:
             # make the objects
-            self._enhanced_video_reader = VideoSource(self._project["enhanced_video"])
+            self._enhanced_video_reader = VideoSource(str(video_file), float(self._project["frame_rate"]))
             self._selectWidget.set_video_source(self._enhanced_video_reader)
             # HACK
             #self._drawingWidget.set_video_source(self._enhanced_video_reader)
@@ -847,15 +856,16 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             # if stats is not None and len(stats.get_frames()) > 0:
             #     self._videoStatsWidget.display_stats()
 
-        except (FileNotFoundError, IOError) as ex:
-            message = self.tr("Unexpected error reading {}: {} => {}")
-            message = message.format(self._project["enhanced_video"],
-                                    type(ex),
-                                    ex.args)
-            qw.QMessageBox.warning(self,
-                                   error_title,
-                                   message)
-            return
+        except ffmpeg.Error as error:
+            self.display_error(f"File {video_file} cannot be probed: {error}")
+            return False
+        except StopIteration:
+            self.display_error(f"File {video_file} does not appear to contain video information")
+            self._video_data = None
+            return False
+        except KeyError as exception:
+            self.display_error(f"Probe video data error: unknown key {exception}")
+            return False
 
     qc.pyqtSlot()
     def save_region_videos(self):

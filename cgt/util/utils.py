@@ -35,7 +35,6 @@ import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 import PyQt5.QtWidgets as qw
 
-import cv2
 import numpy as np
 
 class MarkerTypes(enum.IntEnum):
@@ -109,9 +108,6 @@ def nparray_to_qimage(array, brg=False):
         Returns:
             a QImage Qt image manipulation format
     """
-    if brg:
-        array = cv2.cvtColor(array, cv2.COLOR_BGR2RGB)
-
     # set for Red/Green/Blue 8 bits each
     image_format = qg.QImage.Format_RGB888
 

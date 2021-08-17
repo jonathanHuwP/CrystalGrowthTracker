@@ -26,22 +26,29 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = import-error
 
 import PyQt5.QtCore as qc
+import PyQt5.QtGui as qg
+
 import ffmpeg
 
-from cgt.io.videodata import make_video_data
+from cgt.io.videodata import VideoData
 
 class VideoSource(qc.QObject):
     """
     a source of images from a video file, it will run
     a reader in a seperate thread.
     """
+    ## signal that a frame is ready to display
+    display_image = qc.pyqtSignal(qg.QPixmap, int)
 
     ## the pixel format and number of bytes
     PIX_FMT = ('rgb24', 3)
 
-    def __init__(self, file_name):
+    def __init__(self, file_name, user_frame_rate=None):
         """
         set up the object
+            Args:
+                file_name (str): the path and name of video file
+                user_frame_rate (int): the frame rate provided by user
         """
         super().__init__()
 
@@ -49,7 +56,7 @@ class VideoSource(qc.QObject):
         self._file_name = file_name
 
         ## video data
-        self._video_data = {}
+        self._video_data = None
 
         ## the queue of video frames to be displayed
         self._frame_queue = []
@@ -57,42 +64,40 @@ class VideoSource(qc.QObject):
         ## the viewer currently connected
         self._current_viewer = None
 
-        self.probe_video(file_name)
+        self.probe_video(file_name, user_frame_rate)
 
-    def probe_video(self, file_path):
+    def probe_video(self, file_path, user_frame_rate):
         """
         load a video file
             Args:
                 file_path (string) the file
+                user_frame_rate (int): the frame rate provided by user
+            Throws:
+                 (ffmpeg.Error): can't probe video
+                 (StopIteration): problem with information in video
+                 (KeyError): problem with information in video
         """
-        self._video_data = None
-        try:
-            probe = ffmpeg.probe(file_path)
-            video_info = next(s for s in probe['streams'] if s['codec_type'] == 'video')
+        probe = ffmpeg.probe(file_path)
+        video_info = next(s for s in probe['streams'] if s['codec_type'] == 'video')
 
-            print("Video Data\n========")
-            for key in video_info.keys():
-                print(f"\t{key} => {video_info[key]} {type(video_info[key])}")
-            print("\n")
+        print("Video Data\n========")
+        for key in video_info.keys():
+            print(f"\t{key} => {video_info[key]} {type(video_info[key])}")
+        print("\n")
 
-            self._video_data = make_video_data(file_path,
-                                              video_info["width"],
-                                              video_info["height"],
-                                              video_info["duration_ts"],
-                                              video_info["duration"],
-                                              VideoSource.PIX_FMT[1])
-        except ffmpeg.Error as error:
-            self.display_error(f"File {file_path} cannot be probed: {error}")
-            return False
-        except StopIteration:
-            self.display_error(f"File {file_path} does not appear to contain video information")
-            self._video_data = None
-            return False
-        except KeyError as exception:
-            self.display_error(f"Probe video data error: unknown key {exception}")
-            return False
+        frame_data = [video_info["width"], video_info["height"], video_info["duration_ts"]]
 
-        return True
+        parts = video_info["r_frame_rate"].split('/')
+        frame_rate_codec = float(parts[0])/float(parts[1])
+        frame_rates = []
+        if user_frame_rate is None:
+            frame_rates.append(frame_rate_codec)
+        else:
+            frame_rates.append(user_frame_rate)
+
+        frame_rates.append(frame_rate_codec)
+
+        self._video_data = VideoData(frame_data, frame_rates, VideoSource.PIX_FMT[1])
 
     def connect_viewer(self, viewer):
         """
@@ -107,7 +112,7 @@ class VideoSource(qc.QObject):
             return
 
         viewer.play_pause()
-        self._video_reader.display_image.connect(viewer.display_image)
+        self.display_image.connect(viewer.display_image)
         viewer.request_frame.connect(self.request_frame)
         viewer.clear_queue.connect(self.clear)
         self.clear()
@@ -150,7 +155,7 @@ class VideoSource(qc.QObject):
             Args:
                 frame_number (int) the frame to be read
         """
-        self._frame_queue.push(frame_number)
+        self._frame_queue.append(frame_number)
 
     def request_frames(self, frames):
         """
@@ -158,8 +163,26 @@ class VideoSource(qc.QObject):
             Args:
                 frames ([int]) list of fame number
         """
-        self._frame_queue.add(frames)
+        self._frame_queue += frames
 
+    def get_pixmap(self, time):
+        """
+        getter for the pixmap at a given time (user frame rate):
+            Args:
+                time (float): the time
+            Returns:
+                (QPixmap) of frame
+        """
+        return None
+
+    def get_length(self):
+        """
+        getter for the duration of video, user defined, in seconds
+        """
+        if self._video_data is not None:
+            return self._video_data.get_time_duration_actual()
+
+        return 0.0
 
     @qc.pyqtSlot()
     def clear(self):
@@ -172,6 +195,4 @@ class VideoSource(qc.QObject):
         """
         stop the thread
         """
-        self._video_reader.stop()
-        self._video_thread.quit()
-        self._video_thread.wait()
+        pass

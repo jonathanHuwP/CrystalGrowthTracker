@@ -23,7 +23,6 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 import PyQt5.QtCore as qc
 
 import numpy as np
-import cv2 as cv
 
 from cgt.util.framestats import FrameStats, VideoIntensityStats
 
@@ -46,13 +45,15 @@ class VideoAnalyser(qc.QObject):
         super().__init__(parent)
 
         ## initiaize the file video stream
-        self._video_reader = cv.VideoCapture(video_file)
+        # HACK
+        # self._video_reader = cv.VideoCapture(video_file)
 
         ## store the file name
         self._video_file = video_file
 
         ## the lenght
-        self._length = int(self._video_reader.get(cv.CAP_PROP_FRAME_COUNT))
+        # HACK
+        self._length = 0#int(self._video_reader.get(cv.CAP_PROP_FRAME_COUNT))
 
     def get_name(self):
         """
@@ -110,14 +111,16 @@ class VideoAnalyser(qc.QObject):
             Returns:
                 image (numpy.array dtype=uint8) the image
         """
-        self._video_reader.set(cv.CAP_PROP_POS_FRAMES, frame_number)
+        # HACK
+        # self._video_reader.set(cv.CAP_PROP_POS_FRAMES, frame_number)
         flag, img = self._video_reader.read()
 
         if not flag:
             message = f"failed to read image for frame {frame_number}"
             raise ValueError(message)
 
-        return cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        # HACK
+        return None#cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 
     def get_image_values(self, frame_number):
         """
