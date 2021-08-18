@@ -391,7 +391,7 @@
    <sender>_goToButton</sender>
    <signal>clicked()</signal>
    <receiver>CGTVideoControls</receiver>
-   <slot>go_to_frame()</slot>
+   <slot>goto_time()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>501</x>
@@ -453,9 +453,9 @@
   </connection>
   <connection>
    <sender>_gotoSpinBox</sender>
-   <signal>valueChanged(double)</signal>
+   <signal>editingFinished()</signal>
    <receiver>CGTVideoControls</receiver>
-   <slot>close()</slot>
+   <slot>goto_time()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>409</x>

@@ -190,6 +190,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self._propertiesTab.setEnabled(True)
         elif tab_index == self._tabWidget.indexOf(self._selectTab):
             self._selectWidget.enable(True)
+            self._selectWidget.redisplay()
         elif tab_index == self._tabWidget.indexOf(self._videoStatsTab):
             if self._project["results"].get_video_statistics() is not None:
                 self._videoStatsWidget.enable(True)
@@ -362,7 +363,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         save pixmaps of the first, last
         """
         report_dir, _, _ = utils.make_report_file_names(self._project["proj_full_path"])
-        last = self._enhanced_video_reader.get_length()
+        last = self._enhanced_video_reader.get_video_data().get_time_duration_user()
         middel = float(last/2)
 
         images_dir = report_dir.joinpath("images")

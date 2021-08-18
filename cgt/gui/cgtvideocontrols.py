@@ -254,7 +254,7 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         self.start_end.emit(True)
 
     @qc.pyqtSlot()
-    def go_to_frame(self):
+    def goto_time(self):
         """
         jump to typed in frame
         """

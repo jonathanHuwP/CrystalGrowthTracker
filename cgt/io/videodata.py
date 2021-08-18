@@ -44,10 +44,13 @@ class VideoData():
         self._bytes_per_pixel = bytes_per_pixel
 
         ## the actual frame rate supplied by user
-        self._frame_rate_actual = frame_rates[0]
+        self._frame_rate_user = frame_rates[0]
+
+        ## the time step for the user frame rate
+        self._time_step_user = 1.0/self._frame_rate_user
 
         ## the actual duration for the video, based on user frame rate
-        self._time_duration_actual = self._frame_count/self._frame_rate_actual
+        self._time_duration_user = (self._frame_count/self._frame_rate_user) - self._time_step_user
 
         ## the frame rate read from source file
         self._frame_rate_codec = frame_rates[1]
@@ -59,10 +62,10 @@ class VideoData():
         self._frame_size = self._width*self._height*self._bytes_per_pixel
 
         ## conversion factor to codec time
-        self._to_codec = float(self._frame_rate_actual)/float(self._frame_rate_codec)
+        self._to_codec = float(self._frame_rate_user)/float(self._frame_rate_codec)
 
         ## conversion factor to user time
-        self._to_user = float(self._frame_rate_codec)/float(self._frame_rate_actual)
+        self._to_user = float(self._frame_rate_codec)/float(self._frame_rate_user)
 
     def get_width(self):
         """
@@ -82,17 +85,17 @@ class VideoData():
         """
         return self._frame_count
 
-    def get_frame_rate_actual(self):
+    def get_frame_rate_user(self):
         """
         getter for the user input frame rate
         """
-        return self._frame_rate_actual
+        return self._frame_rate_user
 
-    def get_time_duration_actual(self):
+    def get_time_duration_user(self):
         """
         getter for the length of video at user input frame rate
         """
-        return self._time_duration_actual
+        return self._time_duration_user
 
     def get_frame_rate_codec(self):
         """
@@ -137,3 +140,39 @@ class VideoData():
                 (float): time in user FPS
         """
         return time * self._to_user
+
+    def next_user_time(self, current_user_time):
+        """
+        get the next time user FPS from exising
+            Args:
+               current_user_time (float): the current time
+            Returns
+                (float): the time of the next frame
+        """
+        next_time = current_user_time + self._time_step_user
+
+        if next_time > self._time_duration_user - self._time_step_user:
+            next_time = 0.0
+
+        return next_time
+
+    def previous_user_time(self, current_user_time):
+        """
+        get the previous time user FPS from exising
+            Args:
+               current_user_time (float): the current time
+            Returns
+                (float): the time of the previous frame
+        """
+        next_time = current_user_time - self._time_step_user
+
+        if next_time < 0.0:
+            next_time = self._time_duration_user - self._time_step_user
+
+        return next_time
+
+    def get_user_time_step(self):
+        """
+        getter for the inter-frame time step (user FPS)
+        """
+        return self._time_step_user

@@ -94,6 +94,39 @@ class VideoSource(qc.QObject):
 
         self._video_data = VideoData(frame_data, frame_rates, VideoSource.PIX_FMT[1])
 
+    def get_pixmap_user(self, user_time):
+        """
+        get the pixmap defined in user FPS
+            Args:
+                user_time (float): the time in user fps
+            Returns:
+                (QPixmap)
+        """
+        time = self._video_data.to_codec_time(user_time)
+        return self.get_pixmap(time)
+
+    def get_next_pixmap_user(self, old_time):
+        """
+        get the pixmap for one frame from old_time (user FPS)
+            Args:
+                old_time (float): the time base for the next frame
+            Returns:
+                (QPixmap)
+        """
+        time = self._video_data.next_user_time(old_time)
+        return self.get_pixmap_user(time), time
+
+    def get_previous_pixmap_user(self, old_time):
+        """
+        get the pixmap for one frame back from old_time (user FPS)
+            Args:
+                old_time (float): the time base for the next frame
+            Returns:
+                (QPixmap)
+        """
+        time = self._video_data.previous_user_time(old_time)
+        return self.get_pixmap_user(time), time
+
     def get_pixmap(self, time):
         """
         getter for the pixmap at a given time (user frame rate):
@@ -135,11 +168,8 @@ class VideoSource(qc.QObject):
 
         return qg.QPixmap.fromImage(image)
 
-    def get_length(self):
+    def get_video_data(self):
         """
         getter for the duration of video, user defined, in seconds
         """
-        if self._video_data is not None:
-            return self._video_data.get_time_duration_actual()
-
-        return 0.0
+        return self._video_data

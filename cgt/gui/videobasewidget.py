@@ -95,24 +95,22 @@ class VideoBaseWidget(qw.QWidget):
             video_source (VideoSource): a source of video frames
         """
         self._video_source = video_source
-        self._videoControl.set_range(video_source.get_length())
+        self._videoControl.set_range(video_source.get_video_data().get_time_duration_user())
 
     def display_frame_at(self, time):
         """
         display a given time (ffmpeg closest frame to time)
             Args:
-                time (float): the time of the frame to display
+                time (float): the time of the frame to display (user FPS)
         """
-        pixmap = self._video_source.get_pixmap(time)
+        pixmap = self._video_source.get_pixmap_user(time)
         self.display_image(pixmap, time)
 
     def redisplay(self):
         """
         get and redisplay the current frame
         """
-        time = 0.0
-        pixmap = self._video_source.get_pixmap(time)
-        self.display_image(pixmap, time)
+        self.display_frame_at(self._current_time)
 
     def connect_controls(self):
         """
@@ -159,6 +157,7 @@ class VideoBaseWidget(qw.QWidget):
         display an image, the image must be a pixmap so that
         it can safely be recieved from another thread
         """
+        import time
         if self._current_pixmap is None or self.isHidden():
             return
 
@@ -168,15 +167,38 @@ class VideoBaseWidget(qw.QWidget):
         self._videoControl.set_slider_value(self._current_time)
 
         # display the current time
-        message = f"Time {self._current_time:0>5.1f} of {self._video_source.get_length():0>5.1f}"
+        length = self._video_source.get_video_data().get_time_duration_user()
+        message = f"Time {self._current_time:0>5.1f} of {length:0>5.1f}"
         self._frameLabel.setText(message)
 
+        delay = self._video_source.get_video_data().get_user_time_step()
+        qc.QTimer.singleShot(delay, self.next_pixmap)
+
+    qc.pyqtSlot()
+    def next_pixmap(self):
+        """
+        if in play forwards or backwards get next
+        """
         if self._playing == PlayStates.PLAY_FORWARD:
-            next_frame = (self._current_time + 1)
-            self.post_request_frame(next_frame%self._video_source.get_length())
+            self.next_pixmap_forwards()
         elif self._playing == PlayStates.PLAY_BACKWARD:
-            next_frame = (self._current_time - 1)
-            self.post_request_frame(next_frame%self._video_source.get_length())
+            self.next_pixmap_backwards()
+
+    def next_pixmap_forwards(self):
+        """
+        in play forwards mode next frame
+        """
+        data = self._video_source.get_video_data()
+        next_frame = data.next_user_time(self._current_time)
+        self.display_frame_at(next_frame)
+
+    def next_pixmap_backwards(self):
+        """
+        in play backwards mode next frame
+        """
+        data = self._video_source.get_video_data()
+        next_frame = data.previous_user_time(self._current_time)
+        self.display_frame_at(next_frame)
 
     def display_extra(self):
         """
@@ -191,10 +213,11 @@ class VideoBaseWidget(qw.QWidget):
             Args:
                 end (bool) if true jump to end else start
         """
+        data = self._video_source.get_video_data()
         if end:
-            self.post_request_frame(self._video_source.get_length()-1)
+            self.display_frame_at(data.get_time_duration_user())
         else:
-            self.post_request_frame(0)
+            self.display_frame_at(0.0)
 
     @qc.pyqtSlot(float)
     def zoom_value(self, value):
@@ -209,18 +232,18 @@ class VideoBaseWidget(qw.QWidget):
         """
         advance by one frame
         """
-        frame = self._current_time + 1
-        if frame < self._video_source.get_length():
-            self.post_request_frame(frame)
+        data = self._video_source.get_video_data()
+        time = data.next_user_time(self._current_time)
+        self.display_frame_at(time)
 
     @qc.pyqtSlot()
     def step_backward(self):
         """
         reverse by one frame
         """
-        frame = self._current_time - 1
-        if frame >= 0:
-            self.post_request_frame(frame)
+        data = self._video_source.get_video_data()
+        time = data.previous_user_time(self._current_time)
+        self.display_frame_at(time)
 
     @qc.pyqtSlot()
     def play_pause(self):
@@ -236,7 +259,8 @@ class VideoBaseWidget(qw.QWidget):
         start playing forward
         """
         self._playing = PlayStates.PLAY_FORWARD
-        self.post_request_frame((self._current_time+1)%self._video_source.get_length())
+        pixmap, time = self._video_source.get_next_pixmap_user(self._current_time)
+        self.display_image(pixmap, time)
 
     @qc.pyqtSlot()
     def play_backward(self):
@@ -244,7 +268,8 @@ class VideoBaseWidget(qw.QWidget):
         start playing in reverse
         """
         self._playing = PlayStates.PLAY_BACKWARD
-        self.post_request_frame((self._current_time-1)%self._video_source.get_length())
+        pixmap, time = self._video_source.get_previous_pixmap_user(self._current_time)
+        self.display_image(pixmap, time)
 
     def get_data(self):
         """
