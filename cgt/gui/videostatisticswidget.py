@@ -246,10 +246,9 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         self.make_plots()
         super().clear()
 
-    def enable_and_connect(self, enabled):
+    def enable(self, enabled):
         """
-        enable/disable widget on enable the source
-        is connected on disable play is paused
+        enable/disable widget on disable play is paused
             Args:
                 enabled (bool): if true connect and enable else, disable and pause
         """
@@ -258,4 +257,4 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         self._graphicsView.setEnabled(enabled)
         self._graphScrollArea.setEnabled(enabled)
         self._histogramScrollArea.setEnabled(enabled)
-        self.connect_video(enabled)
+        self.play_pause()

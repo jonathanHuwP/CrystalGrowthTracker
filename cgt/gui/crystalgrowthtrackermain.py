@@ -120,7 +120,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         ## the region selection widget
         self._selectWidget = VideoRegionSelectionWidget(tab, self)
         self._selectWidget.setup_video_widget()
-        self._selectWidget.enable_and_connect(False)
+        self._selectWidget.enable(False)
         self.setup_tab(tab, self._selectWidget)
         return
 
@@ -131,7 +131,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         ## the region selection widget
         self._videoStatsWidget = VideoStatisticsWidget(tab, self)
         self._videoStatsWidget.setup_video_widget()
-        self._videoStatsWidget.enable_and_connect(False)
+        self._videoStatsWidget.enable(False)
         self.setup_tab(tab, self._videoStatsWidget)
 
         # User drawing
@@ -179,9 +179,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             return
 
         self._propertiesWidget.setEnabled(False)
-        self._selectWidget.enable_and_connect(False)
+        self._selectWidget.enable(False)
         # HACK
-        # self._videoStatsWidget.enable_and_connect(False)
+        # self._videoStatsWidget.enable(False)
         # self._drawingWidget.setEnabled(False)
         # self._resultsWidget.setEnabled(False)
         # self._reportWidget.setEnabled(False)
@@ -189,10 +189,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         if tab_index == self._tabWidget.indexOf(self._propertiesTab):
             self._propertiesTab.setEnabled(True)
         elif tab_index == self._tabWidget.indexOf(self._selectTab):
-            self._selectWidget.enable_and_connect(True)
+            self._selectWidget.enable(True)
         elif tab_index == self._tabWidget.indexOf(self._videoStatsTab):
             if self._project["results"].get_video_statistics() is not None:
-                self._videoStatsWidget.enable_and_connect(True)
+                self._videoStatsWidget.enable(True)
         elif tab_index == self._tabWidget.indexOf(self._drawingTab):
             self._drawingWidget.setEnabled(True)
         elif tab_index == self._tabWidget.indexOf(self._resultsTab):
@@ -330,9 +330,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         self._videoStatsWidget.clear()
         self._selectWidget.clear()
+        # HACK
         # TODO check this out
         #self._drawingWidget.clear()
-        self._drawingWidget.set_results(self._project["results"])
+        #self._drawingWidget.set_results(self._project["results"])
 
     def project_created_or_loaded(self):
         """
@@ -342,7 +343,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 None
         """
         self.reset_tab_wigets()
-        self.stop_video()
 
         # dispaly project
         self.display_properties()
@@ -381,18 +381,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         # pixmap.save(file_name.format(middel))
         # pixmap = self._enhanced_video_reader.get_pixmap(last)
         # pixmap.save(file_name.format(last))
-
-    def stop_video(self):
-        """
-        stop and delete the video buffer and it's thread
-        """
-        if self._enhanced_video_reader is not None:
-            self._enhanced_video_reader.stop()
-            self._enhanced_video_reader = None
-
-        if self._raw_video_reader is not None:
-            self._raw_video_reader.stop()
-            self._raw_video_reader = None
 
     def reset_tab_wigets(self):
         """
@@ -966,7 +954,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._progressBar.hide()
 
         self._videoStatsWidget.display_stats()
-        self._videoStatsWidget.enable_and_connect(True)
+        self._videoStatsWidget.enable(True)
 
     def get_video_stats(self):
         """
@@ -1006,8 +994,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         if mb_reply == qw.QMessageBox.Yes:
             #clean-up and exit signalling
-            self.stop_video()
-
             # the event must be accepted
             event.accept()
 

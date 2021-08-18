@@ -123,6 +123,9 @@
        <property name="toolTip">
         <string>Jump to frame.</string>
        </property>
+       <property name="value">
+        <number>0</number>
+       </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -219,20 +222,17 @@
         <number>1</number>
        </property>
        <property name="text">
-        <string>GoTo Frame</string>
+        <string>GoTo Time</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QSpinBox" name="_gotoSpinBox">
+      <widget class="QDoubleSpinBox" name="_gotoSpinBox">
        <property name="toolTip">
         <string>Frame number for jump.</string>
        </property>
        <property name="buttonSymbols">
         <enum>QAbstractSpinBox::NoButtons</enum>
-       </property>
-       <property name="minimum">
-        <number>1</number>
        </property>
       </widget>
      </item>
@@ -444,22 +444,6 @@
     <hint type="sourcelabel">
      <x>362</x>
      <y>30</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>362</x>
-     <y>80</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>_gotoSpinBox</sender>
-   <signal>editingFinished()</signal>
-   <receiver>CGTVideoControls</receiver>
-   <slot>go_to_frame()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>414</x>
-     <y>120</y>
     </hint>
     <hint type="destinationlabel">
      <x>362</x>

@@ -35,8 +35,8 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
     ## the zoom has been changed
     zoom_value = qc.pyqtSignal(float)
 
-    ## signal to indicate change of frame
-    frame_changed = qc.pyqtSignal(int)
+    ## signal to indicate change of time
+    time_changed = qc.pyqtSignal(float)
 
     ## signal for start/end of video, end if parameter = true
     start_end = qc.pyqtSignal(bool)
@@ -198,14 +198,13 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         self.enable_fine_controls()
         self.pause.emit()
 
-    def set_frame_currently_displayed(self, frame_number):
+    def set_time_currently_displayed(self, time):
         """
         display the current frame
         """
-        display_number = frame_number
         if self._gotoSpinBox.isEnabled():
-            self._gotoSpinBox.setValue(display_number)
-        self.set_slider_value(frame_number)
+            self._gotoSpinBox.setValue(time)
+        self.set_slider_value(time)
 
     @qc.pyqtSlot(float)
     def zoom_changed(self, zoom):
@@ -224,7 +223,7 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         respond to the release of the slider
         """
         value = self._frameSlider.value()
-        self.frame_changed.emit(value)
+        self.time_changed.emit(float(value))
 
     @qc.pyqtSlot()
     def step_up(self):
@@ -259,4 +258,4 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         """
         jump to typed in frame
         """
-        self.frame_changed.emit(self._gotoSpinBox.value())
+        self.time_changed.emit(self._gotoSpinBox.value())

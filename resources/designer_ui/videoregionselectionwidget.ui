@@ -86,7 +86,7 @@
          <item>
           <widget class="QLabel" name="_frameLabel">
            <property name="text">
-            <string>Frame</string>
+            <string>Time</string>
            </property>
           </widget>
          </item>

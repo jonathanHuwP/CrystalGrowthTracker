@@ -16,12 +16,12 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 @copyright 2021
 @author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 """
-from collections import namedtuple
 
-## data structure for video data
 class VideoData():
     """
-    class for storing data about video
+    class for storing data about the video in the file. Since actual frame rates
+    may be different from the frame rate specified within the video file both are
+    stored and conversion functions provided
     """
     def __init__(self, frame_data, frame_rates, bytes_per_pixel):
         """
@@ -47,7 +47,7 @@ class VideoData():
         self._frame_rate_actual = frame_rates[0]
 
         ## the actual duration for the video, based on user frame rate
-        self._time_duration_actual = self._frame_rate_actual*self._frame_count
+        self._time_duration_actual = self._frame_count/self._frame_rate_actual
 
         ## the frame rate read from source file
         self._frame_rate_codec = frame_rates[1]
@@ -57,6 +57,12 @@ class VideoData():
 
         ## the size of a frame in bytes
         self._frame_size = self._width*self._height*self._bytes_per_pixel
+
+        ## conversion factor to codec time
+        self._to_codec = float(self._frame_rate_actual)/float(self._frame_rate_codec)
+
+        ## conversion factor to user time
+        self._to_user = float(self._frame_rate_codec)/float(self._frame_rate_actual)
 
     def get_width(self):
         """
@@ -111,3 +117,23 @@ class VideoData():
         getter for the number of bytes in a line (needed by Qt QImage)
         """
         return self._width * self._bytes_per_pixel
+
+    def to_codec_time(self, time):
+        """
+        convert a time from the user frames per second to the codec FPS
+            Args:
+                time (float): time in second user FPS
+            Returns
+                (float): time in codec FPS
+        """
+        return time * self._to_codec
+
+    def to_user_time(self, time):
+        """
+        convert a time from the codec frames per second to the user FPS
+            Args:
+                time (float): time in second codec FPS
+            Returns
+                (float): time in user FPS
+        """
+        return time * self._to_user

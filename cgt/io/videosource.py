@@ -133,7 +133,7 @@ class VideoSource(qc.QObject):
                           self._video_data.get_bytes_per_line(),
                           im_format)
 
-        return image.pixmap()
+        return qg.QPixmap.fromImage(image)
 
     def get_length(self):
         """

@@ -132,7 +132,7 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         self._entryControls.one_frame_backward.connect(self.step_reverse_video)
         self._entryControls.backwards.connect(self.play_reverse_video)
         self._entryControls.start_end.connect(self.start_or_end)
-        self._entryControls.frame_changed.connect(self.frame_changed)
+        self._entryControls.time_changed.connect(self.time_changed)
 
         self._cloneControls.zoom_value.connect(self.clone_zoom_changed)
         self._cloneControls.forwards.connect(self.play_video)
@@ -141,7 +141,7 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         self._cloneControls.one_frame_backward.connect(self.step_reverse_video)
         self._cloneControls.backwards.connect(self.play_reverse_video)
         self._cloneControls.start_end.connect(self.start_or_end)
-        self._cloneControls.frame_changed.connect(self.frame_changed)
+        self._cloneControls.time_changed.connect(self.time_changed)
 
         self._cloneControls.disable_all_but_zoom()
 
@@ -197,7 +197,7 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         handel region change if the region posesses key frames
         """
         self.clear_queue.emit()
-        self.frame_changed(self._base_key_frame)
+        self.time_changed(self._base_key_frame)
 
         self._cloneControls.enable_all()
         self._entryControls.freeze()
@@ -392,7 +392,7 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         self.decrament_frame()
 
     @qc.pyqtSlot(int)
-    def frame_changed(self, frame):
+    def time_changed(self, frame):
         """
         callback for the jump to a new frame
             Args:
@@ -421,7 +421,7 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         """
         frame = self._keyFrameBox.itemData(index)
         if frame is not None:
-            self.frame_changed(frame)
+            self.time_changed(frame)
 
     @qc.pyqtSlot(float)
     def entry_zoom_changed(self, zoom_value):
