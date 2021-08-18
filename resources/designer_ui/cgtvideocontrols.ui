@@ -451,5 +451,21 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>_gotoSpinBox</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>CGTVideoControls</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>409</x>
+     <y>120</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>362</x>
+     <y>80</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
 </ui>
