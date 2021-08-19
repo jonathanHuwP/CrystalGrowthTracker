@@ -80,7 +80,7 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         reset to initial conditions
         """
         self.set_slider_value(0)
-        self.set_frame_currently_displayed(0)
+        self.set_time_currently_displayed(0.0)
         self.set_range(99)
 
     def setup_buttons(self):

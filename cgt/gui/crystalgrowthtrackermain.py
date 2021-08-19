@@ -122,7 +122,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._selectWidget.setup_video_widget()
         self._selectWidget.enable(False)
         self.setup_tab(tab, self._selectWidget)
-        return
+
 
         # Video Statistics
         ###################
@@ -133,7 +133,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._videoStatsWidget.setup_video_widget()
         self._videoStatsWidget.enable(False)
         self.setup_tab(tab, self._videoStatsWidget)
-
+        return
         # User drawing
         ###############
         tab =self._tabWidget.widget(3)
@@ -180,8 +180,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self._propertiesWidget.setEnabled(False)
         self._selectWidget.enable(False)
+        self._videoStatsWidget.enable(False)
         # HACK
-        # self._videoStatsWidget.enable(False)
         # self._drawingWidget.setEnabled(False)
         # self._resultsWidget.setEnabled(False)
         # self._reportWidget.setEnabled(False)
@@ -832,18 +832,18 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             #self._drawingWidget.set_video_source(self._enhanced_video_reader)
             #self._resultsWidget.set_video_source(self._enhanced_video_reader)
 
-            # if self._project["raw_video"] is not None:
-            #     if self._project["stats_from_enhanced"]:
-            #         self._videoStatsWidget.set_video_source(self._enhanced_video_reader)
-            #     else:
-            #         self._raw_video_reader = VideoSource(self._project["raw_video"])
-            #         self._videoStatsWidget.set_video_source(self._raw_video_reader)
-            # else:
-            #     self._videoStatsWidget.set_video_source(self._enhanced_video_reader)
+            if self._project["raw_video"] is not None:
+                if self._project["stats_from_enhanced"]:
+                    self._videoStatsWidget.set_video_source(self._enhanced_video_reader)
+                else:
+                    self._raw_video_reader = VideoSource(self._project["raw_video"])
+                    self._videoStatsWidget.set_video_source(self._raw_video_reader)
+            else:
+                self._videoStatsWidget.set_video_source(self._enhanced_video_reader)
 
-            # stats = self.get_results().get_video_statistics()
-            # if stats is not None and len(stats.get_frames()) > 0:
-            #     self._videoStatsWidget.display_stats()
+            stats = self.get_results().get_video_statistics()
+            if stats is not None and len(stats.get_frames()) > 0:
+                self._videoStatsWidget.display_stats()
 
         except ffmpeg.Error as error:
             self.display_error(f"File {video_file} cannot be probed: {error}")
