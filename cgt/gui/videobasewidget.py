@@ -157,7 +157,6 @@ class VideoBaseWidget(qw.QWidget):
         display an image, the image must be a pixmap so that
         it can safely be recieved from another thread
         """
-        import time
         if self._current_pixmap is None or self.isHidden():
             return
 

@@ -19,6 +19,15 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 import subprocess
 import pathlib
 import json
+import argparse
+
+def get_args():
+    """
+    get command line arguments
+    """
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-d", "--directory", type=str, required=False, help="directory to be searched")
+    return parser.parse_args()
 
 def pylint_files(file_list):
     """
@@ -73,7 +82,15 @@ def analyse_output(file, results):
 
 def main():
     """The main function"""
-    path = pathlib.Path('.')
+    args = get_args()
+    path = None
+    if args.directory is None:
+        path = pathlib.Path('.')
+    else:
+        path = pathlib.Path(args.directory)
+
+    print(f"Searching {path}")
+
     files =[x for x in path.glob("**/*.py") if not x.name.startswith("Ui_")]
     linting_list = pylint_files(files)
 
