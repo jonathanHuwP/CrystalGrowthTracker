@@ -153,11 +153,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         # Report results
         #################
-        # tab = self._tabWidget.widget(5)
+        tab = self._tabWidget.widget(5)
 
         ## the report widget
-        # self._reportWidget = ReportWidget(tab, self)
-        # self.setup_tab(tab, self._reportWidget)
+        self._reportWidget = ReportWidget(tab, self)
+        self.setup_tab(tab, self._reportWidget)
 
     def get_pens(self):
         """
@@ -183,7 +183,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         # HACK
         # self._drawingWidget.setEnabled(False)
         self._resultsWidget.setEnabled(False)
-        # self._reportWidget.setEnabled(False)
+        self._reportWidget.setEnabled(False)
 
         if tab_index == self._tabWidget.indexOf(self._propertiesTab):
             self._propertiesTab.setEnabled(True)
@@ -355,8 +355,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         # HACK
         # self._drawingWidget.display_video_file_name()
 
-        # if self._project["latest_report"] is not None and self._project["latest_report"] != "":
-        #     self._reportWidget.load_html(self._project["latest_report"])
+        if self._project["latest_report"] is not None and self._project["latest_report"] != "":
+            self._reportWidget.load_html(self._project["latest_report"])
 
     def save_region_frames(self):
         """
