@@ -31,9 +31,9 @@ import PyQt5.QtGui as qg
 import ffmpeg
 import subprocess
 
-from cgt.io.videodata import VideoData
+from cgt.io.ffmpegbase import FfmpegBase
 
-class VideoSource(qc.QObject):
+class VideoSource(FfmpegBase):
     """
     a source of images from a video file, it will run
     a reader in a seperate thread.
@@ -44,90 +44,33 @@ class VideoSource(qc.QObject):
     ## the pixel format and number of bytes
     PIX_FMT = ('rgb24', 3)
 
-    def __init__(self, file_name, user_frame_rate=None):
+    def __init__(self, file_name, user_frame_rate, parent=None):
         """
         set up the object
             Args:
                 file_name (str): the path and name of video file
                 user_frame_rate (int): the frame rate provided by user
+                parent (QObject): parent object
         """
-        super().__init__()
+        super().__init__(file_name, parent)
 
         ## file name
         self._file_name = file_name
 
-        ## video data
-        self._video_data = None
+        self.probe_video(file_name, user_frame_rate, VideoSource.PIX_FMT[1])
 
-        self.probe_video(file_name, user_frame_rate)
-
-    def probe_video(self, file_path, user_frame_rate):
+    def get_pixmap(self, frame):
         """
-        load a video file
+        get the pixmap for the frame
             Args:
-                file_path (string) the file
-                user_frame_rate (int): the frame rate provided by user
-            Throws:
-                 (ffmpeg.Error): can't probe video
-                 (StopIteration): problem with information in video
-                 (KeyError): problem with information in video
-        """
-        probe = ffmpeg.probe(file_path)
-        video_info = next(s for s in probe['streams'] if s['codec_type'] == 'video')
-
-        print("Video Data\n========")
-        for key in video_info.keys():
-            print(f"\t{key} => {video_info[key]} {type(video_info[key])}")
-        print("\n")
-
-        frame_data = [video_info["width"], video_info["height"], video_info["duration_ts"]]
-
-        parts = video_info["r_frame_rate"].split('/')
-        frame_rate_codec = float(parts[0])/float(parts[1])
-        frame_rates = []
-        if user_frame_rate is None:
-            frame_rates.append(frame_rate_codec)
-        else:
-            frame_rates.append(user_frame_rate)
-
-        frame_rates.append(frame_rate_codec)
-
-        self._video_data = VideoData(frame_data, frame_rates, VideoSource.PIX_FMT[1])
-
-    def get_pixmap_user(self, user_time):
-        """
-        get the pixmap defined in user FPS
-            Args:
-                user_time (float): the time in user fps
+                frame (int): the time in user fps
             Returns:
-                (QPixmap)
+                (QPixmap, float): the qixmap and the associated time
         """
-        time = self._video_data.to_codec_time(user_time)
-        return self.get_pixmap(time)
+        time = self._video_data.frame_to_internal_time(frame)
+        return self.get_pixmap_at(time)
 
-    def get_next_pixmap_user(self, old_time):
-        """
-        get the pixmap for one frame from old_time (user FPS)
-            Args:
-                old_time (float): the time base for the next frame
-            Returns:
-                (QPixmap)
-        """
-        time = self._video_data.next_user_time(old_time)
-        return self.get_pixmap_user(time), time
-
-    def get_previous_pixmap_user(self, old_time):
-        """
-        get the pixmap for one frame back from old_time (user FPS)
-            Args:
-                old_time (float): the time base for the next frame
-            Returns:
-                (QPixmap)
-        """
-        time = self._video_data.previous_user_time(old_time)
-        return self.get_pixmap_user(time), time
-
-    def get_pixmap(self, time):
+    def get_pixmap_at(self, time):
         """
         getter for the pixmap at a given time (user frame rate):
             Args:

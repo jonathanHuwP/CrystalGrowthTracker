@@ -50,22 +50,25 @@ class VideoData():
         self._time_step_user = 1.0/self._frame_rate_user
 
         ## the actual duration for the video, based on user frame rate
-        self._time_duration_user = (self._frame_count/self._frame_rate_user) - self._time_step_user
+        self._time_duration_user = (self._frame_count-1)*self._time_step_user
 
         ## the frame rate read from source file
-        self._frame_rate_codec = frame_rates[1]
+        self._frame_rate_internal = frame_rates[1]
+
+        ## the time step internal to the video
+        self._time_step_internal = 1.0/self._frame_rate_internal
 
         ## the duration of video based on source file frame rate
-        self._time_duration_codec = self._frame_rate_codec*self._frame_count
+        self._time_duration_codec = (self._frame_count-1)*self._time_step_internal
 
         ## the size of a frame in bytes
         self._frame_size = self._width*self._height*self._bytes_per_pixel
 
         ## conversion factor to codec time
-        self._to_codec = float(self._frame_rate_user)/float(self._frame_rate_codec)
+        self._to_codec = float(self._frame_rate_user)/float(self._frame_rate_internal)
 
         ## conversion factor to user time
-        self._to_user = float(self._frame_rate_codec)/float(self._frame_rate_user)
+        self._to_user = float(self._frame_rate_internal)/float(self._frame_rate_user)
 
     def get_width(self):
         """
@@ -97,11 +100,11 @@ class VideoData():
         """
         return self._time_duration_user
 
-    def get_frame_rate_codec(self):
+    def get_frame_rate_internal(self):
         """
         getter for the frame rate read from video file
         """
-        return self._frame_rate_codec
+        return self._frame_rate_internal
 
     def get_time_duration_codec(self):
         """
@@ -141,38 +144,56 @@ class VideoData():
         """
         return time * self._to_user
 
-    def next_user_time(self, current_user_time):
+    def next_frame(self, frame):
         """
-        get the next time user FPS from exising
+        get the next frame wrapping at the end
             Args:
-               current_user_time (float): the current time
-            Returns
-                (float): the time of the next frame
+                frame (int): the existing frame
+            Returns:
+                (int)
         """
-        next_time = current_user_time + self._time_step_user
+        next_frame = frame+1
+        if next_frame >= self._frame_count:
+            next_frame = 0
 
-        if next_time > self._time_duration_user - self._time_step_user:
-            next_time = 0.0
+        return next_frame
 
-        return next_time
-
-    def previous_user_time(self, current_user_time):
+    def previous_frame(self, frame):
         """
-        get the previous time user FPS from exising
+        get the previous frame wrapping at the start
             Args:
-               current_user_time (float): the current time
-            Returns
-                (float): the time of the previous frame
+                frame (int): the existing frame
+            Returns:
+                (int)
         """
-        next_time = current_user_time - self._time_step_user
+        next_frame = frame-1
+        if next_frame < 0:
+            next_frame = self._frame_count-1
 
-        if next_time < 0.0:
-            next_time = self._time_duration_user - self._time_step_user
-
-        return next_time
+        return next_frame
 
     def get_user_time_step(self):
         """
         getter for the inter-frame time step (user FPS)
         """
         return self._time_step_user
+
+    def frame_to_internal_time(self, frame):
+        """
+        convert a frame number to internal video time
+            Args:
+                frame (int): frame number
+            Returns:
+                (float): the time in internal FPS
+        """
+        return frame * self._time_step_internal
+
+    def frame_to_user_time(self, frame):
+        """
+        convert a frame number to user FPS time
+            Args:
+                frame (int): frame number
+            Returns:
+                (float): the time in user FPS
+        """
+        return frame * self._time_step_user

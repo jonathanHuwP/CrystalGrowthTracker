@@ -63,14 +63,6 @@ class VideoAnalyser(qc.QObject):
         """
         return self._video_file
 
-    def get_length(self):
-        """
-        length of video, the largest allowed frame number is (lenght-1)
-            Returns:
-                the number of frames in the video (int)
-        """
-        return self._length
-
     def stats_whole_film(self):
         """
         get the statistics for every frame of the video

@@ -35,8 +35,8 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
     ## the zoom has been changed
     zoom_value = qc.pyqtSignal(float)
 
-    ## signal to indicate change of time
-    time_changed = qc.pyqtSignal(float)
+    ## signal to indicate change of frame
+    frame_changed = qc.pyqtSignal(int)
 
     ## signal for start/end of video, end if parameter = true
     start_end = qc.pyqtSignal(bool)
@@ -80,7 +80,7 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         reset to initial conditions
         """
         self.set_slider_value(0)
-        self.set_time_currently_displayed(0.0)
+        self.set_frame_currently_displayed(0)
         self.set_range(99)
 
     def setup_buttons(self):
@@ -198,13 +198,15 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         self.enable_fine_controls()
         self.pause.emit()
 
-    def set_time_currently_displayed(self, time):
+    def set_frame_currently_displayed(self, frame):
         """
-        display the current frame
+        set the current frame number#
+            Args:
+                frame (int): frame number
         """
         if self._gotoSpinBox.isEnabled():
-            self._gotoSpinBox.setValue(time)
-        self.set_slider_value(time)
+            self._gotoSpinBox.setValue(frame)
+        self.set_slider_value(frame)
 
     @qc.pyqtSlot(float)
     def zoom_changed(self, zoom):
@@ -223,7 +225,7 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         respond to the release of the slider
         """
         value = self._frameSlider.value()
-        self.time_changed.emit(float(value))
+        self.frame_changed.emit(float(value))
 
     @qc.pyqtSlot()
     def step_up(self):
@@ -254,8 +256,8 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         self.start_end.emit(True)
 
     @qc.pyqtSlot()
-    def goto_time(self):
+    def goto_frame(self):
         """
         jump to typed in frame
         """
-        self.time_changed.emit(self._gotoSpinBox.value())
+        self.frame_changed.emit(self._gotoSpinBox.value())

@@ -222,12 +222,12 @@
         <number>1</number>
        </property>
        <property name="text">
-        <string>GoTo Time</string>
+        <string>GoTo Frame</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QDoubleSpinBox" name="_gotoSpinBox">
+      <widget class="QSpinBox" name="_gotoSpinBox">
        <property name="toolTip">
         <string>Frame number for jump.</string>
        </property>
@@ -391,7 +391,7 @@
    <sender>_goToButton</sender>
    <signal>clicked()</signal>
    <receiver>CGTVideoControls</receiver>
-   <slot>goto_time()</slot>
+   <slot>goto_frame()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>501</x>
@@ -455,10 +455,10 @@
    <sender>_gotoSpinBox</sender>
    <signal>editingFinished()</signal>
    <receiver>CGTVideoControls</receiver>
-   <slot>goto_time()</slot>
+   <slot>goto_frame()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>409</x>
+     <x>414</x>
      <y>120</y>
     </hint>
     <hint type="destinationlabel">

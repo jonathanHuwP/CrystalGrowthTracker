@@ -39,8 +39,8 @@ class VideoBaseView(qw.QGraphicsView):
         ## the pixmap for video display
         self._pixmap_item = None
 
-        ## the current video time
-        self._current_time = None
+        ## the current video frame
+        self._current_frame = None
 
         ## set and connect scene
         self.setScene(qw.QGraphicsScene())
@@ -50,15 +50,15 @@ class VideoBaseView(qw.QGraphicsView):
         clear the scene and reset instance variables
         """
         self._pixmap_item = None
-        self._current_time = None
+        self._current_frame = None
         self.scene().clear()
 
-    def set_pixmap(self, pixmap, time):
+    def set_pixmap(self, pixmap, frame):
         """
         set the pixamp
             Args:
                 pixmap (QPixmap) the pixmap
-                frame_number (int) the number of the frame in the video
+                frame (int) the number of the frame in the video
         """
         if self._pixmap_item is None:
             self._pixmap_item = self.scene().addPixmap(pixmap)
@@ -68,7 +68,7 @@ class VideoBaseView(qw.QGraphicsView):
         else:
             self._pixmap_item.setPixmap(pixmap)
 
-        self._current_time = time
+        self._current_frame = frame
 
     def get_frame_number(self):
         """
@@ -76,7 +76,7 @@ class VideoBaseView(qw.QGraphicsView):
             Returns:
                 the frame number
         """
-        return self._current_time
+        return self._current_frame
 
     def set_zoom(self, zoom_value):
         """
