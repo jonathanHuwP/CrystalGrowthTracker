@@ -23,14 +23,19 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 import PyQt5.QtCore as qc
 
 import numpy as np
+import ffmpeg
+import subprocess
 
+from cgt.io.ffmpegbase import FfmpegBase
 from cgt.util.framestats import FrameStats, VideoIntensityStats
 
-class VideoAnalyser(qc.QObject):
+class VideoAnalyser(FfmpegBase):
     """
-    a video reader that is designed to run as a seperate thread
-    from the display object, allowing smoother animation
+    an object to analyse statistic of a video
     """
+
+    ## the pixel format and number of bytes
+    PIX_FMT = ('gray', 1)
 
     ## the progress signal
     frames_analysed = qc.pyqtSignal(int)
@@ -38,30 +43,13 @@ class VideoAnalyser(qc.QObject):
     def __init__(self, video_file, parent=None):
         """
         initalize by usng opencv opening the video file
-
             Args:
                 video_file (string) the path to the video file
+                parent (QObject): parent object
         """
-        super().__init__(parent)
+        super().__init__(video_file, parent)
 
-        ## initiaize the file video stream
-        # HACK
-        # self._video_reader = cv.VideoCapture(video_file)
-
-        ## store the file name
-        self._video_file = video_file
-
-        ## the lenght
-        # HACK
-        self._length = 0#int(self._video_reader.get(cv.CAP_PROP_FRAME_COUNT))
-
-    def get_name(self):
-        """
-        getter for the file name
-            Returns:
-                file name (string)
-        """
-        return self._video_file
+        self.probe_video(video_file, 1, VideoAnalyser.PIX_FMT[1])
 
     def stats_whole_film(self):
         """
@@ -69,54 +57,61 @@ class VideoAnalyser(qc.QObject):
             Returns:
                 the statistics (VideoIntensityStats)
         """
+        if self._video_data is None:
+            return
+
+        length = self._video_data.get_frame_count()
+        args = (ffmpeg
+                .input(self.get_name())
+                .output('pipe:', format='rawvideo', pix_fmt=VideoAnalyser.PIX_FMT[0], vframes=length)
+                .compile())
+
+        video_proc = subprocess.Popen(args, stdout=subprocess.PIPE)
+
+        return self.read_and_analyse(video_proc)
+
+    def read_and_analyse(self, video_proc):
+        """
+        read the frame and analyse them
+            Args:
+                video_proc (subprocess): ffmpeg process producing frames
+            Retruns:
+                (VideoIntensityStats)
+        """
         bins = np.linspace(0, 256, 32)
         vid_statistics = VideoIntensityStats(bins)
-        for i in range(self._length):
-            vid_statistics.append_frame(self.make_stats(i, bins))
-            if i%10 == 0:
-                self.frames_analysed.emit(i)
+        count = 0
+        flag = True
+        while flag:
+            in_bytes = video_proc.stdout.read(self._video_data.get_frame_size())
 
-        self.frames_analysed.emit(self._length)
+            if not len(in_bytes) == 0:
+                vid_statistics.append_frame(self.make_stats(in_bytes, bins))
+                count += 1
+                if count%10 == 0:
+                    self.frames_analysed.emit(count)
+            else:
+                flag = False
 
+        self.frames_analysed.emit(count)
         return vid_statistics
 
-    def make_stats(self, frame_number, bins):
+    def make_stats(self, image_bytes, bins):
         """
         make the statistics for a single frame
             Args:
-                frame_number (int) the frame
+                image_bytes (bytes): the image in raw bytes
                 bins ([int]) the bins for counting
         """
-        image = self.get_image_values(frame_number)
-
+        image = np.frombuffer(image_bytes, dtype=np.uint8)
         mean = np.mean(image)
         standard_deviation = np.std(image)
         count, _ = np.histogram(image, bins)
 
         return FrameStats(mean, standard_deviation, count)
 
-    def get_frame(self, frame_number):
+    def get_number_frames(self):
         """
-        get a frame of video as a numpy image
-            Args:
-                frame_number (int) the number of the required frame
-            Returns:
-                image (numpy.array dtype=uint8) the image
+        get number of frames in video
         """
-        # HACK
-        # self._video_reader.set(cv.CAP_PROP_POS_FRAMES, frame_number)
-        flag, img = self._video_reader.read()
-
-        if not flag:
-            message = f"failed to read image for frame {frame_number}"
-            raise ValueError(message)
-
-        # HACK
-        return None#cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-
-    def get_image_values(self, frame_number):
-        """
-        get image as a one dimensional array
-        """
-        frame = self.get_frame(frame_number)
-        return frame.flatten()
+        return self._video_data.get_frame_count()

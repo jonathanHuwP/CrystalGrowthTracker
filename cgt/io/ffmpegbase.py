@@ -86,3 +86,12 @@ class FfmpegBase(qc.QObject):
         getter for the video data, return None in file has not been probed
         """
         return self._video_data
+
+    def get_name(self):
+        """
+        getter for the file name
+            Returns:
+                file name (string)
+        """
+        return self._file_name
+

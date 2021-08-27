@@ -947,7 +947,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         else:
             analyser = VideoAnalyser(str(self._project["enhanced_video"]), self)
 
-        self._progressBar.setMaximum(analyser.get_length())
+        self._progressBar.setMaximum(analyser.get_number_frames())
         analyser.frames_analysed.connect(self._progressBar.setValue)
         self._progressBar.show()
 
