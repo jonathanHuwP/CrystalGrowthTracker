@@ -115,8 +115,8 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         """
         if self._frame_line is not None:
             self.clear()
-        #self.draw_stats_graph()
-        #self.plot_histogram()
+        self.draw_stats_graph()
+        self.plot_histogram()
 
     def plot_histogram(self):
         """

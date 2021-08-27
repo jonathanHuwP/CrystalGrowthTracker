@@ -123,7 +123,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._selectWidget.enable(False)
         self.setup_tab(tab, self._selectWidget)
 
-
         # Video Statistics
         ###################
         tab = self._tabWidget.widget(2)
@@ -133,6 +132,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._videoStatsWidget.setup_video_widget()
         self._videoStatsWidget.enable(False)
         self.setup_tab(tab, self._videoStatsWidget)
+
         return
         # User drawing
         ###############
@@ -194,6 +194,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         elif tab_index == self._tabWidget.indexOf(self._videoStatsTab):
             if self._project["results"].get_video_statistics() is not None:
                 self._videoStatsWidget.enable(True)
+                self._videoStatsWidget.redisplay()
         elif tab_index == self._tabWidget.indexOf(self._drawingTab):
             self._drawingWidget.setEnabled(True)
         elif tab_index == self._tabWidget.indexOf(self._resultsTab):
@@ -836,7 +837,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 if self._project["stats_from_enhanced"]:
                     self._videoStatsWidget.set_video_source(self._enhanced_video_reader)
                 else:
-                    self._raw_video_reader = VideoSource(self._project["raw_video"])
+                    self._raw_video_reader = VideoSource(self._project["raw_video"], float(self._project["frame_rate"]))
                     self._videoStatsWidget.set_video_source(self._raw_video_reader)
             else:
                 self._videoStatsWidget.set_video_source(self._enhanced_video_reader)
