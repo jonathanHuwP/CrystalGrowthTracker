@@ -92,7 +92,6 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
         if enabled:
             super().setEnabled(True)
             self.setup_display()
-            self._video_source.simple_connect_viewer(self)
             self.show_results(self._regionBox.currentIndex())
         elif not enabled:
             for item in self._regionView.scene().items():
@@ -149,9 +148,8 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
             for marker in point_markers:
                 self._points.append(marker[0])
 
-        self.post_request_frame(0)
+        self.display_image(self._video_source.get_pixmap(0))
 
-    @qc.pyqtSlot(qg.QPixmap, int)
     def display_image(self, pixmap):
         """
         callback function to display an image from a source
@@ -290,12 +288,6 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
                 video_source (VideoSource): the source object
         """
         self._video_source = video_source
-
-    def post_request_frame(self, frame_number):
-        """
-        a specific frame should be displayed
-        """
-        self.request_frame.emit(frame_number)
 
 def clone_line(marker, pen):
     """

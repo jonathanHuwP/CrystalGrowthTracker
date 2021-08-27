@@ -133,16 +133,15 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._videoStatsWidget.enable(False)
         self.setup_tab(tab, self._videoStatsWidget)
 
-        return
         # User drawing
         ###############
-        tab =self._tabWidget.widget(3)
+        # tab =self._tabWidget.widget(3)
 
         ## the crystal drawing widget
-        self._drawingWidget = MarkUpWidget(tab, self)
-        self._drawingWidget.setup_video_widget()
-        self._drawingWidget.setEnabled(False)
-        self.setup_tab(tab, self._drawingWidget)
+        # self._drawingWidget = MarkUpWidget(tab, self)
+        # self._drawingWidget.setup_video_widget()
+        # self._drawingWidget.setEnabled(False)
+        # self.setup_tab(tab, self._drawingWidget)
 
         # Results
         ###########
@@ -154,11 +153,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         # Report results
         #################
-        tab = self._tabWidget.widget(5)
+        # tab = self._tabWidget.widget(5)
 
         ## the report widget
-        self._reportWidget = ReportWidget(tab, self)
-        self.setup_tab(tab, self._reportWidget)
+        # self._reportWidget = ReportWidget(tab, self)
+        # self.setup_tab(tab, self._reportWidget)
 
     def get_pens(self):
         """
@@ -183,7 +182,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._videoStatsWidget.enable(False)
         # HACK
         # self._drawingWidget.setEnabled(False)
-        # self._resultsWidget.setEnabled(False)
+        self._resultsWidget.setEnabled(False)
         # self._reportWidget.setEnabled(False)
 
         if tab_index == self._tabWidget.indexOf(self._propertiesTab):
@@ -831,7 +830,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self._selectWidget.set_video_source(self._enhanced_video_reader)
             # HACK
             #self._drawingWidget.set_video_source(self._enhanced_video_reader)
-            #self._resultsWidget.set_video_source(self._enhanced_video_reader)
+            self._resultsWidget.set_video_source(self._enhanced_video_reader)
 
             if self._project["raw_video"] is not None:
                 if self._project["stats_from_enhanced"]:
