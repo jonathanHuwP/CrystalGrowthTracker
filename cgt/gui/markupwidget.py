@@ -47,12 +47,6 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
     The tool for marking up items identified in the video
     """
 
-    ## signal that a frame is required
-    request_frame = qc.pyqtSignal(int)
-
-    ## signal that the queue should be cleared
-    clear_queue = qc.pyqtSignal()
-
     def __init__(self, parent, data_source):
         """
         the object initalization function
@@ -74,9 +68,6 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
 
         ## the current raw pixmap
         self._current_pixmap = None
-
-        ## the length of the video
-        self._video_num_frames = -1
 
         ## playing state of the video
         self._playing = PlayStates.MANUAL
@@ -127,21 +118,21 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         """
         self._entryControls.zoom_value.connect(self.entry_zoom_changed)
         self._entryControls.forwards.connect(self.play_video)
+        self._entryControls.backwards.connect(self.play_reverse_video)
         self._entryControls.pause.connect(self.pause_video)
         self._entryControls.one_frame_forward.connect(self.step_video)
         self._entryControls.one_frame_backward.connect(self.step_reverse_video)
-        self._entryControls.backwards.connect(self.play_reverse_video)
         self._entryControls.start_end.connect(self.start_or_end)
-        self._entryControls.time_changed.connect(self.time_changed)
+        self._entryControls.frame_changed.connect(self.display_frame)
 
-        self._cloneControls.zoom_value.connect(self.clone_zoom_changed)
+        self._cloneControls.zoom_value.connect(self.entry_zoom_changed)
         self._cloneControls.forwards.connect(self.play_video)
+        self._cloneControls.backwards.connect(self.play_reverse_video)
         self._cloneControls.pause.connect(self.pause_video)
         self._cloneControls.one_frame_forward.connect(self.step_video)
         self._cloneControls.one_frame_backward.connect(self.step_reverse_video)
-        self._cloneControls.backwards.connect(self.play_reverse_video)
         self._cloneControls.start_end.connect(self.start_or_end)
-        self._cloneControls.time_changed.connect(self.time_changed)
+        self._cloneControls.frame_changed.connect(self.display_frame)
 
         self._cloneControls.disable_all_but_zoom()
 
@@ -164,7 +155,8 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
             self._regionsBox.setCurrentIndex(index)
         self._regionsBox.blockSignals(False)
 
-        self.region_changed()
+        if self._video_source is not None:
+            self.region_changed()
 
     def get_results_proxy(self):
         """
@@ -196,14 +188,14 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         """
         handel region change if the region posesses key frames
         """
-        self.clear_queue.emit()
         self.time_changed(self._base_key_frame)
 
         self._cloneControls.enable_all()
         self._entryControls.freeze()
 
         if self._entry_forward:
-            self._cloneControls.set_range(self._video_num_frames, self._base_key_frame)
+            self._cloneControls.set_range(self._video_source.get_video_data().get_frame_count(),
+                                          self._base_key_frame)
         else:
             self._cloneControls.set_range(self._base_key_frame, 0)
 
@@ -222,12 +214,19 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
             self.display_pixmap()
 
         self._entryControls.enable_all()
-        self._entryControls.set_range(self._video_num_frames, 0)
+        self._entryControls.set_range(self._video_source.get_video_data().get_frame_count(), 0)
         self._cloneControls.disable_all_but_zoom()
-        self._cloneControls.set_range(self._video_num_frames, 0)
+        self._cloneControls.set_range(self._video_source.get_video_data().get_frame_count(), 0)
 
+    def display_frame(self, frame):
+        """
+        display a given frame
+            Args:
+                frame (int): the time of the frame to display (user FPS)
+        """
+        pixmap = self._video_source.get_pixmap(frame)
+        self.display_image(pixmap, frame)
 
-    @qc.pyqtSlot(qg.QPixmap, int)
     def display_image(self, pixmap, frame_number):
         """
         callback function to display an image from a source
@@ -281,14 +280,7 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         """
         emit the current frame
         """
-        self.post_request_frame(self._current_frame)
-
-    @qc.pyqtSlot(int)
-    def post_request_frame(self, frame_number):
-        """
-        a specific frame should be displayed
-        """
-        self.request_frame.emit(frame_number)
+        self.display_frame(self._current_frame)
 
     def set_key_frame_combo(self):
         """
@@ -314,16 +306,6 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
             self._keyFrameBox.setCurrentIndex(0)
             self._keyFrameBox.blockSignals(False)
 
-    def set_length(self, length):
-        """
-        set the length of the video
-            Args:
-                length (int) the number of frames in video
-        """
-        self._video_num_frames = length
-        self._entryControls.set_range(length)
-        self._cloneControls.set_range(length)
-
     def setEnabled(self, enabled):
         """
         enable/disable widget on enable the source
@@ -331,7 +313,6 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         """
         if enabled and self._video_source is not None:
             super().setEnabled(True)
-            self._video_source.connect_viewer(self)
             self.redisplay()
         elif not enabled:
             super().setEnabled(False)
@@ -344,9 +325,8 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
                 video_source (VideoSource): the source object
         """
         self._video_source = video_source
-        self._cloneControls.set_range(video_source.get_length())
-        self._entryControls.set_range(video_source.get_length())
-        self.set_length(video_source.get_length())
+        self._cloneControls.set_range(self._video_source.get_video_data().get_frame_count())
+        self._entryControls.set_range(self._video_source.get_video_data().get_frame_count())
 
     @qc.pyqtSlot()
     def play_video(self):
@@ -370,7 +350,6 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         """
         callback for calling the video
         """
-        self.clear_queue.emit()
         self._playing = PlayStates.MANUAL
         self.unblock_user_entry()
 
@@ -398,7 +377,7 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
             Args:
                 frame (int) the frame number for the jump
         """
-        self.post_request_frame(frame)
+        self.display_frame(frame)
 
     @qc.pyqtSlot(bool)
     def start_or_end(self, start):
@@ -408,9 +387,9 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
                 start (bool) if true first frame else last
         """
         if start:
-            self.post_request_frame(self._video_num_frames-1)
+           self.display_frame(self._video_source.get_video_data().get_frame_count()-1)
         else:
-            self.post_request_frame(0)
+           self.display_frame(0)
 
     @qc.pyqtSlot(int)
     def jump_to_key_frame(self, index):
@@ -465,7 +444,7 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         """
         emit a signal for the next frame looping at max
         """
-        upper_limit = self._video_num_frames
+        upper_limit = self._video_source.get_video_data().get_frame_count()
         lower_limit = 0
 
         if self._base_key_frame is not None:
@@ -476,15 +455,15 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
                 upper_limit = current_range[1]
 
         if self._current_frame < upper_limit-1:
-            self.post_request_frame(self._current_frame+1)
+           self.display_frame(self._current_frame+1)
         else:
-            self.post_request_frame(lower_limit)
+           self.display_frame(lower_limit)
 
     def decrament_frame(self):
         """
         emit a signal for the previous frame looping at min
         """
-        upper_limit = self._video_num_frames
+        upper_limit = self._video_source.get_video_data().get_frame_count()
         lower_limit = 0
 
         if self._base_key_frame is not None:
@@ -495,9 +474,9 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
                 upper_limit = current_range[1]
 
         if self._current_frame > lower_limit:
-            self.post_request_frame(self._current_frame-1)
+           self.display_frame(self._current_frame-1)
         else:
-            self.post_request_frame(upper_limit-1)
+           self.display_frame(upper_limit-1)
 
     def add_point(self, point):
         """
@@ -586,7 +565,7 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         self._keyFrameBox.blockSignals(False)
 
         if self._entry_forward:
-            self._cloneControls.set_range(self._video_num_frames, key_frame)
+            self._cloneControls.set_range(self._video_source.get_video_data().get_frame_count(), key_frame)
         else:
             self._cloneControls.set_range(key_frame, 0)
 
@@ -675,7 +654,6 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         """
         pause the playing
         """
-        self.clear_queue.emit()
         self._playing = PlayStates.MANUAL
 
     @qc.pyqtSlot()

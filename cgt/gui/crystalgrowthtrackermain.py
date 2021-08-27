@@ -135,13 +135,13 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         # User drawing
         ###############
-        # tab =self._tabWidget.widget(3)
+        tab =self._tabWidget.widget(3)
 
         ## the crystal drawing widget
-        # self._drawingWidget = MarkUpWidget(tab, self)
-        # self._drawingWidget.setup_video_widget()
-        # self._drawingWidget.setEnabled(False)
-        # self.setup_tab(tab, self._drawingWidget)
+        self._drawingWidget = MarkUpWidget(tab, self)
+        self._drawingWidget.setup_video_widget()
+        self._drawingWidget.setEnabled(False)
+        self.setup_tab(tab, self._drawingWidget)
 
         # Results
         ###########
@@ -180,8 +180,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._propertiesWidget.setEnabled(False)
         self._selectWidget.enable(False)
         self._videoStatsWidget.enable(False)
-        # HACK
-        # self._drawingWidget.setEnabled(False)
+        self._drawingWidget.setEnabled(False)
         self._resultsWidget.setEnabled(False)
         self._reportWidget.setEnabled(False)
 
@@ -331,10 +330,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         self._videoStatsWidget.clear()
         self._selectWidget.clear()
-        # HACK
         # TODO check this out
-        #self._drawingWidget.clear()
-        #self._drawingWidget.set_results(self._project["results"])
+        self._drawingWidget.clear()
+        self._drawingWidget.set_results(self._project["results"])
 
     def project_created_or_loaded(self):
         """
@@ -352,8 +350,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self.save_region_frames()
         self._selectWidget.redisplay_regions()
         self._selectWidget.display_video_file_name()
-        # HACK
-        # self._drawingWidget.display_video_file_name()
+        self._drawingWidget.display_video_file_name()
 
         if self._project["latest_report"] is not None and self._project["latest_report"] != "":
             self._reportWidget.load_html(self._project["latest_report"])
@@ -390,8 +387,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Returns:
                 None
         """
-        # HACK
-        #self.reset_video_widgets()
+        self.reset_video_widgets()
         self._propertiesWidget.clear()
 
     @qc.pyqtSlot()
@@ -574,10 +570,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             Args:
                 value (int) code for type of data changed, 0: any 1: region
         """
-        # HACK
-        pass
-        # if value == 1:
-        #     self._drawingWidget.update_data_display()
+        if value == 1:
+            self._drawingWidget.update_data_display()
 
     def uptodate_report_exists(self):
         """
@@ -828,8 +822,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             # make the objects
             self._enhanced_video_reader = VideoSource(str(video_file), float(self._project["frame_rate"]))
             self._selectWidget.set_video_source(self._enhanced_video_reader)
-            # HACK
-            #self._drawingWidget.set_video_source(self._enhanced_video_reader)
+            self._drawingWidget.set_video_source(self._enhanced_video_reader)
             self._resultsWidget.set_video_source(self._enhanced_video_reader)
 
             if self._project["raw_video"] is not None:
