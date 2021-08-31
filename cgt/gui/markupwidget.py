@@ -270,11 +270,11 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
             pixmap = self._current_pixmap.copy(region.toRect())
 
         if self._base_key_frame is None:
-            self._entryView.set_pixmap(pixmap, self._current_frame, index)
+            self._entryView.set_region_pixmap(pixmap, self._current_frame, index)
         elif self._base_key_frame == self._current_frame:
-            self._entryView.set_pixmap(pixmap, self._base_key_frame, index)
+            self._entryView.set_region_pixmap(pixmap, self._base_key_frame, index)
 
-        self._cloneView.set_pixmap(pixmap, self._current_frame, index)
+        self._cloneView.set_region_pixmap(pixmap, self._current_frame, index)
 
     def redisplay(self):
         """
@@ -387,9 +387,9 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
                 start (bool) if true first frame else last
         """
         if start:
-           self.display_frame(self._video_source.get_video_data().get_frame_count()-1)
+            self.display_frame(self._video_source.get_video_data().get_frame_count()-1)
         else:
-           self.display_frame(0)
+            self.display_frame(0)
 
     @qc.pyqtSlot(int)
     def jump_to_key_frame(self, index):
@@ -455,9 +455,9 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
                 upper_limit = current_range[1]
 
         if self._current_frame < upper_limit-1:
-           self.display_frame(self._current_frame+1)
+            self.display_frame(self._current_frame+1)
         else:
-           self.display_frame(lower_limit)
+            self.display_frame(lower_limit)
 
     def decrament_frame(self):
         """
@@ -474,9 +474,9 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
                 upper_limit = current_range[1]
 
         if self._current_frame > lower_limit:
-           self.display_frame(self._current_frame-1)
+            self.display_frame(self._current_frame-1)
         else:
-           self.display_frame(upper_limit-1)
+            self.display_frame(upper_limit-1)
 
     def add_point(self, point):
         """

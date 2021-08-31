@@ -139,7 +139,7 @@ class MarkUpView(VideoBaseView):
                 self.scene().removeItem(item)
         super().clear()
 
-    def set_pixmap(self, pixmap, frame_number, region_index):
+    def set_region_pixmap(self, pixmap, frame_number, region_index):
         """
         set the pixamp
             Args:

@@ -25,6 +25,8 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = c-extension-no-member
 # pylint: disable = line-too-long
 # pylint: disable = invalid-name
+# pylint: disable = import-error
+
 import os
 import json
 import pathlib
@@ -330,7 +332,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         self._videoStatsWidget.clear()
         self._selectWidget.clear()
-        # TODO check this out
         self._drawingWidget.clear()
         self._drawingWidget.set_results(self._project["results"])
 
@@ -790,9 +791,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     def load_video(self):
         """
         read in a video and display
-
             Returns:
-                None
+                True if successful, else False
         """
         error_title = self.tr("CGT Video File Error")
         if self._project is None:
@@ -800,14 +800,14 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             qw.QMessageBox.warning(self,
                                    error_title,
                                    message)
-            return
+            return False
 
         if self._project["enhanced_video"] is None:
             message = self.tr("The current project contains no video file")
             qw.QMessageBox.warning(self,
                                    error_title,
                                    message)
-            return
+            return False
 
         video_file = pathlib.Path(self._project["enhanced_video"])
         if not video_file.exists():
@@ -816,7 +816,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             qw.QMessageBox.warning(self,
                                    error_title,
                                    message)
-            return
+            return False
 
         try:
             # make the objects
@@ -843,7 +843,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             return False
         except StopIteration:
             self.display_error(f"File {video_file} does not appear to contain video information")
-            self._video_data = None
             return False
         except KeyError as exception:
             self.display_error(f"Probe video data error: unknown key {exception}")
