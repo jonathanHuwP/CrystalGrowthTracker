@@ -1,4 +1,4 @@
-name: cgt-ffmpeg
+name: cgt-dev
 channels:
   - defaults
   - conda-forge
