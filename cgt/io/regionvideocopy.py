@@ -28,7 +28,6 @@ import itertools
 import PyQt5.QtGui as qg
 
 from cgt.io.ffmpegbase import FfmpegBase
-from cgt.model.videoanalysisresultsstore import VideoAnalysisResultsStore
 
 class RegionVideoCopy(FfmpegBase):
     """
@@ -41,18 +40,18 @@ class RegionVideoCopy(FfmpegBase):
     ## the output pixel format
     OUT_PIX_FMT = 'yuv420p'
 
-    def __init__(self, file_name, results, parent=None):
+    def __init__(self, project, parent=None):
         """
         set up the object
             Args:
                 file_name (str): the path and name of video file
-                results (VideoAnalysisResultsStore): the results
+                project (CGTProject): the project holding results
                 parent (QObject): parent object
         """
-        super().__init__(file_name, parent)
+        super().__init__(project["enhanced_video"], parent)
 
-        ## pointer to the results object
-        self._results = results
+        ## pointer to the project object
+        self._project = project
 
         ## the directory name of output
         self._dir_name = None
@@ -63,7 +62,7 @@ class RegionVideoCopy(FfmpegBase):
         ## the temporary directory that will hold images during production of video
         self._tmp_dir = None
 
-        self.probe_video(file_name, 1, RegionVideoCopy.IN_PIX_FMT[1])
+        self.probe_video(1, RegionVideoCopy.IN_PIX_FMT[1])
 
     def copy_region_videos(self, dir_name, base_name="region"):
         """
@@ -115,7 +114,8 @@ class RegionVideoCopy(FfmpegBase):
         name = f"{self._name_root}_{frame_number:0>4}.png"
         path = pathlib.Path(self._tmp_dir.name)
         file_path = path.joinpath(name)
-        self.make_and_save_image(in_bytes, str(file_path))
+        image = self.make_image(in_bytes)
+        image.save(str(file_path))
 
     def finish_conversion(self):
         """
@@ -125,19 +125,22 @@ class RegionVideoCopy(FfmpegBase):
         path = pathlib.Path(self._tmp_dir.name)
         file_path = path.joinpath(name)
 
+        out_file = f"{self._name_root}.mp4"
+
+        out_path = pathlib.Path(self._dir_name).joinpath(out_file)
+
         command = (ffmpeg
                     .input(file_path, framerate=8)
-                    .output("out_file.mp4", pix_fmt=RegionVideoCopy.OUT_PIX_FMT))
+                    .output(str(out_path), pix_fmt=RegionVideoCopy.OUT_PIX_FMT))
         command.run()
 
         self._tmp_dir.cleanup()
 
-    def make_and_save_image(self, image_bytes, file_path):
+    def make_image(self, image_bytes):
         """
         convert bytes and save to image file (file type determined by postfix .jpg .png)
             Args:
                 image_bytes (bytes): bytes read from file
-                file_path (str): path and file name for output
         """
         im_format = qg.QImage.Format_RGB888
 
@@ -147,4 +150,4 @@ class RegionVideoCopy(FfmpegBase):
                           self._video_data.get_bytes_per_line(),
                           im_format)
 
-        image.save(file_path)
+        return image

@@ -49,7 +49,7 @@ class VideoAnalyser(FfmpegBase):
         """
         super().__init__(video_file, parent)
 
-        self.probe_video(video_file, 1, VideoAnalyser.PIX_FMT[1])
+        self.probe_video(1, VideoAnalyser.PIX_FMT[1])
 
     def stats_whole_film(self):
         """

@@ -54,7 +54,7 @@ class VideoSource(FfmpegBase):
         """
         super().__init__(file_name, parent)
 
-        self.probe_video(file_name, user_frame_rate, VideoSource.PIX_FMT[1])
+        self.probe_video(user_frame_rate, VideoSource.PIX_FMT[1])
 
     def get_pixmap(self, frame):
         """

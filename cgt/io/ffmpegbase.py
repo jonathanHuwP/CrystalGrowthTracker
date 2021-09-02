@@ -47,11 +47,10 @@ class FfmpegBase(qc.QObject):
         ## video data
         self._video_data = None
 
-    def probe_video(self, file_path, user_frame_rate, bytes_per_pixel):
+    def probe_video(self, user_frame_rate, bytes_per_pixel):
         """
         open video file and read data
             Args:
-                file_path (string) the file
                 user_frame_rate (int): the frame rate provided by user
                 bytes_per_pixel (int): the numbe of bytes per pixel
             Throws:
@@ -59,7 +58,7 @@ class FfmpegBase(qc.QObject):
                  (StopIteration): problem with information in video
                  (KeyError): problem with information in video
         """
-        probe = ffmpeg.probe(file_path)
+        probe = ffmpeg.probe(self._file_name)
         video_info = next(s for s in probe['streams'] if s['codec_type'] == 'video')
 
         print("Video Data\n========")
