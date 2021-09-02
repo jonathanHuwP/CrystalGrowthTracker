@@ -243,9 +243,11 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         self.display_pixmap()
         self.set_key_frame_combo()
 
-        fps, _ = self._data_source.get_fps_and_resolution()
-        time = self._current_frame/fps
-        message =   f"Frame {self._current_frame:0>5d} of {self._video_source.get_length():0>5d}, approx {time:0>5.1f} seconds video time"
+        # display the current time
+        data = self._video_source.get_video_data()
+        length = data.get_time_duration_user()
+        now = data.frame_to_user_time(self._current_frame)
+        message = f"Time {now:0>5.1f} of {length:0>5.1f} (Frames: {data.get_frame_count()})"
         self._frameLabel_2.setText(message)
         if self._base_key_frame is None:
             self._frameLabel.setText(message)
