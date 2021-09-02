@@ -742,3 +742,25 @@ def make_report_file_names(proj_full_path):
     hash_file = report_dir.joinpath("results_hash.json")
 
     return (report_dir, html_outfile, hash_file)
+
+def get_rect_even_dimensions(rect_item):
+    """
+    get the the graphics rectangle of the item, moved to position, with sides of even length
+        Args:
+            rect_item (QGraphicsRectItem)
+        Returns
+            (QRect): with even length sides
+    """
+    rect = rect_item.rect().toAlignedRect()
+    pos = rect_item.pos().toPoint()
+    rect.translate(pos)
+    width = rect.width()
+    height = rect.height()
+
+    if width%2 == 1:
+        rect.setWidth(width+1)
+
+    if height%2 == 1:
+        rect.setHeight(height+1)
+
+    return rect

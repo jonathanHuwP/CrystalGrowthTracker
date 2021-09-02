@@ -55,6 +55,7 @@ from cgt.io import (htmlreport, writecsvreports, readcsvreports)
 from cgt.io.videosource import VideoSource
 from cgt.io.videoanalyser import VideoAnalyser
 from cgt.io.offscreenrender import OffScreenRender
+from cgt.io.regionvideocopy import RegionVideoCopy
 
 from cgt.model.cgtproject import CGTProject
 from cgt.model.videoanalysisresultsstore import VideoAnalysisResultsStore
@@ -862,16 +863,16 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                                    message)
             return
 
-        self._tabWidget.setCurrentIndex(1)
         dir_name = qw.QFileDialog.getExistingDirectory(
             self,
-            self.tr("Select the directory for output."),
+            self.tr("Select the directory for output. Existing files will be overwritten."),
             os.path.expanduser('~'))
 
-        from cgt.io.regionvideocopy import RegionVideoCopy
+        if not dir_name:
+            return
 
         region_copy = RegionVideoCopy(self._project)
-        region_copy. copy_region_videos(dir_name)
+        region_copy.copy_region_videos(dir_name)
 
     def has_unsaved_data(self):
         """

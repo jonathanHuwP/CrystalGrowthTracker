@@ -28,6 +28,7 @@ import itertools
 import PyQt5.QtGui as qg
 
 from cgt.io.ffmpegbase import FfmpegBase
+from cgt.util.utils import get_rect_even_dimensions
 
 class RegionVideoCopy(FfmpegBase):
     """
@@ -57,7 +58,7 @@ class RegionVideoCopy(FfmpegBase):
         self._dir_name = None
 
         ## the file name root for output
-        self._name_root = "frame"
+        self._name_root = "region"
 
         ## the temporary directory that will hold images during production of video
         self._tmp_dir = None
@@ -111,28 +112,36 @@ class RegionVideoCopy(FfmpegBase):
                 in_bytes (bytes): the raw frame
                 frame_number (int): the frame number
         """
-        name = f"{self._name_root}_{frame_number:0>4}.png"
-        path = pathlib.Path(self._tmp_dir.name)
-        file_path = path.joinpath(name)
+        regions = self._project["results"].get_regions()
+        frame = f"_{frame_number:0>4}.png"
         image = self.make_image(in_bytes)
-        image.save(str(file_path))
+        for i, region in enumerate(regions):
+            name = f"{self._name_root}_{i}{frame}"
+            file_path = pathlib.Path(self._tmp_dir.name).joinpath(name)
+            out_image = image.copy(get_rect_even_dimensions(region))
+            out_image.save(str(file_path))
+            print(str(file_path))
 
     def finish_conversion(self):
         """
         combine the region images into videos, clear and remove the tmp directory
         """
-        name = f"{self._name_root}_%04d.png"
-        path = pathlib.Path(self._tmp_dir.name)
-        file_path = path.joinpath(name)
+        regions = self._project["results"].get_regions()
+        frame = f"_%04d.png"
+        fps = int(self._project['frame_rate'])
+        for i in range(len(regions)):
+            name = f"{self._name_root}_{i}{frame}"
+            frames_path = pathlib.Path(self._tmp_dir.name).joinpath(name)
+            out_file = f"{self._name_root}_{i}.mp4"
+            out_path = pathlib.Path(self._dir_name).joinpath(out_file)
+            if out_path.exists():
+                out_path.unlink()
 
-        out_file = f"{self._name_root}.mp4"
+            command = (ffmpeg
+                        .input(str(frames_path), framerate=fps)
+                        .output(str(out_path), pix_fmt=RegionVideoCopy.OUT_PIX_FMT))
 
-        out_path = pathlib.Path(self._dir_name).joinpath(out_file)
-
-        command = (ffmpeg
-                    .input(file_path, framerate=8)
-                    .output(str(out_path), pix_fmt=RegionVideoCopy.OUT_PIX_FMT))
-        command.run()
+            command.run()
 
         self._tmp_dir.cleanup()
 
