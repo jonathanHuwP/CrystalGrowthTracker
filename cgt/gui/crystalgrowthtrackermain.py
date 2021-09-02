@@ -868,7 +868,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             self.tr("Select the directory for output."),
             os.path.expanduser('~'))
 
-        self._selectWidget.save_videos(dir_name)
+        from cgt.io.regionvideocopy import RegionVideoCopy
+
+        region_copy = RegionVideoCopy(self._project["enhanced_video"], None)
+        region_copy. copy_region_videos(dir_name)
 
     def has_unsaved_data(self):
         """
