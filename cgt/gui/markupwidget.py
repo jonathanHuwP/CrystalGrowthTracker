@@ -255,6 +255,14 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         self._entryControls.set_frame_currently_displayed(self._current_frame)
         self._cloneControls.set_frame_currently_displayed(self._current_frame)
 
+        delay = self._video_source.get_video_data().get_user_time_step()
+        qc.QTimer.singleShot(delay, self.next_pixmap)
+
+    @qc.pyqtSlot()
+    def next_pixmap(self):
+        """
+        call back for timer in display, will incrament/decrement frame as needed
+        """
         if self._playing == PlayStates.PLAY_FORWARD:
             self.incrament_frame()
         elif self._playing == PlayStates.PLAY_BACKWARD:
