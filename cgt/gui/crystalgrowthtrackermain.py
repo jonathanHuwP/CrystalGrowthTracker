@@ -28,7 +28,6 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = import-error
 
 import os
-import json
 import pathlib
 from shutil import copy2
 
@@ -36,8 +35,6 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
 import PyQt5.Qt as qt
 import ffmpeg
-
-from cgt.util import utils
 
 from cgt.gui.projectstartdialog import ProjectStartDialog
 from cgt.gui.projectpropertieswidget import ProjectPropertiesWidget
@@ -50,7 +47,7 @@ from cgt.gui.videostatisticswidget import VideoStatisticsWidget
 from cgt.gui.penstore import PenStore
 from cgt.gui.resultswidget import ResultsWidget
 
-from cgt.io import (htmlreport, writecsvreports, readcsvreports)
+from cgt.io import (writecsvreports, readcsvreports)
 
 from cgt.io.videosource import VideoSource
 from cgt.io.videoanalyser import VideoAnalyser
@@ -201,14 +198,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         elif tab_index == self._tabWidget.indexOf(self._resultsTab):
             self._resultsWidget.setEnabled(True)
         elif tab_index == self._tabWidget.indexOf(self._reportTab):
-            if not self.uptodate_report_exists():
-                renderer = OffScreenRender(self._project)
-                region_image_paths = renderer.render_region_images()
-                self.make_report(region_image_paths)
-
-            _, report_file, _ = utils.make_report_file_names(self._project["proj_full_path"])
-            if report_file.exists():
-                self._reportWidget.load_html(report_file)
             self._reportWidget.setEnabled(True)
 
     def has_project(self):
@@ -349,38 +338,12 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self.display_properties()
         self.set_title()
         self.load_video()
-        self.save_region_frames()
         self._selectWidget.redisplay_regions()
         self._selectWidget.display_video_file_name()
         self._drawingWidget.display_video_file_name()
 
         if self._project["latest_report"] is not None and self._project["latest_report"] != "":
             self._reportWidget.load_html(self._project["latest_report"])
-
-    def save_region_frames(self):
-        """
-        save pixmaps of the first, last
-        """
-        report_dir, _, _ = utils.make_report_file_names(self._project["proj_full_path"])
-        last = self._enhanced_video_reader.get_video_data().get_time_duration_user()
-        middel = float(last/2)
-
-        images_dir = report_dir.joinpath("images")
-        if not report_dir.exists():
-            report_dir.mkdir()
-
-        if not images_dir.exists():
-            images_dir.mkdir()
-
-        file_name = str(images_dir.joinpath("regions")) + "_{}.ppm"
-
-        # HACK
-        # pixmap = self._enhanced_video_reader.get_pixmap(0.0)
-        # pixmap.save(file_name.format(0))
-        # pixmap = self._enhanced_video_readerffer.get_pixmap(middel)
-        # pixmap.save(file_name.format(middel))
-        # pixmap = self._enhanced_video_reader.get_pixmap(last)
-        # pixmap.save(file_name.format(last))
 
     def reset_tab_wigets(self):
         """
@@ -574,41 +537,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         if value == 1:
             self._drawingWidget.update_data_display()
-
-    def uptodate_report_exists(self):
-        """
-        test if there exists a current report
-            Retruns:
-                True if report exists and is current, else False
-        """
-        report_dir, html_outfile, hash_file = utils.make_report_file_names(self._project["proj_full_path"])
-
-        if not report_dir.exists() or not html_outfile.exists() or not hash_file.exists():
-            return False
-
-        data = None
-        with hash_file.open('r') as fin:
-            data = json.load(fin)
-
-        if data is not None:
-            if "results_hash" in data:
-                if data["results_hash"] == utils.hash_results(self._project["results"]):
-                    return True
-
-        return False
-
-    def make_report(self, region_image_paths):
-        """
-        make a html report
-        """
-        try:
-            report_file = htmlreport.save_html_report(self._project, region_image_paths)
-        except (IOError, OSError, EOFError) as exception:
-            qw.QMessageBox.critical(self,
-                                    self.tr("Auto Save Report"),
-                                    str(exception))
-            return
-        self._reportWidget.load_html(report_file)
 
     @qc.pyqtSlot()
     def set_video_scale_parameters(self):

@@ -318,8 +318,8 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
 
     def setEnabled(self, enabled):
         """
-        enable/disable widget on enable the source
-        is connected on disable play is paused
+        enable/disable widget: on enable the source
+        is connected; on disable play is paused
         """
         if enabled and self._video_source is not None:
             super().setEnabled(True)

@@ -19,13 +19,32 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # set up linting conditions
 # pylint: disable = c-extension-no-member
 import os
+import enum
+import json
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
+import PyQt5.QtGui as qg
 import PyQt5.QtWebEngineWidgets as qe
+
+from cgt.io import htmlreport
+from cgt.util.utils import (make_report_file_names,
+                            hash_results)
 
 # import UI
 from cgt.gui.Ui_reportwidget import Ui_ReportWidget
+
+## status of report
+class ReportStatus(enum.Enum):
+    ## no directory, no html file, no results hash file
+    NO_VALID_REPORT = 0
+
+    ## Report exists but is out of date
+    OUT_OF_DATE_REPORT = 1
+
+    ## upto date report exists
+    UPTO_DATE_REPORT = 2
+
 
 class ReportWidget(qw.QWidget, Ui_ReportWidget):
     """
@@ -48,6 +67,62 @@ class ReportWidget(qw.QWidget, Ui_ReportWidget):
 
         ## the url of the report
         self._url = None
+
+    def setEnabled(self, enabled):
+        """
+        enable/disable widget
+        """
+        status = self.uptodate_report_exists()
+        print(status.name)
+        if enabled:
+            # TODO
+            # Rpt status, user in, actions
+            # No report, don't make => super().setEnabled(False)
+            # No report, make => make_report() display()
+            # Out of date, don't make => display
+            # Out of date, make => make_report() display()
+            # upto date, _ => display()
+
+            if status == ReportStatus.NO_VALID_REPORT:
+                make = self.question(self.tr("No valid report can be found. Make one?"))
+                if not make:
+                    super().setEnabled(False)
+                    return
+                self.make_report()
+            elif status == ReportStatus.OUT_OF_DATE_REPORT:
+                make = self.question(self.tr("Report is out of date. Make new?"))
+                if make:
+                    self.make_report()
+
+            self.load_url()
+            super().setEnabled(True)
+        else:
+            super().setEnabled(False)
+
+    def uptodate_report_exists(self):
+        """
+        test if there exists a current report
+            Retruns:
+                True if report exists and is current, else False
+        """
+        project = self._data_source.get_project()
+        report_dir, html_outfile, hash_file = make_report_file_names(project["proj_full_path"])
+
+        if not report_dir.exists() or not html_outfile.exists() or not hash_file.exists():
+            return ReportStatus.NO_VALID_REPORT
+
+        data = None
+        with hash_file.open('r') as fin:
+            data = json.load(fin)
+
+        if data is not None:
+            if "results_hash" in data:
+                if data["results_hash"] == hash_results(project["results"]):
+                    return ReportStatus.UPTO_DATE_REPORT
+
+                return ReportStatus.OUT_OF_DATE_REPORT
+
+        return ReportStatus.NO_VALID_REPORT
 
     def load_html(self, path):
         """
@@ -105,3 +180,29 @@ class ReportWidget(qw.QWidget, Ui_ReportWidget):
                 file_path (string): the output file
         """
         self._scrollArea.widget().page().printToPdf(file_path)
+
+    def question(self, message):
+        """
+        ask user a question
+            Args:
+                message (string): the question
+            Returns:
+                True/False
+        """
+        ret = qg.QMessageBox.information(None, 'What', message, qg.QMessageBox.Yes | qg.QMessageBox.No)
+
+        return (ret == qg.QMessageBox.Yes)
+
+    def make_report(self):
+        """
+        make a html report
+        """
+        project = self._data_source.get_project()
+        try:
+            report_file = htmlreport.save_html_report(project, None)
+        except (IOError, OSError, EOFError) as exception:
+            qw.QMessageBox.critical(self,
+                                    self.tr("Auto Save Report"),
+                                    str(exception))
+            return
+        self._reportWidget.load_html(report_file)
