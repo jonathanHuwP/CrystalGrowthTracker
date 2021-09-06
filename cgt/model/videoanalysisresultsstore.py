@@ -614,4 +614,4 @@ class VideoAnalysisResultsStore(qc.QObject):
 
         for marker in self._points:
             for point in marker:
-                point.sePen(pens.get_display_pen())
+                point.setPen(pens.get_display_pen())
