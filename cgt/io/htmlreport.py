@@ -51,9 +51,10 @@ def save_html_report(data_source):
     with open(html_outfile, "w") as fout:
         write_html_report_start(fout, project)
         image_files = save_region_location_images(report_dir, data_source)
+        region_files = save_region_images(report_dir, data_source)
         write_html_overview(fout, image_files)
         write_html_stats(fout, report_dir)
-        write_html_regions(fout, project)
+        write_html_regions(fout, project, region_files)
         write_html_report_end(fout, report_dir)
 
     with open(hash_file, 'w') as fout:
@@ -72,6 +73,16 @@ def write_html_stats(fout, report_dir):
             report_dir (string): path to report dir
     """
     fout.write("<h2>Image Statistics</h2>\n")
+    fout.write("<p>This section details some image statistics that show the evolution"
+               " of the individual frames of the raw video.</p>")
+
+    fout.write("<p align=\"center\">A plot of the mean grayscale value for each frame"
+               " over time will go here the caption is below</p>")
+
+    fout.write("<p align=\"center\"><i>The mean grayscale value of each frame plotted"
+               " against the frame number. The gray boxed areas represent the time limits"
+               " of each region containing a crystal.</i></p>")
+
     path = pathlib.Path(report_dir).joinpath("images")
     path = path.joinpath("stats_graph.png")
     if not path.exists():
@@ -118,6 +129,21 @@ def write_html_report_start(fout, project):
     fout.write("th, td {\n")
     fout.write("    padding: 15px;\n")
     fout.write("}\n")
+    fout.write("h1 {\n")
+    fout.write("    font-size: 40px;\n")
+    fout.write("}\n")
+    fout.write("h1 {\n")
+    fout.write("    font-size: 30px;\n")
+    fout.write("}\n")
+    fout.write("h2 {\n")
+    fout.write("    font-size: 25px;\n")
+    fout.write("}\n")
+    fout.write("h3 {\n")
+    fout.write("    font-size: 20px;\n")
+    fout.write("}\n")
+    fout.write("p {\n")
+    fout.write("    font-size: 20px;\n")
+    fout.write("}\n")
     fout.write("</style>\n")
 
     enhanced_path = project['enhanced_video_no_path']
@@ -160,25 +186,13 @@ def write_html_overview(fout, image_files):
     fout.write("<br><figcaption><i>First, middel and last frames showing the regions.</i></figcaption>")
     fout.write("</figure>")
 
-    header3_line = ("<h3 align=\"left\">Image Statistics from the Raw Video</h3>\n")
-    fout.write(header3_line)
-
-    fout.write("<p>This section details some image statistics that show the evolution"
-               " of the individual frames of the raw video.</p>")
-
-    fout.write("<p align=\"center\">A plot of the mean grayscale value for each frame"
-               " over time will go here the caption is below</p>")
-
-    fout.write("<p align=\"center\"><i>The mean grayscale value of each frame plotted"
-               " against the frame number. The gray boxed areas represent the time limits"
-               " of each region containing a crystal.</i></p>")
-
-def write_html_regions(fout, project):
+def write_html_regions(fout, project, region_image_files):
     """
     write out the results for the regions to file
         Args:
             fout (TextIOWrapper): output file stream
             project (CGTProject): The project data
+            region_image_files ([pathlib.Path]): paths to images of each region
     """
     results = project["results"]
     fout.write("<h2 align=\"left\">Motion Results</h2>\n")
@@ -189,10 +203,9 @@ def write_html_regions(fout, project):
 
     html_table.append(f"<tr><th>ID</th><th>Top Left(pixels)</th><th>Bottom Right (pixels)</th></tr>")
     for i, region in enumerate(results.get_regions()):
-        rect = region.rect()
-        position = region.pos()
-        top_left = f"({rect.topLeft().x()+position.x():.1f}, {rect.topLeft().y()+position.y():.1f})"
-        bottom_right = f"({rect.bottomRight().x()+position.x():.1f}, {rect.bottomRight().y()+position.y():.1f})"
+        rect = get_rect_even_dimensions(region, False)
+        top_left = f"({rect.topLeft().x():.1f}, {rect.topLeft().y():.1f})"
+        bottom_right = f"({rect.bottomRight().x():.1f}, {rect.bottomRight().y():.1f})"
         html_table.append(f"<tr><th>{i}</th><th>{top_left}</th><th>{bottom_right}</th></tr>")
 
     html_table.append("</table>")
@@ -203,21 +216,25 @@ def write_html_regions(fout, project):
         write_html_region(fout,
                           results,
                           index,
+                          region_image_files[index],
                           project["frame_rate"],
                           project["resolution"],
                           project["resolution_units"])
 
-def write_html_region(fout, results, index, fps, scale, units):
+def write_html_region(fout, results, index, region_image_file, fps, scale, units):
     '''
     Creates the section for each region in the html report.
         Args:
             fout (TextIOWrapper): output file stream
             results (VideoAnalysisResultsStore): The project results data
             index (int): The index for the crystal that is being reported.
+            region_image_file (pathlib.Path): paths to images of each region
             fps (np.float64): the number of frames per second
             scale (np.float64): the size of a pixel
     '''
     fout.write(f"<h3 align=\"left\">Region {index}:</h3>\n")
+
+    fout.write(f"<img src=\"{region_image_file}\" width=\"10%\">\n")
 
     lines = []
     for marker in results.get_lines():
@@ -265,7 +282,30 @@ def to_date_and_time(timestamp):
     month = timestamp.strftime("%B") # language given by local
     date = f"{timestamp.date().day}-{month}-{timestamp.date().year}"
     time = f"{timestamp.time().hour}:{timestamp.time().minute}:{timestamp.time().second}"
+
     return date, time
+
+def save_region_images(report_dir, data_source):
+    """
+    save image of each region
+        Args:
+            report_dir (libpath.Path): the directory to hold images
+            data_source (CrystlGrowthTrackerMain): the holder of the data
+    """
+
+    images_dir = report_dir.joinpath("images")
+    raw_image = data_source.get_enhanced_reader().get_pixmap(0)
+    files = []
+
+    results = data_source.get_results()
+    for i, region in enumerate(results.get_regions()):
+        rect = get_rect_even_dimensions(region)
+        pixmap = raw_image.copy(rect)
+        out_file = images_dir.joinpath(f"region_{i}.png")
+        pixmap.save(str(out_file))
+        files.append(out_file)
+
+    return files
 
 def save_region_location_images(report_dir, data_source):
     """
