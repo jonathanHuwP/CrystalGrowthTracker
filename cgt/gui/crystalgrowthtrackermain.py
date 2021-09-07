@@ -942,3 +942,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         layout = qw.QVBoxLayout()
         layout.addWidget(widget)
         tab.setLayout(layout)
+
+    def get_enhanced_reader(self):
+        """
+        getter for the enhanced video reader
+        """
+        return self._enhanced_video_reader

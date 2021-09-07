@@ -22,24 +22,27 @@ import json
 from datetime import datetime
 import pathlib
 
+import PyQt5.QtGui as qg
+
 from cgt.model.velocitiescalculator import VelocitiesCalculator
+from cgt.util.utils import get_rect_even_dimensions
 
 from cgt.util.utils import (hash_results,
                             make_report_file_names,
                             get_region)
 
-def save_html_report(project, region_image_paths):
+def save_html_report(data_source):
     '''
     Creates and co-ordinates the html report file creation and on the file handle to
     other functions that write/create the relevant sections.
         Args:
-            project (CGTProject): The project we are reporting.
-            region_image_paths ([pathlib.Path]): paths to the region images
+            data_source (crystalgrowthtrackermain): holder for all the data and video.
         Returns:
             the report file (pathlib.Path)
         Throws:
             Error if the report directory cannot be made, or file cannot be opened
     '''
+    project = data_source.get_project()
     report_dir, html_outfile, hash_file = make_report_file_names(project["proj_full_path"])
 
     if not report_dir.exists():
@@ -47,7 +50,8 @@ def save_html_report(project, region_image_paths):
 
     with open(html_outfile, "w") as fout:
         write_html_report_start(fout, project)
-        write_html_overview(fout, project["results"], region_image_paths)
+        image_files = save_region_location_images(report_dir, data_source)
+        write_html_overview(fout, image_files)
         write_html_stats(fout, report_dir)
         write_html_regions(fout, project)
         write_html_report_end(fout, report_dir)
@@ -139,22 +143,19 @@ def write_html_report_start(fout, project):
 
     fout.write(report_info)
 
-def write_html_overview(fout, results, region_image_paths):
+def write_html_overview(fout, image_files):
     '''
     Creates the overview section of the html report.
     Args:
         fout (file handler): The file handler allows this function to write out.
-        results:              The project results data
+        image_files (libpath.Path): the locations of the files holding region location images
     '''
     fout.write("<h2 align=\"left\">Overview</h2>\n")
 
     fout.write("<figure><br>")
-    for file in region_image_paths:
-        parts = file.parts
-        file_name = pathlib.Path(parts[-2])
-        file_name = file_name.joinpath(parts[-1])
 
-        fout.write(f"<img src=\"{file_name}\" width=\"30%\">\n")
+    for name in image_files:
+        fout.write(f"<img src=\"{name}\" width=\"30%\">\n")
 
     fout.write("<br><figcaption><i>First, middel and last frames showing the regions.</i></figcaption>")
     fout.write("</figure>")
@@ -265,3 +266,49 @@ def to_date_and_time(timestamp):
     date = f"{timestamp.date().day}-{month}-{timestamp.date().year}"
     time = f"{timestamp.time().hour}:{timestamp.time().minute}:{timestamp.time().second}"
     return date, time
+
+def save_region_location_images(report_dir, data_source):
+    """
+    save start, middle and final frames of video with the regions marked
+        Args:
+            report_dir (libpath.Path): the directory to hold images
+            data_source (CrystlGrowthTrackerMain): the holder of the data
+    """
+    images_dir = report_dir.joinpath("images")
+    start_file = images_dir.joinpath("regions_start.png")
+    middle_file = images_dir.joinpath("regions_middle.png")
+    last_file = images_dir.joinpath("regions_end.png")
+
+    last = data_source.get_enhanced_reader().get_video_data().get_frame_count()-1
+    middle = int(last/2)
+    first = 0
+
+    if not images_dir.exists():
+        images_dir.mkdir()
+
+    save_image_with_regions(first, start_file, data_source)
+    save_image_with_regions(middle, middle_file, data_source)
+    save_image_with_regions(middle, last_file, data_source)
+
+    return [start_file, middle_file, last_file]
+
+def save_image_with_regions(frame, out_file, data_source):
+    """
+    save frame to file
+        Args:
+            frame (int): frame number
+            out_file (pathlib.Path):
+            data_source (CrystalGrowthTrackeMain): holder of the data
+    """
+    pixmap = data_source.get_enhanced_reader().get_pixmap(frame)
+
+    painter = qg.QPainter(pixmap)
+    painter.setPen(data_source.get_pens().get_display_pen())
+    results = data_source.get_results()
+    for region in results.get_regions():
+        rect = get_rect_even_dimensions(region, False)
+        painter.drawRect(rect)
+
+    painter.end()
+
+    pixmap.save(str(out_file))

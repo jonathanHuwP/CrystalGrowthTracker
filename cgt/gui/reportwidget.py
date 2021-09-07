@@ -197,12 +197,11 @@ class ReportWidget(qw.QWidget, Ui_ReportWidget):
         """
         make a html report
         """
-        project = self._data_source.get_project()
         try:
-            report_file = htmlreport.save_html_report(project, None)
+            report_file = htmlreport.save_html_report(self._data_source)
         except (IOError, OSError, EOFError) as exception:
             qw.QMessageBox.critical(self,
                                     self.tr("Auto Save Report"),
                                     str(exception))
             return
-        self._reportWidget.load_html(report_file)
+        self.load_html(report_file)

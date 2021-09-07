@@ -743,11 +743,12 @@ def make_report_file_names(proj_full_path):
 
     return (report_dir, html_outfile, hash_file)
 
-def get_rect_even_dimensions(rect_item):
+def get_rect_even_dimensions(rect_item, even_dimensions=True):
     """
     get the the graphics rectangle of the item, moved to position, with sides of even length
         Args:
             rect_item (QGraphicsRectItem)
+            even_dimensions (bool): if False even dimensions are not enforced
         Returns
             (QRect): with even length sides
     """
@@ -756,6 +757,9 @@ def get_rect_even_dimensions(rect_item):
     rect.translate(pos)
     width = rect.width()
     height = rect.height()
+
+    if not even_dimensions:
+        return rect
 
     if width%2 == 1:
         rect.setWidth(width+1)
