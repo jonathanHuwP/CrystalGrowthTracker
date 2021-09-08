@@ -52,9 +52,10 @@ def save_html_report(data_source):
         write_html_report_start(fout, project)
         image_files = save_region_location_images(report_dir, data_source)
         region_files = save_region_start_images(report_dir, data_source)
+        key_frame_files = save_region_keyframe_images(report_dir, data_source)
         write_html_overview(fout, image_files)
         write_html_stats(fout, report_dir)
-        write_html_regions(fout, project, region_files)
+        write_html_regions(fout, project, region_files, key_frame_files)
         write_html_report_end(fout, report_dir)
 
     with open(hash_file, 'w') as fout:
@@ -186,13 +187,14 @@ def write_html_overview(fout, image_files):
     fout.write("<br><figcaption><i>First, middel and last frames showing the regions.</i></figcaption>")
     fout.write("</figure>")
 
-def write_html_regions(fout, project, region_image_files):
+def write_html_regions(fout, project, region_image_files, frame_image_files):
     """
     write out the results for the regions to file
         Args:
             fout (TextIOWrapper): output file stream
             project (CGTProject): The project data
             region_image_files ([pathlib.Path]): paths to images of each region
+            frame_image_files ([pathlib.Path]): paths to images of each region at key frames
     """
     results = project["results"]
     fout.write("<h2 align=\"left\">Motion Results</h2>\n")
@@ -211,30 +213,33 @@ def write_html_regions(fout, project, region_image_files):
     html_table.append("</table>")
 
     fout.write('\n'.join(html_table))
+    fout.write("<figure><br>")
+    for image in region_image_files:
+        fout.write(f"<img src=\"{image}\" width=\"10%\">\n")
+    fout.write("<br><figcaption><i>First frame of each region.</i></figcaption>")
+    fout.write("</figure>")
 
     for index in range(len(results.get_regions())):
         write_html_region(fout,
                           results,
                           index,
-                          region_image_files[index],
+                          frame_image_files[index],
                           project["frame_rate"],
                           project["resolution"],
                           project["resolution_units"])
 
-def write_html_region(fout, results, index, region_image_file, fps, scale, units):
+def write_html_region(fout, results, index, images, fps, scale, units):
     '''
     Creates the section for each region in the html report.
         Args:
             fout (TextIOWrapper): output file stream
             results (VideoAnalysisResultsStore): The project results data
             index (int): The index for the crystal that is being reported.
-            region_image_file (pathlib.Path): paths to images of each region
+            images ([pathlib.Path]): paths to images of region at each key frame
             fps (np.float64): the number of frames per second
             scale (np.float64): the size of a pixel
     '''
     fout.write(f"<h3 align=\"left\">Region {index}:</h3>\n")
-
-    fout.write(f"<img src=\"{region_image_file}\" width=\"10%\">\n")
 
     lines = []
     for marker in results.get_lines():
@@ -250,6 +255,9 @@ def write_html_region(fout, results, index, region_image_file, fps, scale, units
     counts = calculator.number_markers()
     if counts[0] > 0 or counts[1] > 0:
         fout.write(make_html_speeds_table(calculator, units))
+
+    for image in images:
+        fout.write(f"<img src=\"{image}\" width=\"10%\">\n")
 
 def write_html_report_end(fout, report_dir):
     '''
@@ -351,3 +359,46 @@ def save_image_with_regions(frame, out_file, data_source):
     painter.end()
 
     pixmap.save(str(out_file))
+
+def save_region_keyframe_images(report_dir, data_source):
+    """
+    save image of each region
+        Args:
+            report_dir (libpath.Path): the directory to hold images
+            data_source (CrystlGrowthTrackerMain): the holder of the data
+    """
+    images_dir = report_dir.joinpath("images")
+    files = []
+
+    results = data_source.get_results()
+    for index in range(len(results.get_regions())):
+        files.append(save_keyframe_images(images_dir,
+                                          data_source,
+                                          index))
+
+    return files
+
+def save_keyframe_images(images_dir, data_source, region_index):
+    """
+    save image of the region at each key frame
+        Args:
+            images_dir,
+            data_source, region_index
+    """
+    results = data_source.get_results()
+    region = results.get_regions()[region_index]
+    key_frames = results.get_key_frames(region_index)
+    rect = get_rect_even_dimensions(region)
+    files = []
+
+    if key_frames is None:
+        return files
+
+    for frame in key_frames:
+        raw_image = data_source.get_enhanced_reader().get_pixmap(frame)
+        pixmap = raw_image.copy(rect)
+        out_file = images_dir.joinpath(f"region_{region_index}_frame_{frame}.png")
+        pixmap.save(str(out_file))
+        files.append(out_file)
+
+    return files
