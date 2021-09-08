@@ -51,7 +51,7 @@ def save_html_report(data_source):
     with open(html_outfile, "w") as fout:
         write_html_report_start(fout, project)
         image_files = save_region_location_images(report_dir, data_source)
-        region_files = save_region_images(report_dir, data_source)
+        region_files = save_region_start_images(report_dir, data_source)
         write_html_overview(fout, image_files)
         write_html_stats(fout, report_dir)
         write_html_regions(fout, project, region_files)
@@ -285,14 +285,13 @@ def to_date_and_time(timestamp):
 
     return date, time
 
-def save_region_images(report_dir, data_source):
+def save_region_start_images(report_dir, data_source):
     """
     save image of each region
         Args:
             report_dir (libpath.Path): the directory to hold images
             data_source (CrystlGrowthTrackerMain): the holder of the data
     """
-
     images_dir = report_dir.joinpath("images")
     raw_image = data_source.get_enhanced_reader().get_pixmap(0)
     files = []
