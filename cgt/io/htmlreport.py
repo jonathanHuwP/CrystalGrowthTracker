@@ -53,9 +53,9 @@ def save_html_report(data_source):
         image_files = save_region_location_images(report_dir, data_source)
         region_files = save_region_start_images(report_dir, data_source)
         key_frame_files = save_region_keyframe_images(report_dir, data_source)
-        write_html_overview(fout, image_files)
+        #write_html_overview(fout, image_files)
         write_html_stats(fout, report_dir)
-        write_html_regions(fout, project, region_files, key_frame_files)
+        write_html_regions(fout, project, image_files, region_files, key_frame_files)
         write_html_report_end(fout, report_dir)
 
     with open(hash_file, 'w') as fout:
@@ -73,7 +73,7 @@ def write_html_stats(fout, report_dir):
             fout (file): the open output file
             report_dir (string): path to report dir
     """
-    fout.write("<h2>Image Statistics</h2>\n")
+    fout.write("<h1>Image Statistics</h1>\n")
     fout.write("<p>This section details some image statistics that show the evolution"
                " of the individual frames of the raw video.</p>")
 
@@ -86,6 +86,7 @@ def write_html_stats(fout, report_dir):
 
     path = pathlib.Path(report_dir).joinpath("images")
     path = path.joinpath("stats_graph.png")
+    print(path)
     if not path.exists():
         fout.write("<p>Not available</p>")
     else:
@@ -99,12 +100,12 @@ def make_html_speeds_table(calculator, units):
     calculator.process_latest_data()
     average_speeds = calculator.get_average_speeds()
 
-    html_table = ["<table border=\"1\" width=\"100%\">"]
-    html_table.append("""<caption style=\"caption-side:bottom\"><em>Speeds of the markers.</em></caption>\n""")
+    html_table = ["<table style=\"margin-bottom:5mm;\" class=\"hg-pdf\">"]
+    html_table.append("""<caption>Speeds of the markers.</caption>\n""")
 
     html_table.append(f"<tr><th>ID</th><th>Type</th><th>Speed ({units} s<sup>-1</sup>)</th></tr>")
     for item in average_speeds:
-        html_table.append(f"<tr><th>{item.ID}</th><th>{item.m_type.name}</th><th>{item.speed:.2f}</th></tr>")
+        html_table.append(f"<tr><td>{item.ID}</td><td>{item.m_type.name}</td><td>{item.speed:.2f}</td></tr>")
 
     html_table.append("</table>")
 
@@ -124,12 +125,17 @@ def write_html_report_start(fout, project):
     fout.write("<meta charset=\"UTF-8\">\n")
     fout.write("<style>\n")
     fout.write("table, th, td {\n")
-    fout.write("    border: 1px solid black;\n")
+    fout.write("    border: 2px solid black;\n")
     fout.write("    border-collapse: collapse;\n")
+    fout.write("    font-size: 20px\n")
     fout.write("}\n")
     fout.write("th, td {\n")
     fout.write("    padding: 15px;\n")
     fout.write("}\n")
+    fout.write("tr {")
+    fout.write("    page-break-inside:avoid;")
+    fout.write("    page-break-after:auto")
+    fout.write("}")
     fout.write("h1 {\n")
     fout.write("    font-size: 40px;\n")
     fout.write("}\n")
@@ -145,6 +151,8 @@ def write_html_report_start(fout, project):
     fout.write("p {\n")
     fout.write("    font-size: 20px;\n")
     fout.write("}\n")
+    fout.write("caption {\n\tfont-style: italic;\n\tfont-size: 20px;\n\tpadding: 2px;\n\ttext-align: left;\n}")
+    fout.write("figcaption {\n\tfont-style: italic;\n\tfont-size: 20px;\n\tpadding: 2px;\n\ttext-align: left;\n}")
     fout.write("</style>\n")
 
     enhanced_path = project['enhanced_video_no_path']
@@ -180,14 +188,12 @@ def write_html_overview(fout, image_files):
     fout.write("<h2 align=\"left\">Overview</h2>\n")
 
     fout.write("<figure><br>")
-
     for name in image_files:
         fout.write(f"<img src=\"{name}\" width=\"30%\">\n")
-
     fout.write("<br><figcaption><i>First, middel and last frames showing the regions.</i></figcaption>")
     fout.write("</figure>")
 
-def write_html_regions(fout, project, region_image_files, frame_image_files):
+def write_html_regions(fout, project, image_files, region_image_files, frame_image_files):
     """
     write out the results for the regions to file
         Args:
@@ -197,18 +203,23 @@ def write_html_regions(fout, project, region_image_files, frame_image_files):
             frame_image_files ([pathlib.Path]): paths to images of each region at key frames
     """
     results = project["results"]
-    fout.write("<h2 align=\"left\">Motion Results</h2>\n")
-    fout.write("<p>Results for each region are summerised below.</p>")
+    fout.write("<h1 align=\"left\">Regions</h2>\n")
+    fout.write("<p>The regions chosen for analysis are described.</p>")
+    fout.write("<figure><br>")
+    for name in image_files:
+        fout.write(f"<img src=\"{name}\" width=\"30%\">\n")
+    fout.write("<br><figcaption><i>First, middel and last frames showing the regions.</i></figcaption>")
+    fout.write("</figure>")
 
-    html_table = ["<table border=\"1\" width=\"100%\">"]
-    html_table.append("""<caption style=\"caption-side:bottom\"><em>Summary of the regions.</em></caption>\n""")
+    html_table = ["<table style=\"margin-bottom:5mm;\">"]
+    html_table.append("""<caption>Summary of the regions.</caption>\n""")
 
     html_table.append(f"<tr><th>ID</th><th>Top Left(pixels)</th><th>Bottom Right (pixels)</th></tr>")
     for i, region in enumerate(results.get_regions()):
         rect = get_rect_even_dimensions(region, False)
         top_left = f"({rect.topLeft().x():.1f}, {rect.topLeft().y():.1f})"
         bottom_right = f"({rect.bottomRight().x():.1f}, {rect.bottomRight().y():.1f})"
-        html_table.append(f"<tr><th>{i}</th><th>{top_left}</th><th>{bottom_right}</th></tr>")
+        html_table.append(f"<tr><td>{i}</td><td>{top_left}</td><td>{bottom_right}</td></tr>")
 
     html_table.append("</table>")
 
@@ -239,7 +250,7 @@ def write_html_region(fout, results, index, images, fps, scale, units):
             fps (np.float64): the number of frames per second
             scale (np.float64): the size of a pixel
     '''
-    fout.write(f"<h3 align=\"left\">Region {index}:</h3>\n")
+    fout.write(f"<h2 align=\"left\">Region {index}:</h3>\n")
 
     lines = []
     for marker in results.get_lines():
@@ -256,8 +267,11 @@ def write_html_region(fout, results, index, images, fps, scale, units):
     if counts[0] > 0 or counts[1] > 0:
         fout.write(make_html_speeds_table(calculator, units))
 
+    fout.write("<figure>")
     for image in images:
         fout.write(f"<img src=\"{image}\" width=\"10%\">\n")
+    fout.write("<br><figcaption><i>The region at each key frame.</i></figcaption>")
+    fout.write("</figure>")
 
 def write_html_report_end(fout, report_dir):
     '''
@@ -266,13 +280,13 @@ def write_html_report_end(fout, report_dir):
             fout (file): the output file
             report_dir (pathlib.Path) directory holding the report
     '''
-    fout.write("""<p>Crystal Growht Tracker was developed by
+    fout.write("""<hr>\n<em><p>Crystal Growht Tracker was developed by
     JH Pickering & J Leng at the University of Leeds, Leeds UK,
     funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1).
     The software is freely available from
     <a href=\"https://github.com/jonathanHuwP/CrystalGrowthTracker\">GitHub</a>,
     under the <a href=\"http://www.apache.org/licenses/LICENSE-2.0\">Apache License, Version 2.0</a></p>
-    <p>Source code and this report format are copyright University of Leeds, 2020.</p>""")
+    <p><em>Source code and this report format are copyright University of Leeds, 2020.</p>""")
 
     fout.write("</font>")
     fout.write("</body>\n")
