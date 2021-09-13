@@ -30,6 +30,8 @@ import PyQt5.QtGui as qg
 
 import ffmpeg
 import subprocess
+import os
+import pathlib
 
 from cgt.io.ffmpegbase import FfmpegBase
 
@@ -44,7 +46,7 @@ class VideoSource(FfmpegBase):
     ## the pixel format and number of bytes
     PIX_FMT = ('rgb24', 3)
 
-    def __init__(self, file_name, user_frame_rate, parent=None):
+    def __init__(self, file_name, user_frame_rate, parent=None, debug=False):
         """
         set up the object
             Args:
@@ -53,6 +55,9 @@ class VideoSource(FfmpegBase):
                 parent (QObject): parent object
         """
         super().__init__(file_name, parent)
+
+        ## debugging flag
+        self._debug = debug
 
         self.probe_video(user_frame_rate, VideoSource.PIX_FMT[1])
 
@@ -81,9 +86,16 @@ class VideoSource(FfmpegBase):
                 .compile())
 
         in_bytes = 0
+
+        # make path for ffmpeg's logs
+        error_path = pathlib.Path("ffmpeg_log.txt")
+        if self._debug:
+            error_path = pathlib.Path(os.devnull)
+
         # create ffmpeg process with piped output and read output
-        with subprocess.Popen(args, stdout=subprocess.PIPE) as process:
-            in_bytes = process.stdout.read(self._video_data.get_frame_size())
+        with error_path.open('a') as f_err:
+            with subprocess.Popen(args, stdout=subprocess.PIPE, stderr=f_err) as process:
+                in_bytes = process.stdout.read(self._video_data.get_frame_size())
 
         if not in_bytes == 0:
             return self.make_pixmap(in_bytes)
