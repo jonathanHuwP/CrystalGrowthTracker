@@ -53,6 +53,7 @@ class VideoSource(FfmpegBase):
                 file_name (str): the path and name of video file
                 user_frame_rate (int): the frame rate provided by user
                 parent (QObject): parent object
+                debug (bool): if true save ffmpeg log to file, else devnull
         """
         super().__init__(file_name, parent)
 
@@ -88,9 +89,9 @@ class VideoSource(FfmpegBase):
         in_bytes = 0
 
         # make path for ffmpeg's logs
-        error_path = pathlib.Path("ffmpeg_log.txt")
+        error_path = pathlib.Path(os.devnull)
         if self._debug:
-            error_path = pathlib.Path(os.devnull)
+            error_path = pathlib.Path("ffmpeg_log.txt")
 
         # create ffmpeg process with piped output and read output
         with error_path.open('a') as f_err:
