@@ -171,7 +171,7 @@ class VideoBaseWidget(qw.QWidget):
         message = f"Time {now:0>5.1f} of {length:0>5.1f} (Frames: {data.get_frame_count()})"
         self._frameLabel.setText(message)
 
-        delay = self._video_source.get_video_data().get_user_time_step()
+        delay = int(1000*self._video_source.get_video_data().get_user_time_step())
         qc.QTimer.singleShot(delay, self.next_pixmap)
 
     qc.pyqtSlot()
