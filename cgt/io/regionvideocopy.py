@@ -24,6 +24,7 @@ import subprocess
 import pathlib
 import tempfile
 import itertools
+import os
 
 import PyQt5.QtGui as qg
 
@@ -78,8 +79,9 @@ class RegionVideoCopy(FfmpegBase):
                 .output('pipe:', format='rawvideo', pix_fmt=RegionVideoCopy.IN_PIX_FMT[0], vframes=length)
                 .compile())
 
-        proc = subprocess.Popen(args, stdout=subprocess.PIPE)
-        self.process_film(proc)
+        with open(os.devnull, 'w') as f_err:
+            proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=f_err)
+            self.process_film(proc)
 
     def process_film(self, video_proc):
         """
@@ -120,7 +122,6 @@ class RegionVideoCopy(FfmpegBase):
             file_path = pathlib.Path(self._tmp_dir.name).joinpath(name)
             out_image = image.copy(get_rect_even_dimensions(region))
             out_image.save(str(file_path))
-            print(str(file_path))
 
     def finish_conversion(self):
         """
@@ -129,19 +130,20 @@ class RegionVideoCopy(FfmpegBase):
         regions = self._project["results"].get_regions()
         frame = f"_%04d.png"
         fps = int(self._project['frame_rate'])
+
         for i in range(len(regions)):
             name = f"{self._name_root}_{i}{frame}"
             frames_path = pathlib.Path(self._tmp_dir.name).joinpath(name)
             out_file = f"{self._name_root}_{i}.mp4"
             out_path = pathlib.Path(self._dir_name).joinpath(out_file)
+
             if out_path.exists():
                 out_path.unlink()
 
             command = (ffmpeg
-                        .input(str(frames_path), framerate=fps)
-                        .output(str(out_path), pix_fmt=RegionVideoCopy.OUT_PIX_FMT))
-
-            command.run()
+                       .input(str(frames_path), framerate=fps)
+                       .output(str(out_path), pix_fmt=RegionVideoCopy.OUT_PIX_FMT))
+            command.run(capture_stderr=True)
 
         self._tmp_dir.cleanup()
 

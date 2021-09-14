@@ -61,11 +61,6 @@ class FfmpegBase(qc.QObject):
         probe = ffmpeg.probe(self._file_name)
         video_info = next(s for s in probe['streams'] if s['codec_type'] == 'video')
 
-        print("Video Data\n========")
-        for key in video_info.keys():
-            print(f"\t{key} => {video_info[key]} {type(video_info[key])}")
-        print("\n")
-
         frame_data = [video_info["width"], video_info["height"], video_info["duration_ts"]]
 
         parts = video_info["r_frame_rate"].split('/')

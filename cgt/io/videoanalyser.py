@@ -25,6 +25,7 @@ import PyQt5.QtCore as qc
 import numpy as np
 import ffmpeg
 import subprocess
+import os
 
 from cgt.io.ffmpegbase import FfmpegBase
 from cgt.util.framestats import FrameStats, VideoIntensityStats
@@ -66,7 +67,8 @@ class VideoAnalyser(FfmpegBase):
                 .output('pipe:', format='rawvideo', pix_fmt=VideoAnalyser.PIX_FMT[0], vframes=length)
                 .compile())
 
-        video_proc = subprocess.Popen(args, stdout=subprocess.PIPE)
+        with open(os.devnull, 'w') as f_err:
+            video_proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=f_err)
 
         return self.read_and_analyse(video_proc)
 
