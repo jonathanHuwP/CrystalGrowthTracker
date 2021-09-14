@@ -14,3 +14,4 @@ Ui_*
 LINT.txt
 *.jpg
 tmp/
+*_log.txt
