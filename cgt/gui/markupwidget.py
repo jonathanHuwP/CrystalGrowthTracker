@@ -125,7 +125,7 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         self._entryControls.start_end.connect(self.start_or_end)
         self._entryControls.frame_changed.connect(self.display_frame)
 
-        self._cloneControls.zoom_value.connect(self.entry_zoom_changed)
+        self._cloneControls.zoom_value.connect(self.clone_zoom_changed)
         self._cloneControls.forwards.connect(self.play_video)
         self._cloneControls.backwards.connect(self.play_reverse_video)
         self._cloneControls.pause.connect(self.pause_video)
