@@ -66,12 +66,13 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     data-structures required to implement the intended behaviour
     """
 
-    def __init__(self, parent=None, project=None):
+    def __init__(self, parent=None, project=None, logs=False):
         """
         the object initalization function
             Args:
                 parent (QObject): the parent QObject for this window
-                project (string): path to the directory of the project to be opened on start
+                project (string): directory path of the start project
+                logs (bool): if true any debugging logs are used
         """
         super().__init__(parent)
         self.setupUi(self)
@@ -87,6 +88,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         ## the project data structure
         self._project = None
+
+        ## if true logging is used
+        self._logging = logs
 
         ## the pens
         self._pens = PenStore()
@@ -948,3 +952,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         getter for the enhanced video reader
         """
         return self._enhanced_video_reader
+
+    def get_logging(self):
+        """
+        get the logging status
+            Returns:
+                True if logging is being used else False
+        """
+        return self._logging

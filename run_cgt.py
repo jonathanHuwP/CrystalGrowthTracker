@@ -21,17 +21,27 @@ import argparse
 
 from cgt.cgt_app import CGTApp
 
-def get_project():
+def get_python_args():
     """
     set up to read project name from command line
         Returns:
             (string) the project name
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument("-p", "--project", type=str, required=False, help="project directory path")
+
+    parser.add_argument("-p",
+                        "--project",
+                        type=str,
+                        required=False,
+                        help="project directory path")
+
+    parser.add_argument("-l",
+                        "--log",
+                        action='store_true',
+                        help="if set write log files")
+
     args = parser.parse_args()
-    return args.project
+    return args
 
 if __name__ == "__main__":
-    project = get_project()
-    application = CGTApp(sys.argv, project)
+    application = CGTApp(sys.argv, get_python_args())

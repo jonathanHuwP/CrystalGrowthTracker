@@ -33,7 +33,7 @@ class CGTApp(qw.QApplication):
     the application that runs the main window
     """
 
-    def __init__(self, args, project_dir=None):
+    def __init__(self, args, python_args):
         """
         initalize and run main window
             Args:
@@ -55,7 +55,8 @@ class CGTApp(qw.QApplication):
         for translator in translators:
             qc.QCoreApplication.installTranslator(translator)
 
-        window = CrystalGrowthTrackerMain(project=project_dir)
+        window = CrystalGrowthTrackerMain(project=python_args.project,
+                                          logs=python_args.log)
         window.show()
 
         self.exec_()    # enter event loop
