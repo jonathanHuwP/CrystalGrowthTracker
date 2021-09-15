@@ -646,11 +646,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     def append_lines(self, region_index, lines):
         """
         add a list of lines to a region
-
             Args:
                 region_index (int) the array index of the region
                 lines [Line] array of lines to be added
-
             Returns:
                 None
         """
@@ -751,6 +749,14 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                                    message)
             return False
 
+        self.setup_video_source(video_file)
+
+    def setup_video_source(self, video_file):
+        """
+        make the video readers
+            Args:
+                video_file (palthlib.Path): the file holding the video
+        """
         try:
             # make the objects
             self._enhanced_video_reader = VideoSource(str(video_file),
