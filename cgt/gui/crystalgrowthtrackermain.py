@@ -46,6 +46,7 @@ from cgt.gui.reportwidget import ReportWidget
 from cgt.gui.videostatisticswidget import VideoStatisticsWidget
 from cgt.gui.penstore import PenStore
 from cgt.gui.resultswidget import ResultsWidget
+import cgt.util.config as config
 
 from cgt.io import (writecsvreports, readcsvreports)
 
@@ -89,11 +90,13 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         ## the project data structure
         self._project = None
 
-        ## if true logging is used
-        self._logging = logs
-
         ## the pens
         self._pens = PenStore()
+
+        ## assign logging state
+        if logs:
+            config.use_logs = True
+            config.start_logging()
 
         self.setup_tabs()
 
@@ -760,8 +763,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         try:
             # make the objects
             self._enhanced_video_reader = VideoSource(str(video_file),
-                                                      float(self._project["frame_rate"]),
-                                                      logs=self._logging)
+                                                      float(self._project["frame_rate"]))
             self._selectWidget.set_video_source(self._enhanced_video_reader)
             self._drawingWidget.set_video_source(self._enhanced_video_reader)
             self._resultsWidget.set_video_source(self._enhanced_video_reader)
@@ -771,8 +773,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                     self._videoStatsWidget.set_video_source(self._enhanced_video_reader)
                 else:
                     self._raw_video_reader = VideoSource(self._project["raw_video"],
-                                                         float(self._project["frame_rate"]),
-                                                         logs=self._logging)
+                                                         float(self._project["frame_rate"]))
                     self._videoStatsWidget.set_video_source(self._raw_video_reader)
             else:
                 self._videoStatsWidget.set_video_source(self._enhanced_video_reader)
@@ -936,6 +937,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             # the event must be accepted
             event.accept()
 
+            config.stop_logging()
+
             # to get rid tell the event-loop to schedule for deleteion
             # do not destroy as a pointer may survive in event-loop
             # which will trigger errors if it recieves a queued signal
@@ -962,11 +965,3 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         getter for the enhanced video reader
         """
         return self._enhanced_video_reader
-
-    def get_logging(self):
-        """
-        get the logging status
-            Returns:
-                True if logging is being used else False
-        """
-        return self._logging
