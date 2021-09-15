@@ -46,19 +46,19 @@ class VideoSource(FfmpegBase):
     ## the pixel format and number of bytes
     PIX_FMT = ('rgb24', 3)
 
-    def __init__(self, file_name, user_frame_rate, parent=None, debug=False):
+    def __init__(self, file_name, user_frame_rate, parent=None, logs=False):
         """
         set up the object
             Args:
                 file_name (str): the path and name of video file
                 user_frame_rate (int): the frame rate provided by user
                 parent (QObject): parent object
-                debug (bool): if true save ffmpeg log to file, else devnull
+                logs (bool): if true save ffmpeg log to file, else devnull
         """
         super().__init__(file_name, parent)
 
-        ## debugging flag
-        self._debug = debug
+        ## logging flag
+        self._logs = logs
 
         self.probe_video(user_frame_rate, VideoSource.PIX_FMT[1])
 
@@ -90,7 +90,7 @@ class VideoSource(FfmpegBase):
 
         # make path for ffmpeg's logs
         error_path = pathlib.Path(os.devnull)
-        if self._debug:
+        if self._logs:
             error_path = pathlib.Path("ffmpeg_log.txt")
 
         # create ffmpeg process with piped output and read output

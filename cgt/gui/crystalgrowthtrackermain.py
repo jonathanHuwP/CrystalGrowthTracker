@@ -137,8 +137,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._videoStatsWidget.enable(False)
         self.setup_tab(tab, self._videoStatsWidget)
 
-        # User drawing
-        ###############
+        # User markup of video features
+        ###############################
         tab =self._tabWidget.widget(3)
 
         ## the crystal drawing widget
@@ -753,7 +753,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         try:
             # make the objects
-            self._enhanced_video_reader = VideoSource(str(video_file), float(self._project["frame_rate"]))
+            self._enhanced_video_reader = VideoSource(str(video_file),
+                                                      float(self._project["frame_rate"]),
+                                                      logs=self._logging)
             self._selectWidget.set_video_source(self._enhanced_video_reader)
             self._drawingWidget.set_video_source(self._enhanced_video_reader)
             self._resultsWidget.set_video_source(self._enhanced_video_reader)
@@ -762,7 +764,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 if self._project["stats_from_enhanced"]:
                     self._videoStatsWidget.set_video_source(self._enhanced_video_reader)
                 else:
-                    self._raw_video_reader = VideoSource(self._project["raw_video"], float(self._project["frame_rate"]))
+                    self._raw_video_reader = VideoSource(self._project["raw_video"],
+                                                         float(self._project["frame_rate"]),
+                                                         logs=self._logging)
                     self._videoStatsWidget.set_video_source(self._raw_video_reader)
             else:
                 self._videoStatsWidget.set_video_source(self._enhanced_video_reader)
