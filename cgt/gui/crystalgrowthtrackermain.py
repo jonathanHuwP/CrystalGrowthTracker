@@ -67,13 +67,14 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
     data-structures required to implement the intended behaviour
     """
 
-    def __init__(self, parent=None, project=None, logs=False):
+    def __init__(self,
+                 parent=None,
+                 config_args=None):
         """
         the object initalization function
             Args:
                 parent (QObject): the parent QObject for this window
-                project (string): directory path of the start project
-                logs (bool): if true any debugging logs are used
+                config_args (argparse.Namespace): command line initial setup arguments
         """
         super().__init__(parent)
         self.setupUi(self)
@@ -93,20 +94,22 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         ## the pens
         self._pens = PenStore()
 
-        ## assign logging state
-        if logs:
-            config.use_logs = True
-            config.start_logging()
-
         self.setup_tabs()
+        self._tabWidget.setCurrentIndex(0)
+
+        ## assign logging state
+        if config_args is not None:
+            args = vars(config_args)
+            if args.get("log") is not None and args.get("log"):
+                config.use_logs = True
+                config.start_logging()
+            if args.get("log_ffmpeg") is not None and args.get("log_ffmpeg"):
+                config.use_ffmpeg_log = True
+            if args.get("project") is not None:
+                self.read_project_directory(args.get("project"))
 
         self._progressBar.hide()
         self.set_title()
-
-        if project is not None:
-            self.read_project_directory(project)
-
-        self._tabWidget.setCurrentIndex(0)
 
     def setup_tabs(self):
         """

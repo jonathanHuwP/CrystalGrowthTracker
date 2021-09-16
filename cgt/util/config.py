@@ -24,6 +24,9 @@ import pathlib
 ## use logging for debug purposes
 use_logs = False
 
+## save ffmpeg logs to file
+use_ffmpeg_log = False
+
 ## a global log file
 _log_file = None
 

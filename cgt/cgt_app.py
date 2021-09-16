@@ -38,7 +38,7 @@ class CGTApp(qw.QApplication):
         initalize and run main window
             Args:
                 args [string] the command line arguments
-                project_dir (string) the directory path of the start project
+                python_args (argparse.Namespace) argumens found by argparse
          """
         super().__init__(args)
         self.setApplicationName("CrystalGrowthTracker")
@@ -55,8 +55,7 @@ class CGTApp(qw.QApplication):
         for translator in translators:
             qc.QCoreApplication.installTranslator(translator)
 
-        window = CrystalGrowthTrackerMain(project=python_args.project,
-                                          logs=python_args.log)
+        window = CrystalGrowthTrackerMain(config_args=python_args)
         window.show()
 
         self.exec_()    # enter event loop

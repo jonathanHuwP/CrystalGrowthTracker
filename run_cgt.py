@@ -40,6 +40,11 @@ def get_python_args():
                         action='store_true',
                         help="if set write log files")
 
+    parser.add_argument("-f",
+                        "--log_ffmpeg",
+                        action='store_true',
+                        help="if set write ffmpeg log files to file")
+
     args = parser.parse_args()
     return args
 
