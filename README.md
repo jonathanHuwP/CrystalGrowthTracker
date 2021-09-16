@@ -18,13 +18,13 @@ This software uses Anaconda with Python 3.8, at present it will not work with 3.
 
 If you have installed Anaconda, you can install the software and run in two steps:,
 
-### Set-up the Enviromet and Build the Software
+### Set-up the Environment and Build the Software
 
 Download or clone from gitHub.
 
 Open an Anaconda shell and navigate to the CrystalGrowthTracker directory.
 
-Set up the conda enviroment (if you are a developer see below):
+Set up the conda environment (if you are a developer see below):
 
 `conda env create -f environment_CGT.yml`
 
@@ -36,9 +36,27 @@ To build the Qt widgets reqired
 
 `python .\build_ui.py`
 
+### Changing the environment
+
+If you need to change an old environment following the inculsion or removal of a package.
+
+Remove old environments:
+'conda env remove --name cgt'
+'conda env remove --name cgt-dev'
+
+Update conda:
+'conda update --all'
+
+Create new environment:
+'conda env create -f environment_CGT.yml'
+
+Activate:
+'conda activete cgt'
+
+
 ### Runing the Software
 
-Open an Anaconda shell and activate the enviroment
+Open an Anaconda shell and activate the environment
 
 `conda activate CGT`
 
@@ -60,7 +78,7 @@ To remove software delete the CrystalGrowthTracker direcory, then delete the env
 
 ### Development and Doxygen Documentation
 
-The software is documented with doxygen, to build the documentation you will have to install and avtivate the development enviroment.
+The software is documented with doxygen, to build the documentation you will have to install and avtivate the development environment.
 
 `conda env create -f environment_CGT_DEV.yml`
 
