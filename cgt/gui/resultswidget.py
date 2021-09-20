@@ -19,13 +19,11 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # set up linting conditions
 # pylint: disable = c-extension-no-member
 # pylint: disable = import-error
-import traceback
+import itertools
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
 import PyQt5.QtGui as qg
-
-import pyqtgraph as pg
 
 from cgt.model.velocitiescalculator import VelocitiesCalculator
 from cgt.io.mpl import make_mplcanvas, draw_displacements
@@ -135,7 +133,6 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
             Args:
                 index (int): the index of the region
         """
-        print("index changed")
         self.fill_table(index)
         self.draw_graph_of_region(index)
         self.display_region(index)
@@ -207,22 +204,30 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
         lines = calc.get_line_displacements()
         points = calc.get_point_displacements()
 
-        row = 0
+        row_count = itertools.count()
         for j, line in enumerate(lines):
             for displacement in line:
-                self._resultsTable.setItem(row, 0, qw.QTableWidgetItem(self.tr(f"Line {j}")))
-                self._resultsTable.setItem(row, 1, qw.QTableWidgetItem(str(displacement.get_start())))
-                self._resultsTable.setItem(row, 2, qw.QTableWidgetItem(str(displacement.get_end())))
-                self._resultsTable.setItem(row, 3, qw.QTableWidgetItem( f"{displacement.get_length():.2f}"))
-                row += 1
+                row = next(row_count)
+                self._resultsTable.setItem(row, 0,
+                                           qw.QTableWidgetItem(self.tr(f"Line {j}")))
+                self._resultsTable.setItem(row, 1,
+                                           qw.QTableWidgetItem(str(displacement.get_start())))
+                self._resultsTable.setItem(row, 2,
+                                           qw.QTableWidgetItem(str(displacement.get_end())))
+                self._resultsTable.setItem(row, 3,
+                                           qw.QTableWidgetItem( f"{displacement.get_length():.2f}"))
 
         for j, point in enumerate(points):
             for displacement in point:
-                self._resultsTable.setItem(row, 0, qw.QTableWidgetItem(self.tr(f"Point {j}")))
-                self._resultsTable.setItem(row, 1, qw.QTableWidgetItem(str(displacement.get_start())))
-                self._resultsTable.setItem(row, 2, qw.QTableWidgetItem(str(displacement.get_end())))
-                self._resultsTable.setItem(row, 3, qw.QTableWidgetItem( f"{displacement.get_length():.2f}"))
-                row += 1
+                row = next(row_count)
+                self._resultsTable.setItem(row, 0,
+                                           qw.QTableWidgetItem(self.tr(f"Point {j}")))
+                self._resultsTable.setItem(row, 1,
+                                           qw.QTableWidgetItem(str(displacement.get_start())))
+                self._resultsTable.setItem(row, 2,
+                                           qw.QTableWidgetItem(str(displacement.get_end())))
+                self._resultsTable.setItem(row, 3,
+                                           qw.QTableWidgetItem( f"{displacement.get_length():.2f}"))
 
     def draw_graph_of_region(self, index):
         """
@@ -305,4 +310,5 @@ def clone_point(marker, pen):
     graph_path.setData(ItemDataTypes.FRAME_NUMBER, get_frame(marker))
     graph_path.setData(ItemDataTypes.REGION_INDEX, get_region(marker))
     graph_path.setData(ItemDataTypes.CROSS_CENTRE, centre)
+
     return graph_path
