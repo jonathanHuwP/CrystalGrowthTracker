@@ -10,3 +10,4 @@ dependencies:
   - doxygen
   - pylint
   - ffmpeg-python
+  - matplotlib

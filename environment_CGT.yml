@@ -8,3 +8,4 @@ dependencies:
   - pyqt
   - pyqtgraph
   - ffmpeg-python
+  - matplotlib

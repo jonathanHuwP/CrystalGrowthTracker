@@ -25,14 +25,17 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = too-many-instance-attributes
 # pylint: disable = no-member
 # pylint: disable = too-many-public-methods
-import numpy as np
-import pathlib
 
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
-import pyqtgraph as pg
+import PyQt5.QtWidgets as qw
 
-import cgt.util.utils as utils
+from cgt.io.mpl import (make_mplcanvas,
+                        render_graph,
+                        render_prob_density,
+                        update_density,
+                        update_graph)
+
 from cgt.gui.videobasewidget import VideoBaseWidget
 from cgt.gui.Ui_videostatisticswidget import Ui_VideoStatisticsWidget
 
@@ -61,17 +64,20 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         self._video_label = None
 
         ## the plot widget for time series graph
-        self._graph = None
+        self._evolution_canvas = None
+
+        ## the probability density curve for a single frame
+        self._density_curve = None
+
+        ## the plot widget for for the single frame
+        self._single_frame_canvas = None
 
         ## pointer for the vertical line identifying the frame
         self._frame_line = None
 
-        ## the plot widget for for the histogram
-        self._histogram = None
-
         self._makeStatsButton.clicked.connect(data_source.make_video_statistics)
 
-        self.make_plots()
+        self.make_canvases()
 
         font = qg.QFont( "Monospace", 8, qg.QFont.DemiBold)
         self._videoNameLabel.setFont(font)
@@ -84,142 +90,60 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         self.clear()
         super().set_video_source(video_source)
 
-    def make_plots(self):
+    def make_canvases(self):
         """
-        make the plain plots
+        make the empty plotting canvases
         """
-        self._graph = pg.PlotWidget(title="<b>Intensity</b>")
-        self._graph.setBackground('w')
-        self._graphScrollArea.setWidget(self._graph)
+        self.make_time_evolution_canvas()
+        self.make_single_frame_canvas()
 
-        self._histogram = pg.PlotWidget(title="<b>Intensity</b>")
-        self._histogram.setBackground('w')
-        self._histogramScrollArea.setWidget(self._histogram)
+    def  make_time_evolution_canvas(self):
+        """
+        make the canvas for the evolution of the mean
+        """
+        self._evolution_canvas, toolbar = make_mplcanvas()
+        layout = qw.QVBoxLayout(self._graphScrollArea)
+        layout.addWidget(toolbar)
+        layout.addWidget(self._evolution_canvas)
+        self._graphScrollArea.setLayout(layout)
+
+    def make_single_frame_canvas(self):
+        """
+        make the canvas for the distribution of the current frame
+        """
+        self._single_frame_canvas, toolbar = make_mplcanvas()
+        layout = qw.QVBoxLayout(self._histogramScrollArea)
+        layout.addWidget(toolbar)
+        layout.addWidget(self._single_frame_canvas)
+        self._histogramScrollArea.setLayout(layout)
 
     def animate_graphs(self):
         """
-        adjust graphs in step with view of video
-            Args:
-                frame_number (int) the current frame number
+        display the data animating the frame line
         """
-        if self._frame_line is None:
-            return
+        stats = self._data_source.get_results().get_video_statistics()
+        if self._density_curve is not None:
+            update_density(self._single_frame_canvas,
+                           self._density_curve,
+                           stats,
+                           self._current_frame)
 
-        self._frame_line.setPos(self._current_frame+1)
-        self.plot_histogram()
+        if self._frame_line is not None:
+            update_graph(self._evolution_canvas, self._frame_line, self._current_frame)
 
     @qc.pyqtSlot()
     def display_stats(self):
         """
         draw the two graphs
         """
-        if self._frame_line is not None:
-            self.clear()
-        self.draw_stats_graph()
-        self.plot_histogram()
+        stats = self._data_source.get_results().get_video_statistics()
+        self._frame_line = render_graph(stats.get_frames(),
+                                        self._evolution_canvas,
+                                        self._current_frame)
 
-    def plot_histogram(self):
-        """
-        draw the histogram of the current frame
-        """
-        tick_font = qg.QFont()
-        tick_font.setBold(True)
-
-        self._histogram.clear()
-        self._histogram.getAxis('left').setLabel("Counts (number)",
-                                                 **VideoStatisticsWidget.label_style)
-        self._histogram.getAxis('bottom').setLabel("Bins (Level)",
-                                                   **VideoStatisticsWidget.label_style)
-        self._histogram.getAxis('left').setTickFont(tick_font)
-        self._histogram.getAxis('bottom').setTickFont(tick_font)
-        self._histogram.setXRange(0, 260)
-
-        stats = self._data_source.get_video_stats()
-
-        # use only lower limits of bins
-        plot_bins = stats.get_bins()[:len(stats.get_bins())-1]
-
-        # visible width 7/8 of full bin width
-        width = stats.get_bins()[1] - stats.get_bins()[0]
-        width -= width/8.0
-
-        self._histogram.addItem(pg.BarGraphItem(x=plot_bins,
-                                                height=stats.get_frames()[self._current_frame].bin_counts,
-                                                width=width,
-                                                brush='g'))
-
-    def draw_stats_graph(self):
-        """
-        draw the statistics graph
-        """
-        if self._data_source.get_project()["raw_video_path"] is None:
-            text = self._data_source.get_project()["enhanced_video_no_path"]
-        else:
-            text = self._data_source.get_project()["raw_video_no_path"]
-
-        self._videoNameLabel.setText(text)
-
-        # off screen render
-        pi = pg.PlotWidget(title="<b>Intensity</b>")
-        pi.setBackground('w')
-
-        # make plots
-        self.make_plot(pi)
-        frame_count = self.make_plot(self._graph)
-
-        # at current frame line to GUI plot
-        self._frame_line = pg.InfiniteLine(angle=90, movable=False)
-        self._frame_line.setBounds([0, frame_count])
-        self._graph.addItem(self._frame_line)
-
-        # save off screen render
-        pi.setFixedWidth(800)
-        pi.setFixedHeight(600)
-        pixmap = pi.grab()
-        rpt_dir, _, _ = utils.make_report_file_names(self._data_source.get_project()["proj_full_path"])
-        path = pathlib.Path(rpt_dir).joinpath("images")
-        path = path.joinpath("stats_graph.png")
-        pixmap.save(str(path))
-
-    def make_plot(self, plot_widget):
-        """
-        make a plot of the the evolution of the statistics graph
-            Args:
-                plot_widget (PlotWidget) the plotting widget in use
-        """
-        tick_font = qg.QFont()
-        tick_font.setBold(True)
-
-        levels = np.linspace(0.2, 1, 5)
-        stats = self._data_source.get_video_stats()
-        means = [x.mean for x in stats.get_frames()]
-        std_dev = [x.std_deviation for x in stats.get_frames()]
-
-        means_plus = []
-        means_minus = []
-
-        for i, mean in enumerate(means):
-            means_plus.append(mean + std_dev[i])
-            means_minus.append(mean - std_dev[i])
-
-        plot_widget.getAxis('left').setLabel("Intensity (Level)",
-                                             **VideoStatisticsWidget.label_style)
-        plot_widget.getAxis('left').setTickFont(tick_font)
-        plot_widget.getAxis('bottom').setLabel("Frame (number)",
-                                               **VideoStatisticsWidget.label_style)
-        plot_widget.getAxis('bottom').setTickFont(tick_font)
-        plot_widget.setYRange(0, 260)
-
-        x_axis = range(1, len(stats.get_frames())+1)
-        plot_widget.addLegend()
-        m_plot = plot_widget.plot(x_axis, means, pen='b', name="Mean")
-        up_plot = plot_widget.plot(x_axis, means_plus, pen='r', name="Std Dev up")
-        down_plot = plot_widget.plot(x_axis, means_minus, pen='r', name="Std Dev down")
-
-        plot_widget.addItem(pg.FillBetweenItem(m_plot, up_plot, levels[3]))
-        plot_widget.addItem(pg.FillBetweenItem(m_plot, down_plot, levels[3]))
-
-        return len(stats.get_frames())
+        self._density_curve = render_prob_density(stats,
+                                                  self._single_frame_canvas,
+                                                  self._current_frame)
 
     def display_extra(self):
         """
@@ -240,8 +164,15 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         clear the current contents
         """
         self._frame_line = None
+
         self._videoNameLabel.setText(self.tr("Video"))
-        self.make_plots()
+
+        if self._evolution_canvas is not None:
+            self._evolution_canvas.axes.cla()
+
+        if self._single_frame_canvas is not None:
+            self._single_frame_canvas.axes.cla()
+
         super().clear()
 
     def enable(self, enabled):

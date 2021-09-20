@@ -25,11 +25,12 @@ import pathlib
 import PyQt5.QtGui as qg
 
 from cgt.model.velocitiescalculator import VelocitiesCalculator
-from cgt.util.utils import get_rect_even_dimensions
-
-from cgt.util.utils import (hash_results,
+from cgt.io.mpl import OffScreenRender, render_graph
+from cgt.util.utils import (get_rect_even_dimensions,
+                            hash_results,
                             make_report_file_names,
                             get_region)
+
 
 def save_html_report(data_source):
     '''
@@ -53,6 +54,7 @@ def save_html_report(data_source):
         image_files = save_region_location_images(report_dir, data_source)
         region_files = save_region_start_images(report_dir, data_source)
         key_frame_files = save_region_keyframe_images(report_dir, data_source)
+        save_time_evolution_video_statistics(report_dir, data_source)
         #write_html_overview(fout, image_files)
         write_html_stats(fout, report_dir)
         write_html_regions(fout, project, image_files, region_files, key_frame_files)
@@ -85,7 +87,7 @@ def write_html_stats(fout, report_dir):
                " of each region containing a crystal.</i></p>")
 
     path = pathlib.Path(report_dir).joinpath("images")
-    path = path.joinpath("stats_graph.png")
+    path = path.joinpath("video_statistics.png")
     print(path)
     if not path.exists():
         fout.write("<p>Not available</p>")
@@ -306,6 +308,26 @@ def to_date_and_time(timestamp):
     time = f"{timestamp.time().hour}:{timestamp.time().minute}:{timestamp.time().second}"
 
     return date, time
+
+def save_time_evolution_video_statistics(report_dir, data_source):
+    """
+    save image of time evolution of mean pixel intensity
+        Args:
+            report_dir (libpath.Path): the directory to hold images
+            data_source (CrystlGrowthTrackerMain): the holder of the data
+    """
+    statistics = data_source.get_results().get_video_statistics()
+    if statistics is None:
+        return None
+
+    images_dir = report_dir.joinpath("images")
+    file_name = images_dir.joinpath("video_statistics.png")
+
+    canvas = OffScreenRender()
+    render_graph(statistics.get_frames(), canvas)
+    canvas.print_png(str(file_name))
+
+    return file_name
 
 def save_region_start_images(report_dir, data_source):
     """
