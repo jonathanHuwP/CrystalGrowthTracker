@@ -19,6 +19,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # set up linting conditions
 # pylint: disable = c-extension-no-member
 # pylint: disable = import-error
+import traceback
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
@@ -27,6 +28,7 @@ import PyQt5.QtGui as qg
 import pyqtgraph as pg
 
 from cgt.model.velocitiescalculator import VelocitiesCalculator
+from cgt.io.mpl import make_mplcanvas, draw_displacements
 from cgt.util.utils import (ItemDataTypes,
                             MarkerTypes,
                             get_region,
@@ -78,21 +80,31 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
         # ensure view has a scene graph
         self._regionView.setScene(qw.QGraphicsScene())
 
-        self._graph = pg.PlotWidget(title="<b>Marker Displacments</b>")
-        self._graph.setBackground('w')
-        self._graphScrollArea.setWidget(self._graph)
+        self.make_graph_canvas()
 
-        self.setup_display()
+    def  make_graph_canvas(self):
+        """
+        make the canvas for the displacment graphs
+        """
+        self._graph, toolbar = make_mplcanvas()
+        layout = qw.QVBoxLayout(self._graphScrollArea)
+        layout.addWidget(toolbar)
+        layout.addWidget(self._graph)
+        self._graphScrollArea.setLayout(layout)
 
     def setEnabled(self, enabled):
         """
-        enable/disable widget on enable the source
+        enable/disable widget. On enable the source
         is connected on disable play is paused
+            Args:
+                enabled (bool): the new state
         """
+        if enabled == self.isEnabled():
+            return
+
         if enabled:
             super().setEnabled(True)
             self.setup_display()
-            self.show_results(self._regionBox.currentIndex())
         elif not enabled:
             for item in self._regionView.scene().items():
                 self._regionView.scene().removeItem(item)
@@ -123,6 +135,7 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
             Args:
                 index (int): the index of the region
         """
+        print("index changed")
         self.fill_table(index)
         self.draw_graph_of_region(index)
         self.display_region(index)
@@ -217,46 +230,10 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
             Args:
                 index (int): the array index of the region
         """
-        self._graph.clear()
-
-        label_style = {'font-weight': 'bold'}
         calc = self.calculate_speeds(index)
         lines = calc.get_line_displacements()
         points = calc.get_point_displacements()
-
-        tick_font = qg.QFont()
-        tick_font.setBold(True)
-
-        self._graph.getAxis('left').setLabel("Displacement (micron)", **label_style)
-        self._graph.getAxis('left').setTickFont(tick_font)
-        self._graph.getAxis('bottom').setLabel("Frame (number)", **label_style)
-        self._graph.getAxis('bottom').setTickFont(tick_font)
-
-        pen = 0
-        pens = len(lines) + len(points)
-        for i, marker in enumerate(lines):
-            displacements = [0.0]
-            frames = [0]
-            for dis in marker:
-                new_dis = displacements[-1] + dis.get_length()
-                displacements.append(new_dis)
-                frames.append(dis.get_end())
-
-            self._graph.plot(frames, displacements, pen=(pen, pens), name=f"Line {i}")
-            pen += 1
-
-        for i, marker in enumerate(points):
-            displacements = [0.0]
-            frames = [0]
-            for dis in marker:
-                new_dis = displacements[-1] + dis.get_length()
-                displacements.append(new_dis)
-                frames.append(dis.get_end())
-
-            self._graph.plot(frames, displacements, pen=(pen, pens), name=f"Point {i}")
-            pen += 1
-
-        self._graph.addLegend()
+        draw_displacements(self._graph, lines, points, index)
 
     def calculate_speeds(self, index):
         """
@@ -279,6 +256,7 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
         scale = self._data_source.get_project()["resolution"]
         calculator = VelocitiesCalculator(lines, points, fps, scale)
         calculator.process_latest_data()
+
         return calculator
 
     def set_video_source(self, video_source):

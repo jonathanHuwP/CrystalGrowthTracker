@@ -43,8 +43,6 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
     """
     A widget intended to dispay the intensity statistics
     """
-    ## font for the graphs
-    label_style = {'font-weight': 'bold'}
 
     def __init__(self, parent, data_source):
         """

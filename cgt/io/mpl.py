@@ -173,3 +173,42 @@ def update_graph(plot, frame_line, frame):
     line_y = [5, 250]
     frame_line[0].set_data(line_x, line_y)
     plot.draw()
+
+def draw_displacements(canvas, lines, points, region):
+    """
+    draw the time displacement graphs
+        Args:
+            canvas (MplCanvas): the drawing canvas
+            lines (): array of graphics line
+            points (): array of grahics point
+            region (int): the region
+    """
+    canvas.axes.cla()
+    canvas.axes.set_title(f'Marker Displacements Frame {region}')
+    canvas.axes.set_ylabel("Displacement (micron)")
+    canvas.axes.set_xlabel("Frame (number)")
+
+    for i, marker in enumerate(lines):
+        displacements = [0.0]
+        frames = [0]
+        for dis in marker:
+            new_dis = displacements[-1] + dis.get_length()
+            displacements.append(new_dis)
+            frames.append(dis.get_end())
+
+        canvas.axes.plot(frames, displacements, label=f"Line {i}")
+
+    for i, marker in enumerate(points):
+        displacements = [0.0]
+        frames = [0]
+        for dis in marker:
+            new_dis = displacements[-1] + dis.get_length()
+            displacements.append(new_dis)
+            frames.append(dis.get_end())
+
+        canvas.axes.plot(frames, displacements, label=f"Point {i}")
+
+    if len(lines) or len(points):
+        canvas.axes.legend()
+
+    canvas.draw()
