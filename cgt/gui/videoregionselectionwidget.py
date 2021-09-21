@@ -25,7 +25,6 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = too-many-instance-attributes
 # pylint: disable = no-member
 # pylint: disable = too-many-public-methods
-import pathlib
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
@@ -33,7 +32,6 @@ import PyQt5.QtGui as qg
 
 from cgt.gui.videobasewidget import VideoBaseWidget
 from cgt.gui.regionselectionview import SelectStates
-from cgt.util.utils import qimage_to_nparray
 
 # import UI
 from cgt.gui.Ui_videoregionselectionwidget import Ui_VideoRegionSelectionWidget
