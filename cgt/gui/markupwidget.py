@@ -324,6 +324,7 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         if enabled and self._video_source is not None:
             super().setEnabled(True)
             self.redisplay()
+            self.region_changed()
         elif not enabled:
             super().setEnabled(False)
             self.play_pause()
