@@ -189,9 +189,10 @@ class ReportWidget(qw.QWidget, Ui_ReportWidget):
             Returns:
                 True/False
         """
-        ret = qg.QMessageBox.information(None, 'What', message, qg.QMessageBox.Yes | qg.QMessageBox.No)
+        ret = qw.QMessageBox.information(None, 'What', message,
+                                         qw.QMessageBox.Yes | qw.QMessageBox.No)
 
-        return (ret == qg.QMessageBox.Yes)
+        return (ret == qw.QMessageBox.Yes)
 
     def make_report(self):
         """
