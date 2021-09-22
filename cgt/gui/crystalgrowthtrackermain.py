@@ -826,27 +826,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         return self._project is not None and self._project.has_been_changed()
 
     @qc.pyqtSlot()
-    def save_results_widget(self):
-        """
-        callback for triggering save results
-        """
-        if self._project is None:
-            message = self.tr("You must have a project.")
-            qw.QMessageBox.warning(self, self.tr("No Project"), message)
-            return
-
-        file_types = "Commer Seperated Value (*.csv)"
-        file_path, _ = qw.QFileDialog.getSaveFileName(self,
-                                                     self.tr("Enter/select file for save"),
-                                                     os.path.expanduser('~'),
-                                                     file_types)
-
-        if file_path is None or file_path == '':
-            return
-
-        self._resultsWidget.save(file_path)
-
-    @qc.pyqtSlot()
     def edit_notes(self):
         """
         allow the user the edit the projects notes
