@@ -46,7 +46,7 @@ from cgt.gui.reportwidget import ReportWidget
 from cgt.gui.videostatisticswidget import VideoStatisticsWidget
 from cgt.gui.penstore import PenStore
 from cgt.gui.resultswidget import ResultsWidget
-import cgt.util.config as config
+from cgt.util import config
 
 from cgt.io import (writecsvreports, readcsvreports)
 from cgt.io.htmlreport import ReportMaker
@@ -752,6 +752,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             return False
 
         self.setup_video_source(video_file)
+        return True
 
     def setup_video_source(self, video_file):
         """
@@ -790,6 +791,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         except KeyError as exception:
             self.display_error(f"Probe video data error: unknown key {exception}")
             return False
+
+        return True
 
     qc.pyqtSlot()
     def save_region_videos(self):

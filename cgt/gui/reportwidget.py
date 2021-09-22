@@ -24,7 +24,6 @@ import json
 
 import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
-import PyQt5.QtGui as qg
 import PyQt5.QtWebEngineWidgets as qe
 
 from cgt.util.utils import (make_report_file_names,
@@ -35,6 +34,8 @@ from cgt.gui.Ui_reportwidget import Ui_ReportWidget
 
 ## status of report
 class ReportStatus(enum.Enum):
+    """possible status of report file"""
+
     ## no directory, no html file, no results hash file
     NO_VALID_REPORT = 0
 
@@ -74,14 +75,6 @@ class ReportWidget(qw.QWidget, Ui_ReportWidget):
         status = self.uptodate_report_exists()
         print(status.name)
         if enabled:
-            # TODO
-            # Rpt status, user in, actions
-            # No report, don't make => super().setEnabled(False)
-            # No report, make => make_report() display()
-            # Out of date, don't make => display
-            # Out of date, make => make_report() display()
-            # upto date, _ => display()
-
             if status == ReportStatus.NO_VALID_REPORT:
                 make = self.question(self.tr("No valid report can be found. Make one?"))
                 if not make:
@@ -188,10 +181,12 @@ class ReportWidget(qw.QWidget, Ui_ReportWidget):
             Returns:
                 True/False
         """
-        ret = qw.QMessageBox.information(None, 'What', message,
+        ret = qw.QMessageBox.information(self,
+                                         'What',
+                                         message,
                                          qw.QMessageBox.Yes | qw.QMessageBox.No)
 
-        return (ret == qw.QMessageBox.Yes)
+        return ret == qw.QMessageBox.Yes
 
     def make_report(self):
         """

@@ -18,6 +18,10 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 @copyright 2020
 @author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 '''
+# set up linting conditions
+# pylint: disable = c-extension-no-member
+# pylint: disable = too-few-public-methods
+
 import json
 from datetime import datetime
 import pathlib
@@ -40,9 +44,6 @@ class ReportMaker(qc.QObject):
 
     ## the progress signal
     stage_completed = qc.pyqtSignal(int)
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
 
     def save_html_report(self, data_source):
         '''
@@ -78,7 +79,7 @@ class ReportMaker(qc.QObject):
             self.stage_completed.emit(next(stage))
             write_html_regions(fout, project, image_files, region_files, key_frame_files)
             self.stage_completed.emit(next(stage))
-            write_html_report_end(fout, report_dir)
+            write_html_report_end(fout)
             self.stage_completed.emit(next(stage))
 
         with open(hash_file, 'w') as fout:
@@ -237,7 +238,7 @@ def write_html_regions(fout, project, image_files, region_image_files, frame_ima
     html_table = ["<table style=\"margin-bottom:5mm;\">"]
     html_table.append("""<caption>Summary of the regions.</caption>\n""")
 
-    html_table.append(f"<tr><th>ID</th><th>Top Left(pixels)</th><th>Bottom Right (pixels)</th></tr>")
+    html_table.append("<tr><th>ID</th><th>Top Left(pixels)</th><th>Bottom Right (pixels)</th></tr>")
     for i, region in enumerate(results.get_regions()):
         rect = get_rect_even_dimensions(region, False)
         top_left = f"({rect.topLeft().x():.1f}, {rect.topLeft().y():.1f})"
@@ -296,12 +297,11 @@ def write_html_region(fout, results, index, images, fps, scale, units):
     fout.write("<br><figcaption><i>The region at each key frame.</i></figcaption>")
     fout.write("</figure>")
 
-def write_html_report_end(fout, report_dir):
+def write_html_report_end(fout):
     '''
     Ends and closes a html report.
         Args:
             fout (file): the output file
-            report_dir (pathlib.Path) directory holding the report
     '''
     fout.write("""<hr>\n<em><p>Crystal Growht Tracker was developed by
     JH Pickering & J Leng at the University of Leeds, Leeds UK,
