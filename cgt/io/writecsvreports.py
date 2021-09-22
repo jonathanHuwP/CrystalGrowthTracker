@@ -76,7 +76,8 @@ def save_csv_video_statistics(project, stats):
 
     with open(path.joinpath(csv_outfile_name), "w") as fout:
         writer = csv.writer(fout, delimiter=',', lineterminator='\n')
-        writer.writerow(stats.get_bins())
+        headers = ["Mean", "Std. Dev."]+stats.get_bins()[1:]
+        writer.writerow(headers)
         for item in stats.get_frames():
             array = []
             array.append(item.mean)

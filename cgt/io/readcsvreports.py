@@ -124,7 +124,7 @@ def read_csv_video_statistics(new_project, files, path):
         reader = csv.reader(file_in)
         row = next(reader)
         bins = []
-        for item in row:
+        for item in [0] + row[2:]:
             if bin is not None:
                 bins.append(np.float64(item))
 
