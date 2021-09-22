@@ -173,6 +173,14 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
 
         super().clear()
 
+    def save_scene(self, file_path):
+        """
+        save the current scene regarless of current view
+            Args:
+                file_path (string): the file
+        """
+        self._graphicsView.save_scene(file_path)
+
     def enable(self, enabled):
         """
         enable/disable widget on disable play is paused

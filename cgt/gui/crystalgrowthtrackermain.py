@@ -384,8 +384,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             widget = self._selectWidget
         elif current_tab_widget == self._drawingTab:
             widget = self._drawingWidget
+        elif current_tab_widget == self._videoStatsTab:
+            widget = self._videoStatsWidget
         else:
-            message = self.tr("You must be using either the Select Regions or the Draw Crystals tabs.")
+            message = self.tr("You must be using either Select Regions, Draw Crystals or Statistics tabs.")
             qw.QMessageBox.information(self, self.tr("Save Image"), message)
             return
 
