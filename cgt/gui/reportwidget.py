@@ -27,7 +27,6 @@ import PyQt5.QtCore as qc
 import PyQt5.QtGui as qg
 import PyQt5.QtWebEngineWidgets as qe
 
-from cgt.io import htmlreport
 from cgt.util.utils import (make_report_file_names,
                             hash_results)
 
@@ -198,11 +197,6 @@ class ReportWidget(qw.QWidget, Ui_ReportWidget):
         """
         make a html report
         """
-        try:
-            report_file = htmlreport.save_html_report(self._data_source)
-        except (IOError, OSError, EOFError) as exception:
-            qw.QMessageBox.critical(self,
-                                    self.tr("Auto Save Report"),
-                                    str(exception))
-            return
+        report_file = self._data_source.make_report()
+
         self.load_html(report_file)

@@ -21,8 +21,10 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 import json
 from datetime import datetime
 import pathlib
+import itertools
 
 import PyQt5.QtGui as qg
+import PyQt5.QtCore as qc
 
 from cgt.model.velocitiescalculator import VelocitiesCalculator
 from cgt.io.mpl import OffScreenRender, render_graph
@@ -31,42 +33,61 @@ from cgt.util.utils import (get_rect_even_dimensions,
                             make_report_file_names,
                             get_region)
 
+class ReportMaker(qc.QObject):
+    """
+    provide ability to signal in Qt
+    """
 
-def save_html_report(data_source):
-    '''
-    Creates and co-ordinates the html report file creation and on the file handle to
-    other functions that write/create the relevant sections.
-        Args:
-            data_source (crystalgrowthtrackermain): holder for all the data and video.
-        Returns:
-            the report file (pathlib.Path)
-        Throws:
-            Error if the report directory cannot be made, or file cannot be opened
-    '''
-    project = data_source.get_project()
-    report_dir, html_outfile, hash_file = make_report_file_names(project["proj_full_path"])
+    ## the progress signal
+    stage_completed = qc.pyqtSignal(int)
 
-    if not report_dir.exists():
-        report_dir.mkdir()
+    def __init__(self, parent=None):
+        super().__init__(parent)
 
-    with open(html_outfile, "w") as fout:
-        write_html_report_start(fout, project)
-        image_files = save_region_location_images(report_dir, data_source)
-        region_files = save_region_start_images(report_dir, data_source)
-        key_frame_files = save_region_keyframe_images(report_dir, data_source)
-        save_time_evolution_video_statistics(report_dir, data_source)
-        #write_html_overview(fout, image_files)
-        write_html_stats(fout, report_dir)
-        write_html_regions(fout, project, image_files, region_files, key_frame_files)
-        write_html_report_end(fout, report_dir)
+    def save_html_report(self, data_source):
+        '''
+        Creates and co-ordinates the html report file creation and on the file handle to
+        other functions that write/create the relevant sections.
+            Args:
+                data_source (crystalgrowthtrackermain): holder for all the data and video.
+            Returns:
+                the report file (pathlib.Path)
+            Throws:
+                Error if the report directory cannot be made, or file cannot be opened
+        '''
+        project = data_source.get_project()
+        report_dir, html_outfile, hash_file = make_report_file_names(project["proj_full_path"])
 
-    with open(hash_file, 'w') as fout:
-        hash_code = hash_results(project["results"])
-        data = {"results_hash": hash_code}
-        json.dump(data, fout)
+        if not report_dir.exists():
+            report_dir.mkdir()
 
-    project["latest_report"] = str(html_outfile)
-    return html_outfile
+        stage = itertools.count(1)
+        with open(html_outfile, "w") as fout:
+            write_html_report_start(fout, project)
+            self.stage_completed.emit(next(stage))
+            image_files = save_region_location_images(report_dir, data_source)
+            self.stage_completed.emit(next(stage))
+            region_files = save_region_start_images(report_dir, data_source)
+            self.stage_completed.emit(next(stage))
+            key_frame_files = save_region_keyframe_images(report_dir, data_source)
+            self.stage_completed.emit(next(stage))
+            save_time_evolution_video_statistics(report_dir, data_source)
+            self.stage_completed.emit(next(stage))
+            #write_html_overview(fout, image_files)
+            write_html_stats(fout, report_dir)
+            self.stage_completed.emit(next(stage))
+            write_html_regions(fout, project, image_files, region_files, key_frame_files)
+            self.stage_completed.emit(next(stage))
+            write_html_report_end(fout, report_dir)
+            self.stage_completed.emit(next(stage))
+
+        with open(hash_file, 'w') as fout:
+            hash_code = hash_results(project["results"])
+            data = {"results_hash": hash_code}
+            json.dump(data, fout)
+
+        project["latest_report"] = str(html_outfile)
+        return html_outfile
 
 def write_html_stats(fout, report_dir):
     """

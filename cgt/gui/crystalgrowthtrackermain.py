@@ -49,10 +49,10 @@ from cgt.gui.resultswidget import ResultsWidget
 import cgt.util.config as config
 
 from cgt.io import (writecsvreports, readcsvreports)
+from cgt.io.htmlreport import ReportMaker
 
 from cgt.io.videosource import VideoSource
 from cgt.io.videoanalyser import VideoAnalyser
-from cgt.io.offscreenrender import OffScreenRender
 from cgt.io.regionvideocopy import RegionVideoCopy
 
 from cgt.model.cgtproject import CGTProject
@@ -873,6 +873,27 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         self._videoStatsWidget.display_stats()
         self._videoStatsWidget.enable(True)
+
+    def make_report(self):
+        """
+        make a html report
+        """
+        report_file = None
+
+        self._progressBar.setMaximum(8)
+        maker = ReportMaker(self)
+        maker.stage_completed.connect(self._progressBar.setValue)
+        self._progressBar.show()
+        try:
+            report_file = maker.save_html_report(self)
+        except (IOError, OSError, EOFError) as exception:
+            qw.QMessageBox.critical(self,
+                                    self.tr("Auto Save Report"),
+                                    str(exception))
+            report_file = None
+        finally:
+            self._progressBar.hide()
+        return report_file
 
     def get_video_stats(self):
         """
