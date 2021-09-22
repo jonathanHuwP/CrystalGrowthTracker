@@ -382,17 +382,10 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         if current_tab_widget == self._selectTab:
             widget = self._selectWidget
-        #elif current_tab_widget == self._drawingTab:
-        #    widget = self._drawingWidget
+        elif current_tab_widget == self._drawingTab:
+            widget = self._drawingWidget
         else:
             message = self.tr("You must be using either the Select Regions or the Draw Crystals tabs.")
-            qw.QMessageBox.information(self, self.tr("Save Image"), message)
-            return
-
-        # grab tab image
-        image = widget.get_image_copy()
-        if image is None:
-            message = self.tr("You do not appear to be displaying an image.")
             qw.QMessageBox.information(self, self.tr("Save Image"), message)
             return
 
@@ -404,7 +397,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         if file_path is None or file_path == '':
             return
-        image.save(file_path, quality=100)
+
+        widget.save_scene(file_path)
 
         message = f"Image saved to {file_path}"
         qw.QMessageBox.information(self, self.tr("Save Image"), message)

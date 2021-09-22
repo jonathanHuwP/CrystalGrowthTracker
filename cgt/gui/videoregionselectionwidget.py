@@ -174,6 +174,14 @@ class VideoRegionSelectionWidget(VideoBaseWidget, Ui_VideoRegionSelectionWidget)
         """
         self._graphicsView.redisplay_regions()
 
+    def save_scene(self, file_path):
+        """
+        save the current scene regarless of current view
+            Args:
+                file_path (string): the file
+        """
+        self._graphicsView.save_scene(file_path)
+
     def clear(self):
         """
         reset to initial conditions

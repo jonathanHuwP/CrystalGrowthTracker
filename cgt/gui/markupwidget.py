@@ -731,6 +731,14 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         """
         self.setup_regions_combobox()
 
+    def save_scene(self, file_path):
+        """
+        save the current scene regarless of current view
+            Args:
+                file_path (string): the file
+        """
+        self._cloneView.save_scene(file_path)
+
     @staticmethod
     def get_scene_image(view):
         """
