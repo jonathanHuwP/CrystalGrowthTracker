@@ -108,3 +108,15 @@ class VideoBaseView(qw.QGraphicsView):
         for item in items:
             if item is not None:
                 self.scene().removeItem(item)
+
+    def save_scene(self, file_path):
+        """
+        save the current scene regarless of current view
+            Args:
+                file_path (string): the file
+        """
+        pixmap = qg.QPixmap(self.scene().sceneRect().toAlignedRect().size())
+        painter = qg.QPainter(pixmap)
+        self.scene().render(painter)
+        del painter
+        pixmap.save(file_path)
