@@ -202,21 +202,6 @@ def write_html_report_start(fout, project):
 
     fout.write(report_info)
 
-def write_html_overview(fout, image_files):
-    '''
-    Creates the overview section of the html report.
-    Args:
-        fout (file handler): The file handler allows this function to write out.
-        image_files (libpath.Path): the locations of the files holding region location images
-    '''
-    fout.write("<h2 align=\"left\">Overview</h2>\n")
-
-    fout.write("<figure><br>")
-    for name in image_files:
-        fout.write(f"<img src=\"{name}\" width=\"30%\">\n")
-    fout.write("<br><figcaption><i>First, middel and last frames showing the regions.</i></figcaption>")
-    fout.write("</figure>")
-
 def write_html_regions(fout, project, image_files, region_image_files, frame_image_files):
     """
     write out the results for the regions to file
