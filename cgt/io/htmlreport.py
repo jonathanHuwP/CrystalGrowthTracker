@@ -98,24 +98,24 @@ def write_html_stats(fout, report_dir):
             report_dir (string): path to report dir
     """
     fout.write("<h1>Image Statistics</h1>\n")
-    fout.write("<p>This section details some image statistics that show the evolution"
-               " of the individual frames of the raw video.</p>")
+    fout.write("<p>This section describes the evolution of image intensity statistics during the video.</p>")
 
-    fout.write("<p align=\"center\">A plot of the mean grayscale value for each frame"
-               " over time will go here the caption is below</p>")
-
-    fout.write("<p align=\"center\"><i>The mean grayscale value of each frame plotted"
-               " against the frame number. The gray boxed areas represent the time limits"
-               " of each region containing a crystal.</i></p>")
+    fout.write("<p align=\"center\"><i></i></p>")
 
     path = pathlib.Path(report_dir).joinpath("images")
     path = path.joinpath("video_statistics.png")
-    print(path)
+
+    fout.write("<figure><br>")
+
     if not path.exists():
         fout.write("<p>Not available</p>")
     else:
         fout.write(f"<img src=\"{path}\" width=\"80%\">\n")
-        fout.write("<p>Graph of image intensit statistics against frame number.</p>")
+
+    fout.write("<br><figcaption>Fig 1. The mean grayscale value of each frame plotted"
+               " against the frame number. The gray boxed areas represent the time limits"
+               " of each region containing a crystal.</figcaption>")
+    fout.write("</figure>")
 
 def make_html_speeds_table(calculator, units):
     """
@@ -127,7 +127,7 @@ def make_html_speeds_table(calculator, units):
     html_table = ["<table style=\"margin-bottom:5mm;\" class=\"hg-pdf\">"]
     html_table.append("""<caption>Speeds of the markers.</caption>\n""")
 
-    html_table.append(f"<tr><th>ID</th><th>Type</th><th>Speed ({units} s<sup>-1</sup>)</th></tr>")
+    html_table.append(f"<tr><th>Marker ID</th><th>Type</th><th>Speed ({units} s<sup>-1</sup>)</th></tr>")
     for item in average_speeds:
         html_table.append(f"<tr><td>{item.ID}</td><td>{item.m_type.name}</td><td>{item.speed:.2f}</td></tr>")
 
@@ -217,13 +217,13 @@ def write_html_regions(fout, project, image_files, region_image_files, frame_ima
     fout.write("<figure><br>")
     for name in image_files:
         fout.write(f"<img src=\"{name}\" width=\"30%\">\n")
-    fout.write("<br><figcaption><i>First, middel and last frames showing the regions.</i></figcaption>")
+    fout.write("<br><figcaption>Fig 2. First, middel and last frames showing the regions.</figcaption>")
     fout.write("</figure>")
 
     html_table = ["<table style=\"margin-bottom:5mm;\">"]
     html_table.append("""<caption>Summary of the regions.</caption>\n""")
 
-    html_table.append("<tr><th>ID</th><th>Top Left(pixels)</th><th>Bottom Right (pixels)</th></tr>")
+    html_table.append("<tr><th>Region ID</th><th>Top Left (pixels)</th><th>Bottom Right (pixels)</th></tr>")
     for i, region in enumerate(results.get_regions()):
         rect = get_rect_even_dimensions(region, False)
         top_left = f"({rect.topLeft().x():.1f}, {rect.topLeft().y():.1f})"
@@ -236,7 +236,7 @@ def write_html_regions(fout, project, image_files, region_image_files, frame_ima
     fout.write("<figure><br>")
     for image in region_image_files:
         fout.write(f"<img src=\"{image}\" width=\"10%\">\n")
-    fout.write("<br><figcaption><i>First frame of each region.</i></figcaption>")
+    fout.write("<br><figcaption>Fig 3. First frame of each region.</figcaption>")
     fout.write("</figure>")
 
     for index in range(len(results.get_regions())):
@@ -276,11 +276,14 @@ def write_html_region(fout, results, index, images, fps, scale, units):
     if counts[0] > 0 or counts[1] > 0:
         fout.write(make_html_speeds_table(calculator, units))
 
-    fout.write("<figure>")
-    for image in images:
-        fout.write(f"<img src=\"{image}\" width=\"10%\">\n")
-    fout.write("<br><figcaption><i>The region at each key frame.</i></figcaption>")
-    fout.write("</figure>")
+        fig_number = 4 + index
+        fout.write("<figure>")
+        for image in images:
+            fout.write(f"<img src=\"{image}\" width=\"10%\">\n")
+        fout.write(f"<br><figcaption>Fig {fig_number}. The region at each key frame.</figcaption>")
+        fout.write("</figure>")
+    else:
+        fout.write("<p>No markers defined in the region.")
 
 def write_html_report_end(fout):
     '''

@@ -45,7 +45,6 @@ class ReportStatus(enum.Enum):
     ## upto date report exists
     UPTO_DATE_REPORT = 2
 
-
 class ReportWidget(qw.QWidget, Ui_ReportWidget):
     """
     a widget for viewing the current HTML report
@@ -73,7 +72,6 @@ class ReportWidget(qw.QWidget, Ui_ReportWidget):
         enable/disable widget
         """
         status = self.uptodate_report_exists()
-        print(status.name)
         if enabled:
             if status == ReportStatus.NO_VALID_REPORT:
                 make = self.question(self.tr("No valid report can be found. Make one?"))
