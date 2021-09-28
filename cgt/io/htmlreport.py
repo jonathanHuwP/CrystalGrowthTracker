@@ -117,15 +117,19 @@ def write_html_stats(fout, report_dir):
                " of each region containing a crystal.</figcaption>")
     fout.write("</figure>")
 
-def make_html_speeds_table(calculator, units):
+def make_html_speeds_table(calculator, units, speed_table_count):
     """
     make a table of results
+        Args:
+            calculator (VelocitiesCalculator): the calculator holding the results
+            units (string): the units of measure
+            speed_table_count (itertools.count): counter for the tables
     """
     calculator.process_latest_data()
     average_speeds = calculator.get_average_speeds()
 
     html_table = ["<table style=\"margin-bottom:5mm;\" class=\"hg-pdf\">"]
-    html_table.append("""<caption>Speeds of the markers.</caption>\n""")
+    html_table.append(f"""<caption>Table {next(speed_table_count)}. Speeds of the markers.</caption>\n""")
 
     html_table.append(f"<tr><th>Marker ID</th><th>Type</th><th>Speed ({units} s<sup>-1</sup>)</th></tr>")
     for item in average_speeds:
@@ -221,14 +225,15 @@ def write_html_regions(fout, project, image_files, region_image_files, frame_ima
     fout.write("</figure>")
 
     html_table = ["<table style=\"margin-bottom:5mm;\">"]
-    html_table.append("""<caption>Summary of the regions.</caption>\n""")
+    html_table.append("""<caption>Table 1. The top-left and bottom-right corners defining each region. The origin of the coordinates is the top left hand of the image, with x measured to the right and y downward.</caption>\n""")
 
-    html_table.append("<tr><th>Region ID</th><th>Top Left (pixels)</th><th>Bottom Right (pixels)</th></tr>")
+    html_table.append("<tr><th rowspan=\"2\">Region ID</th><th colspan=\"2\">Top Left (pixels)</th><th colspan=\"2\">Bottom Right (pixels)</th></tr>")
+    html_table.append("<tr><th>x</th><th>y</th><th>x</th><th>y</th></tr>")
     for i, region in enumerate(results.get_regions()):
         rect = get_rect_even_dimensions(region, False)
-        top_left = f"({rect.topLeft().x():.1f}, {rect.topLeft().y():.1f})"
-        bottom_right = f"({rect.bottomRight().x():.1f}, {rect.bottomRight().y():.1f})"
-        html_table.append(f"<tr><td>{i}</td><td>{top_left}</td><td>{bottom_right}</td></tr>")
+        top_left = f"<td>{rect.topLeft().x()}</td><td>{rect.topLeft().y()}</td>"
+        bottom_right = f"<td>{rect.bottomRight().x()}</td><td>{rect.bottomRight().y()}</td>"
+        html_table.append(f"<tr><td>{i}</td>{top_left}{bottom_right}</tr>")
 
     html_table.append("</table>")
 
@@ -239,22 +244,25 @@ def write_html_regions(fout, project, image_files, region_image_files, frame_ima
     fout.write("<br><figcaption>Fig 3. First frame of each region.</figcaption>")
     fout.write("</figure>")
 
+    speeds_table_count = itertools.count(2)
     for index in range(len(results.get_regions())):
         write_html_region(fout,
                           results,
                           index,
+                          speeds_table_count,
                           frame_image_files[index],
                           project["frame_rate"],
                           project["resolution"],
                           project["resolution_units"])
 
-def write_html_region(fout, results, index, images, fps, scale, units):
+def write_html_region(fout, results, index, speeds_table_count, images, fps, scale, units):
     '''
     Creates the section for each region in the html report.
         Args:
             fout (TextIOWrapper): output file stream
             results (VideoAnalysisResultsStore): The project results data
             index (int): The index for the crystal that is being reported.
+            speeds_table_count (itertools.count): counter for table number
             images ([pathlib.Path]): paths to images of region at each key frame
             fps (np.float64): the number of frames per second
             scale (np.float64): the size of a pixel
@@ -274,7 +282,7 @@ def write_html_region(fout, results, index, images, fps, scale, units):
     calculator = VelocitiesCalculator(lines, points, fps, scale)
     counts = calculator.number_markers()
     if counts[0] > 0 or counts[1] > 0:
-        fout.write(make_html_speeds_table(calculator, units))
+        fout.write(make_html_speeds_table(calculator, units, speeds_table_count))
 
         fig_number = 4 + index
         fout.write("<figure>")
