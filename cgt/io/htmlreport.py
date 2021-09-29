@@ -26,6 +26,7 @@ import json
 from datetime import datetime
 import pathlib
 import itertools
+import getpass
 
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
@@ -192,19 +193,22 @@ def write_html_report_start(fout, project):
 
     timestamp = datetime.now()
     date, time = to_date_and_time(timestamp)
-    fout.write(f"<p>Report generated on: {date} at {time}</p>")
+    fout.write(f"<p>Report generated on: {date} at {time} by {getpass.getuser()}</p>\n")
 
-    report_info = (r"<p>This project was started at "+project['start_datetime']+r" on machine "
-                   +project['host']+r".</p>"
-                   +r"<p>The video file, "+str(project['enhanced_video_no_path'])
-                   +r" was analysed and has a frame rate of "+str(project['frame_rate'])
-                   +" frames per second, and a resolution of " +str(project['resolution'])
-                   +str(project['resolution_units'])+" per pixel. Pixels are assumed to be square.</p>"
-                   + "<p>Caution: sometimes the frame rate and resolution "
-                   +"are changed in the video header when the video is being "
-                   +"pre-processed.</p>\n")
+    tmp = project['start_datetime']
+    date, time = to_date_and_time(datetime.strptime(tmp, '%Y-%m-%d_%H-%M-%S'))
+    fout.write(f"<p>This project was started on {date} at {time} on machine "+project['host']+".</p>\n")
 
-    fout.write(report_info)
+    fout.write("<table>\n")
+    fout.write("<tr><td>Enhanced Video</td><td>"+str(project['enhanced_video_no_path'])+"</td></tr>\n")
+    fout.write("<tr><td>Raw Video</td><td>"+str(project['enhanced_video_no_path'])+"</td></tr>\n")
+    fout.write("<tr><td>Frame Rate</td><td>"+str(project['frame_rate'])+" s<sup>-1</sup></td></tr>\n")
+    fout.write("<tr><td>Resolution</td><td>" +str(project['resolution'])+str(project['resolution_units'])+"<sup>-1</sup></td></tr>\n")
+    fout.write("</table>")
+
+    fout.write("<p>Caution: sometimes the frame rate and resolution "
+                +"are changed in the video header when the video is being "
+                +"pre-processed.</p>\n")
 
 def write_html_regions(fout, project, image_files, region_image_files, frame_image_files):
     """
