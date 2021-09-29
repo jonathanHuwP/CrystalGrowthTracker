@@ -197,13 +197,13 @@ def write_html_report_start(fout, project):
 
     tmp = project['start_datetime']
     date, time = to_date_and_time(datetime.strptime(tmp, '%Y-%m-%d_%H-%M-%S'))
-    fout.write(f"<p>This project was started on {date} at {time} on machine "+project['host']+".</p>\n")
+    fout.write(f"<p>This project was started on {date} at {time} by "+project['start_user']+" on machine "+project['host']+".</p>\n")
 
     fout.write("<table>\n")
     fout.write("<tr><td>Enhanced Video</td><td>"+str(project['enhanced_video_no_path'])+"</td></tr>\n")
     fout.write("<tr><td>Raw Video</td><td>"+str(project['enhanced_video_no_path'])+"</td></tr>\n")
     fout.write("<tr><td>Frame Rate</td><td>"+str(project['frame_rate'])+" s<sup>-1</sup></td></tr>\n")
-    fout.write("<tr><td>Resolution</td><td>" +str(project['resolution'])+str(project['resolution_units'])+"<sup>-1</sup></td></tr>\n")
+    fout.write("<tr><td>Resolution</td><td>" +str(project['resolution'])+str(project['resolution_units'])+" pixel<sup>-1</sup></td></tr>\n")
     fout.write("</table>")
 
     fout.write("<p>Caution: sometimes the frame rate and resolution "
