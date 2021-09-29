@@ -200,6 +200,7 @@ def write_html_report_start(fout, project):
     fout.write(f"<p>This project was started on {date} at {time} by "+project['start_user']+" on machine "+project['host']+".</p>\n")
 
     fout.write("<table>\n")
+    fout.write("<caption>Table 1. Project Proporties.</caption>")
     fout.write("<tr><td>Enhanced Video</td><td>"+str(project['enhanced_video_no_path'])+"</td></tr>\n")
     fout.write("<tr><td>Raw Video</td><td>"+str(project['enhanced_video_no_path'])+"</td></tr>\n")
     fout.write("<tr><td>Frame Rate</td><td>"+str(project['frame_rate'])+" s<sup>-1</sup></td></tr>\n")
@@ -229,7 +230,7 @@ def write_html_regions(fout, project, image_files, region_image_files, frame_ima
     fout.write("</figure>")
 
     html_table = ["<table style=\"margin-bottom:5mm;\">"]
-    html_table.append("""<caption>Table 1. The top-left and bottom-right corners defining each region. The origin of the coordinates is the top left hand of the image, with x measured to the right and y downward.</caption>\n""")
+    html_table.append("""<caption>Table 2. The top-left and bottom-right corners defining each region. The origin of the coordinates is the top left hand of the image, with x measured to the right and y downward.</caption>\n""")
 
     html_table.append("<tr><th rowspan=\"2\">Region ID</th><th colspan=\"2\">Top Left (pixels)</th><th colspan=\"2\">Bottom Right (pixels)</th></tr>")
     html_table.append("<tr><th>x</th><th>y</th><th>x</th><th>y</th></tr>")
@@ -248,7 +249,7 @@ def write_html_regions(fout, project, image_files, region_image_files, frame_ima
     fout.write("<br><figcaption>Fig 3. First frame of each region.</figcaption>")
     fout.write("</figure>")
 
-    speeds_table_count = itertools.count(2)
+    speeds_table_count = itertools.count(3)
     for index in range(len(results.get_regions())):
         write_html_region(fout,
                           results,
