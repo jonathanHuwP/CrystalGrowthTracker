@@ -25,7 +25,7 @@ import unittest
 import datetime as dt
 import sys
 
-import cgt.videoanalysisresultsstore as vas
+import cgt.model.videoanalysisresultsstore as vas
 from cgt.region import Region
 import cgt.imagelinesegment as ia
 
