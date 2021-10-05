@@ -26,8 +26,8 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
 import PyQt5.QtWebEngineWidgets as qe
 
-from cgt.util.utils import (make_report_file_names,
-                            hash_results)
+from cgt.util.utils import make_report_file_names
+from cgt.util.markers import hash_results
 
 # import UI
 from cgt.gui.Ui_reportwidget import Ui_ReportWidget

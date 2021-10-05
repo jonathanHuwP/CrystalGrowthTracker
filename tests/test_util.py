@@ -15,15 +15,17 @@ specific language governing permissions and limitations under the License.
 @copyright 2020
 @author: j.h.pickering@leeds.ac.uk
 """
-
 # set up linting conditions
 # pylint: disable = too-many-public-methods
 # pylint: disable = c-extension-no-member
 
 import unittest
 
-
 class TestUtilFunctions(unittest.TestCase):
+    """
+    test harness for utility functions
+    """
+
     def setUp(self):
         pass
 

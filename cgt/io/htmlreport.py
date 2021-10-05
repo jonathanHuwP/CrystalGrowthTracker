@@ -33,10 +33,10 @@ import PyQt5.QtCore as qc
 
 from cgt.model.velocitiescalculator import VelocitiesCalculator
 from cgt.io.mpl import OffScreenRender, render_graph
-from cgt.util.utils import (get_rect_even_dimensions,
-                            hash_results,
-                            make_report_file_names,
-                            get_region)
+from cgt.util.utils import (make_report_file_names,
+                            get_rect_even_dimensions)
+from cgt.util.markers import (hash_results,
+                              get_region)
 
 class ReportMaker(qc.QObject):
     """

@@ -35,9 +35,9 @@ import PyQt5.QtGui as qg
 from cgt.gui.markupview import MarkUpStates
 from cgt.gui.resultsstoreproxy import ResultsStoreProxy
 from cgt.gui.videobasewidget import PlayStates
-from cgt.util.utils import (get_region,
-                            get_frame,
-                            hash_marker)
+from cgt.util.markers import (get_region,
+                              get_frame,
+                              hash_marker)
 
 # import UI
 from cgt.gui.Ui_markupwidget import Ui_MarkUpWidget

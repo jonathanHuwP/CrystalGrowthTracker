@@ -31,13 +31,13 @@ import PyQt5.QtCore as qc
 import PyQt5.QtWidgets as qw
 
 from cgt.gui.videobaseview import VideoBaseView
-from cgt.util.utils import (hash_graphics_line,
-                            hash_graphics_point,
-                            get_marker_type,
-                            MarkerTypes,
-                            ItemDataTypes,
-                            make_cross_path,
-                            hash_marker)
+from cgt.util.utils import make_cross_path
+from cgt.util.markers import (hash_graphics_line,
+                              hash_graphics_point,
+                              get_marker_type,
+                              MarkerTypes,
+                              ItemDataTypes,
+                              hash_marker)
 
 ## containger of moving a marker
 class MarkerInMotion():

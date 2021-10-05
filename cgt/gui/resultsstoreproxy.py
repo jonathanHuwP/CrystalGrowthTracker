@@ -23,18 +23,19 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 
 import PyQt5.QtCore as qc
 
-from cgt.util.utils import (ItemDataTypes,
-                            MarkerTypes,
-                            make_arrow,
-                            make_arrow_head,
-                            get_marker_type,
-                            get_parent_hash,
-                            get_region,
-                            get_frame,
-                            get_point_of_point,
-                            hash_marker,
-                            hash_graphics_line,
-                            hash_graphics_point)
+from cgt.util.markers import (ItemDataTypes,
+                              MarkerTypes,
+                              get_marker_type,
+                              get_parent_hash,
+                              get_region,
+                              get_frame,
+                              get_point_of_point,
+                              hash_marker,
+                              hash_graphics_line,
+                              hash_graphics_point)
+
+from cgt.util.utils import (make_arrow,
+                            make_arrow_head)
 
 class ResultsStoreProxy():
     """

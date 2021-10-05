@@ -27,12 +27,12 @@ import PyQt5.QtGui as qg
 
 from cgt.model.velocitiescalculator import VelocitiesCalculator
 from cgt.io.mpl import make_mplcanvas, draw_displacements
-from cgt.util.utils import (ItemDataTypes,
-                            MarkerTypes,
-                            get_region,
-                            hash_graphics_line,
-                            hash_graphics_point,
-                            get_frame)
+from cgt.util.markers import (ItemDataTypes,
+                              MarkerTypes,
+                              get_region,
+                              hash_graphics_line,
+                              hash_graphics_point,
+                              get_frame)
 
 from cgt.gui.Ui_resultswidget import Ui_ResultsWidget
 

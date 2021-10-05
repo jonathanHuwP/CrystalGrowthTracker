@@ -25,7 +25,7 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
 import PyQt5.QtGui as qg
 
-import cgt.util.utils as utils
+from cgt.util.utils import make_report_file_names
 
 class OffScreenRender():
     """
@@ -49,7 +49,7 @@ class OffScreenRender():
         """
         get a list of all the pixmaps
         """
-        rpt_dir, _, _ = utils.make_report_file_names(self._project["proj_full_path"])
+        rpt_dir, _, _ = make_report_file_names(self._project["proj_full_path"])
         image_dir = rpt_dir.joinpath("images")
         images = [i for i in image_dir.iterdir() if i.suffix == ".ppm"]
         return images

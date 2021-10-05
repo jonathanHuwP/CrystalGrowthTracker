@@ -24,14 +24,14 @@ import bisect
 
 import PyQt5.QtCore as qc
 
-from cgt.util.utils import (ItemDataTypes,
-                            MarkerTypes,
-                            get_parent_hash,
-                            hash_graphics_point,
-                            hash_graphics_line,
-                            get_frame,
-                            get_region,
-                            get_marker_type)
+from cgt.util.markers import (ItemDataTypes,
+                              MarkerTypes,
+                              get_parent_hash,
+                              hash_graphics_point,
+                              hash_graphics_line,
+                              get_frame,
+                              get_region,
+                              get_marker_type)
 
 class DataTypes(enum.IntEnum):
     """

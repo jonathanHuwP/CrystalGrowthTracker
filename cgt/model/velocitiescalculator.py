@@ -22,10 +22,10 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 from collections import namedtuple
 from math import sqrt
 
-from cgt.util.utils import (MarkerTypes,
-                            get_point_of_point,
-                            get_frame,
-                            perpendicular_dist_to_position)
+from cgt.util.markers import (MarkerTypes,
+                              get_point_of_point,
+                              get_frame)
+from cgt.util.utils import perpendicular_dist_to_position
 
 class ScreenDisplacement():
     """data type for a single marker displacement"""

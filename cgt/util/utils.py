@@ -1,9 +1,5 @@
+## -*- coding: utf-8 -*-
 '''
-utils.py
-
-This python module contains useful functions that are needed for the
- CrystalGrowthTracker application.
-
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 this file except in compliance with the License. You may obtain a copy of the
 License at http://www.apache.org/licenses/LICENSE-2.0
@@ -20,16 +16,13 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 '''
 # set up linting conditions
 # pylint: disable = c-extension-no-member
-
-import enum
 import socket
 import datetime
 import pathlib
 
 from sys import platform as _platform
 import array as arr
-from math import sqrt
-import math
+from math import (sqrt, isfinite)
 
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
@@ -37,40 +30,7 @@ import PyQt5.QtWidgets as qw
 
 import numpy as np
 
-class MarkerTypes(enum.IntEnum):
-    """
-    define the types of marker used in images
-    """
-    ## mark a line
-    LINE = 1
-
-    ## mark a point
-    POINT = 2
-
-    ## a region
-    REGION=4
-
-    ## not in any other.
-    DECORATOR = 8
-
-class ItemDataTypes(enum.IntEnum):
-    """
-    define the indices for storing data in QGraphicsItem
-    """
-    ## store for the type of data item
-    ITEM_TYPE = 0
-
-    ## store for parent hash code
-    PARENT_HASH = 1
-
-    ## store for the number of the frame in which the artifact was defined
-    FRAME_NUMBER = 2
-
-    ## the index number of the region in which the mark is defined
-    REGION_INDEX = 3
-
-    ## for a cross the centre point
-    CROSS_CENTRE = 4
+from cgt.util.markers import hash_results
 
 def memview_3b_to_qpixmap(pixels, width, height):
     """
@@ -97,14 +57,12 @@ def memview_3b_to_qpixmap(pixels, width, height):
 
     return qg.QPixmap.fromImage(image)
 
-def nparray_to_qimage(array, brg=False):
+def nparray_to_qimage(array):
     """
     convert an image in numpy array format to a QImage (Qt editing type)
-
         Args:
             array (np.array uint=8) the numpy array
             brg (bool) if True is blue/red/green format, else RGB
-
         Returns:
             a QImage Qt image manipulation format
     """
@@ -157,16 +115,12 @@ def qimage_to_nparray(image):
     return array.copy()
 
 def find_hostname_and_ip():
-    """Finds the hostname and IP address to go in the log file.
-
-    Args:
-       No arguments
-
-    Returns:
-       host (str): Name of the host machine executing the script.
-       ip_address (str): IP adress of the machine that runs the script.
-       operating_system (str): Operating system of the machine that runs the script.
-
+    """
+    Finds the hostname and IP address to go in the log file.
+        Returns:
+            host (str): Name of the host machine executing the script.
+            ip_address (str): IP adress of the machine that runs the script.
+            operating_system (str): Operating system of the machine that runs the script.
     """
     host = 'undetermined'
     ip_address = 'undetermined'
@@ -204,11 +158,10 @@ def find_hostname_and_ip():
     return host, ip_address, operating_system
 
 def timestamp():
-    ''' Gets the date and time from the operating system and turns it into
-        a string used as a time stamp. This function allows consistency in the
-        format of the time stamp string.
-        Args:
-            NONE
+    '''
+    Gets the date and time from the operating system and turns it into
+    a string used as a time stamp. This function allows consistency in the
+    format of the time stamp string.
         Returns:
             timestamp (str):  In the format of year_month_day_hour_minute_second.
     '''
@@ -217,11 +170,9 @@ def timestamp():
 def difference_to_distance(difference, scale):
     """
     convert a difference object to distance to
-
         Args:
             difference (ImageLineDifference) the difference
             scale (float) the pixel size
-
         Returns:
             the average seperation as a distance
     """
@@ -230,12 +181,10 @@ def difference_to_distance(difference, scale):
 def difference_list_to_velocities(diff_list, scale, fps):
     """
     converts a list of (frame interval, difference) tuples to a list of velocities
-
         Args:
             diff_list (tuple(int, ImageLineDifference)) the list of inputs
             scale (float) the size of a pixel
             fps (int) the number of frames per second
-
         Returns:
             a list of velocities
     """
@@ -308,188 +257,7 @@ def length_squared(point):
     """
     return point.x()*point.x() + point.y()*point.y()
 
-def hash_marker(marker):
-    """
-    find hash code for marker
-        Args:
-            marker (QGraphicsItem) the item to hash
-        Returns:
-            hash code or None if not appropriate type
-    """
-    m_type = get_marker_type(marker)
 
-    if m_type == MarkerTypes.LINE:
-        return hash_graphics_line(marker)
-
-    if m_type == MarkerTypes.POINT:
-        return hash_graphics_point(marker)
-
-    return None
-
-def hash_graphics_line(line):
-    """
-    a hash function for QGraphicsLineItem,
-        Args:
-            line (QGraphicsLineItem) the line
-        Returns:
-            hash of tuple (line hash, position hash, frame)
-    """
-    hashes = (hash_qlinef(line.line()),
-                          hash_qpointf(line.pos()),
-                          hash(line.data(ItemDataTypes.FRAME_NUMBER)))
-
-    return hash(hashes)
-
-def hash_graphics_point(point):
-    """
-    a hash function for QGraphicsPathItem,
-        Args:
-            line (QGraphicsPathItem) the line
-        Returns:
-            hash of tuple (centre hash, position hash, frame number)
-    """
-    hashes = (hash_qpointf(point.data(ItemDataTypes.CROSS_CENTRE)),
-              hash_qpointf(point.pos()),
-              hash(point.data(ItemDataTypes.FRAME_NUMBER)))
-
-    return hash(hashes)
-
-def hash_qlinef(line):
-    """
-    a hash function for QLineF,
-        Args:
-            line (QLineF) the line
-        Returns:
-            hash of tuple formed from end point coordinates (x1, x2, y1, y2)
-    """
-    coords = (line.x1(), line.x2(), line.y1(), line.y2())
-    return hash(coords)
-
-def hash_qpointf(point):
-    """
-    a hash function for QPontF,
-        Args:
-            point (QpointF) the point
-        Returns:
-            hash of tuple formed from end point coordinates (x, y)
-    """
-    coords = (point.x(), point.y())
-    return hash(coords)
-
-def hash_framestats(stats):
-    """
-    get a hash code for the statistics of one frame of video
-        Return:
-            (int) hash code
-    """
-    items = []
-    items.append(stats.mean)
-    items.append(stats.std_deviation)
-    for count in stats.bin_counts:
-        items.append(count)
-
-    return hash(tuple(items))
-
-def hash_videointensitystats(stats):
-    """
-    get hashcode for a complet set of video stats
-        Return:
-            (int) hash code
-    """
-    items = []
-    for stat in stats.get_frames():
-        items.append(hash_framestats(stat))
-
-    for s_bin in stats.get_bins():
-        items.append(hash(s_bin))
-
-    return hash(tuple(items))
-
-def hash_graphics_region(region):
-    """
-    get hash code for a QGraphicsRectItem
-        Args:
-            region (QGraphicsRectItem): the region
-        Returns:
-            (int) hash code
-    """
-    rect = region.rect()
-    tmp = (hash_qpointf(rect.topLeft()), hash_qpointf(rect.bottomRight()))
-    return hash(tmp)
-
-def hash_results(results):
-    """
-    find hash of results store
-        Return:
-            (int) hash code
-    """
-    items = []
-    stats = results.get_video_statistics()
-    if stats is not None:
-        items.append(hash_videointensitystats(stats))
-
-    for marker in results.get_lines():
-        for line in marker:
-            items.append(hash_graphics_line(line))
-
-    for marker in results.get_points():
-        for point in marker:
-            items.append(hash_graphics_point(point))
-
-    for region in results.get_regions():
-        items.append(hash_graphics_region(region))
-
-    return hash(tuple(items))
-
-def get_marker_type(item):
-    """
-    get the type enum of the item
-        Args:
-            item (QGraphicsItem)
-        Returns:
-            the type enum or None
-    """
-    return item.data(ItemDataTypes.ITEM_TYPE)
-
-def get_parent_hash(item):
-    """
-    get the parent hash code of the item
-        Args:
-            item (QGraphicsItem)
-        Returns:
-            the parent hash code (int): 'p' if progenitor, or None
-    """
-    return item.data(ItemDataTypes.PARENT_HASH)
-
-def get_frame(item):
-    """
-    get the frame number of the item
-        Args:
-            item (QGraphicsItem)
-        Returns:
-            the frame number (int), or None
-    """
-    return item.data(ItemDataTypes.FRAME_NUMBER)
-
-def get_region(item):
-    """
-    get the index of the region in which the item is defined
-        Args:
-            item (QGraphicsItem)
-        Returns:
-            the region index (int), or None
-    """
-    return item.data(ItemDataTypes.REGION_INDEX)
-
-def get_point_of_point(item):
-    """
-    get the centre point of a cross
-        Args:
-            item (QGraphicsItem)
-        Returns:
-            the centre point (QPontF), or None
-    """
-    return item.data(ItemDataTypes.CROSS_CENTRE)
 
 def make_cross_path(point):
     """
@@ -532,7 +300,7 @@ def cgt_intersection(centred_normal, clone):
 
     # test if parallel
     denominator = a.y() * b.x() - a.x() * b.y()
-    if denominator == 0 or not math.isfinite(denominator):
+    if denominator == 0 or not isfinite(denominator):
         raise ArithmeticError("Clone line is parallel to parent")
 
     # find the intersection
