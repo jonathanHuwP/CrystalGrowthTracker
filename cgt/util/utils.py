@@ -30,8 +30,6 @@ import PyQt5.QtWidgets as qw
 
 import numpy as np
 
-from cgt.util.markers import hash_results
-
 def memview_3b_to_qpixmap(pixels, width, height):
     """
     convert a CPython array pixels (RGB unsingned char) to QPixmap
