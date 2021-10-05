@@ -29,6 +29,22 @@ import PyQt5.QtWidgets as qw
 
 from cgt.util.markers import (MarkerTypes, ItemDataTypes)
 
+def make_report_file_names(proj_full_path):
+    """
+    make the directory and file names for a report
+        Args:
+            proj_full_path (string): the path of the results directory
+        Returns:
+            report_dir (pathlib.Path)
+            html_outfile (pathlib.Path)
+            hash_file (pathlib.Path)
+    """
+    report_dir = pathlib.Path(proj_full_path).joinpath("report")
+    html_outfile = report_dir.joinpath("report.html")
+    hash_file = report_dir.joinpath("results_hash.json")
+
+    return (report_dir, html_outfile, hash_file)
+
 def find_hostname_and_ip():
     """
     Finds the hostname and IP address to go in the log file.
@@ -171,8 +187,6 @@ def length_squared(point):
             square of length
     """
     return point.x()*point.x() + point.y()*point.y()
-
-
 
 def make_cross_path(point):
     """
@@ -409,22 +423,6 @@ def list_to_g_line(line, pen):
     item.setZValue(1.0)
 
     return item
-
-def make_report_file_names(proj_full_path):
-    """
-    make the directory and file names for a report
-        Args:
-            proj_full_path (string): the path of the results directory
-        Returns:
-            report_dir (pathlib.Path)
-            html_outfile (pathlib.Path)
-            hash_file (pathlib.Path)
-    """
-    report_dir = pathlib.Path(proj_full_path).joinpath("report")
-    html_outfile = report_dir.joinpath("report.html")
-    hash_file = report_dir.joinpath("results_hash.json")
-
-    return (report_dir, html_outfile, hash_file)
 
 def get_rect_even_dimensions(rect_item, even_dimensions=True):
     """
