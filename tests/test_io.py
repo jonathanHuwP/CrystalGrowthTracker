@@ -19,7 +19,7 @@ import unittest
 
 class TestIO(unittest.TestCase):
     """
-    advanced tests of Results class
+    advanced tests of IO units
     """
 
     def setUp(self):
@@ -31,5 +31,11 @@ class TestIO(unittest.TestCase):
     def tearDown(self):
         """
         delete widget
+        """
+        pass
+
+    def test_write(self):
+        """
+        test output
         """
         pass

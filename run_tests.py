@@ -46,9 +46,6 @@ def run_tests(args):
     test_dir = './tests'
     suite = loader.discover(test_dir)
 
-    for test in suite:
-        print(test)
-    return
     verbosity = 2
     if args.quiet:
         verbosity = 1
