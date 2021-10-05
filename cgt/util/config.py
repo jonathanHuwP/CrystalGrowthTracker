@@ -1,6 +1,6 @@
 ## -*- coding: utf-8 -*-
 """
-Created on Wed Sept 56 2021
+Created Sept 2021
 
 This module contains the top level graphical user interface for measuring the
 growth rates of crystals observed in videos taken using an X-ray synchrotron source
