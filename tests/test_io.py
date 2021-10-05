@@ -15,26 +15,21 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 @copyright 2020
 @author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 '''
-from cgt.model.cgtproject import CGTProject
-from cgt.io.readcsvreports import read_csv_project
+import unittest
 
-def test_io(path):
+class TestIO(unittest.TestCase):
     """
-    TODO turn this into a proper io unit test
+    advanced tests of Results class
     """
-    proj = CGTProject()
 
-    read_csv_project(path, proj)
+    def setUp(self):
+        """
+        build a full test class
+        """
+        pass
 
-    results = proj["results"]
-    print("Regions\n=======")
-    for region in results.get_regions():
-        print(region)
-    print("\nLines\n======")
-    for line in results.get_lines():
-        print(line)
-        for key in line.keys():
-            print(f"\tFrame {key} => {line[key]}")
-
-if __name__ == "__main__":
-    test_io(r"C:\Users\jhp11\tmp\ns_02")
+    def tearDown(self):
+        """
+        delete widget
+        """
+        pass
