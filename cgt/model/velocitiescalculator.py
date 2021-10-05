@@ -25,7 +25,7 @@ from math import sqrt
 from cgt.util.markers import (MarkerTypes,
                               get_point_of_point,
                               get_frame)
-from cgt.util.utils import perpendicular_dist_to_position
+from cgt.util.scenegraphitems import perpendicular_dist_to_position
 
 class ScreenDisplacement():
     """data type for a single marker displacement"""

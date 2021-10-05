@@ -28,7 +28,7 @@ import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
 from cgt.gui.videobaseview import VideoBaseView
-from cgt.util.utils import (make_positive_rect, length_squared)
+from cgt.util.scenegraphitems import (make_positive_rect, length_squared)
 
 ## storage for a rectangle being drawn, start point + current rectangle
 UnfinishedRect = namedtuple("UnfinishedRect", ["start_point", "graphics_rect"])

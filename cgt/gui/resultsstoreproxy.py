@@ -34,8 +34,8 @@ from cgt.util.markers import (ItemDataTypes,
                               hash_graphics_line,
                               hash_graphics_point)
 
-from cgt.util.utils import (make_arrow,
-                            make_arrow_head)
+from cgt.util.scenegraphitems import (make_arrow,
+                                      make_arrow_head)
 
 class ResultsStoreProxy():
     """

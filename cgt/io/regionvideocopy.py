@@ -29,7 +29,7 @@ import os
 import PyQt5.QtGui as qg
 
 from cgt.io.ffmpegbase import FfmpegBase
-from cgt.util.utils import get_rect_even_dimensions
+from cgt.util.scenegraphitems import get_rect_even_dimensions
 
 class RegionVideoCopy(FfmpegBase):
     """

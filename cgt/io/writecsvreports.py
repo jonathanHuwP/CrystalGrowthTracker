@@ -22,9 +22,9 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 import pathlib
 import csv
 
-from cgt.util.utils import (rect_to_tuple,
-                            g_point_to_tuple,
-                            g_line_to_tuple)
+from cgt.util.scenegraphitems import (rect_to_tuple,
+                                      g_point_to_tuple,
+                                      g_line_to_tuple)
 
 def save_csv_project(project):
     """

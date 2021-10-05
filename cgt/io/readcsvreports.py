@@ -36,8 +36,8 @@ import PyQt5.QtWidgets as qw
 from cgt.util.framestats import FrameStats, VideoIntensityStats
 from cgt.util.markers import(get_region,
                              get_frame)
-from cgt.util.utils import (list_to_g_point,
-                            list_to_g_line)
+from cgt.util.scenegraphitems import (list_to_g_point,
+                                      list_to_g_line)
 
 def read_csv_project(results_dir, new_project, pens):
     '''Coordinates the reading of a selection of csv reports.
