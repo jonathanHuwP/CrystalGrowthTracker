@@ -20,8 +20,10 @@ specific language governing permissions and limitations under the License.
 
 import unittest
 
+from cgt.util.markers import MarkerTypes
 from cgt.model.velocitiescalculator import (ScreenDisplacement,
                                             VelocitiesCalculator)
+import tests.makeresults as mkres
 
 class TestDisplacements(unittest.TestCase):
     """
@@ -83,20 +85,37 @@ class TestVelocities(unittest.TestCase):
         """
         initalize objects
         """
-        self._calculator = None#VelocitiesCalculator()
+        self._points = mkres.make_test_points()
+        self._lines = mkres.make_test_lines()
+        self._fps = 10.0
+        self._scale = 1.5
+
+        self._calculator = VelocitiesCalculator(self._lines,
+                                                self._points,
+                                                self._fps,
+                                                self._scale)
+
+        self._calculator.process_latest_data()
 
     def tearDown(self):
         """
         clean up
         """
-        pass #del self._calculator
+        del self._calculator
 
     def test_calculator(self):
         """
         ensure calculator works
         """
-        message = "something is wrong"
-        self.assertTrue(True, message)
+        speeds = self._calculator.get_average_speeds()
+
+        for speed in speeds:
+            if speed.m_type is MarkerTypes.POINT:
+                message = "point speed is wrong"
+                self.assertAlmostEqual(8.3853, speed.speed, places=4, msg=message)
+            elif speed.m_type is MarkerTypes.LINE:
+                message = "line speed is wrong"
+                self.assertAlmostEqual(7.5, speed.speed, places=4, msg=message)
 
 if __name__ == "__main__":
     unittest.main()
