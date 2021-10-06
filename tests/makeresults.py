@@ -17,11 +17,10 @@ specific language governing permissions and limitations under the License.
 # set up linting conditions
 # pylint: disable = too-many-public-methods
 # pylint: disable = c-extension-no-member
+from collections import namedtuple
 
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
-
-from collections import namedtuple
 
 from cgt.util.scenegraphitems import list_to_g_line, list_to_g_point
 
@@ -90,19 +89,3 @@ def make_test_lines():
         lines.append(list_to_g_line(line_list, pen))
 
     return [lines]
-
-def main():
-    for region in make_regions():
-        print(region)
-
-    for kf in make_key_frames().items():
-        print(kf)
-
-    for point in make_test_points():
-        print(point)
-
-    for line in make_test_lines():
-        print(line)
-
-if __name__ == "__main__":
-    main()

@@ -78,7 +78,7 @@ class TestDisplacements(unittest.TestCase):
 
 class TestVelocities(unittest.TestCase):
     """
-    test
+    test the velocities calculator class
     """
 
     def setUp(self):
