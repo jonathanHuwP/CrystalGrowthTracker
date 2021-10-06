@@ -19,6 +19,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # set up linting conditions
 # pylint: disable = too-many-public-methods
 # pylint: disable = too-many-arguments
+# pylint: disable = c-extension-no-member
 import enum
 import bisect
 
@@ -49,14 +50,13 @@ class DataTypes(enum.IntEnum):
     ## a key frame
     KEY_FRAME = 3
 
-
 class VideoAnalysisResultsStore(qc.QObject):
     """
     a storage class that records the results of a video analysis
     """
 
     ## signal to indicate that the contents has changed
-    ## 0 any
+    ## 0 any change
     ## 1 Region added
     data_changed = qc.pyqtSignal(int)
 
@@ -345,7 +345,7 @@ class VideoAnalysisResultsStore(qc.QObject):
                 LookupError if there is no match
         """
         hash_code = get_parent_hash(line)
-        for i in range(len(self._lines)):
+        for i, _ in enumerate(self._lines):
             for line_move in self._lines[i]:
                 if hash_graphics_line(line_move) == hash_code:
                     return i
@@ -381,7 +381,7 @@ class VideoAnalysisResultsStore(qc.QObject):
                 LookupError if there is no match
         """
         hash_code = get_parent_hash(point)
-        for i in range(len(self._points)):
+        for i, _ in enumerate(self._points):
             for point_move in self._points[i]:
                 if hash_graphics_point(point_move) == hash_code:
                     return i

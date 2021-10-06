@@ -17,13 +17,14 @@ specific language governing permissions and limitations under the License.
 @copyright 2020
 @author: j.h.pickering@leeds.ac.uk
 """
-
 # set up linting conditions
 # pylint: disable = too-many-public-methods
 # pylint: disable = c-extension-no-member
 import unittest
 
-import cgt.model.videoanalysisresultsstore as vas
+import PyQt5.QtCore as qc
+
+from cgt.model.videoanalysisresultsstore import VideoAnalysisResultsStore
 
 class TestResults(unittest.TestCase):
     """
@@ -34,27 +35,60 @@ class TestResults(unittest.TestCase):
         """
         build a full test class
         """
-        self._top = 450
-        self._left = 200
-        self._bottom = 675
-        self._right = 500
-        self._start_frame = 250
-        self._stop_frame = 500
+        self._store = VideoAnalysisResultsStore(None)
 
     def tearDown(self):
         """
         delete the test class
         """
-        self._top = None
-        self._left = None
-        self._bottom = None
-        self._right = None
-        self._start_frame = None
-        self._stop_frame = None
-        self._test_result = None
+        del self._store
 
-    def test_data(self):
-        pass
+    def test_initial_state(self):
+        """
+        test the inital state of the object
+        """
+        message = "store initalized in state changed"
+        self.assertFalse(self._store.has_been_changed(), message)
+
+    def test_add_region(self):
+        """
+        test the addition of a region
+        """
+        rect = self.add_region()
+        regions = self._store.get_regions()
+
+        number = len(regions)
+        message = f"regions list is the wrong length: {number} instead of 1"
+        self.assertEqual(1, number, message)
+        message = "region not stored correctly"
+        self.assertEqual(rect, regions[0], message)
+
+    def test_add_keyframe(self):
+        """
+        test the additon of a key frame to region
+        """
+        frame = 200
+        self.add_region()
+        self._store.add_key_frame(0, frame)
+
+        frames = self._store.get_key_frames(0)
+        number = len(frames)
+
+        message = "wrong number of key frames: {number} should be 1"
+        self.assertEqual(1, number, message)
+        message = "key frame wrong: {frams[0]} should be {frame}"
+        self.assertEqual(frame, frames[0], message)
+
+    def add_region(self):
+        """
+        add a region
+            Returns:
+                region (QRect): the region added
+        """
+        rect = qc.QRect(0, 0, 100, 50)
+        self._store.add_region(rect)
+
+        return rect
 
 if __name__ == "__main__":
     unittest.main()

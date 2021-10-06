@@ -37,7 +37,7 @@ class TestProject(unittest.TestCase):
         """
         delete widget
         """
-        pass
+        del self._project
 
     def test_create_project(self):
         """
