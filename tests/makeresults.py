@@ -21,7 +21,18 @@ specific language governing permissions and limitations under the License.
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
+from collections import namedtuple
+
 from cgt.util.scenegraphitems import list_to_g_line, list_to_g_point
+
+## store for test values
+TestValues = namedtuple("TestValues", ["fps", "scale", "point_speed", "line_speed"])
+
+def get_test_values():
+    """
+    get the values needed to set up and carry out the test
+    """
+    return TestValues(10.0, 1.5, 8.3853, 7.5)
 
 def make_regions():
     """

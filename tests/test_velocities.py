@@ -87,13 +87,12 @@ class TestVelocities(unittest.TestCase):
         """
         self._points = mkres.make_test_points()
         self._lines = mkres.make_test_lines()
-        self._fps = 10.0
-        self._scale = 1.5
+        self._test_values = mkres.get_test_values()
 
         self._calculator = VelocitiesCalculator(self._lines,
                                                 self._points,
-                                                self._fps,
-                                                self._scale)
+                                                self._test_values.fps,
+                                                self._test_values.scale)
 
         self._calculator.process_latest_data()
 
@@ -112,10 +111,17 @@ class TestVelocities(unittest.TestCase):
         for speed in speeds:
             if speed.m_type is MarkerTypes.POINT:
                 message = "point speed is wrong"
-                self.assertAlmostEqual(8.3853, speed.speed, places=4, msg=message)
+                self.assertAlmostEqual(self._test_values.point_speed,
+                                       speed.speed,
+                                       places=4,
+                                       msg=message)
+
             elif speed.m_type is MarkerTypes.LINE:
                 message = "line speed is wrong"
-                self.assertAlmostEqual(7.5, speed.speed, places=4, msg=message)
+                self.assertAlmostEqual(self._test_values.line_speed,
+                                       speed.speed,
+                                       places=4,
+                                       msg=message)
 
 if __name__ == "__main__":
     unittest.main()
