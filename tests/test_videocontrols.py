@@ -48,6 +48,14 @@ class TestVideoControls(unittest.TestCase):
         """
         del self._controller
 
+    def test_initial_state(self):
+        """
+        test initialized ok
+        """
+        min, max = self._controller.get_range()
+        self.assertEqual(min, 0, "minimum not zero")
+        self.assertEqual(max, 99, "maximum not 99")
+
     def test_one_frame_forward(self):
         """
         test the controller emitts the step forward signal
