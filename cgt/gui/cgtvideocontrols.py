@@ -177,27 +177,6 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         self._pauseButton.setEnabled(True)
         self._zoomSpinBox.setEnabled(True)
 
-    def play_forwards(self):
-        """
-        play the video forwards
-        """
-        self.disable_fine_controls()
-        self.forwards.emit()
-
-    def play_backwards(self):
-        """
-        play the video backwards
-        """
-        self.disable_fine_controls()
-        self.backwards.emit()
-
-    def play_pause(self):
-        """
-        pause the video
-        """
-        self.enable_fine_controls()
-        self.pause.emit()
-
     def set_frame_currently_displayed(self, frame):
         """
         set the current frame number#
@@ -207,6 +186,30 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         if self._gotoSpinBox.isEnabled():
             self._gotoSpinBox.setValue(frame)
         self.set_slider_value(frame)
+
+    @qc.pyqtSlot()
+    def play_forwards(self):
+        """
+        play the video forwards
+        """
+        self.disable_fine_controls()
+        self.forwards.emit()
+
+    @qc.pyqtSlot()
+    def play_backwards(self):
+        """
+        play the video backwards
+        """
+        self.disable_fine_controls()
+        self.backwards.emit()
+
+    @qc.pyqtSlot()
+    def play_pause(self):
+        """
+        pause the video
+        """
+        self.enable_fine_controls()
+        self.pause.emit()
 
     @qc.pyqtSlot(float)
     def zoom_changed(self, zoom):
@@ -225,7 +228,7 @@ class CGTVideoControls(qw.QWidget, Ui_CGTVideoControls):
         respond to the release of the slider
         """
         value = self._frameSlider.value()
-        self.frame_changed.emit(float(value))
+        self.frame_changed.emit(value)
 
     @qc.pyqtSlot()
     def step_up(self):

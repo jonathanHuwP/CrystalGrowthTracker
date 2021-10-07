@@ -15,6 +15,10 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 @copyright 2020
 @author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 '''
+# set up linting condition
+# pylint: disable = protected-access
+# pylint: disable = c-extension-no-member
+# pylint: disable = no-name-in-module
 import unittest
 
 import PyQt5.QtWidgets as qw
@@ -46,7 +50,7 @@ class TestVideoControls(unittest.TestCase):
 
     def test_one_frame_forward(self):
         """
-        test the controller emitts the step froward signal
+        test the controller emitts the step forward signal
         """
         spy = QSignalSpy(self._controller.one_frame_forward)
         QTest.mouseClick(self._controller._stepUpButton, qt.Qt.LeftButton)
@@ -87,3 +91,93 @@ class TestVideoControls(unittest.TestCase):
         self.assertEqual(len(spy), 1, message)
         message = "signal argument is True (forward)"
         self.assertFalse(spy[0][0], message)
+
+    def test_goto_frame_button(self):
+        """
+        test goto button works
+        """
+        number = 27
+        spy = QSignalSpy(self._controller.frame_changed)
+        QTest.keyClicks(self._controller._gotoSpinBox, str(number))
+        QTest.mouseClick(self._controller._goToButton, qt.Qt.LeftButton)
+
+        message = "the wrong number of signals emitted"
+        self.assertEqual(len(spy), 1, message)
+        message = "signal argument is wrong"
+        self.assertEqual(spy[0][0], number, message)
+
+    def test_goto_frame_box(self):
+        """
+        test goto spinbox works
+        """
+        number = 27
+        spy = QSignalSpy(self._controller.frame_changed)
+        QTest.keyClicks(self._controller._gotoSpinBox, str(number))
+        QTest.keyClick(self._controller._gotoSpinBox, qt.Qt.Key_Return)
+
+        message = "the wrong number of signals emitted"
+        self.assertEqual(len(spy), 1, message)
+        message = "signal argument is wrong"
+        self.assertEqual(spy[0][0], number, message)
+
+    def test_play_pause(self):
+        """
+        test pause button works
+        """
+        spy = QSignalSpy(self._controller.pause)
+        QTest.mouseClick(self._controller._pauseButton, qt.Qt.LeftButton)
+
+        message = "the wrong number of signals emitted"
+        self.assertEqual(len(spy), 1, message)
+
+    def test_play_forwards(self):
+        """
+        test forwards button works
+        """
+        spy = QSignalSpy(self._controller.forwards)
+        QTest.mouseClick(self._controller._forwardButton, qt.Qt.LeftButton)
+
+        message = "the wrong number of signals emitted"
+        self.assertEqual(len(spy), 1, message)
+
+    def test_play_backwards(self):
+        """
+        test backwards button works
+        """
+        spy = QSignalSpy(self._controller.backwards)
+        QTest.mouseClick(self._controller._backwardButton, qt.Qt.LeftButton)
+
+        message = "the wrong number of signals emitted"
+        self.assertEqual(len(spy), 1, message)
+
+    def test_zoom_box(self):
+        """
+        test zoom spinbox works
+        """
+        number = 2.0
+        spy = QSignalSpy(self._controller.zoom_value)
+        self._controller._zoomSpinBox.clear()
+        QTest.keyClicks(self._controller._zoomSpinBox, str(number))
+
+        message = "the wrong number of signals emitted"
+        self.assertEqual(len(spy), 1, message)
+        message = "signal argument is wrong"
+        self.assertEqual(spy[0][0], number, message)
+
+    def test_slider(self):
+        """
+        test slider works
+        """
+        number = 44
+
+        spy = QSignalSpy(self._controller.frame_changed)
+        self._controller._frameSlider.setValue(number)
+        QTest.mouseClick(self._controller._frameSlider, qt.Qt.LeftButton)
+
+        message = "the wrong number of signals emitted"
+        self.assertEqual(len(spy), 1, message)
+        message = "signal argument is wrong"
+        self.assertEqual(spy[0][0], number, message)
+
+if __name__ == '__main__':
+    unittest.main(verbosity=2)
