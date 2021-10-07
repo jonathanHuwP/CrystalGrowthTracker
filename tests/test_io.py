@@ -16,26 +16,27 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 @author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 '''
 import unittest
+import tempfile
 
 class TestIO(unittest.TestCase):
     """
-    advanced tests of IO units
+    tests of IO
     """
 
     def setUp(self):
         """
         build a full test class
         """
-        pass
+        # make results
 
-    def tearDown(self):
-        """
-        delete widget
-        """
-        pass
+        self._results = None
 
-    def test_write(self):
+    def test_write_read(self):
         """
         test output
         """
-        pass
+        # save to tmp file
+        # read results
+        # compare with existing
+
+        self._tmp_dir = tempfile.TemporaryFile('w+')
