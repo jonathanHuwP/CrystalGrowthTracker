@@ -22,7 +22,7 @@ import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 import PyQt5.QtWidgets as qw
 
-from cgt.util.markers import (MarkerTypes, ItemDataTypes)
+from cgt.util.markers import (MarkerTypes, ItemDataTypes, get_point_of_point)
 
 def difference_to_distance(difference, scale):
     """
@@ -375,3 +375,20 @@ def get_rect_even_dimensions(rect_item, even_dimensions=True):
         rect.setHeight(height+1)
 
     return rect
+def compare_lines(first, second):
+    """
+    compare the lines withing two line items
+        Args:
+            first (QGraphicsLineItem):
+            second (QGraphicsLineItem)
+    """
+    return first.line() == second.line()
+
+def compare_points(first, second):
+    """
+    compare the points withing two line items
+        Args:
+            first (QGraphicsLineItem):
+            second (QGraphicsLineItem)
+    """
+    return get_point_of_point(first) == get_point_of_point(second)

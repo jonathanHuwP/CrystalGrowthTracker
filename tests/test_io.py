@@ -25,6 +25,7 @@ from cgt.io.writecsvreports import save_csv_project
 from cgt.io.readcsvreports import read_csv_project
 from cgt.model.cgtproject import CGTProject
 from cgt.model.videoanalysisresultsstore import VideoAnalysisResultsStore
+from cgt.util.scenegraphitems import compare_lines, compare_points
 
 from tests.makeresults import make_results_object
 
@@ -92,6 +93,18 @@ class TestIO(unittest.TestCase):
             out_kf = self._project["results"].get_key_frames(i)
             in_kf = project["results"].get_key_frames(i)
             self.assertEqual(out_kf, in_kf, "error in key frames")
+
+        in_lines = project["results"].get_lines_for_region(1)[0]
+        out_lines = self._project["results"].get_lines_for_region(1)[0]
+
+        for i, line in enumerate(out_lines):
+            self.assertTrue(compare_lines(in_lines[i], line), "wrong line")
+
+        in_points = project["results"].get_points_for_region(0)[0]
+        out_points = self._project["results"].get_points_for_region(0)[0]
+
+        for i, point in enumerate(out_points):
+            self.assertTrue(compare_points(in_points[i], point), "wrong point")
 
     def assert_file_names(self, dir_path):
         """
