@@ -164,7 +164,7 @@ class VideoAnalysisResultsStore(qc.QObject):
         """
         getter for the regions
             Returns:
-                [QRect]
+                [QGraphicsRectItem]
         """
         return self._regions
 

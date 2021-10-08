@@ -18,9 +18,15 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 import unittest
 import tempfile
 import pathlib
+import getpass
+
+import PyQt5.QtGui as qg
 
 from cgt.io.writecsvreports import save_csv_project
+from cgt.io.readcsvreports import read_csv_project
 from cgt.model.cgtproject import CGTProject
+from cgt.model.videoanalysisresultsstore import VideoAnalysisResultsStore
+
 from tests.makeresults import make_results_object
 
 class TestIO(unittest.TestCase):
@@ -35,6 +41,8 @@ class TestIO(unittest.TestCase):
         self._project = CGTProject()
         self._project.init_new_project()
         self._project["results"] = make_results_object()
+        self._project["resolution"] = 0.8
+        self._project["frame_rate"] = 10.0
 
     def tearDown(self):
         """
@@ -57,8 +65,35 @@ class TestIO(unittest.TestCase):
         save_csv_project(self._project)
 
         self.assert_file_names(pathlib.Path(self._tmp_dir.name))
+        self.run_test_input()
 
+    def run_test_input(self):
+        """
+        read and test the output files
+        """
+        project = CGTProject()
+        project["results"] = VideoAnalysisResultsStore(None)
+        pens = qg.QPen()
 
+        read_csv_project(self._project["proj_full_path"], project, pens)
+
+        self.assertEqual(project["start_user"],
+                         getpass.getuser(),
+                         "user name not read correctly")
+
+        in_regions = project["results"].get_regions()
+        out_regions = self._project["results"].get_regions()
+
+        self.assertEqual(len(in_regions), len(out_regions), "wrong number of reagions read")
+
+        for i, region in enumerate(out_regions):
+            out_rect = region.rect()
+            in_rect = in_regions[i].rect()
+            self.assertEqual(in_rect, out_rect, "rectangle are wrong")
+            # need to add markers to results to work
+            # out_kf = self._project["results"].get_key_frames(i)
+            # in_kf = project["results"].get_key_frames(i)
+            # self.assertEqual(out_kf, in_kf, "error in key frames")
 
     def assert_file_names(self, dir_path):
         """
