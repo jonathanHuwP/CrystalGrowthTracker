@@ -21,8 +21,10 @@ from collections import namedtuple
 
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
+import PyQt5.QtWidgets as qw
 
 from cgt.util.scenegraphitems import list_to_g_line, list_to_g_point
+from cgt.model.videoanalysisresultsstore import VideoAnalysisResultsStore
 
 ## store for test values
 TestValues = namedtuple("TestValues", ["fps", "scale", "point_speed", "line_speed"])
@@ -33,6 +35,35 @@ def get_test_values():
     """
     return TestValues(10.0, 1.5, 8.3853, 7.5)
 
+def make_results_object():
+    """
+    make a complete results object
+    """
+    store = VideoAnalysisResultsStore(None)
+
+    for region in make_regions():
+        store.add_region(region)
+
+    for item in make_key_frames().items():
+        for key_frame in item[1]:
+            store.add_key_frame(item[0], key_frame)
+
+    return store
+
+def make_region(x, y, width, height):
+    """
+    make a region
+        Args:
+            x (float): x coordinate of top left
+            y (float): y coordinage of top left
+            width (float): width of rectangle
+            height (float):height of rectangle
+        Returns:
+            (QGraphicsRectItem)
+    """
+    rect = qc.QRectF(x, y, width, height)
+    return qw.QGraphicsRectItem(rect)
+
 def make_regions():
     """
     make a list of regions
@@ -40,8 +71,8 @@ def make_regions():
             [QRect]
     """
     regions = []
-    regions.append(qc.QRect(0, 0, 100, 50))
-    regions.append(qc.QRect(20, 20, 200, 200))
+    regions.append(make_region(0, 0, 100, 50))
+    regions.append(make_region(20, 20, 200, 200))
     return regions
 
 def make_key_frames():
@@ -89,3 +120,6 @@ def make_test_lines():
         lines.append(list_to_g_line(line_list, pen))
 
     return [lines]
+
+if __name__ == '__main__':
+    get_results_object()
