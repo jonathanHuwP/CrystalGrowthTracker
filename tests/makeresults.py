@@ -31,7 +31,12 @@ TestValues = namedtuple("TestValues", ["fps", "scale", "point_speed", "line_spee
 
 def get_test_values():
     """
-    get the values needed to set up and carry out the test
+    get the values needed to set up and carry out a test of calculation of speeds
+        Returns:
+            frames per seconds
+            scale length/pixel
+            correct point speed
+            correct line speed
     """
     return TestValues(10.0, 1.5, 8.3853, 7.5)
 

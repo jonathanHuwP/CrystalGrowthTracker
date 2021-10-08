@@ -81,10 +81,21 @@ class TestIO(unittest.TestCase):
                          getpass.getuser(),
                          "user name not read correctly")
 
+        self.assert_regions(project)
+        self.assert_lines_points(project)
+
+    def assert_regions(self, project):
+        """
+        check the reagions have been read in correctly
+            Args:
+                project (CGTProject): the read-back-in project
+        """
         in_regions = project["results"].get_regions()
         out_regions = self._project["results"].get_regions()
 
-        self.assertEqual(len(in_regions), len(out_regions), "wrong number of reagions read")
+        self.assertEqual(len(in_regions),
+                         len(out_regions),
+                         "wrong number of reagions read")
 
         for i, region in enumerate(out_regions):
             out_rect = region.rect()
@@ -94,6 +105,12 @@ class TestIO(unittest.TestCase):
             in_kf = project["results"].get_key_frames(i)
             self.assertEqual(out_kf, in_kf, "error in key frames")
 
+    def assert_lines_points(self, project):
+        """
+        check the lines and points have been read in correctly
+            Args:
+                project (CGTProject): the read-back-in project
+        """
         in_lines = project["results"].get_lines_for_region(1)[0]
         out_lines = self._project["results"].get_lines_for_region(1)[0]
 

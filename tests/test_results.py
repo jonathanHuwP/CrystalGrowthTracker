@@ -23,7 +23,9 @@ specific language governing permissions and limitations under the License.
 import unittest
 
 import PyQt5.QtCore as qc
+import PyQt5.QtWidgets as qw
 
+from tests.makeresults import make_results_object
 from cgt.model.videoanalysisresultsstore import VideoAnalysisResultsStore
 
 class TestResults(unittest.TestCase):
@@ -35,7 +37,7 @@ class TestResults(unittest.TestCase):
         """
         build a full test class
         """
-        self._store = VideoAnalysisResultsStore(None)
+        self._store = make_results_object()
 
     def tearDown(self):
         """
@@ -43,25 +45,33 @@ class TestResults(unittest.TestCase):
         """
         del self._store
 
-    def test_initial_state(self):
+    def test_state_raw_object(self):
         """
-        test the inital state of the object
+        test the inital state of the object with no added data
         """
-        message = "store initalized in state changed"
-        self.assertFalse(self._store.has_been_changed(), message)
+        results = VideoAnalysisResultsStore(None)
+        message = "store in state changed"
+        self.assertFalse(results.has_been_changed(), message)
+
+
+    def test_state_with_new_data(self):
+        """
+        test the inital state of the object with data added
+        """
+        message = "store in state unchanged"
+        self.assertTrue(self._store.has_been_changed(), message)
 
     def test_add_region(self):
         """
         test the addition of a region
         """
-        rect = self.add_region()
+        region = self.add_region()
         regions = self._store.get_regions()
 
-        number = len(regions)
-        message = f"regions list is the wrong length: {number} instead of 1"
-        self.assertEqual(1, number, message)
+        message = "regions list is the wrong length"
+        self.assertEqual(len(regions), 3, message)
         message = "region not stored correctly"
-        self.assertEqual(rect, regions[0], message)
+        self.assertEqual(region.rect(), regions[2].rect(), message)
 
     def test_add_keyframe(self):
         """
@@ -69,14 +79,14 @@ class TestResults(unittest.TestCase):
         """
         frame = 200
         self.add_region()
-        self._store.add_key_frame(0, frame)
+        self._store.add_key_frame(2, frame)
 
-        frames = self._store.get_key_frames(0)
+        frames = self._store.get_key_frames(2)
         number = len(frames)
 
-        message = "wrong number of key frames: {number} should be 1"
+        message = "wrong number of key frames"
         self.assertEqual(1, number, message)
-        message = "key frame wrong: {frams[0]} should be {frame}"
+        message = "key frame wrong"
         self.assertEqual(frame, frames[0], message)
 
     def add_region(self):
@@ -85,10 +95,10 @@ class TestResults(unittest.TestCase):
             Returns:
                 region (QRect): the region added
         """
-        rect = qc.QRect(0, 0, 100, 50)
-        self._store.add_region(rect)
+        region = qw.QGraphicsRectItem(qc.QRectF(0, 0, 100, 50))
+        self._store.add_region(region)
 
-        return rect
+        return region
 
 if __name__ == "__main__":
     unittest.main()
