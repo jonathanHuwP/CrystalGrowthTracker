@@ -19,10 +19,10 @@ specific language governing permissions and limitations under the License.
 # pylint: disable = c-extension-no-member
 from collections import namedtuple
 
-import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 import PyQt5.QtWidgets as qw
 
+from cgt.gui.penstore import PenStore
 from cgt.util.scenegraphitems import list_to_g_line, list_to_g_point
 from cgt.model.videoanalysisresultsstore import VideoAnalysisResultsStore
 
@@ -47,6 +47,9 @@ def make_results_object():
     for item in make_key_frames().items():
         for key_frame in item[1]:
             store.add_key_frame(item[0], key_frame)
+
+    store.insert_line_marker(make_test_lines())
+    store.insert_point_marker(make_test_points())
 
     return store
 
@@ -96,12 +99,12 @@ def make_test_points():
     string_lists.append(["0", "0", "0", "50", "25", "200", "0"])
     string_lists.append(["0", "0", "0", "100", "50", "300", "0"])
 
-    pen = qg.QPen()
+    pen = PenStore()
     points = []
     for string_list in string_lists:
-        points.append(list_to_g_point(string_list, pen))
+        points.append(list_to_g_point(string_list, pen.get_display_pen()))
 
-    return [points]
+    return points
 
 def make_test_lines():
     """
@@ -114,12 +117,9 @@ def make_test_lines():
     line_lists.append(["0", "20", "20", "20", "220", "0", "0", "50", "1"])
     line_lists.append(["0", "20", "20", "20", "220", "50", "0", "150", "1"])
 
-    pen = qg.QPen()
+    pen = PenStore()
     lines = []
     for line_list in line_lists:
-        lines.append(list_to_g_line(line_list, pen))
+        lines.append(list_to_g_line(line_list, pen.get_display_pen()))
 
-    return [lines]
-
-if __name__ == '__main__':
-    get_results_object()
+    return lines

@@ -89,8 +89,8 @@ class TestVelocities(unittest.TestCase):
         self._lines = mkres.make_test_lines()
         self._test_values = mkres.get_test_values()
 
-        self._calculator = VelocitiesCalculator(self._lines,
-                                                self._points,
+        self._calculator = VelocitiesCalculator([self._lines],
+                                                [self._points],
                                                 self._test_values.fps,
                                                 self._test_values.scale)
 

@@ -20,8 +20,7 @@ import tempfile
 import pathlib
 import getpass
 
-import PyQt5.QtGui as qg
-
+from cgt.gui.penstore import PenStore
 from cgt.io.writecsvreports import save_csv_project
 from cgt.io.readcsvreports import read_csv_project
 from cgt.model.cgtproject import CGTProject
@@ -73,7 +72,7 @@ class TestIO(unittest.TestCase):
         """
         project = CGTProject()
         project["results"] = VideoAnalysisResultsStore(None)
-        pens = qg.QPen()
+        pens = PenStore()
 
         read_csv_project(self._project["proj_full_path"], project, pens)
 
@@ -90,10 +89,9 @@ class TestIO(unittest.TestCase):
             out_rect = region.rect()
             in_rect = in_regions[i].rect()
             self.assertEqual(in_rect, out_rect, "rectangle are wrong")
-            # need to add markers to results to work
-            # out_kf = self._project["results"].get_key_frames(i)
-            # in_kf = project["results"].get_key_frames(i)
-            # self.assertEqual(out_kf, in_kf, "error in key frames")
+            out_kf = self._project["results"].get_key_frames(i)
+            in_kf = project["results"].get_key_frames(i)
+            self.assertEqual(out_kf, in_kf, "error in key frames")
 
     def assert_file_names(self, dir_path):
         """
@@ -112,8 +110,6 @@ class TestIO(unittest.TestCase):
 
         for file in files:
             self.assertIn(file, contents, "unknown file in csv directory")
-
-
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
