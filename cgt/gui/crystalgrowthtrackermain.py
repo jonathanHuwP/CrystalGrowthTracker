@@ -100,11 +100,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         ## assign logging state
         if config_args is not None:
             args = vars(config_args)
-            if args.get("log") is not None and args.get("log"):
-                config.use_logs = True
-                config.start_logging()
             if args.get("log_ffmpeg") is not None and args.get("log_ffmpeg"):
-                config.use_ffmpeg_log = True
+                config.USE_FFMPEG_LOG = True
             if args.get("project") is not None:
                 self.read_project_directory(args.get("project"))
 
@@ -938,8 +935,6 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             #clean-up and exit signalling
             # the event must be accepted
             event.accept()
-
-            config.stop_logging()
 
             # to get rid tell the event-loop to schedule for deleteion
             # do not destroy as a pointer may survive in event-loop

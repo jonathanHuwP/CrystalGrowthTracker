@@ -88,7 +88,7 @@ class VideoSource(FfmpegBase):
 
         # make path for ffmpeg's logs
         error_path = pathlib.Path(os.devnull)
-        if config.use_ffmpeg_log:
+        if config.USE_FFMPEG_LOG:
             error_path = pathlib.Path("ffmpeg_log.txt")
 
         # create ffmpeg process with piped output and read output

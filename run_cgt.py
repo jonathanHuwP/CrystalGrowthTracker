@@ -35,11 +35,6 @@ def get_python_args():
                         required=False,
                         help="project directory path")
 
-    parser.add_argument("-l",
-                        "--log",
-                        action='store_true',
-                        help="if set write log files")
-
     parser.add_argument("-f",
                         "--log_ffmpeg",
                         action='store_true',
