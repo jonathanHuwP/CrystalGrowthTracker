@@ -61,7 +61,6 @@ class TestProject(unittest.TestCase):
         self._project["resolution"] = "8.1"
         self._project["frame_rate"] = "22"
         self._project.ensure_numeric()
-
         message = "error in resolution"
         self.assertEqual(self._project["resolution"], 8.1, message)
         message = "error in frame rate"
@@ -71,3 +70,6 @@ class TestProject(unittest.TestCase):
         self._project.reset_changed()
         message = "project not in unchanged state after reset"
         self.assertFalse(self._project.has_been_changed(), message)
+
+if __name__ == "__main__":
+    unittest.main()

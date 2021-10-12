@@ -94,6 +94,11 @@ The doxygen documentation for this project lists gives the API (Application Prog
 
 ## Notes for Developers
 
+### UnitTesting
+Unit tests are in the directory 'tests', which also contains a module for building a dummy restults object.  All he tests can be run using the python script 'run_tests.py', which takes a '-q --quiet' command line option.  The script will run all the tests printing results in verbose format unless the quiet option is used. Any individual test module can be run by running the file itself 'python tests\test_io.py' for example.
+
+The tests are written using the Python unittest module and can also be run using the unittest command line, see [unittest man pages] (https://docs.python.org/3/library/unittest.html).  QWidgets are tested using the [PyQt5.QTest](https://doc.qt.io/qtforpython-5/PySide2/QtTest/QTest.html) module to generate simulated user events.
+
 ### QT5
 The project uses the Python version of Qt for its GUI. This window is designed visually using a Qt Designer, and saved as a .ui file (XML description of the window). The file is then compiled to an object stump that can be subclassed.
 
@@ -143,11 +148,3 @@ To use pylint on your project through eclipe from the top menu select Window -> 
 The pylint results are displayed in the problems window so you need to open this. It appears in the same frame and the Console and you need to click on its tab to see the contents of it. You can also edit what and how this displays results by select options through a drop down menu that is access by clicking on the 3 vertical dots at the top left of the problem frame. Errors and warnings are displyed in the problems window but information on conventions and refactoring are visible in the editor window.
 
 As unnescessary white space is an output of pylint information you may also want to view the what spaces. Select Window -> Preferences and from the proferences window select General -> Editors -> Text Editors and here you can select a number of text display options including showing white space and configuring which caharature of those to include.
-
-## ToDo
-
-- [x] Refactor the video widgets
-- [ ] Get artifacts widget working
-- [ ] Add a results widget
-- [x] Video stats on raw
-- [x] Progress bar built into main
