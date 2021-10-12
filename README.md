@@ -66,7 +66,7 @@ then navigate to the CrystalGrowthTracker directory and run by typing:
 
 you can also run from another directory using:
 
-`python C:\Users\<usre name>\Work\CrystalGrowthTracker\run_cgt.py`
+`python C:\Users\uname\Work\CrystalGrowthTracker\run_cgt.py`
 
 or the path relative to your current location.
 
@@ -115,7 +115,7 @@ The code has been designed to allow translations of the user interface. The proc
 1. Use pylupdate5 to make a .ts file
 
     '''
-    pylupdate5 .\CrystalGrowthTrackerMain.py .\CrystalGrowthTrackerMain.ui .\PolyLineExtract.py .\DrawRect.py .\ImageLabel.py -ts cgt_german.ts
+    pylupdate5 .\\CrystalGrowthTrackerMain.py .\\CrystalGrowthTrackerMain.ui .\\PolyLineExtract.py .\\DrawRect.py .\\ImageLabel.py -ts cgt_german.ts
     '''
 2. Run 'linguist.exe', open the 'cgt_german.ts', if there is an existing phrase book load that as well.  Carry out the translation, and save the .ts file and save it again as a phrase book, overwriting the existing if necessary.
 
@@ -139,12 +139,12 @@ http://cis.bentley.edu/tbabaian/cs602/notes/setup-anaconda-eclipse-pydev.pdf
 I had problems with this because I am running a Windows 10 system with a previously installed version of anaconda. For Eclipe to pick up the Anconda python interpreter correctly the Anaconda install needs to have the Anaconda Path added to the PATH environment variables. This is an Advanced option in the Anaconda install which is not normally recommended. To correct this I had to uninstall Anaconda and reinstall with this new option. I chose to do a full uninstall as given here:
 https://stackoverflow.com/questions/48236584/python-how-can-i-completely-uninstall-anaconda-on-windows-10
 
-This gives Eclipe the path for the base Anaconda environment but it best to work on the CGT environment. The environment install on a Windows system for the user called john is C:\Users\john\anaconda3\python.exe while for that use the CGT environment would be C:\Users\john\anaconda3\envs\CGT\python.exe. This needs to be added manually as an environment variable through the Control Panel. Editing the environment variables in Windows is considered an Advanced operation so be careful.
+This gives Eclipe the path for the base Anaconda environment but it best to work on the CGT environment. The environment install on a Windows system for the user called uname is C:\\Users\\uname\\anaconda3\\python.exe while for that use the CGT environment would be C:\\Users\\uname\\anaconda3\\envs\\CGT\\python.exe. This needs to be added manually as an environment variable through the Control Panel. Editing the environment variables in Windows is considered an Advanced operation so be careful.
 
-When you create the Eclipe project use the path code\CrystalGrowthTracker\src as the location for the project, this cannot be edited later.
+When you create the Eclipe project use the path code\\CrystalGrowthTracker\\src as the location for the project, this cannot be edited later.
 
-To use pylint on your project through eclipe from the top menu select Window -> Prferences to open the preferences window. From the left hand list now select PyDev -> Builders and in this frame check that the "Use Builders?" options is selected. Now from the left hand list select PyDev -> Editor -> Code Analysis -> PyLint and in this frame select the severicty of the pylint outputs that you want to be displayed.
+To use pylint on your project through eclipe from the top menu select *Window -> Prferences* to open the preferences window. From the left hand list now select *PyDev -> Builders* and in this frame check that the "Use Builders?" options is selected. Now from the left hand list select *PyDev -> Editor -> Code Analysis -> PyLint* and in this frame select the severicty of the pylint outputs that you want to be displayed.
 
 The pylint results are displayed in the problems window so you need to open this. It appears in the same frame and the Console and you need to click on its tab to see the contents of it. You can also edit what and how this displays results by select options through a drop down menu that is access by clicking on the 3 vertical dots at the top left of the problem frame. Errors and warnings are displyed in the problems window but information on conventions and refactoring are visible in the editor window.
 
-As unnescessary white space is an output of pylint information you may also want to view the what spaces. Select Window -> Preferences and from the proferences window select General -> Editors -> Text Editors and here you can select a number of text display options including showing white space and configuring which caharature of those to include.
+As unnescessary white space is an output of pylint information you may also want to view the what spaces. Select *Window -> Preferences* and from the proferences window select *General -> Editors -> Text Editors* and here you can select a number of text display options including showing white space and configuring which caharature of those to include.
