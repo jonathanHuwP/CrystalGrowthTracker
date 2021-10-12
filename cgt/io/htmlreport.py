@@ -87,7 +87,11 @@ class ReportMaker(qc.QObject):
             data = {"results_hash": hash_code}
             json.dump(data, fout)
 
+        changed = project.has_been_changed()
         project["latest_report"] = str(html_outfile)
+        if not changed:
+            project.reset_changed()
+
         return html_outfile
 
 def write_html_stats(fout, report_dir):
