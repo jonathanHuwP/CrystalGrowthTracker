@@ -143,6 +143,8 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
                                                   self._single_frame_canvas,
                                                   self._current_frame)
 
+        self.redisplay()
+
     def display_extra(self):
         """
         location for additional code beyond displaying the video label
