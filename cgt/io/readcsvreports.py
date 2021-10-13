@@ -203,10 +203,10 @@ def read_csv_points(new_project, files, path, pens):
     rows.sort(key=operator.itemgetter(6))
 
     for _, region_iterator in itertools.groupby(rows, operator.itemgetter(6)):
-        region_group = [x for x in region_iterator]
+        region_group = list(region_iterator)
         region_group.sort(key=operator.itemgetter(0))
         for _, point_iterator in itertools.groupby(region_group, operator.itemgetter(0)):
-            point_group = [x for x in point_iterator]
+            point_group = list(point_iterator)
             point_group.sort(key=operator.itemgetter(5))
             g_marker = []
             for row in point_group:
@@ -246,10 +246,10 @@ def read_csv_lines(new_project, files, path, pens):
     rows.sort(key=operator.itemgetter(8))
 
     for _, region_iterator in itertools.groupby(rows, operator.itemgetter(8)):
-        region_group = [x for x in region_iterator]
+        region_group = list(region_iterator)
         region_group.sort(key=operator.itemgetter(0))
         for _, line_iterator in itertools.groupby(region_group, operator.itemgetter(0)):
-            line_group = [x for x in line_iterator]
+            line_group = list(line_iterator)
             line_group.sort(key=operator.itemgetter(7))
             g_marker = []
             for row in line_group:

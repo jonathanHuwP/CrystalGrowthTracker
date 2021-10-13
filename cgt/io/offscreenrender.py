@@ -81,7 +81,7 @@ class OffScreenRender():
         file_name = str(file_path)
         pixmap = qg.QPixmap()
         if not pixmap.load(file_name):
-                raise IOError(f"unable to read {file_name}")
+            raise IOError(f"unable to read {file_name}")
 
         pixmap_item = self._view.scene().addPixmap(pixmap)
         pixmap_item.setZValue(-1.0)

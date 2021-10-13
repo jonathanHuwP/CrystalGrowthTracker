@@ -28,8 +28,6 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
-import cgt.util.config as config
-
 class PlayStates(Enum):
     """
     enumeration of video playing states

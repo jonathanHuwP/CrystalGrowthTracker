@@ -66,11 +66,10 @@ class RegionVideoCopy(FfmpegBase):
 
         self.probe_video(1, RegionVideoCopy.IN_PIX_FMT[1])
 
-    def copy_region_videos(self, dir_name, base_name="region"):
+    def copy_region_videos(self, dir_name):
         """
         copy each region to a seperate video file
             dir_name (str): the path to the directory
-            base_name (str) the base name of the output files
         """
         self._dir_name = pathlib.Path(dir_name)
         length = self._video_data.get_frame_count()
@@ -80,8 +79,8 @@ class RegionVideoCopy(FfmpegBase):
                 .compile())
 
         with open(os.devnull, 'w') as f_err:
-            proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=f_err)
-            self.process_film(proc)
+            with subprocess.Popen(args, stdout=subprocess.PIPE, stderr=f_err) as proc:
+                self.process_film(proc)
 
     def process_film(self, video_proc):
         """
@@ -128,7 +127,7 @@ class RegionVideoCopy(FfmpegBase):
         combine the region images into videos, clear and remove the tmp directory
         """
         regions = self._project["results"].get_regions()
-        frame = f"_%04d.png"
+        frame = "_%04d.png"
         fps = int(self._project['frame_rate'])
 
         for i in range(len(regions)):

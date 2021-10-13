@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
 Created on Tue December 08 2020
 
@@ -43,6 +44,7 @@ class TestIO(unittest.TestCase):
         self._project["results"] = make_results_object()
         self._project["resolution"] = 0.8
         self._project["frame_rate"] = 10.0
+        self._tmp_dir = None
 
     def tearDown(self):
         """

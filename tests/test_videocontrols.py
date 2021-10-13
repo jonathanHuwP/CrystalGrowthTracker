@@ -52,9 +52,9 @@ class TestVideoControls(unittest.TestCase):
         """
         test initialized ok
         """
-        min, max = self._controller.get_range()
-        self.assertEqual(min, 0, "minimum not zero")
-        self.assertEqual(max, 99, "maximum not 99")
+        minimum, maximum = self._controller.get_range()
+        self.assertEqual(minimum, 0, "minimum not zero")
+        self.assertEqual(maximum, 99, "maximum not 99")
 
     def test_one_frame_forward(self):
         """
