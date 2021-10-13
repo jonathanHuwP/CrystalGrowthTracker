@@ -26,7 +26,19 @@ def get_args():
     get command line arguments
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument("-d", "--directory", type=str, required=False, help="directory to be searched")
+    parser.add_argument("-d",
+                        "--directory",
+                        type=str,
+                        required=False,
+                        help="directory to be searched")
+
+
+    parser.add_argument("-f",
+                        "--file",
+                        type=str,
+                        required=False,
+                        help="target file")
+
     return parser.parse_args()
 
 def pylint_files(file_list):
@@ -58,7 +70,7 @@ def pylint_file(file_name):
                             stdout=subprocess.PIPE,
                             check=False)
 
-    output = str(result.stdout.decode('utf-8'))#.splitlines()
+    output = str(result.stdout.decode('utf-8'))
     return json.loads(output)
 
 def analyse_output(file, results):
@@ -81,17 +93,22 @@ def analyse_output(file, results):
         print(f"\t{issue['line']} => {issue['message']}")
 
 def main():
-    """The main function"""
+    """
+    The main function
+    """
     args = get_args()
-    path = None
-    if args.directory is None:
-        path = pathlib.Path('.')
-    else:
+
+    files = None
+    if args.file is not None:
+        path = pathlib.Path(args.file)
+        files = [path]
+    elif args.directory is not None:
         path = pathlib.Path(args.directory)
+        files =[x for x in path.glob("**/*.py") if not x.name.startswith("Ui_")]
+    else:
+        path =  pathlib.Path('.')
+        files =[x for x in path.glob("**/*.py") if not x.name.startswith("Ui_")]
 
-    print(f"Searching {path}")
-
-    files =[x for x in path.glob("**/*.py") if not x.name.startswith("Ui_")]
     linting_list = pylint_files(files)
 
     for file, results in linting_list.items():
