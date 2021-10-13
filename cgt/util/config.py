@@ -19,4 +19,3 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 
 ## save ffmpeg logs to file
 USE_FFMPEG_LOG = False
-

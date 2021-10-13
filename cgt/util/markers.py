@@ -1,5 +1,5 @@
 ## -*- coding: utf-8 -*-
-'''
+"""
 Created on 05 Oct 2021
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -15,7 +15,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 
 @copyright 2021
 @author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
-'''
+"""
 import enum
 
 class MarkerTypes(enum.IntEnum):

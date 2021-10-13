@@ -102,7 +102,7 @@ class OffScreenRender():
         """
         get an image of a whole scene
             Returns:
-                QImage holding image of everything within the scene-graph's bounding rectangle
+                QImage of everything within the scene-graph's bounding rectangle
         """
         bound_rect = self._view.scene().itemsBoundingRect()
 

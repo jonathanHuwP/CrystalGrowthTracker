@@ -19,13 +19,13 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # set up linting conditions
 # pylint: disable = c-extension-no-member
 # pylint: disable = import-error
+import subprocess
+import os
 
 import PyQt5.QtCore as qc
 
 import numpy as np
 import ffmpeg
-import subprocess
-import os
 
 from cgt.io.ffmpegbase import FfmpegBase
 from cgt.util.framestats import FrameStats, VideoIntensityStats
@@ -59,7 +59,7 @@ class VideoAnalyser(FfmpegBase):
                 the statistics (VideoIntensityStats)
         """
         if self._video_data is None:
-            return
+            return None
 
         length = self._video_data.get_frame_count()
         args = (ffmpeg
@@ -98,7 +98,8 @@ class VideoAnalyser(FfmpegBase):
         self.frames_analysed.emit(count)
         return vid_statistics
 
-    def make_stats(self, image_bytes, bins):
+    @staticmethod
+    def make_stats(image_bytes, bins):
         """
         make the statistics for a single frame
             Args:

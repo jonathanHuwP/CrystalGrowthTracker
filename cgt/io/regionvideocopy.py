@@ -19,12 +19,13 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # set up linting conditions
 # pylint: disable = c-extension-no-member
 # pylint: disable = import-error
-import ffmpeg
 import subprocess
 import pathlib
 import tempfile
 import itertools
 import os
+
+import ffmpeg
 
 import PyQt5.QtGui as qg
 

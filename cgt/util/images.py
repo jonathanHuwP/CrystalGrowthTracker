@@ -18,9 +18,8 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 '''
 # set up linting conditions
 # pylint: disable = c-extension-no-member
-
-import numpy as np
 import array as arr
+import numpy as np
 
 import PyQt5.QtGui as qg
 

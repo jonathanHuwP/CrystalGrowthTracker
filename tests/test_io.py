@@ -57,9 +57,6 @@ class TestIO(unittest.TestCase):
         """
         test output
         """
-        # save to tmp file
-        # read results
-        # compare with existing
         self._tmp_dir = tempfile.TemporaryDirectory()
         self._project["proj_full_path"] = self._tmp_dir.name
         self._project["proj_name"] = "testing"

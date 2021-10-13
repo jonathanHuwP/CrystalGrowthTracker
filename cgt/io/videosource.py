@@ -25,16 +25,16 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = c-extension-no-member
 # pylint: disable = import-error
 
-import PyQt5.QtCore as qc
-import PyQt5.QtGui as qg
-
-import ffmpeg
 import subprocess
 import os
 import pathlib
 
-import cgt.util.config as config
+import PyQt5.QtCore as qc
+import PyQt5.QtGui as qg
 
+import ffmpeg
+
+from cgt.util import config
 from cgt.io.ffmpegbase import FfmpegBase
 
 class VideoSource(FfmpegBase):
@@ -96,7 +96,7 @@ class VideoSource(FfmpegBase):
             with subprocess.Popen(args, stdout=subprocess.PIPE, stderr=f_err) as process:
                 in_bytes = process.stdout.read(self._video_data.get_frame_size())
 
-        if not in_bytes == 0:
+        if in_bytes != 0:
             return self.make_pixmap(in_bytes)
 
         return None
