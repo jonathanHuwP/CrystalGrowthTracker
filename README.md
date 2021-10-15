@@ -10,17 +10,19 @@ Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 
-## DEVELOPED WITH:
+## Developed With:
 This was developed using Python 3.7/3.8 and Anaconda, Inc. on Windows 10 systems. The software has not been executed on Linux or Mac.
 
 ## Installation, Use and Development
 This software uses Anaconda with Python 3.8, at present it will not work with 3.9. The packages required to run the software are listed in the file environment_CGT.yml.
 
-If you have installed Anaconda, you can install the software and run in two steps:,
+If you have installed Anaconda, you can install the software and run in two steps:
 
-### Set-up the Environment and Build the Software
+### Quick Start: Set-up the Environment and Build the Software
 
-Download or clone from gitHub.
+Download through the gitHub web interface or clone from gitHub, to clone:
+
+`git clone https://github.com/jonathanHuwP/CrystalGrowthTracker.git`
 
 Open an Anaconda shell and navigate to the CrystalGrowthTracker directory.
 
@@ -40,23 +42,26 @@ To build the Qt widgets reqired
 
 If you need to change an old environment following the inculsion or removal of a package.
 
+List conda environments:
+`conda env list`
+
 Remove old environments:
-'conda env remove --name cgt'
-'conda env remove --name cgt-dev'
+`conda env remove --name cgt`
+`conda env remove --name cgt-dev`
 
 Update conda:
-'conda update --all'
+`conda update --all`
 
 Create new environment:
-'conda env create -f environment_CGT.yml'
+`conda env create -f environment_CGT.yml`
 
 Activate:
-'conda activete cgt'
+`conda activete cgt`
 
 
 ### Runing the Software
 
-Open an Anaconda shell and activate the environment
+Open an Anaconda shell and activate the environment:
 
 `conda activate CGT`
 
@@ -76,7 +81,11 @@ To remove software delete the CrystalGrowthTracker direcory, then delete the env
 
 `conda remove --name CGT --all`
 
-### Development and Doxygen Documentation
+
+
+## Notes for Developers
+
+### Doxygen Documentation
 
 The software is documented with doxygen, to build the documentation you will have to install and avtivate the development environment.
 
@@ -91,8 +100,6 @@ Then, in the CrystalGrowthTracker direcory, run the command:
 After this has run a doc/html directory will appear. Open the index.html file in this directory.
 
 The doxygen documentation for this project lists gives the API (Application Programmers Interface) for all the modules and scripts in this project making it useful to developers who wish to further develop this software.
-
-## Notes for Developers
 
 ### UnitTesting
 Unit tests are in the directory 'tests', which also contains a module for building a dummy restults object.  All he tests can be run using the python script 'run_tests.py', which takes a '-q --quiet' command line option.  The script will run all the tests printing results in verbose format unless the quiet option is used. Any individual test module can be run by running the file itself 'python tests\test_io.py' for example.
