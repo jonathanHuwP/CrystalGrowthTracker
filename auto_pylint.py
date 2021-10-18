@@ -18,6 +18,8 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 """
 import subprocess
 import pathlib
+import csv
+import stat
 import json
 import argparse
 from collections import namedtuple
@@ -50,6 +52,12 @@ def get_args():
                         type=str,
                         required=False,
                         help="target file")
+
+    parser.add_argument("-o",
+                        "--out_file",
+                        type=str,
+                        required=False,
+                        help="output csv file")
 
     parser.add_argument("-t",
                         "--type",
@@ -93,11 +101,10 @@ def pylint_file(file_name):
     output = str(result.stdout.decode('utf-8'))
     return json.loads(output)
 
-def analyse_output(file, results):
+def analyse_output(results):
     """
     analyse the lint output
         Args:
-            file (pathlib.Path) the file
             results ([dict]) results in JSON format
         Returns:
             PylintIssues: holding arrays of (line, description) pairs
@@ -105,8 +112,7 @@ def analyse_output(file, results):
     num_issues = len(results)
 
     if num_issues == 0:
-        print(f"File {file} no problems")
-        return None
+        return PylintIssues([], [], [], [])
 
     return process_pylint_results(results)
 
@@ -169,9 +175,12 @@ def display_all(linting_list):
     """
     issue_files = []
     for file, results in linting_list.items():
-        issues = analyse_output(file, results)
-        if issues  is not None:
+        issues = analyse_output(results)
+        if total_issues(issues) == 0:
+            print(f"File {file} no issues.")
+        else:
             issue_files.append((file, issues))
+    if len(issue_files) > 0:
         print_issues(issue_files)
 
 def filter_output(issue_type, results):
@@ -216,6 +225,135 @@ def display_type(issue_type, linting_list):
 
     print_issues_type(issue_type, issue_files)
 
+def check_file(file_name):
+    """
+    test if file: exists and is writable or can be created
+        Args:
+            file_name (str): the file name
+        Returns:
+            (pathlib.Path): the path or None if problems
+    """
+    if not file_name:
+        return None
+
+    path = pathlib.Path(file_name)
+
+    # if file exists test if writable
+    if path.exists() and path.is_file():
+        handle = None
+        try:
+            handle = open(path, 'w')
+        except PermissionError:
+            return None
+        finally:
+            if handle:
+                handle.close()
+
+    # crate file with write permissions
+    try:
+        path.touch(stat.S_IWUSR)
+    except PermissionError:
+        return None
+
+    return path
+
+def write_results(out_file, linting_list, issue_type):
+    """
+    write the results to file
+    """
+    headers = ["File", "Issue Type", "Issue Count", "Line", "Message"]
+    with out_file.open('w') as fout:
+        writer = csv.writer(fout, delimiter=',', lineterminator='\n')
+        writer.writerow(headers)
+        for file, results in linting_list.items():
+            array = [file]
+            issues = analyse_output(results)
+            writer.writerow(array)
+            write_issues(writer, issues, issue_type)
+
+def write_issues(writer, issues, issue_type=None):
+    """
+    write issues to csv file
+        Args:
+            wrirter (csv.writer): the output file writer
+            issues (PylintIssues): container for the issues
+            issue_type (str): if provided the only output this type
+    """
+    if issue_type == "error":
+        write_errors(writer, issues)
+    elif issue_type == "warning":
+        write_warnings(writer, issues)
+    elif issue_type == "refactor":
+        write_refactoring(writer, issues)
+    elif issue_type == "convention":
+        write_conventions(writer, issues)
+    else:
+        write_errors(writer, issues)
+        write_warnings(writer, issues)
+        write_refactoring(writer, issues)
+        write_conventions(writer, issues)
+
+def write_errors(writer, issues):
+    """
+    write errors to csv file
+        Args:
+            wrirter (csv.writer): the output file writer
+            issues (PylintIssues): container for the issues
+    """
+    array = ["", "Errors", f"{len(issues.error)}"]
+    writer.writerow(array)
+    for line, message in issues.error:
+        array = ["", "", "", line, message]
+        writer.writerow(array)
+
+def write_warnings(writer, issues):
+    """
+    write warnings to csv file
+        Args:
+            wrirter (csv.writer): the output file writer
+            issues (PylintIssues): container for the issues
+    """
+    array = ["", "Warnings", f"{len(issues.warning)}"]
+    writer.writerow(array)
+    for line, message in issues.warning:
+        array = ["", "", "", line, message]
+        writer.writerow(array)
+
+def write_refactoring(writer, issues):
+    """
+    write refactoring to csv file
+        Args:
+            wrirter (csv.writer): the output file writer
+            issues (PylintIssues): container for the issues
+    """
+    array = ["", "Refactoring", f"{len(issues.refactor)}"]
+    writer.writerow(array)
+    for line, message in issues.refactor:
+        array = ["", "", "", line, message]
+        writer.writerow(array)
+
+def write_conventions(writer, issues):
+    """
+    write conventions to csv file
+        Args:
+            wrirter (csv.writer): the output file writer
+            issues (PylintIssues): container for the issues
+    """
+    array = ["", "Convention", f"{len(issues.convention)}"]
+    writer.writerow(array)
+    for line, message in issues.convention:
+        array = ["", "", "", line, message]
+        writer.writerow(array)
+
+def display_results(linting_list, issue_type):
+    """
+    display the results
+    """
+    if issue_type is not None:
+        display_type(issue_type, linting_list)
+    else:
+        display_all(linting_list)
+
 def main():
     """
     The main function
@@ -233,12 +371,19 @@ def main():
         path =  pathlib.Path('.')
         files =[x for x in path.glob("**/*.py") if not x.name.startswith("Ui_")]
 
+    out_file = None
+    if args.out_file:
+        out_file = check_file(args.out_file)
+        if not out_file:
+            print(f"File {args.out_file} cannot: be created, or opened for writing")
+            return
+
     linting_list = pylint_files(files)
 
-    if args.type is not None:
-        display_type(args.type, linting_list)
+    if out_file:
+        write_results(out_file, linting_list, args.type)
     else:
-        display_all(linting_list)
+        display_results(linting_list, args.type)
 
 if __name__ == "__main__":
     main()
