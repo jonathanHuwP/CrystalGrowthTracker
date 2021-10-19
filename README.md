@@ -56,7 +56,7 @@ Activate:
 
 Open an Anaconda shell and activate the environment
 
-`conda activate CGT`
+`conda activate cgt`
 
 then navigate to the CrystalGrowthTracker directory and run by typing:
 
