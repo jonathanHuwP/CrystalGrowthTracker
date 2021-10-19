@@ -42,7 +42,6 @@ If you need to change an old environment following the inculsion or removal of a
 
 Remove old environments:
 'conda env remove --name cgt'
-'conda env remove --name cgt-dev'
 
 Update conda:
 'conda update --all'
@@ -52,7 +51,6 @@ Create new environment:
 
 Activate:
 'conda activete cgt'
-
 
 ### Runing the Software
 
@@ -74,13 +72,11 @@ or the path relative to your current location.
 
 To remove software delete the CrystalGrowthTracker direcory, then delete the environment:
 
-`conda remove --name CGT --all`
+`conda remove --name cgt --all`
 
 ### Development and Doxygen Documentation
 
-The software is documented with doxygen, to build the documentation you will have to install and avtivate the development environment.
-
-`conda env create -f environment_CGT_DEV.yml`
+The software is documented with doxygen.
 
 `conda activate cgt`
 
