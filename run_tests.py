@@ -22,6 +22,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 
 import unittest
 import argparse
+import csv
 
 def get_arguments():
     """
@@ -34,7 +35,58 @@ def get_arguments():
                         help="if set verbosity is low",
                         action="store_true")
 
+    parser.add_argument("-c",
+                        "--csv_file",
+                        type=str,
+                        required=False,
+                        help="if used save list of results to csv file")
+
     return parser.parse_args()
+
+def print_failures(results, writer):
+    """
+    print the failures from a results object to csv
+        Args:
+            results (TextTestResult): the object
+            writer (csv.writer): output object
+    """
+    count = len(results.failures)
+    row = ["Assert Failures", str(count)]
+    writer.writerow(row)
+
+    for item in results.failures:
+        row = ["", item[0]]
+        writer.writerow(row)
+
+def print_errors(results, writer):
+    """
+    print the errors from a results object to csv
+        Args:
+            results (TextTestResult): the object
+            writer (csv.writer): output object
+    """
+    count = len(results.errors)
+    row = ["Errors (unexpected exceptions)", str(count)]
+    writer.writerow(row)
+
+    for item in results.errors:
+        print(f"\t{item[0]}")
+
+def save_results(results, file_name):
+    """
+    save failures and errors from a results object to CSV file
+        Args:
+            results (TextTestResult): the object
+    """
+    with open(file_name, 'w') as out_file:
+        writer = csv.writer(out_file, delimiter=',', lineterminator='\n')
+        if results.wasSuccessful():
+            output = ["No failures or errors"]
+            writer.writerow(output)
+            return
+
+        print_errors(results, writer)
+        print_failures(results, writer)
 
 def run_tests(args):
     """
@@ -51,7 +103,10 @@ def run_tests(args):
         verbosity = 1
 
     runner = unittest.TextTestRunner(verbosity=verbosity)
-    runner.run(suite)
+    results = runner.run(suite)
+
+    if args.csv_file:
+        save_results(results, args.csv_file)
 
 if __name__ == '__main__':
     run_tests(get_arguments())
