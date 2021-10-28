@@ -1,5 +1,5 @@
 '''
-Created on Tue December 08 2020
+Created on Oct 2020
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 this file except in compliance with the License. You may obtain a copy of the
@@ -12,7 +12,7 @@ specific language governing permissions and limitations under the License.
 
 This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 
-@copyright 2020
+@copyright 2021
 @author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 '''
 # set up linting condition

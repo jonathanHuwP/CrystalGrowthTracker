@@ -50,22 +50,29 @@ def draw_image(tmp_path, number, size):
     path = tmp_path.joinpath(f"frame{number:0>4}.png")
     image.save(str(path))
 
-def save_video(tmp_path, fps, silent=True):
+def save_video(tmp_path, fps, dir_path, silent=True):
     """
     combine the region images into videos
         Args:
             tmp_path (pathlib.Path): the directory holding frames
             fps (int): the number of frames per second
+            dir_path (pathlib.Path): the output directory
             silent (bool): if true ffmpeg error output is not printed
     """
     frames_path = tmp_path.joinpath("frame%04d.png")
-    out_file = "test_video.mp4"
+    out_file = pathlib.Path("test_video.avi")
+    if dir_path is not None:
+        out_file = dir_path.joinpath(out_file)
+    else:
+        out_file = pathlib.Path.cwd().joinpath(out_file)
 
     command = (ffmpeg
                .input(str(frames_path), framerate=fps)
-               .output(out_file, pix_fmt='yuv420p'))
+               .output(str(out_file), pix_fmt='yuv420p'))
 
     command.run(capture_stderr=silent)
+
+    return out_file
 
 def make_stills(tmp_path, frame_count):
     """
@@ -77,16 +84,17 @@ def make_stills(tmp_path, frame_count):
     for i in range(frame_count):
         draw_image(tmp_path, i, i*5.0)
 
-def main():
+def make_test(dir_path=None):
     """
     run everything
+        dir_path (pathlib.Path): path to output dir
     """
     frame_count = 75
     frames_per_second = 5
     with tempfile.TemporaryDirectory() as tmp_dir:
         tmp_path = pathlib.Path(tmp_dir)
         make_stills(tmp_path, frame_count)
-        save_video(tmp_path, frames_per_second)
+        return save_video(tmp_path, frames_per_second, dir_path)
 
 if __name__ == "__main__":
-    main()
+    print(f"Test video written to {make_test()}")
