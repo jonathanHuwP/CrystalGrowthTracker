@@ -22,9 +22,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 import unittest
 from pathlib import Path
 
-#import PyQt5.QtWidgets as qw
-#import PyQt5.Qt as qt
-#from PyQt5.QtTest import QTest, QSignalSpy
+import PyQt5.QtGui as qg
 
 from cgt.io.videosource import VideoSource
 from tests.make_test_video import make_test
@@ -39,6 +37,7 @@ class TestVideoControls(unittest.TestCase):
         make a test video
         """
         self._test_file = make_test(Path.cwd())
+        print(f"made {self._test_file}")
 
     def tearDown(self):
         """
@@ -46,19 +45,26 @@ class TestVideoControls(unittest.TestCase):
         """
         if self._test_file.exists():
             self._test_file.unlink()
+            print(f"removed {self._test_file}")
 
     def test_source(self):
         """
         run tests on the video
         """
         source = VideoSource(self._test_file, 5.0)
-        data = source.get_video_data()
+
+        self.data_test(source.get_video_data())
+
+    def data_test(self, data):
+        """
+        test video data
+            data (VideoData): the test object
+        """
         self.assertEqual(data.get_frame_rate_internal(),
                          data.get_frame_rate_user(),
                          "internal and user frame rated differnt")
         self.assertEqual(data.get_frame_rate_internal(), 5.0, "frame rates are not 5")
         self.assertEqual(data.get_frame_count(), 75, "wrong number of frames")
-
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
