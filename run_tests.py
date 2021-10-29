@@ -70,15 +70,17 @@ def print_errors(results, writer):
     writer.writerow(row)
 
     for item in results.errors:
-        print(f"\t{item[0]}")
+        row = ["", item[0]]
+        writer.writerow(row)
 
 def save_results(results, file_name):
     """
-    save failures and errors from a results object to CSV file
+    save unittest failures and errors from a results object to CSV file
         Args:
             results (TextTestResult): the object
     """
     with open(file_name, 'w') as out_file:
+        print(f"save to {file_name}")
         writer = csv.writer(out_file, delimiter=',', lineterminator='\n')
         if results.wasSuccessful():
             output = ["No failures or errors"]
@@ -88,9 +90,24 @@ def save_results(results, file_name):
         print_errors(results, writer)
         print_failures(results, writer)
 
-def run_tests(args):
+def append_results(results, file_name):
     """
-    run the tests
+    append integration test results to CSV file
+        Args:
+            results (TextTestResult): the object
+    """
+    with open(file_name, 'a') as out_file:
+        writer = csv.writer(out_file, delimiter=',', lineterminator='\n')
+        row = ["Integration Tests"]
+        writer.writerow(row)
+
+        for item in results:
+            row = [str(item)]
+            writer.writerow(row)
+
+def run_unittests(args):
+    """
+    run the unit tests
         Args:
             args (argparse.namespace): command line
     """
@@ -106,7 +123,20 @@ def run_tests(args):
     results = runner.run(suite)
 
     if args.csv_file:
+        print("about to save")
         save_results(results, args.csv_file)
 
+def run_integration(args):
+    """
+    run the integration tests
+        Args:
+            args (argparse.namespace): command line
+    """
+    results = []
+
+    if args.csv_file:
+        append_results(results, args.csv_file)
+
 if __name__ == '__main__':
-    run_tests(get_arguments())
+    run_unittests(get_arguments())
+    #run_integration(get_arguments())

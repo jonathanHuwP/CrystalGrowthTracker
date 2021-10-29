@@ -34,7 +34,9 @@ class TestVideoControls(unittest.TestCase):
         """
         make a test video
         """
+        print("about to make")
         self._test_file = make_test(Path.cwd())
+        print(f"made file {self._test_file}")
 
     def tearDown(self):
         """
@@ -42,10 +44,11 @@ class TestVideoControls(unittest.TestCase):
         """
         if self._test_file.exists():
             self._test_file.unlink()
+            print("removed file ok")
 
     def test_source(self):
         """
-        run tests on the video
+        test constructing a VideoSource
         """
         source = VideoSource(self._test_file, get_frame_rate())
 
