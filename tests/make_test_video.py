@@ -27,6 +27,18 @@ import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 import PyQt5.Qt as qt
 
+def get_frame_rate():
+    """
+    the frame rate in frames per second (float)
+    """
+    return 5.0
+
+def get_frame_count():
+    """
+    the number of frames (int)
+    """
+    return 75
+
 def draw_image(tmp_path, number, size):
     """
     draw and save an image of a square centered in 500, 500 pixels
@@ -89,8 +101,8 @@ def make_test(dir_path=None):
     run everything
         dir_path (pathlib.Path): path to output dir
     """
-    frame_count = 75
-    frames_per_second = 5
+    frame_count = get_frame_count()
+    frames_per_second = get_frame_rate()
     with tempfile.TemporaryDirectory() as tmp_dir:
         tmp_path = pathlib.Path(tmp_dir)
         make_stills(tmp_path, frame_count)

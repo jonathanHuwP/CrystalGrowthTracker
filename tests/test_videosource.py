@@ -23,7 +23,7 @@ import unittest
 from pathlib import Path
 
 from cgt.io.videosource import VideoSource
-from tests.make_test_video import make_test
+from tests.make_test_video import make_test, get_frame_count, get_frame_rate
 
 class TestVideoControls(unittest.TestCase):
     """
@@ -47,7 +47,7 @@ class TestVideoControls(unittest.TestCase):
         """
         run tests on the video
         """
-        source = VideoSource(self._test_file, 5.0)
+        source = VideoSource(self._test_file, get_frame_rate())
 
         self.data_test(source.get_video_data())
 
@@ -59,8 +59,12 @@ class TestVideoControls(unittest.TestCase):
         self.assertEqual(data.get_frame_rate_internal(),
                          data.get_frame_rate_user(),
                          "internal and user frame rated differnt")
-        self.assertEqual(data.get_frame_rate_internal(), 5.0, "frame rates are not 5")
-        self.assertEqual(data.get_frame_count(), 75, "wrong number of frames")
+        self.assertEqual(data.get_frame_rate_internal(),
+                         get_frame_rate(),
+                         "frame rates are not 5")
+        self.assertEqual(data.get_frame_count(),
+                         get_frame_count(),
+                         "wrong number of frames")
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
