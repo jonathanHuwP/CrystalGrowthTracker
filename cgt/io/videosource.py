@@ -79,6 +79,18 @@ class VideoSource(FfmpegBase):
             Returns:
                 (QPixmap): the frame
         """
+        image = self.get_image_at(time)
+
+        return qg.QPixmap.fromImage(image)
+
+    def get_image_at(self, time):
+        """
+        getter for the image at a given time (user frame rate):
+            Args:
+                time (float): the time in video internal time
+            Returns:
+                (QImage): the frame
+        """
         args = (ffmpeg
                 .input(self._file_name, ss=time)
                 .output('pipe:', format='rawvideo', pix_fmt=VideoSource.PIX_FMT[0], vframes=1)
@@ -97,11 +109,11 @@ class VideoSource(FfmpegBase):
                 in_bytes = process.stdout.read(self._video_data.get_frame_size())
 
         if in_bytes != 0:
-            return self.make_pixmap(in_bytes)
+            return self.make_image(in_bytes)
 
         return None
 
-    def make_pixmap(self, image_bytes):
+    def make_image(self, image_bytes):
         """
         convert bytes to QPixmap
             Args:
@@ -111,13 +123,11 @@ class VideoSource(FfmpegBase):
         """
         im_format = qg.QImage.Format_RGB888
 
-        image = qg.QImage(image_bytes,
-                          self._video_data.get_width(),
-                          self._video_data.get_height(),
-                          self._video_data.get_bytes_per_line(),
-                          im_format)
-
-        return qg.QPixmap.fromImage(image)
+        return qg.QImage(image_bytes,
+                         self._video_data.get_width(),
+                         self._video_data.get_height(),
+                         self._video_data.get_bytes_per_line(),
+                         im_format)
 
     def get_video_data(self):
         """

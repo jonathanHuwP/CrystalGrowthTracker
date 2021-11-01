@@ -19,55 +19,88 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = protected-access
 # pylint: disable = c-extension-no-member
 # pylint: disable = no-name-in-module
-import unittest
 from pathlib import Path
 
 from cgt.io.videosource import VideoSource
 from tests.make_test_video import make_test, get_frame_count, get_frame_rate
 
-class TestVideoControls(unittest.TestCase):
+class VSTestResults(list):
+    """
+    list ignoring append(None)
+    """
+    def append(self, item):
+        if item is not None:
+            super().append(item)
+
+def test_video_source():
     """
     test the video vidoe source object
     """
+    print("hi there")
+    test_file = Path.cwd()
+    try:
+        print("trying")
+        test_file = make_test(test_file)
+        print("made test file")
+        test_source(test_file)
+    except IOError:
+        return None
+    finally:
+        if test_file.exists() and test_file.is_file():
+            test_file.unlink()
 
-    def setUp(self):
-        """
-        make a test video
-        """
-        print("about to make")
-        self._test_file = make_test(Path.cwd())
-        print(f"made file {self._test_file}")
+def test_source(test_file):
+    """
+    test constructing a VideoSource, must use QImage as no QEnviroment
+    """
+    source = VideoSource(test_file, get_frame_rate())
+    results = VSTestResults()
+    data_test(source.get_video_data(), results)
+    image_test(source, results)
 
-    def tearDown(self):
-        """
-        remove
-        """
-        if self._test_file.exists():
-            self._test_file.unlink()
-            print("removed file ok")
+    if len(results) > 0:
+        for item in results:
+            print(item)
+    else:
+        print("No errors")
 
-    def test_source(self):
-        """
-        test constructing a VideoSource
-        """
-        source = VideoSource(self._test_file, get_frame_rate())
+def image_test(source, results):
+    """
+    test if a pixmap can be extracted from VideoSource
+        Args:
+            source (VideoSource): the test object
+            results (VSTestResults): results list
+    """
+    print("image test")
+    image = source.get_image_at(1.0)
+    print("image")
+    results.append(assert_equal(image.width(), 500, "image has wrong width"))
 
-        self.data_test(source.get_video_data())
+def data_test(data, results):
+    """
+    test video data
+        data (VideoData): the test object
+    """
+    results.append(assert_equal(data.get_frame_rate_internal(),
+                                data.get_frame_rate_user(),
+                                "internal and user frame rated differnt"))
 
-    def data_test(self, data):
-        """
-        test video data
-            data (VideoData): the test object
-        """
-        self.assertEqual(data.get_frame_rate_internal(),
-                         data.get_frame_rate_user(),
-                         "internal and user frame rated differnt")
-        self.assertEqual(data.get_frame_rate_internal(),
-                         get_frame_rate(),
-                         "frame rates are not 5")
-        self.assertEqual(data.get_frame_count(),
-                         get_frame_count(),
-                         "wrong number of frames")
+    results.append(assert_equal(data.get_frame_rate_internal(),
+                                get_frame_rate(),
+                                "frame rates are not 5"))
+
+    results.append(assert_equal(data.get_frame_count(),
+                                get_frame_count(),
+                                "wrong number of frames"))
+
+def assert_equal(first, second, message):
+    """
+    if first == second return None: else else message
+    """
+    if first == second:
+        return None
+
+    return message
 
 if __name__ == '__main__':
-    unittest.main(verbosity=2)
+    test_video_source()

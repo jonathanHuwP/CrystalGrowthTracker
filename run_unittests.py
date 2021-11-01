@@ -126,17 +126,5 @@ def run_unittests(args):
         print("about to save")
         save_results(results, args.csv_file)
 
-def run_integration(args):
-    """
-    run the integration tests
-        Args:
-            args (argparse.namespace): command line
-    """
-    results = []
-
-    if args.csv_file:
-        append_results(results, args.csv_file)
-
 if __name__ == '__main__':
     run_unittests(get_arguments())
-    #run_integration(get_arguments())
