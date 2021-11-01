@@ -36,12 +36,9 @@ def test_video_source():
     """
     test the video vidoe source object
     """
-    print("hi there")
     test_file = Path.cwd()
     try:
-        print("trying")
         test_file = make_test(test_file)
-        print("made test file")
         test_source(test_file)
     except IOError:
         return None
@@ -71,9 +68,7 @@ def image_test(source, results):
             source (VideoSource): the test object
             results (VSTestResults): results list
     """
-    print("image test")
     image = source.get_image_at(1.0)
-    print("image")
     results.append(assert_equal(image.width(), 500, "image has wrong width"))
 
 def data_test(data, results):
