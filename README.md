@@ -100,6 +100,9 @@ Unit tests are in the directory 'tests', which also contains a module for buildi
 
 The tests are written using the Python unittest module and can also be run using the unittest command line, see [unittest man pages] (https://docs.python.org/3/library/unittest.html).  QWidgets are tested using the [PyQt5.QTest](https://doc.qt.io/qtforpython-5/PySide2/QtTest/QTest.html) module to generate simulated user events.
 
+### Other Tests
+Tests of the subprocess calls to ffmpeg cannot be carried out in unittest so the seperate program videosource_ffmpeg_test.py is provided. Please run this in the cgt enviroment.
+
 ### QT5
 The project uses the Python version of Qt for its GUI. This window is designed visually using a Qt Designer, and saved as a .ui file (XML description of the window). The file is then compiled to an object stump that can be subclassed.
 
