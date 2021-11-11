@@ -73,8 +73,6 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         ## pointer for the vertical line identifying the frame
         self._frame_line = None
 
-        self._makeStatsButton.clicked.connect(data_source.make_video_statistics)
-
         self.make_canvases()
 
         font = qg.QFont( "Monospace", 8, qg.QFont.DemiBold)
@@ -182,6 +180,13 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
                 file_path (string): the file
         """
         self._graphicsView.save_scene(file_path)
+
+    @qc.pyqtSlot()
+    def make_statistics(self):
+        """
+        calculate the statistics for the video
+        """
+        self._data_source.make_video_statistics()
 
     def enable(self, enabled):
         """
