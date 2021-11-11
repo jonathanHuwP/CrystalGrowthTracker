@@ -21,6 +21,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # pylint: disable = import-error
 import subprocess
 import os
+import pathlib
 
 import PyQt5.QtCore as qc
 
@@ -29,6 +30,7 @@ import ffmpeg
 
 from cgt.io.ffmpegbase import FfmpegBase
 from cgt.util.framestats import FrameStats, VideoIntensityStats
+from cgt.util import config
 
 class VideoAnalyser(FfmpegBase):
     """
@@ -67,10 +69,15 @@ class VideoAnalyser(FfmpegBase):
                 .output('pipe:', format='rawvideo', pix_fmt=VideoAnalyser.PIX_FMT[0], vframes=length)
                 .compile())
 
-        with open(os.devnull, 'w') as f_err:
+        result = None
+        error_path = pathlib.Path(os.devnull)
+        if config.STATS_ANALYSER_LOG:
+            error_path = pathlib.Path("stats_analyser_log.txt")
+        with open(error_path, 'w') as f_err:
             video_proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=f_err)
+            result = self.read_and_analyse(video_proc)
 
-        return self.read_and_analyse(video_proc)
+        return result
 
     def read_and_analyse(self, video_proc):
         """
@@ -86,7 +93,6 @@ class VideoAnalyser(FfmpegBase):
         flag = True
         while flag:
             in_bytes = video_proc.stdout.read(self._video_data.get_frame_size())
-
             if not len(in_bytes) == 0:
                 vid_statistics.append_frame(self.make_stats(in_bytes, bins))
                 count += 1
@@ -96,6 +102,7 @@ class VideoAnalyser(FfmpegBase):
                 flag = False
 
         self.frames_analysed.emit(count)
+
         return vid_statistics
 
     @staticmethod
