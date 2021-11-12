@@ -841,6 +841,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         """
         calculate the intensity statistics for the video
         """
+        print("Main.make_video_statistics()")
         if self._project is None:
             return
 
@@ -860,15 +861,21 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
 
         analyser = None
         if self._project["raw_video"] is not None:
+            print("main raw video")
             analyser = VideoAnalyser(str(self._project["raw_video"]), self)
         else:
+            print("main enhanced video")
             analyser = VideoAnalyser(str(self._project["enhanced_video"]), self)
 
         self._progressBar.setMaximum(analyser.get_number_frames())
+        print(f"set number of frames {analyser.get_number_frames()}")
         analyser.frames_analysed.connect(self._progressBar.setValue)
+        print("connected")
         self._progressBar.show()
+        print("show")
 
         self._project["results"].set_video_statistics(analyser.stats_whole_film())
+        print("have stats")
         self._progressBar.hide()
 
         self._videoStatsWidget.display_stats()
