@@ -274,6 +274,7 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         """
         pixmap = self._current_pixmap
         regions = self._results_proxy.get_regions()
+        index = -1
         if len(regions) > 0:
             index = self._regionsBox.currentIndex()
             region = regions[index].rect()
@@ -284,7 +285,8 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
         elif self._base_key_frame == self._current_frame:
             self._entryView.set_region_pixmap(pixmap, self._base_key_frame, index)
 
-        self._cloneView.set_region_pixmap(pixmap, self._current_frame, index)
+        if index >= 0:
+            self._cloneView.set_region_pixmap(pixmap, self._current_frame, index)
 
     def redisplay(self):
         """
