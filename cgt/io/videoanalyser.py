@@ -28,20 +28,22 @@ import PyQt5.QtCore as qc
 import numpy as np
 import ffmpeg
 
-from cgt.io.ffmpegbase import FfmpegBase
 from cgt.util.framestats import FrameStats, VideoIntensityStats
 from cgt.util import config
+from cgt.io.videodata import VideoData
 
-class VideoAnalyser(FfmpegBase):
+class VideoAnalyser(qc.QObject):
     """
     an object to analyse statistic of a video
     """
-
     ## the pixel format and number of bytes
     PIX_FMT = ('gray', 1)
 
     ## the progress signal
     frames_analysed = qc.pyqtSignal(int)
+
+    ## the finished signal
+    finished = qc.pyqtSignal()
 
     def __init__(self, video_file, parent=None):
         """
@@ -50,7 +52,16 @@ class VideoAnalyser(FfmpegBase):
                 video_file (string) the path to the video file
                 parent (QObject): parent object
         """
-        super().__init__(video_file, parent)
+        super().__init__(parent)
+
+        ## file name
+        self._file_name = video_file
+
+        ## video data
+        self._video_data = None
+
+        # storage for the results
+        self._result = None
 
         self.probe_video(1, VideoAnalyser.PIX_FMT[1])
 
@@ -68,7 +79,6 @@ class VideoAnalyser(FfmpegBase):
                 .output('pipe:', format='rawvideo', pix_fmt=VideoAnalyser.PIX_FMT[0], vframes=length)
                 .compile())
 
-        result = None
         error_path = pathlib.Path(os.devnull)
         print(f"default error path {type(error_path)} {error_path}")
         if config.STATS_ANALYSER_LOG:
@@ -76,9 +86,16 @@ class VideoAnalyser(FfmpegBase):
         with open(error_path, 'w') as f_err:
             print(f"final error path {error_path}")
             video_proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=f_err)
-            result = self.read_and_analyse(video_proc)
+            self._result = self.read_and_analyse(video_proc)
 
-        return result
+        print("finished")
+        self.finished.emit()
+
+    def get_stats(self):
+        """
+        get the statistics
+        """
+        return self._result
 
     def read_and_analyse(self, video_proc):
         """
@@ -126,3 +143,46 @@ class VideoAnalyser(FfmpegBase):
         get number of frames in video
         """
         return self._video_data.get_frame_count()
+
+    def probe_video(self, user_frame_rate, bytes_per_pixel):
+        """
+        open video file and read data
+            Args:
+                user_frame_rate (int): the frame rate provided by user
+                bytes_per_pixel (int): the numbe of bytes per pixel
+            Throws:
+                 (ffmpeg.Error): can't probe video
+                 (StopIteration): problem with information in video
+                 (KeyError): problem with information in video
+        """
+        probe = ffmpeg.probe(self._file_name)
+        video_info = next(s for s in probe['streams'] if s['codec_type'] == 'video')
+
+        frame_data = [video_info["width"], video_info["height"], video_info["duration_ts"]]
+
+        parts = video_info["r_frame_rate"].split('/')
+        frame_rate_codec = float(parts[0])/float(parts[1])
+        frame_rates = []
+        if user_frame_rate is None:
+            frame_rates.append(frame_rate_codec)
+        else:
+            frame_rates.append(user_frame_rate)
+
+        frame_rates.append(frame_rate_codec)
+
+        self._video_data = VideoData(frame_data, frame_rates, bytes_per_pixel)
+
+    def get_video_data(self):
+        """
+        getter for the video data, return None in file has not been probed
+        """
+        return self._video_data
+
+    def get_name(self):
+        """
+        getter for the file name
+            Returns:
+                file name (string)
+        """
+        return self._file_name
+

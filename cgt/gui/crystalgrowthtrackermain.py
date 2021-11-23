@@ -79,6 +79,12 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         super().__init__(parent)
         self.setupUi(self)
 
+        ## pointer for the statistics analyser
+        self._analyser = None
+
+        ## pointer for the thread
+        self._thread = None
+
         ## the name in the current translation
         self._translated_name = self.tr("CrystalGrowthTracker")
 
@@ -859,23 +865,40 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             if mb_reply == qw.QMessageBox.No:
                 return
 
-        analyser = None
         if self._project["raw_video"] is not None:
             print("main raw video")
-            analyser = VideoAnalyser(str(self._project["raw_video"]), self)
+            self._analyser = VideoAnalyser(str(self._project["raw_video"]))
         else:
             print("main enhanced video")
-            analyser = VideoAnalyser(str(self._project["enhanced_video"]), self)
+            self._analyser = VideoAnalyser(str(self._project["enhanced_video"]))
 
-        self._progressBar.setMaximum(analyser.get_number_frames())
-        print(f"set number of frames {analyser.get_number_frames()}")
-        analyser.frames_analysed.connect(self._progressBar.setValue)
+
+        # create a QThread object
+        self._thread = qc.QThread()
+        # move worker to the thread
+        self._analyser.moveToThread(self._thread)
+
+        self._progressBar.setMaximum(self._analyser.get_number_frames())
+        self._analyser.frames_analysed.connect(self._progressBar.setValue)
+
+        self._thread.started.connect(self._analyser.stats_whole_film)
+        self._analyser.finished.connect(self._thread.quit)
+        self._analyser.finished.connect(self.set_stats_data)
+        self._thread.finished.connect(self._analyser.deleteLater)
+
         print("connected")
         self._progressBar.show()
-        print("show")
 
-        self._project["results"].set_video_statistics(analyser.stats_whole_film())
-        print("have stats")
+        self._thread.start()
+
+    @qc.pyqtSlot()
+    def set_stats_data(self):
+        """
+        get the stats and add to results
+        """
+        if self._analyser is not None:
+            self._project["results"].set_video_statistics(self._analyser.get_stats())
+            print("have stats")
         self._progressBar.hide()
 
         self._videoStatsWidget.display_stats()
