@@ -689,11 +689,11 @@ class MarkUpWidget(qw.QWidget, Ui_MarkUpWidget):
 
     def clear(self):
         """
-        empyt scene graphs and results proxy
+        empty scene graphs and results proxy
         """
-        self._cloneView.scene().clear()
-        self._entryView.scene().clear()
-        self._results_proxy = None
+        self._cloneView.clear()
+        self._entryView.clear()
+        self._current_pixmap = None
 
     def grab_clone_image(self):
         """

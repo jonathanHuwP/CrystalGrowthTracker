@@ -368,6 +368,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self.reset_video_widgets()
         self._propertiesWidget.clear()
         self._videoStatsWidget.clear()
+        self._drawingWidget.clear()
 
     @qc.pyqtSlot()
     def save_image(self):
