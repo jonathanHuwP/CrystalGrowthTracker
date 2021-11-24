@@ -185,4 +185,3 @@ class VideoAnalyser(qc.QObject):
                 file name (string)
         """
         return self._file_name
-
