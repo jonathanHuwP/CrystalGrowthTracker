@@ -289,3 +289,4 @@ class VideoBaseWidget(qw.QWidget):
         self._current_frame = 0
         self.zoom_value(1.0)
         self._videoControl.clear()
+        self._graphicsView.clear()

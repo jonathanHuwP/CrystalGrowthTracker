@@ -166,10 +166,14 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         self._videoNameLabel.setText(self.tr("Video"))
 
         if self._evolution_canvas is not None:
-            self._evolution_canvas.axes.cla()
+            self._evolution_canvas.axes.clear()
+            self._evolution_canvas.draw()
+            self._evolution_canvas.flush_events()
 
         if self._single_frame_canvas is not None:
-            self._single_frame_canvas.axes.cla()
+            self._single_frame_canvas.axes.clear()
+            self._single_frame_canvas.draw()
+            self._single_frame_canvas.flush_events()
 
         super().clear()
 
