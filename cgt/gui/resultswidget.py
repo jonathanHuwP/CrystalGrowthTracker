@@ -275,6 +275,15 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
         """
         self._video_source = video_source
 
+    def clear(self):
+        """
+        clear up for new results
+        """
+        self._resultsTable.clear()
+        self._graph.axes.clear()
+        self._graph.draw()
+        self._graph.flush_events()
+
 def clone_line(marker, pen):
     """
     clone a line
