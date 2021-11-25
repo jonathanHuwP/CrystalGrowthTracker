@@ -229,7 +229,7 @@ def write_html_regions(fout, project, image_files, region_image_files, frame_ima
     fout.write("<figure><br>")
     for name in image_files:
         fout.write(f"<img src=\"{name}\" width=\"30%\">\n")
-    fout.write("<br><figcaption>Fig 2. First, middel and last frames showing the regions.</figcaption>")
+    fout.write("<br><figcaption>Fig 2. First, middle and last frames showing the regions.</figcaption>")
     fout.write("</figure>")
 
     html_table = ["<table style=\"margin-bottom:5mm;\">"]
