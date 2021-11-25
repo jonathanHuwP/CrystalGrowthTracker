@@ -133,6 +133,9 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
             Args:
                 index (int): the index of the region
         """
+        if index<0:
+            return
+
         self.fill_table(index)
         self.draw_graph_of_region(index)
         self.display_region(index)
