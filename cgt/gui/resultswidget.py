@@ -176,10 +176,18 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
         pixmap = pixmap.copy(rect)
         scene.addPixmap(pixmap)
         pen = self._data_source.get_pens().get_display_pen()
-        for line in self._lines:
+        for number, line in enumerate(self._lines):
             scene.addItem(clone_line(line, pen))
-        for point in self._points:
+            add_number_to_point(number,
+                                scene,
+                                line.line().p1(),
+                                self._data_source.get_pens().get_highlight_pen())
+        for number, point in enumerate(self._points):
             scene.addItem(clone_point(point, pen))
+            add_number_to_point(number,
+                                scene,
+                                point.data(ItemDataTypes.CROSS_CENTRE),
+                                self._data_source.get_pens().get_highlight_pen())
 
     @qc.pyqtSlot(float)
     def zoom_changed(self, value):
@@ -324,3 +332,19 @@ def clone_point(marker, pen):
     graph_path.setData(ItemDataTypes.CROSS_CENTRE, centre)
 
     return graph_path
+
+def add_number_to_point(number, scene, point, pen):
+    """
+    add a number to a graphics scene to the left of a point
+        number (int): the number
+        scene (QGraphicsScene): the scene
+        point (QPointF): the point
+        pen (QPen): the pen
+    """
+    item = qw.QGraphicsSimpleTextItem(str(number))
+    font = qg.QFont("Helvetica")
+    font.setPointSize(15)
+    item.setFont(font)
+    item.setPos(point.x()-40.0, point.y()-20.0)
+    item.setPen(pen)
+    item = scene.addItem(item)
