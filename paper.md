@@ -18,7 +18,7 @@ authors:
     affiliation: "4 5 6 7"
 affiliations:
  - name: EPSRC Research Fellow in Software Engineering
-   index 1
+   index: 1
  - name: Research Fellow in Software Engineering
    index: 2
  - name: School of Computer Science, University of Leeds, Leeds, LS2 9JT, UK
