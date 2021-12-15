@@ -2,9 +2,9 @@
 
 This project extracts data on the growth rates of individual faces from x-ray video shadowgraphs of growing crystals.
 
-The algorithm and software in this project were developed by Jonathan Pickering and Joanna Leng at the University of Leeds. They are both funded by EPSRC as part of Joanna Leng's Research Software Engineering Fellowship (EP/R025819/1).
+The algorithm and software in this project were developed by Jonathan Pickering and Joanna Leng at the University of Leeds, Leeds, UK. They are both funded by EPSRC as part of Joanna Leng's Research Software Engineering Fellowship (EP/R025819/1).
 
-Copyright 2020 Jonathan Pickering and Joanna Leng.
+© 2020 Jonathan Pickering and Joanna Leng, University of Leeds, Leeds, UK.
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 
