@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+## @package regionviewcontrol
+# <PACKAGE DESCRIPTION>
+#
+# @copyright Jonathan Pickering and Joanna Leng, University of Leeds, Leeds, UK.
 """
 Created on Wed Feb 10 2021
 

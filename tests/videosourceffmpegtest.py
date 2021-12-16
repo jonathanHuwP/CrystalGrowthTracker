@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+## @package videosourceffmpegtest
+# <PACKAGE DESCRIPTION>
+#
+# @copyright Jonathan Pickering and Joanna Leng, University of Leeds, Leeds, UK.
 '''
 Created on 28 Oct 2020
 
@@ -22,7 +27,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 from pathlib import Path
 
 from cgt.io.videosource import VideoSource
-from tests.make_test_video import make_test, get_frame_count, get_frame_rate
+from tests.maketestvideo import make_test, get_frame_count, get_frame_rate
 
 class VSTestResults(list):
     """

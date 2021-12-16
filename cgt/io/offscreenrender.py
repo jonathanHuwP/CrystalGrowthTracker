@@ -1,4 +1,8 @@
-## -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+## @package offscreenrender
+# <PACKAGE DESCRIPTION>
+#
+# @copyright Jonathan Pickering and Joanna Leng, University of Leeds, Leeds, UK.
 """
 Created on Sat June 19 2021
 

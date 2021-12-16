@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+## @package videoregionselectionwidget
+# <PACKAGE DESCRIPTION>
+#
+# @copyright Jonathan Pickering and Joanna Leng, University of Leeds, Leeds, UK.
 """
 Created on Wed 03 Feb 2021
 

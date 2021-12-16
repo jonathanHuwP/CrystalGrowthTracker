@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+## @package videobasewidget
+# <PACKAGE DESCRIPTION>
+#
+# @copyright Jonathan Pickering and Joanna Leng, University of Leeds, Leeds, UK.
 """
 Created on Thur 11 Feb 2021
 

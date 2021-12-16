@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+## @package cgtproject
+# <PACKAGE DESCRIPTION>
+#
+# @copyright Jonathan Pickering and Joanna Leng, University of Leeds, Leeds, UK.
 ## @package cgtproject
 # the top level class of the model in the MVC architecture, stores project
 # data and the results, also provides a record of having been changed.

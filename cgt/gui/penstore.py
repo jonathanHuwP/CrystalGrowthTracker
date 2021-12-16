@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+## @package penstore
+# <PACKAGE DESCRIPTION>
+#
+# @copyright Jonathan Pickering and Joanna Leng, University of Leeds, Leeds, UK.
 """
 Created on Tue 25 May 2021
 

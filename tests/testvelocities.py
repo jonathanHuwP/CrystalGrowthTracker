@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+## @package testvelocities
+# <PACKAGE DESCRIPTION>
+#
+# @copyright Jonathan Pickering and Joanna Leng, University of Leeds, Leeds, UK.
 """
 Created on 06 Oct 2021
 

@@ -1,4 +1,8 @@
-## -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+## @package videodata
+# <PACKAGE DESCRIPTION>
+#
+# @copyright Jonathan Pickering and Joanna Leng, University of Leeds, Leeds, UK.
 """
 Created on  Sunday 01 Aug 2021
 

@@ -1,4 +1,8 @@
-## -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+## @package buildui
+# <PACKAGE DESCRIPTION>
+#
+# @copyright Jonathan Pickering and Joanna Leng, University of Leeds, Leeds, UK.
 """
 Created on Tue 27 Oct 2020
 

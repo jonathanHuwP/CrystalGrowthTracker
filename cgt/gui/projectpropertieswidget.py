@@ -1,4 +1,8 @@
-## -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+## @package projectpropertieswidget
+# <PACKAGE DESCRIPTION>
+#
+# @copyright Jonathan Pickering and Joanna Leng, University of Leeds, Leeds, UK.
 """
 Created on Wed Sept 30 2020
 

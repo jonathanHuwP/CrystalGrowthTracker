@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+## @package autopylint
+# <PACKAGE DESCRIPTION>
+#
+# @copyright Jonathan Pickering and Joanna Leng, University of Leeds, Leeds, UK.
 """
 Created on Fri 25 June 2021
 

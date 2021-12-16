@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+## @package testio
+# <PACKAGE DESCRIPTION>
+#
+# @copyright Jonathan Pickering and Joanna Leng, University of Leeds, Leeds, UK.
 '''
 Created on Tue December 08 2020
 

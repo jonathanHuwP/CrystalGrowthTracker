@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+## @package htmlreport
+# <PACKAGE DESCRIPTION>
+#
+# @copyright Jonathan Pickering and Joanna Leng, University of Leeds, Leeds, UK.
 '''
 htmlreport.py
 

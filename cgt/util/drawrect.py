@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+## @package drawrect
+# <PACKAGE DESCRIPTION>
+#
+# @copyright Jonathan Pickering and Joanna Leng, University of Leeds, Leeds, UK.
 """
 Created on Wed Jun 10 11:26:28 2020
 

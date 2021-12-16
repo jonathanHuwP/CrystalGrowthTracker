@@ -1,4 +1,8 @@
-## -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+## @package crystalgrowthtrackermain
+# <PACKAGE DESCRIPTION>
+#
+# @copyright Jonathan Pickering and Joanna Leng, University of Leeds, Leeds, UK.
 """
 Created on Mon Feb 24 15:45:07 2020
 

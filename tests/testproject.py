@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+## @package testproject
+# <PACKAGE DESCRIPTION>
+#
+# @copyright Jonathan Pickering and Joanna Leng, University of Leeds, Leeds, UK.
 '''
 Created on 05 Oct 2021
 

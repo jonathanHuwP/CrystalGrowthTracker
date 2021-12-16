@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+## @package videoanalysisresultsstore
+# <PACKAGE DESCRIPTION>
+#
+# @copyright Jonathan Pickering and Joanna Leng, University of Leeds, Leeds, UK.
 """
 Created on Tuesday August 18 2020
 
