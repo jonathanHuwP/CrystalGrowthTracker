@@ -14,7 +14,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 This was developed using Python 3.7/3.8 and Anaconda, Inc. on Windows 10 systems. The software has not been executed on Linux or Mac.
 
 ## Installation, Use and Development
-This software uses Anaconda with Python 3.8, at present it will not work with 3.9. The packages required to run the software are listed in the file environment_CGT.yml.
+This software uses Anaconda with Python 3.8, at present it will not work with 3.9. The packages required to run the software are listed in the file environment.yml.
 
 If you have installed Anaconda, you can install the software and run in two steps:
 
@@ -28,7 +28,7 @@ Open an Anaconda shell and navigate to the CrystalGrowthTracker directory.
 
 Set up the conda environment (if you are a developer see below):
 
-`conda env create -f environment_CGT.yml`
+`conda env create -f environment.yml`
 
 To activate the CGT Anaconda environment type the following:
 
@@ -36,7 +36,7 @@ To activate the CGT Anaconda environment type the following:
 
 To build the Qt widgets reqired
 
-`python .\build_ui.py`
+`python .\buildui.py`
 
 ### Changing the environment
 
@@ -52,7 +52,7 @@ Update conda:
 `conda update --all`
 
 Create new environment:
-`conda env create -f environment_CGT.yml`
+`conda env create -f environment.yml`
 
 Activate:
 `conda activete cgt`
@@ -65,11 +65,11 @@ Open an Anaconda shell and activate the environment:
 
 then navigate to the CrystalGrowthTracker directory and run by typing:
 
-`python .\run_cgt.py`
+`python .\growthtracker.py`
 
 you can also run from another directory using:
 
-`python C:\Users\uname\Work\CrystalGrowthTracker\run_cgt.py`
+`python C:\Users\uname\Work\CrystalGrowthTracker\growthtracker.py`
 
 or the path relative to your current location.
 
@@ -96,12 +96,12 @@ After this has run a doc/html directory will appear. Open the index.html file in
 The doxygen documentation for this project lists gives the API (Application Programmers Interface) for all the modules and scripts in this project making it useful to developers who wish to further develop this software.
 
 ### UnitTesting
-Unit tests are in the directory 'tests', which also contains a module for building a dummy restults object.  All he tests can be run using the python script 'run_tests.py', which takes a '-q --quiet' command line option.  The script will run all the tests printing results in verbose format unless the quiet option is used. Any individual test module can be run by running the file itself 'python tests\test_io.py' for example.
+Unit tests are in the directory 'tests', which also contains a module for building a dummy restults object.  All he tests can be run using the python script 'unittests.py', which takes a '-q --quiet' command line option.  The script will run all the tests printing results in verbose format unless the quiet option is used. Any individual test module can be run by running the file itself 'python tests\testio.py' for example.
 
 The tests are written using the Python unittest module and can also be run using the unittest command line, see [unittest man pages] (https://docs.python.org/3/library/unittest.html).  QWidgets are tested using the [PyQt5.QTest](https://doc.qt.io/qtforpython-5/PySide2/QtTest/QTest.html) module to generate simulated user events.
 
 ### Other Tests
-Tests of the subprocess calls to ffmpeg cannot be carried out in unittest so the seperate program videosource_ffmpeg_test.py is provided. Please run this in the cgt enviroment.
+Tests of the subprocess calls to ffmpeg cannot be carried out in unittest so the seperate program videosourceffmpegtest.py is provided. Please run this in the cgt enviroment.
 
 ### QT5
 The project uses the Python version of Qt for its GUI. This window is designed visually using a Qt Designer, and saved as a .ui file (XML description of the window). The file is then compiled to an object stump that can be subclassed.
@@ -119,9 +119,9 @@ The code has been designed to allow translations of the user interface. The proc
 1. Use pylupdate5 to make a .ts file
 
     '''
-    pylupdate5 .\\CrystalGrowthTrackerMain.py .\\CrystalGrowthTrackerMain.ui .\\PolyLineExtract.py .\\DrawRect.py .\\ImageLabel.py -ts cgt_german.ts
+    pylupdate5 .\\CrystalGrowthTrackerMain.py .\\CrystalGrowthTrackerMain.ui .\\PolyLineExtract.py .\\DrawRect.py .\\ImageLabel.py -ts cgtgerman.ts
     '''
-2. Run 'linguist.exe', open the 'cgt_german.ts', if there is an existing phrase book load that as well.  Carry out the translation, and save the .ts file and save it again as a phrase book, overwriting the existing if necessary.
+2. Run 'linguist.exe', open the 'cgtgerman.ts', if there is an existing phrase book load that as well.  Carry out the translation, and save the .ts file and save it again as a phrase book, overwriting the existing if necessary.
 
 3. Save the .ts file a third time by selecting 'Release' or 'Release As' on Linguist's 'File' menu.
 
