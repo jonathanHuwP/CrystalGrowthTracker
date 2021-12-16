@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 ## @package videosource
-# <PACKAGE DESCRIPTION>
+# a wrapper class for the ffmpeg package, allows access to individual frames
 #
-# @copyright Jonathan Pickering and Joanna Leng, University of Leeds, Leeds, UK.
+# @copyright 2021 University of Leeds, Leeds, UK.
+# @author j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 """
 Created on Thur Mar 04 2021
 
@@ -19,9 +20,6 @@ CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 
 This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
-
-@copyright 2021
-@author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 """
 # set up linting conditions
 # pylint: disable = too-many-public-methods

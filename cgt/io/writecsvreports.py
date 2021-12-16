@@ -1,14 +1,10 @@
 # -*- coding: utf-8 -*-
 ## @package writecsvreports
-# <PACKAGE DESCRIPTION>
+# functions that write results files in comma seperated values (CSV) format
 #
-# @copyright Jonathan Pickering and Joanna Leng, University of Leeds, Leeds, UK.
+# @copyright 2021 University of Leeds, Leeds, UK.
+# @author j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 '''
-writecsvreports.py
-
-This python module contains functions that create reports in comma seperated values
-format for the CrystalGrowthTracker application.
-
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 this file except in compliance with the License. You may obtain a copy of the
 License at http://www.apache.org/licenses/LICENSE-2.0
@@ -19,9 +15,6 @@ CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 
 This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
-
-@copyright 2020
-@author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 '''
 import pathlib
 import csv
