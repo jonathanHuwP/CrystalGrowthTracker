@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 ## @package testvideocontrols
-# <PACKAGE DESCRIPTION>
+# unittesting of the video controls
 #
-# @copyright Jonathan Pickering and Joanna Leng, University of Leeds, Leeds, UK.
+# @copyright 2021 University of Leeds, Leeds, UK.
+# @author j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 '''
-Created on Oct 2020
+Created 2021
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 this file except in compliance with the License. You may obtain a copy of the
@@ -16,9 +17,6 @@ CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 
 This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
-
-@copyright 2021
-@author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 '''
 # set up linting condition
 # pylint: disable = protected-access

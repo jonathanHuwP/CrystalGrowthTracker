@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 ## @package cgtapplication
-# <PACKAGE DESCRIPTION>
+# makes a qt application, adds a CGT main window to it, then runs and shows
 #
-# @copyright Jonathan Pickering and Joanna Leng, University of Leeds, Leeds, UK.
+# @copyright 2020 University of Leeds, Leeds, UK.
+# @author j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 """
 Created on Tue 22 Nov 2020
 
@@ -16,9 +17,6 @@ CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 
 This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
-
-@copyright 2020
-@author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 """
 # set up linting conditions
 # pylint: disable = too-few-public-methods

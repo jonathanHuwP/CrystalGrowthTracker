@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 ## @package testproject
-# <PACKAGE DESCRIPTION>
+# unittests of the project class
 #
-# @copyright Jonathan Pickering and Joanna Leng, University of Leeds, Leeds, UK.
+# @copyright 2021 University of Leeds, Leeds, UK.
+# @author j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 '''
 Created on 05 Oct 2021
 

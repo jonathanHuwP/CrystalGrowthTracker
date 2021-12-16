@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 ## @package cgtproject
-# <PACKAGE DESCRIPTION>
-#
-# @copyright Jonathan Pickering and Joanna Leng, University of Leeds, Leeds, UK.
-## @package cgtproject
 # the top level class of the model in the MVC architecture, stores project
 # data and the results, also provides a record of having been changed.
 #
-# © 2020 Jonathan Pickering and Joanna Leng, University of Leeds, Leeds, UK.
+# @copyright 2020 University of Leeds, Leeds, UK.
+# @author j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 """
 Created on Mon Feb 24 15:45:07 2020
 
@@ -24,9 +21,6 @@ CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 
 This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
-
-@copyright 2020
-@author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 """
 # set up linting conditions
 
