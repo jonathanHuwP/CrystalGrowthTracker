@@ -28,7 +28,7 @@ import PyQt5.QtCore as qc
 
 from cgt.gui.crystalgrowthtrackermain import CrystalGrowthTrackerMain
 
-class CGTApp(qw.QApplication):
+class CGTApplication(qw.QApplication):
     """
     the application that runs the main window
     """

@@ -19,7 +19,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 import sys
 import argparse
 
-from cgt.cgt_app import CGTApp
+from cgt.cgtapplication import CGTApplication
 
 def get_python_args():
     """
@@ -44,4 +44,4 @@ def get_python_args():
     return args
 
 if __name__ == "__main__":
-    application = CGTApp(sys.argv, get_python_args())
+    application = CGTApplication(sys.argv, get_python_args())
