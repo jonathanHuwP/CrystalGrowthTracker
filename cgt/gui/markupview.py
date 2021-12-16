@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 ## @package markupview
-# <PACKAGE DESCRIPTION>
+# subclass of QGraphicalView allowing the user to draw markers on the video images
 #
-# @copyright Jonathan Pickering and Joanna Leng, University of Leeds, Leeds, UK.
+# @copyright 2021 University of Leeds, Leeds, UK.
+# @author j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 """
 Created on 22 March 2021
 
@@ -16,9 +17,6 @@ CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 
 This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
-
-@copyright 2021
-@author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 """
 # set up linting conditions
 # pylint: disable = c-extension-no-member

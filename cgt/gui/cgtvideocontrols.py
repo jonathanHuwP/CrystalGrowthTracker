@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 ## @package cgtvideocontrols
-# <PACKAGE DESCRIPTION>
+# widget providing the user controls for a video player
 #
-# @copyright Jonathan Pickering and Joanna Leng, University of Leeds, Leeds, UK.
+# @copyright 2020 University of Leeds, Leeds, UK.
+# @author j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 """
 Created on Tue September 09 2020
 
@@ -15,11 +16,7 @@ under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 
-This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
-
-@copyright 2020
-@author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
-"""
+This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)"""
 # set up linting condition
 # pylint: disable = c-extension-no-member
 # pylint: disable = import-error

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 ## @package editnotesdialog
-# <PACKAGE DESCRIPTION>
+# widget allowing the user to enter text
 #
-# @copyright Jonathan Pickering and Joanna Leng, University of Leeds, Leeds, UK.
+# @copyright 2020 University of Leeds, Leeds, UK.
+# @author j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 """
 Created on Tuesday 13 Oct 2020
 
@@ -16,9 +17,6 @@ CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 
 This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
-
-@copyright 2020
-@author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 """
 
 # set up linting conditions
