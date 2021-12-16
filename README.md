@@ -81,6 +81,10 @@ To remove software delete the CrystalGrowthTracker direcory, then delete the env
 
 ## Notes for Developers
 
+If you change the Qt .ui files you will need to rebuild the Ui_<name>.py files by running:
+
+`python .\buildui.py`
+
 ### Doxygen Documentation
 
 The software is documented with doxygen.
@@ -97,6 +101,8 @@ The doxygen documentation for this project lists gives the API (Application Prog
 
 ### UnitTesting
 Unit tests are in the directory 'tests', which also contains a module for building a dummy restults object.  All he tests can be run using the python script 'unittests.py', which takes a '-q --quiet' command line option.  The script will run all the tests printing results in verbose format unless the quiet option is used. Any individual test module can be run by running the file itself 'python tests\testio.py' for example.
+
+A seperate script 'videosourceffmpegtest.py', in the tests directory can be run to test the video reading classes.
 
 The tests are written using the Python unittest module and can also be run using the unittest command line, see [unittest man pages] (https://docs.python.org/3/library/unittest.html).  QWidgets are tested using the [PyQt5.QTest](https://doc.qt.io/qtforpython-5/PySide2/QtTest/QTest.html) module to generate simulated user events.
 
