@@ -40,7 +40,7 @@ ROOT_FILE_NAMES = ["crystalgrowthtrackermain",
                    "resultswidget"]
 
 # relative path to the Qt .ui files
-UI_PATH = "./resources/designer_ui/"
+UI_PATH = "./resources/designer/"
 
 # relative path to the python source files
 PY_PATH = "./cgt/gui/"
