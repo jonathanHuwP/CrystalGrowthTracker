@@ -8,14 +8,14 @@ tags:
 authors:
   - name: Joanna Leng^[co-first author]
     orcid: 0000-0001-9790-162X
-    affiliation: "1 3"
+    affiliation: "1,3"
   - name: Jonathan H. Pickering^[co-first author]
-    affiliation: "2 3"
+    affiliation: "2,3"
     orcid: 0000-0001-5283-8065
   - name: Sven L. M. Schroeder
-    affiliation: "4 5 6 7"
+    affiliation: "4,5,6,7"
   - name: Gunjen Das
-    affiliation: "4 5 6 7"
+    affiliation: "4,5,6,7"
 affiliations:
  - name: EPSRC Research Fellow in Software Engineering
    index: 1
