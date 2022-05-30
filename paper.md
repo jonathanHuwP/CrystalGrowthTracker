@@ -1,5 +1,5 @@
 ---
-title: 'CrysalGrowthTracker: A Python package for calculating the face advancment rates of crystals from videos taken using synchrotron radiation'
+title: 'CrystalGrowthTracker: A Python package to analyse crystal face advancement rates from time lapse synchrotron radiography'
 tags:
   - Python
   - video processing
@@ -37,15 +37,15 @@ bibliography: paper.bib
 
 # Summary
 
-X-ray synchrotron radiation allows the investigation of many physical processes in unprecedented ways, one application is early stages of crystallization important to the world’s fine chemicals industry.  To aid chemical engineers working in this area we developed the CrystalGrowthTracker package.  It allows crystals to be found in videos and their growth rates measured, we hope that this work can provide the basis for further fully automated systems.
+X-ray synchrotron radiation allows the investigation of many physical processes in unprecedented ways. One application, important to the fine chemicals industry, is charaterizing the early stages of crystallization.  To aid chemical engineers working in this area we developed the CrystalGrowthTracker package.  It allows crystals to be found in videos and their growth rates measured.  We hope that this work can provide the basis for further fully automated systems.
 
 # Statement of Need
 
-Much of the output of global fine chemicals industries consists of crystalline powders produced by precipitation from solution.  Since the geometry of a crystal is the result of differential growth rates on different crystal planes, there is great commercial interest in studying the growth rates of crystal faces in the early stages of crystallization.  One approach is to use the X-rays of synchrotron radiation [@Baruchel2013] to produce shadow graphs of crystals precipitating onto a substrate.  Videos of the shadow graphs first need enhancement using the packages such as Euler’s Magnifier [@Wu12Eulerian] and some statistical analysis of the raw video is desirable to find regions of interest. **CrystalGrowthTracker** has been developed to assist in the analysis of videos of the raw and enhanced videos.
+Much of the output of global fine chemicals industries consists of crystalline powders produced by precipitation from solution.  Since the geometry of a crystal is the result of differential growth rates on different crystal planes, there is great commercial interest in studying the growth rates of crystal faces in the early stages of crystallization.  One approach is to use the X-rays of synchrotron radiation [@Baruchel2013] to produce shadowgraphs of crystals precipitating onto a substrate.  Videos of the shadow graphs first need enhancement using the packages such as Euler’s Magnifier [@Wu12Eulerian] and some statistical analysis of the raw video is desirable to find regions of interest.  **CrystalGrowthTracker** has been developed to assist in the analysis of videos of the raw and enhanced videos.
 
 # Design
 
-Although the obvious approach would be to use image analysis and machine learning, the relatively noisy data, the limited number of data sets and the need for verifiable results lead to a manual approach.  User analysis of video required the package to be based on a graphical user interface (GUI).  Finally the users would need to be able to download and run the package on any machine, so the package was developed using Python and PyQt5 [@riverbank] withing the conda package management system.  The use of Qt naturally leads to an object orientated architecture.
+Although the obvious approach would be to use image analysis and machine learning, the relatively noisy data, the limited number of data sets and the need for verifiable results lead to a manual approach.  User analysis of video required the package to be based on a graphical user interface (GUI).  Finally the users would need to be able to download and run the package on any machine, so the package was developed using Python and PyQt5 from Riverbank Computing Limited, withing the conda package management system.  The use of Qt naturally leads to an object orientated architecture.
 
 The package must allow the user to load two videos, the raw and the enhanced and had to provide the following functions.
 
