@@ -95,7 +95,7 @@ After this has run a doc/html directory will appear. Open the index.html file in
 The doxygen documentation for this project lists gives the API (Application Programmers Interface) for all the modules and scripts in this project making it useful to developers who wish to further develop this software.
 
 ### UnitTesting
-Unit tests are in the directory 'tests', which also contains a module for building a dummy restults object.  All he tests can be run using the python script 'run_tests.py', which takes a '-q --quiet' command line option.  The script will run all the tests printing results in verbose format unless the quiet option is used. Any individual test module can be run by running the file itself 'python tests\test_io.py' for example.
+Unit tests are in the directory 'tests', which also contains a module for building a dummy restults object.  All he tests can be run using the python script 'run_tests.py', which takes a '-q --quiet' command line option.  The script will run all the tests printing results in verbose format unless the quiet option is used. Any individual test module can be run by running the file itself `python tests\test_io.py` for example.
 
 The tests are written using the Python unittest module and can also be run using the unittest command line, see [unittest man pages] (https://docs.python.org/3/library/unittest.html).  QWidgets are tested using the [PyQt5.QTest](https://doc.qt.io/qtforpython-5/PySide2/QtTest/QTest.html) module to generate simulated user events.
 
