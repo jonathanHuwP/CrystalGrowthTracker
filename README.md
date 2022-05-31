@@ -117,9 +117,8 @@ The code has been designed to allow translations of the user interface. The proc
 
 1. Use pylupdate5 to make a .ts file
 
-    '''
-    pylupdate5 .\\CrystalGrowthTrackerMain.py .\\CrystalGrowthTrackerMain.ui .\\PolyLineExtract.py .\\DrawRect.py .\\ImageLabel.py -ts cgt_german.ts
-    '''
+    `pylupdate5 .\\CrystalGrowthTrackerMain.py .\\CrystalGrowthTrackerMain.ui .\\PolyLineExtract.py .\\DrawRect.py .\\ImageLabel.py -ts cgt_german.ts`
+
 2. Run 'linguist.exe', open the 'cgt_german.ts', if there is an existing phrase book load that as well.  Carry out the translation, and save the .ts file and save it again as a phrase book, overwriting the existing if necessary.
 
 3. Save the .ts file a third time by selecting 'Release' or 'Release As' on Linguist's 'File' menu.
