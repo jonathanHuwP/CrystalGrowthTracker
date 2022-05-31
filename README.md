@@ -38,26 +38,25 @@ To build the Qt widgets reqired
 
 `python .\build_ui.py`
 
-### Changing the environment
+### Changing or updating the environment
 
-If you need to change an old environment following the inculsion or removal of a package.
+If you need to change or replace an old environment following the inculsion or removal of a package.
 
 List conda environments:
 `conda env list`
 
-Remove old environments:
-'conda env remove --name cgt'
+Update all packages in the current conda environment:
+`conda update --all` or
 
-Update conda:
-`conda update --all`
+Update cgt from a new .yml file:
+`conda env update --name cgt --file environment.yml`
 
-Create new environment:
-`conda env create -f environment_CGT.yml`
+If you need to remove old environments:
+`conda env remove --name cgt`
 
-Activate:
-`conda activete cgt`
+The enviroment can be recreated as described above.
 
-### Runing the Software
+### Running the Software
 
 Open an Anaconda shell and activate the environment:
 

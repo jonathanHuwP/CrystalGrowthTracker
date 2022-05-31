@@ -45,7 +45,7 @@ Much of the output of global fine chemicals industries consists of crystalline p
 
 # Design
 
-Although the obvious approach would be to use image analysis and machine learning, the relatively noisy data, the limited number of data sets and the need for verifiable results lead to a manual approach.  User analysis of video required the package to be based on a graphical user interface (GUI).  Finally the users would need to be able to download and run the package on any machine, so the package was developed using Python and PyQt5 from Riverbank Computing Limited, withing the conda package management system.  The use of Qt naturally leads to an object orientated architecture.
+Although the obvious approach would be to use image analysis and machine learning, the relatively noisy data, the limited number of data sets and the need for verifiable results lead to a manual approach.  User analysis of video required the package to be based on a graphical user interface (GUI).  Finally the users would need to be able to download and run the package on any machine, so the package was developed using Python and PyQt5, from Riverbank Computing Limited (https://riverbankcomputing.com/about), within the conda package management system.  The use of Qt naturally leads to an object orientated architecture.
 
 The package must allow the user to load two videos, the raw and the enhanced, and must provide the following functions.
 
