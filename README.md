@@ -43,15 +43,19 @@ To build the Qt widgets reqired
 If you need to change or replace an old environment following the inculsion or removal of a package.
 
 List conda environments:
+
 `conda env list`
 
 Update all packages in the current conda environment:
+
 `conda update --all` or
 
 Update cgt from a new .yml file:
+
 `conda env update --name cgt --file environment.yml`
 
 If you need to remove old environments:
+
 `conda env remove --name cgt`
 
 The enviroment can be recreated as described above.
