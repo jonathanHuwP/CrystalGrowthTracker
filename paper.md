@@ -62,7 +62,7 @@ A model-view-controller (MVC) software architecture [@mvc88krasne] was used, in 
 
 The VideoSource object accessed the video via the ffmpeg package (https://www.ffmpeg.org/), which was encapsulated in a using the subprocess module. The frame access had to be in terms of time rather than frame number as when accessing a specified frame number ffmpeg scans the entire video to count frames from the start.  The widgets requiring video stored their own time in the video and when playing called for the frame at the next time step.  No effort was made to play at the correct number of frames per second.
 
-Project data and results are saved in comer-separated value (CSV) files handled by an input-output module using the Python csv module.  The results of a project can be saved in a HTML report, which can be viewed using the report tab widget. The HTML was written by a report writer module using offscreen rendering for the associated graphics.
+Project data and results are saved in comma-separated value (CSV) files handled by an input-output module using the Python csv module.  The results of a project can be saved in a HTML report, which can be viewed using the report tab widget. The HTML was written by a report writer module using offscreen rendering for the associated graphics.
 
 The video is displayed using a QGraphicsView with an associated QGraphicsScene, which together provide a scene-graph and view. Video is displayed as a QPixmap at depth zero in the scene, and the user markings are QGrapicsItems at depth one (above the pixmap). A zoom feature is provided by scaling the view matrix in the QGraphicsView.
 
