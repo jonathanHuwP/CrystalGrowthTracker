@@ -108,6 +108,9 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._progressBar.hide()
         self.set_title()
 
+        for item in dir(self):
+            print(f"{item}")
+
     def setup_tabs(self):
         """
         setup the tabs

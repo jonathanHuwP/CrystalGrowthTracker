@@ -42,7 +42,7 @@ class CGTApp(qw.QApplication):
          """
         super().__init__(args)
         self.setApplicationName("CrystalGrowthTracker")
-        self.setApplicationVersion("B0.1")
+        self.setApplicationVersion("1.0.0")
         self.setOrganizationName("School of Computer Science, University of Leeds, Leeds, UK")
         self.setOrganizationDomain("leeds.ac.uk")
         self.setAttribute(qc.Qt.AA_EnableHighDpiScaling)
