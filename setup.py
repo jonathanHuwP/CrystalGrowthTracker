@@ -15,12 +15,27 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 @copyright 2020
 @author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 """
+from pathlib import Path
 from setuptools import setup
+
+def read(fname):
+    """
+    read and return contents of file:
+        Args:
+            fname (str): the file name
+        Returns:
+            (str) the contents of the file
+    """
+    return (Path(__file__).parent.joinpath(fname)).open(encoding='UTF-8').read()
 
 setup(
     name='CrystalGrowthTracker',
     version='1.0.0',
     packages=['cgt',
              ],
-    license='Apache2',
+    license='Apache 2.0, January 2004',
+    description ='Measure crystal growth rates in x-ray shadowgraphs.',
+    platforms="Windows10, Linux",
+    long_description=read('README.md'),
+    include_package_data=True
 )
