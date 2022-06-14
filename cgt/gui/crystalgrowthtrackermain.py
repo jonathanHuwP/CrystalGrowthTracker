@@ -283,7 +283,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             mb_reply = qw.QMessageBox.question(
                 self,
                 self.tr('CrystalGrowthTracker'),
-                self.tr('You have a project with unsaved dat that will be lost. Proceed?'),
+                self.tr('You have a project with unsaved data that will be lost. Proceed?'),
                 qw.QMessageBox.Yes | qw.QMessageBox.No,
                 qw.QMessageBox.No)
 
