@@ -25,7 +25,7 @@ import unittest
 import PyQt5.QtCore as qc
 import PyQt5.QtWidgets as qw
 
-from tests.makeresults import make_results_object
+from cgt.tests.makeresults import make_results_object
 from cgt.model.videoanalysisresultsstore import VideoAnalysisResultsStore
 
 class TestResults(unittest.TestCase):

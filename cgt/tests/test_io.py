@@ -27,8 +27,7 @@ from cgt.io.readcsvreports import read_csv_project
 from cgt.model.cgtproject import CGTProject
 from cgt.model.videoanalysisresultsstore import VideoAnalysisResultsStore
 from cgt.util.scenegraphitems import compare_lines, compare_points
-
-from tests.makeresults import make_results_object
+from cgt.tests.makeresults import make_results_object
 
 class TestIO(unittest.TestCase):
     """

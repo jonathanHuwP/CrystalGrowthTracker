@@ -23,7 +23,7 @@ import unittest
 from cgt.util.markers import MarkerTypes
 from cgt.model.velocitiescalculator import (ScreenDisplacement,
                                             VelocitiesCalculator)
-import tests.makeresults as mkres
+import cgt.tests.makeresults as mkres
 
 class TestDisplacements(unittest.TestCase):
     """

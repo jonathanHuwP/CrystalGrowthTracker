@@ -79,7 +79,7 @@ def save_results(results, file_name):
         Args:
             results (TextTestResult): the object
     """
-    with open(file_name, 'w') as out_file:
+    with open(file_name, 'w', encoding='UTF-8') as out_file:
         print(f"save to {file_name}")
         writer = csv.writer(out_file, delimiter=',', lineterminator='\n')
         if results.wasSuccessful():
@@ -96,7 +96,7 @@ def append_results(results, file_name):
         Args:
             results (TextTestResult): the object
     """
-    with open(file_name, 'a') as out_file:
+    with open(file_name, 'a', encoding='UTF-8') as out_file:
         writer = csv.writer(out_file, delimiter=',', lineterminator='\n')
         row = ["Integration Tests"]
         writer.writerow(row)
@@ -112,7 +112,7 @@ def run_unittests(args):
             args (argparse.namespace): command line
     """
     loader = unittest.TestLoader()
-    test_dir = './tests'
+    test_dir = './cgt/tests'
     suite = loader.discover(test_dir)
 
     verbosity = 2
