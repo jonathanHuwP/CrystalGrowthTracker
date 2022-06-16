@@ -22,7 +22,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 from pathlib import Path
 
 from cgt.io.videosource import VideoSource
-from tests.make_test_video import make_test, get_frame_count, get_frame_rate
+from cgt.tests.make_test_video import make_test, get_frame_count, get_frame_rate
 
 class VSTestResults(list):
     """
@@ -55,11 +55,12 @@ def test_source(test_file):
     data_test(source.get_video_data(), results)
     image_test(source, results)
 
+    print("Test of ffmpeg video source:")
     if len(results) > 0:
         for item in results:
-            print(item)
+            print(f"\t{item}")
     else:
-        print("No errors")
+        print("\tNo errors")
 
 def image_test(source, results):
     """

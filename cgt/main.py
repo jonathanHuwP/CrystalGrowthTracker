@@ -18,6 +18,9 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 import sys
 import argparse
 
+from cgt.cgt_app import CGTApp
+from cgt.tests.videosource_ffmpeg_test import test_video_source
+
 def get_python_args():
     """
     set up to read project name from command line
@@ -56,8 +59,9 @@ def main():
 
     if parsed_args.test:
         print("Running tests")
+        test_video_source()
     else:
-        print("running app")
+        CGTApp(sys.argv, get_python_args())
 
 if __name__ == "__main__":
     main()
