@@ -1,6 +1,5 @@
-## -*- coding: utf-8 -*-
 """
-Created on Sunday 22 Nov 2020
+Created on Sun 16 June 2022
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 this file except in compliance with the License. You may obtain a copy of the
@@ -13,17 +12,15 @@ specific language governing permissions and limitations under the License.
 
 This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 
-@copyright 2020
+@copyright 2022
 @author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 """
 import sys
 import argparse
 
-from cgt.cgt_app import CGTApp
-
 def get_python_args():
     """
-    get the command line arguments
+    set up to read project name from command line
         Returns:
             (argparse.Namespace) parsed command line arguments
     """
@@ -40,8 +37,27 @@ def get_python_args():
                         action='store_true',
                         help="if set write ffmpeg log files to file")
 
-    args = parser.parse_args()
-    return args
+    parser.add_argument("-t",
+                        "--test",
+                        action='store_true',
+                        help="run the test suite instead of main window")
+
+    return parser.parse_args()
+
+def main():
+    """
+    run the application or the tests
+        Args:
+            argv (list<string>): the raw command line arguments
+            parsed_args (argparse.Namespace)
+    """
+    parsed_args = get_python_args()
+    print(f"Hello world! {parsed_args} {sys.argv}")
+
+    if parsed_args.test:
+        print("Running tests")
+    else:
+        print("running app")
 
 if __name__ == "__main__":
-    application = CGTApp(sys.argv, get_python_args())
+    main()

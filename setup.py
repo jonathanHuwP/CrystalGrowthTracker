@@ -37,5 +37,10 @@ setup(
     description ='Measure crystal growth rates in x-ray shadowgraphs.',
     platforms="Windows10, Linux",
     long_description=read('README.md'),
-    include_package_data=True
-)
+    include_package_data=True,
+    entry_points={
+        'console_scripts': [
+            'cgt=cgt.main:main',
+        ]
+    }
+    )
