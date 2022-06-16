@@ -11,10 +11,10 @@ Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 
 ## Developed With:
-This was developed using Python 3.7/3.8 and Anaconda, Inc. on Windows 10 systems. The software has not been executed on Linux or Mac.
+This was developed using Python 3.7/3.8/3.9/3.10 and Anaconda, Inc. on Windows 10 systems, the software has been tested on Ubuntu 20. The software has not been tested under any other operating systems.
 
 ## Installation, Use and Development
-This software uses Anaconda with Python 3.8, at present it will not work with 3.9. The packages required to run the software are listed in the file environment_CGT.yml.
+This software uses Anaconda with a Python version greater than 3.8. The packages required to run the software are listed in the file environment_CGT.yml.
 
 If you have installed Anaconda, you can install the software and run in two steps:
 
