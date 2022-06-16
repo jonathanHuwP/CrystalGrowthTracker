@@ -20,6 +20,7 @@ import argparse
 
 from cgt.cgt_app import CGTApp
 from cgt.tests.videosource_ffmpeg_test import test_video_source
+from cgt.tests.run_unittests import run_all_tests
 
 def get_python_args():
     """
@@ -60,6 +61,8 @@ def main():
     if parsed_args.test:
         print("Running tests")
         test_video_source()
+        print("\n------------------\n")
+        run_all_tests()
     else:
         CGTApp(sys.argv, get_python_args())
 
