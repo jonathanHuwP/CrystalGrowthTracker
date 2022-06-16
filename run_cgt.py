@@ -20,6 +20,8 @@ import sys
 import argparse
 
 from cgt.cgt_app import CGTApp
+from cgt.tests.videosource_ffmpeg_test import test_video_source
+from cgt.tests.run_unittests import run_all_tests
 
 def get_python_args():
     """
@@ -40,8 +42,29 @@ def get_python_args():
                         action='store_true',
                         help="if set write ffmpeg log files to file")
 
-    args = parser.parse_args()
-    return args
+    parser.add_argument("-t",
+                        "--test",
+                        action='store_true',
+                        help="run the test suite instead of main window")
+
+    return parser.parse_args()
+
+def main():
+    """
+    run the application or the tests
+        Args:
+            argv (list<string>): the raw command line arguments
+            parsed_args (argparse.Namespace)
+    """
+    parsed_args = get_python_args()
+
+    if parsed_args.test:
+        print("Running tests")
+        test_video_source()
+        print("\n------------------\n")
+        run_all_tests()
+    else:
+        CGTApp(sys.argv, get_python_args())
 
 if __name__ == "__main__":
-    application = CGTApp(sys.argv, get_python_args())
+    main()
