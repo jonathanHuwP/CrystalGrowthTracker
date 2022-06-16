@@ -186,7 +186,6 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         """
         calculate the statistics for the video
         """
-        print("VideoStatisticsWidget.make_statistics()")
         self._data_source.make_video_statistics()
 
     def enable(self, enabled):

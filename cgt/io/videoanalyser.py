@@ -60,9 +60,8 @@ class VideoAnalyser(FfmpegBase):
             Returns:
                 the statistics (VideoIntensityStats)
         """
-        print("VideoAnalyser.stats_whole_film")
         length = self._video_data.get_frame_count()
-        print(f"Analyser number of frames {length}")
+
         args = (ffmpeg
                 .input(self.get_name())
                 .output('pipe:', format='rawvideo', pix_fmt=VideoAnalyser.PIX_FMT[0], vframes=length)
@@ -70,11 +69,11 @@ class VideoAnalyser(FfmpegBase):
 
         result = None
         error_path = pathlib.Path(os.devnull)
-        print(f"default error path {type(error_path)} {error_path}")
+
         if config.STATS_ANALYSER_LOG:
             error_path = pathlib.Path("stats_analyser_log.txt")
-        with open(error_path, 'w') as f_err:
-            print(f"final error path {error_path}")
+
+        with open(error_path, 'w', encoding="UTF-8") as f_err:
             video_proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=f_err)
             result = self.read_and_analyse(video_proc)
 

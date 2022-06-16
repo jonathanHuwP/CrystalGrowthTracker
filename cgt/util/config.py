@@ -21,4 +21,4 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 USE_FFMPEG_LOG = False
 
 ## save statistics analyser logs to file
-STATS_ANALYSER_LOG = True
+STATS_ANALYSER_LOG = False

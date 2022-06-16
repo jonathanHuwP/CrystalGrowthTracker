@@ -56,7 +56,6 @@ def main():
             parsed_args (argparse.Namespace)
     """
     parsed_args = get_python_args()
-    print(f"Hello world! {parsed_args} {sys.argv}")
 
     if parsed_args.test:
         print("Running tests")
