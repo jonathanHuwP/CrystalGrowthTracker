@@ -11,7 +11,7 @@ Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 
 ## Developed With:
-This was developed using Python 3.7/3.8/3.9/3.10 and Anaconda, Inc. on Windows 10 systems, the software has been tested on Ubuntu 20. The software has not been tested under any other operating systems.
+This was developed using Python 3.8/3.9/3.10 and Anaconda, on Windows 10 systems, and also successfully tested on Ubuntu 20. The software has not been tested under any other operating systems.
 
 ## Installation, Use and Development
 This software uses Anaconda with a Python version greater than 3.8. The packages required to run the software are listed in the file environment_CGT.yml.
@@ -26,7 +26,7 @@ Download through the gitHub web interface or clone from gitHub, to clone:
 
 Open an Anaconda shell and navigate to the CrystalGrowthTracker directory.
 
-Set up the conda environment (if you are a developer see below):
+Set up the conda environment:
 
 `conda env create -f environment_CGT.yml`
 
@@ -76,6 +76,20 @@ you can also run from another directory using:
 
 or the path relative to your current location.
 
+### Install with Pip
+
+The software can be installed using pip, if you are in Anaconda the installation will be in the current enviroment.  To install open a command tool navigate to the project home directory and run the following commands.
+
+`python build_ui.py`
+`python setup.py build`
+`python setup.py sdist`
+`python setup.py clean`
+`pip install -e .`
+
+The project will now be installed with the name cgt, which has the same command line fundtions as run_cgt.py. The options can be listed by running
+
+`cgt --help`
+
 ### Remove the Software
 
 To remove software delete the CrystalGrowthTracker direcory, then delete the environment:
@@ -83,6 +97,8 @@ To remove software delete the CrystalGrowthTracker direcory, then delete the env
 `conda remove --name cgt --all`
 
 ## Notes for Developers
+
+The following are intended for developers wishing to extend CrystalGrowthTracker.
 
 ### Doxygen Documentation
 
@@ -99,14 +115,28 @@ After this has run a doc/html directory will appear. Open the index.html file in
 The doxygen documentation for this project lists gives the API (Application Programmers Interface) for all the modules and scripts in this project making it useful to developers who wish to further develop this software.
 
 ### UnitTesting
-Unit tests are in the directory 'tests', which also contains a module for building a dummy restults object.  All he tests can be run using the python script 'run_tests.py', which takes a '-q --quiet' command line option.  The script will run all the tests printing results in verbose format unless the quiet option is used. Any individual test module can be run by running the file itself `python tests\test_io.py` for example.
+Unit tests are in the directory 'cgt\tests', which also contains a module for building a dummy restults object.  All he tests can be run using the python script 'cgt\tests\run_tests.py'.  Any individual test module can be run by running the file itself `python tests\test_io.py` for example.
+
+The script `run_unittests_2_csv.py` will run all the unit test printing results to a comma seperated value (.csv) file.
 
 The tests are written using the Python unittest module and can also be run using the unittest command line, see [unittest man pages] (https://docs.python.org/3/library/unittest.html).  QWidgets are tested using the [PyQt5.QTest](https://doc.qt.io/qtforpython-5/PySide2/QtTest/QTest.html) module to generate simulated user events.
 
 ### Other Tests
+
 Tests of the subprocess calls to ffmpeg cannot be carried out in unittest so the seperate program videosource_ffmpeg_test.py is provided. Please run this in the cgt enviroment.
 
+### Combined Testing
+
+Both unit tests and ffmpeg tests can be run by running the command
+
+`python run_cgt.py -t`
+
+or, if the project has been pip installed,
+
+`cgt -t`
+
 ### QT5
+
 The project uses the Python version of Qt for its GUI. This window is designed visually using a Qt Designer, and saved as a .ui file (XML description of the window). The file is then compiled to an object stump that can be subclassed.
 
 To run the Qt Designer tool open a terminal (this could be an anaconda power shell) and run designer.exe:
@@ -132,13 +162,12 @@ The code has been designed to allow translations of the user interface. The proc
 ### IDEs (Integrated Development Environments)
 Some IDE such as Spyder use QT5 for their GUI (Graphical User Interface). This can cause complications. The conda environment created for this application does not have Spyder included in it and if it were included it would not run. You will need to start Spyder from the Start menu or from a conda shell that does not use the environment for this application.
 
-
 You may like to use an IDE that does not use QT5 - some IDE that work well with Anaconda are given right at the very bottom of this web page:
 
 https://docs.anaconda.com/anaconda/user-guide/getting-started/
 
-
 #### Eclipse
+
 Eclipe uses Java rather than QT5 for its windowing system and offers some advanced level of support for software devlopment. Details on its installation and setup are available here:
 http://cis.bentley.edu/tbabaian/cs602/notes/setup-anaconda-eclipse-pydev.pdf
 
