@@ -101,7 +101,7 @@ To remove software delete the CrystalGrowthTracker direcory, then delete the env
 The following are intended for developers wishing to extend CrystalGrowthTracker.
 
 For information on how to contribute the project, please refer to the
-[CONTRIBUTING](CONTRIBUTING.md) file at the top level of the repositary.
+[CONTRIBUTING](contributing.md) file at the top level of the repositary.
 
 ### Doxygen Documentation
 
