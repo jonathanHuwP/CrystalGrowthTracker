@@ -100,6 +100,9 @@ To remove software delete the CrystalGrowthTracker direcory, then delete the env
 
 The following are intended for developers wishing to extend CrystalGrowthTracker.
 
+For information on how to contribute the project, please refer to the
+[CONTRIBUTING](CONTRIBUTING.md) file at the top level of the repositary.
+
 ### Doxygen Documentation
 
 The software is documented with doxygen.
@@ -115,6 +118,7 @@ After this has run a doc/html directory will appear. Open the index.html file in
 The doxygen documentation for this project lists gives the API (Application Programmers Interface) for all the modules and scripts in this project making it useful to developers who wish to further develop this software.
 
 ### UnitTesting
+
 Unit tests are in the directory 'cgt\tests', which also contains a module for building a dummy restults object.  All he tests can be run using the python script 'cgt\tests\run_tests.py'.  Any individual test module can be run by running the file itself `python tests\test_io.py` for example.
 
 The script `run_unittests_2_csv.py` will run all the unit test printing results to a comma seperated value (.csv) file.
