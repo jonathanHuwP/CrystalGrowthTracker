@@ -45,7 +45,7 @@ Much of the output of global fine chemicals industries consists of crystalline p
 
 # Design
 
-Although the obvious approach would be to use image analysis and machine learning, the relatively noisy data, the limited number of data sets and the need for verifiable results lead to a manual approach.  User analysis of video required the package to be based on a graphical user interface (GUI).  Finally the users would need to be able to download and run the package on any machine, so the package was developed using Python and PyQt5, from Riverbank Computing Limited (https://riverbankcomputing.com/about), within the conda package management system.  The use of Qt naturally leads to an object orientated architecture.
+Although the obvious approach would be to use image analysis and machine learning, the relatively noisy data, the limited number of data sets and the need for verifiable results lead to a manual approach.  User analysis of video required the package to be based on a graphical user interface (GUI).  Finally the users would need to be able to download and run the package on any machine, so the package was developed using Python and PyQt5, from Riverbank Computing Limited [@web:riverbank], within the conda package management system.  The use of Qt naturally leads to an object orientated architecture.
 
 The package must allow the user to load two videos, the raw and the enhanced, and must provide the following functions.
 
@@ -60,7 +60,7 @@ The package must allow the user to load two videos, the raw and the enhanced, an
 
 A model-view-controller (MVC) software architecture [@mvc88krasne] was used, in which the view and the controller were merged into the main widget.  The video was accessed via a VideoSource object, which was held by the main window, together with project data, and results objects. These objects constitute the MVC architecture model and were made available to the widgets carrying out user functions by getter methods.  These widgets were themselves held by the main window in a tab widget.
 
-The VideoSource object accessed the video via the ffmpeg package (https://www.ffmpeg.org/), which was encapsulated in a using the subprocess module. The frame access had to be in terms of time rather than frame number as when accessing a specified frame number ffmpeg scans the entire video to count frames from the start.  The widgets requiring video stored their own time in the video and when playing called for the frame at the next time step.  No effort was made to play at the correct number of frames per second.
+The VideoSource object accessed the video via the ffmpeg package [@web:ffmpeg], which was encapsulated in a using the subprocess module. The frame access had to be in terms of time rather than frame number as when accessing a specified frame number ffmpeg scans the entire video to count frames from the start.  The widgets requiring video stored their own time in the video and when playing called for the frame at the next time step.  No effort was made to play at the correct number of frames per second.
 
 Project data and results are saved in comma-separated value (CSV) files handled by an input-output module using the Python csv module.  The results of a project can be saved in a HTML report, which can be viewed using the report tab widget. The HTML was written by a report writer module using offscreen rendering for the associated graphics.
 
