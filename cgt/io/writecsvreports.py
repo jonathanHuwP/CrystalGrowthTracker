@@ -74,7 +74,7 @@ def save_csv_video_statistics(project, stats):
     path = pathlib.Path(project["proj_full_path"])
     csv_outfile_name = project["prog"] + r"_" + project["proj_name"] + r"_video_statistics.csv"
 
-    with open(path.joinpath(csv_outfile_name), "w") as fout:
+    with open(path.joinpath(csv_outfile_name), "w", encoding="UTF-8") as fout:
         writer = csv.writer(fout, delimiter=',', lineterminator='\n')
         headers = ["Mean", "Std. Dev."]+[str(x) for x in stats.get_bins()[1:]]
         writer.writerow(headers)
@@ -107,7 +107,7 @@ def save_csv_info(info):
     path = pathlib.Path(info["proj_full_path"])
     csv_outfile_name = info["prog"] + r"_" + info["proj_name"] + r"_project_info.csv"
 
-    with open(path.joinpath(csv_outfile_name), "w") as fout:
+    with open(path.joinpath(csv_outfile_name), "w", encoding="UTF-8") as fout:
         writer = csv.writer(fout, delimiter=',', lineterminator='\n')
         for key, value in info.items():
             if not key == "results":
@@ -126,7 +126,7 @@ def save_csv_regions(project):
     results = project["results"]
 
     headers = ["ID", "Left", "Top", "Width", "Height"]
-    with open(path.joinpath(csv_outfile_name), 'w') as fout:
+    with open(path.joinpath(csv_outfile_name), 'w', encoding="UTF-8") as fout:
         writer = csv.writer(fout, delimiter=',', lineterminator='\n')
         writer.writerow(headers)
 
@@ -148,7 +148,7 @@ def save_csv_points(project):
     results = project["results"]
 
     headers = ["ID", "x", "y", "pos_x", "pos_y", "frame", "region"]
-    with open(path.joinpath(csv_outfile_name), 'w') as fout:
+    with open(path.joinpath(csv_outfile_name), 'w', encoding="UTF-8") as fout:
         writer = csv.writer(fout, delimiter=',', lineterminator='\n')
         writer.writerow(headers)
 
@@ -172,7 +172,7 @@ def save_csv_lines(project):
     results = project["results"]
 
     headers = ["ID", "x1", "y1", "x2", "y2", "pos_x", "pos_y", "frame", "region"]
-    with open(path.joinpath(csv_outfile_name), 'w') as fout:
+    with open(path.joinpath(csv_outfile_name), 'w', encoding="UTF-8") as fout:
         writer = csv.writer(fout, delimiter=',', lineterminator='\n')
         writer.writerow(headers)
 

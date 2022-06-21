@@ -425,7 +425,8 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             qw.QMessageBox.warning(self, "CGT File Error", message)
             return
 
-        message = "Project saved to: {}".format(self._project["proj_full_path"])
+        out_dir = self._project["proj_full_path"]
+        message = f"Project saved to: {out_dir}"
         qw.QMessageBox.information(self, "CGT File", message)
 
     def start_project(self,
@@ -451,7 +452,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         path = proj_dir.joinpath(proj_name)
 
         if path.exists():
-            message = "Project {} already exists you are not allowd to overwrite.".format(proj_name)
+            message = f"Project {proj_name} already exists you are not allowd to overwrite."
             qw.QMessageBox.critical(self, "Project Exists!", message)
             return
 
@@ -461,7 +462,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         try:
             path.mkdir()
         except (FileNotFoundError, OSError) as err:
-            message = "Error making project directory \"{}\"".format(err)
+            message = f"Error making project directory \"{err}\""
             qw.QMessageBox.critical(self, "Cannot Create Project!", message)
             return
 
@@ -503,7 +504,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
             project["notes"] = notes
 
             try:
-                with open(notes_file, 'w') as n_file:
+                with open(notes_file, 'w', encoding="UTF-8") as n_file:
                     n_file.write(notes)
             except IOError as error:
                 message = f"Can't open file for notes {error}"

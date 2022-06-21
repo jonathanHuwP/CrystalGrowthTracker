@@ -242,15 +242,18 @@ def check_file(file_name):
     if path.exists() and path.is_file():
         handle = None
         try:
-            handle = open(path, 'w')
+            print("try handle")
+            handle = open(path, 'w', encoding="UTF-8")
         except PermissionError:
             return None
         finally:
             if handle:
                 handle.close()
+        return path
 
-    # crate file with write permissions
+    # create file with write permissions
     try:
+        print("try touch")
         path.touch(stat.S_IWUSR)
     except PermissionError:
         return None

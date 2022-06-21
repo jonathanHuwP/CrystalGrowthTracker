@@ -125,7 +125,7 @@ class DrawRect(BaseRect):
                 string describing object (including memory address)
         """
 
-        return "<{} at {}>".format(self.__class__.__name__, id(self))
+        return f"<{self.__class__.__name__} at {id(self)}>"
 
     def __str__(self):
         """
@@ -134,5 +134,7 @@ class DrawRect(BaseRect):
             Returns:
                 string describing object
         """
-        return "(top: {}, bottom:{}, left:{}, right:{}, height:{}, width:{})".format(
-            self.top, self.bottom, self.left, self.right, self.height, self.width)
+        reper = f"(top: {self.top}, bottom:{self.bottom}, left:{self.left}, "
+        reper += f"right:{self.right}, height:{self.height}, width:{self.width})"
+
+        return reper

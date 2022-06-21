@@ -63,7 +63,7 @@ class ReportMaker(qc.QObject):
             report_dir.mkdir()
 
         stage = itertools.count(1)
-        with open(html_outfile, "w") as fout:
+        with open(html_outfile, "w", encoding="UTF-8") as fout:
             write_html_report_start(fout, project)
             self.stage_completed.emit(next(stage))
             image_files = save_region_location_images(report_dir, data_source)
@@ -82,7 +82,7 @@ class ReportMaker(qc.QObject):
             write_html_report_end(fout)
             self.stage_completed.emit(next(stage))
 
-        with open(hash_file, 'w') as fout:
+        with open(hash_file, 'w', encoding="UTF-8") as fout:
             hash_code = hash_results(project["results"])
             data = {"results_hash": hash_code}
             json.dump(data, fout)

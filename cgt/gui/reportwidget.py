@@ -102,7 +102,7 @@ class ReportWidget(qw.QWidget, Ui_ReportWidget):
             return ReportStatus.NO_VALID_REPORT
 
         data = None
-        with hash_file.open('r') as fin:
+        with hash_file.open('r', encoding="UTF-8") as fin:
             data = json.load(fin)
 
         if data is not None:

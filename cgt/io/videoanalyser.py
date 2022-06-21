@@ -64,7 +64,10 @@ class VideoAnalyser(FfmpegBase):
 
         args = (ffmpeg
                 .input(self.get_name())
-                .output('pipe:', format='rawvideo', pix_fmt=VideoAnalyser.PIX_FMT[0], vframes=length)
+                .output('pipe:',
+                        format='rawvideo',
+                        pix_fmt=VideoAnalyser.PIX_FMT[0],
+                        vframes=length)
                 .compile())
 
         result = None

@@ -65,7 +65,9 @@ class OffScreenRender():
 
         names = []
         for file_path in region_images:
-            names.append(self.make_image_with_regions(file_path, self._project["results"].get_regions()))
+            names.append(self.make_image_with_regions(
+                file_path,
+                self._project["results"].get_regions()))
 
         return names
 
@@ -102,7 +104,7 @@ class OffScreenRender():
         """
         get an image of a whole scene
             Returns:
-                QImage of everything within the scene-graph's bounding rectangle
+                (QImage) everything in the scene-graph's bounding rectangle
         """
         bound_rect = self._view.scene().itemsBoundingRect()
 

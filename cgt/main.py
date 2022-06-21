@@ -51,16 +51,13 @@ def get_python_args():
 def main():
     """
     run the application or the tests
-        Args:
-            argv (list<string>): the raw command line arguments
-            parsed_args (argparse.Namespace)
     """
     parsed_args = get_python_args()
 
     if parsed_args.test:
-        print("Running tests")
+        print("Running FFmpeg tests\n------------------\n")
         test_video_source()
-        print("\n------------------\n")
+        print("\nRunning Unittests\n------------------\n")
         run_all_tests()
     else:
         CGTApp(sys.argv, get_python_args())

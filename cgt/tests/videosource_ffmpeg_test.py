@@ -40,8 +40,8 @@ def test_video_source():
     try:
         test_file = make_test(test_file)
         test_source(test_file)
-    except IOError:
-        return None
+    except IOError as error:
+        print(f"Error reading file {test_file}: {error}")
     finally:
         if test_file.exists() and test_file.is_file():
             test_file.unlink()

@@ -76,10 +76,12 @@ class RegionVideoCopy(FfmpegBase):
         length = self._video_data.get_frame_count()
         args = (ffmpeg
                 .input(self.get_name())
-                .output('pipe:', format='rawvideo', pix_fmt=RegionVideoCopy.IN_PIX_FMT[0], vframes=length)
+                .output('pipe:',
+                        format='rawvideo',
+                        pix_fmt=RegionVideoCopy.IN_PIX_FMT[0], vframes=length)
                 .compile())
 
-        with open(os.devnull, 'w') as f_err:
+        with open(os.devnull, 'w', encoding="UTF-8") as f_err:
             with subprocess.Popen(args, stdout=subprocess.PIPE, stderr=f_err) as proc:
                 self.process_film(proc)
 
