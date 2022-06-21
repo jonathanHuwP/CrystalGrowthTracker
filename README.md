@@ -108,8 +108,8 @@ To remove software delete the CrystalGrowthTracker direcory, then delete the env
 
 The following are intended for developers wishing to extend CrystalGrowthTracker.
 
-For information on how to contribute the project, please refer to the
-[contributing](contributing.md) file at the top level of the repositary.
+For information on how to contribute the project, please refer to the file
+*[contributing.md](contributing.md)*, at the top level of the repositary.
 
 ### Doxygen Documentation
 
@@ -127,9 +127,9 @@ The doxygen documentation for this project lists gives the API (Application Prog
 
 ### UnitTesting
 
-Unit tests are in the directory `cgt\tests`, which also contains a module for building a dummy restults object.  All he tests can be run using the python script 'cgt\tests\run_tests.py'.  Any individual test module can be run by running the file itself `python tests\test_io.py` for example.
+Unit tests are in the directory `cgt\tests`, which also contains a module for building a dummy restults object.  All he tests can be run using the python script `cgt\tests\run_tests.py`.  Any individual test module can be run by running the file itself `python tests\test_io.py` for example.
 
-The script `run_unittests_2_csv.py` will run all the unit test printing results to a comma seperated value (.csv) file.
+The script `cgt\tests\run_unittests_2_csv.py` will run all the unit test printing results to a comma seperated value (.csv) file.
 
 The tests are written using the Python unittest module and can also be run using the unittest command line, see [unittest man pages] (https://docs.python.org/3/library/unittest.html).  QWidgets are tested using the [PyQt5.QTest](https://doc.qt.io/qtforpython-5/PySide2/QtTest/QTest.html) module to generate simulated user events.
 
@@ -141,7 +141,7 @@ Tests of the subprocess calls to ffmpeg cannot be carried out in unittest so the
 
 Both unit tests and ffmpeg tests can be run by running the command
 
-`python run_cgt.py -t`
+`python cgt\main.py -t`
 
 or, if the project has been pip installed,
 
@@ -161,11 +161,9 @@ Button, slicers and other QWidgets communicate via message passing (signals to s
 
 The code has been designed to allow translations of the user interface. The process of producing a translation is to extract the text strings needing translation from the .py and .ui files using the Qt program pylupdate5; then use Qt Linguist to read the strings file and add the translations; and finally save the translations as a binary .qm file. It is important to save the latest translation as a phrase book .qph file.  Linguist can open a phrase book alongside a translation file to allow quick filling of unchanged text, this avoids retranslating the entire interface because of the correction of a single typo.  The following describes the production of a translation for German, using an Anaconda PowerShell.
 
-1. Use pylupdate5 to make a .ts file
+1. Use pylupdate5 to make a .ts file, for the main window for example enter.  `pylupdate5 .\cgt\gui\CrystalGrowthTrackerMain.py .\resources\designer_ui\CrystalGrowthTrackerMain.ui -ts cgt_german.t`
 
-    `pylupdate5 .\\CrystalGrowthTrackerMain.py .\\CrystalGrowthTrackerMain.ui .\\PolyLineExtract.py .\\DrawRect.py .\\ImageLabel.py -ts cgt_german.ts`
-
-2. Run 'linguist.exe', open the 'cgt_german.ts', if there is an existing phrase book load that as well.  Carry out the translation, and save the .ts file and save it again as a phrase book, overwriting the existing if necessary.
+2. Run `linguist`, open the *cgt_german.ts*, if there is an existing phrase book load that as well.  Carry out the translation, and save the .ts file and save it again as a phrase book, overwriting the existing if necessary.
 
 3. Save the .ts file a third time by selecting 'Release' or 'Release As' on Linguist's 'File' menu.
 
