@@ -68,13 +68,21 @@ Open an Anaconda shell and activate the environment:
 
 then navigate to the CrystalGrowthTracker directory and run by typing:
 
-`python .\run_cgt.py`
+`python cgt\main.py`
 
 you can also run from another directory using:
 
-`python C:\Users\uname\Work\CrystalGrowthTracker\run_cgt.py`
+`python C:\Users\uname\Work\CrystalGrowthTracker\cgt\main.py`
 
 or the path relative to your current location.
+
+You can run the test suite by using the '-t' option
+
+`python cgt\main.py -t`
+
+If a project has already been created you can start and open from the command line using the `-p` option.
+
+`python cgt\main.py -p <path to project file>`
 
 ### Install with Pip
 
@@ -101,7 +109,7 @@ To remove software delete the CrystalGrowthTracker direcory, then delete the env
 The following are intended for developers wishing to extend CrystalGrowthTracker.
 
 For information on how to contribute the project, please refer to the
-[CONTRIBUTING](contributing.md) file at the top level of the repositary.
+[contributing](contributing.md) file at the top level of the repositary.
 
 ### Doxygen Documentation
 
@@ -119,7 +127,7 @@ The doxygen documentation for this project lists gives the API (Application Prog
 
 ### UnitTesting
 
-Unit tests are in the directory 'cgt\tests', which also contains a module for building a dummy restults object.  All he tests can be run using the python script 'cgt\tests\run_tests.py'.  Any individual test module can be run by running the file itself `python tests\test_io.py` for example.
+Unit tests are in the directory `cgt\tests`, which also contains a module for building a dummy restults object.  All he tests can be run using the python script 'cgt\tests\run_tests.py'.  Any individual test module can be run by running the file itself `python tests\test_io.py` for example.
 
 The script `run_unittests_2_csv.py` will run all the unit test printing results to a comma seperated value (.csv) file.
 
