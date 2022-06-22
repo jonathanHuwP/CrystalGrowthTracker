@@ -39,7 +39,7 @@ from cgt.util.markers import (hash_graphics_line,
                               ItemDataTypes,
                               hash_marker)
 
-## containger of moving a marker
+## container for a moving a marker
 class MarkerInMotion():
     """
     storage for a marker in the process of bing moved
