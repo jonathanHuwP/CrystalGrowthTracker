@@ -79,3 +79,5 @@ The software can be obtained from [GitHub](https://github.com/jonathanHuwP/Cryst
 
 # Acknowledgement
 This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1).
+
+# References
