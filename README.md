@@ -1,6 +1,6 @@
 # Crystal Growth Tracker (CGT)
 
-This project extracts data on the growth rates of individual faces from x-ray video shadowgraphs of growing crystals.  The project is a graphical user interface, that is run from the command line in shell tool.  The user can then view and analyse video files, measuring the rate of advance of features in the video, frame calibration data can be input to allow calculation of velocities.
+This project extracts data on the growth rates of individual faces from x-ray video shadowgraphs of growing crystals.  The project is a graphical user interface, that is run from the command line in shell tool.  The user can then view and analyse video files, measuring the rate of advance of features in the video, frame calibration data can be input to allow calculation of actual velocities.  The need for user input to mark-up the video means the package was not designed to be scripted by the user.
 
 The algorithm and software in this project were developed by Jonathan Pickering and Joanna Leng at the University of Leeds. They are both funded by EPSRC as part of Joanna Leng's Research Software Engineering Fellowship (EP/R025819/1).
 
