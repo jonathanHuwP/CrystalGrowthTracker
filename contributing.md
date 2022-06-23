@@ -27,3 +27,7 @@ Before submitting new code, please note the coding convention, which is a pylint
 We would like to hear your ideas!
 
 Open an issue to describe your new feature, or how an existing feature should be changed, which will enable you to discuss the issue with other developers.
+
+## Do you require assistance?
+
+There is no mailing list for this project so raise an issue describing the problem you are having.
