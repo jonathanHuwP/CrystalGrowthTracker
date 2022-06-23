@@ -1,6 +1,6 @@
 # Crystal Growth Tracker (CGT)
 
-This project extracts data on the growth rates of individual faces from x-ray video shadowgraphs of growing crystals.
+This project extracts data on the growth rates of individual faces from x-ray video shadowgraphs of growing crystals.  The project is a graphical user interface, that is run from the command line in shell tool.  The user can then view and analyse video files, measuring the rate of advance of features in the video, frame calibration data can be input to allow calculation of velocities.
 
 The algorithm and software in this project were developed by Jonathan Pickering and Joanna Leng at the University of Leeds. They are both funded by EPSRC as part of Joanna Leng's Research Software Engineering Fellowship (EP/R025819/1).
 
@@ -14,6 +14,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 This was developed using Python 3.8/3.9/3.10 and Anaconda, on Windows 10 systems, and also successfully tested on Ubuntu 20. The software has not been tested under any other operating systems.
 
 ## Installation, Use and Development
+
 This software uses Anaconda with a Python version greater than 3.8. The packages required to run the software are listed in the file environment_CGT.yml.
 
 If you have installed Anaconda, you can install the software and run in two steps:
@@ -72,7 +73,7 @@ then navigate to the CrystalGrowthTracker directory and run by typing:
 
 you can also run from another directory using:
 
-`python C:\Users\uname\Work\CrystalGrowthTracker\cgt\main.py`
+`python <PATH to dir>\CrystalGrowthTracker\cgt\main.py`
 
 or the path relative to your current location.
 
@@ -97,6 +98,14 @@ The software can be installed using pip, if you are in Anaconda the installation
 The project will now be installed with the name cgt, which has the same command line fundtions as run_cgt.py. The options can be listed by running
 
 `cgt --help`
+
+The software can be run or tested from the command line by typing.
+
+`cgt` or `cgt -p <project directory>`
+
+or
+
+`cgt -t`
 
 ### Remove the Software
 
