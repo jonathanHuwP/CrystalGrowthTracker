@@ -90,9 +90,13 @@ If a project has already been created you can start and open from the command li
 The software can be installed using pip, if you are in Anaconda the installation will be in the current enviroment.  To install open a command tool navigate to the project home directory and run the following commands.
 
 `python build_ui.py`
+
 `python setup.py build`
+
 `python setup.py sdist`
+
 `python setup.py clean`
+
 `pip install -e .`
 
 The project will now be installed with the name cgt, which has the same command line fundtions as run_cgt.py. The options can be listed by running
