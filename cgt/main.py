@@ -15,12 +15,12 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 @copyright 2022
 @author: j.h.pickering@leeds.ac.uk and j.leng@leeds.ac.uk
 """
+# set up linting conditions
+# pylint: disable = import-outside-toplevel
+
 import sys
 import argparse
-
-from cgt.cgt_app import CGTApp
-from cgt.tests.videosource_ffmpeg_test import test_video_source
-from cgt.tests.run_unittests import run_all_tests
+import pathlib
 
 def get_python_args():
     """
@@ -52,6 +52,13 @@ def main():
     """
     run the application or the tests
     """
+    # imports in main function so that if the file is run as a script
+    # the imports will not occure until the location of cgt directory
+    # has been appended to sys.path
+    from cgt.cgt_app import CGTApp
+    from cgt.tests.videosource_ffmpeg_test import test_video_source
+    from cgt.tests.run_unittests import run_all_tests
+
     parsed_args = get_python_args()
 
     if parsed_args.test:
@@ -63,4 +70,9 @@ def main():
         CGTApp(sys.argv, get_python_args())
 
 if __name__ == "__main__":
+    # if this file is run as a script location of the 
+    # cgt directory must be added to the sys.path array
+    path = pathlib.Path(__file__)
+    sys.path.append(str(path.parent.parent))
+
     main()
