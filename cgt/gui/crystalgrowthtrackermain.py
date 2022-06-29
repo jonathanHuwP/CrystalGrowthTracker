@@ -184,7 +184,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         if not self.has_project():
             return
 
-        self._propertiesWidget.setEnabled(False)
+        self._propertiesWidget.enabled(False)
         self._selectWidget.enable(False)
         self._videoStatsWidget.enable(False)
         self._drawingWidget.setEnabled(False)
@@ -192,7 +192,7 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
         self._reportWidget.setEnabled(False)
 
         if tab_index == self._tabWidget.indexOf(self._propertiesTab):
-            self._propertiesTab.setEnabled(True)
+            self._propertiesWidget.enabled(True)
         elif tab_index == self._tabWidget.indexOf(self._selectTab):
             self._selectWidget.enable(True)
             self._selectWidget.redisplay()

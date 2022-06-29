@@ -88,3 +88,11 @@ class ProjectPropertiesWidget(qw.QWidget, Ui_ProjectPropertiesWidget):
         set to top of text
         """
         self._propertiesBrowser.verticalScrollBar().setValue(0)
+
+    def enabled(self, enabled):
+        """
+        enable/disable widget.
+            Args:
+                enabled (bool): the new state
+        """
+        super().setEnabled(enabled)
