@@ -149,7 +149,6 @@ class VideoAnalysisResultsStore(qc.QObject):
             Throws:
                 IndexError: pop index out of range
         """
-        # TODO remove region properly
         markers = []
         markers.append(self.get_lines_for_region(index))
         markers.append(self.get_points_for_region(index))
