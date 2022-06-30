@@ -37,9 +37,17 @@ class SelectStates(IntEnum):
     """
     possible states of the widget
     """
+
+    ## no action just view the video
     VIEW = 0
+
+    ## draw a region on the video
     MAKE_REGION = 2
+
+    ## adjust an existing region
     EDIT_REGION = 4
+
+    ## select and delete regions
     DELETE_REGION = 8
 
 class RegionSelectionView(VideoBaseView):
