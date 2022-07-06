@@ -31,7 +31,7 @@ import PyQt5.QtCore as qc
 import PyQt5.QtWidgets as qw
 
 from cgt.io.mpl import (make_mplcanvas,
-                        render_graph,
+                        render_intesities_graph,
                         render_prob_density,
                         update_density,
                         update_graph)
@@ -133,9 +133,9 @@ class VideoStatisticsWidget(VideoBaseWidget, Ui_VideoStatisticsWidget):
         draw the two graphs
         """
         stats = self._data_source.get_results().get_video_statistics()
-        self._frame_line = render_graph(stats.get_frames(),
-                                        self._evolution_canvas,
-                                        self._current_frame)
+        self._frame_line = render_intesities_graph(stats.get_frames(),
+                                                   self._evolution_canvas,
+                                                   self._current_frame)
 
         self._density_curve = render_prob_density(stats,
                                                   self._single_frame_canvas,

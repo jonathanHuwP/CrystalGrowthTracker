@@ -78,7 +78,7 @@ def make_mplcanvas(width=5, height=4, dpi=100, toolbar_flag=True):
 
     return canvas, toolbar
 
-def render_graph(frames, canvas, frame=None):
+def render_intesities_graph(frames, canvas, frame=None):
     """
     render the graph of intesities against time
         Args:

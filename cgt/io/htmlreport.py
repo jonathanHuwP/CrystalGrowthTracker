@@ -32,7 +32,7 @@ import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
 from cgt.model.velocitiescalculator import VelocitiesCalculator
-from cgt.io.mpl import OffScreenRender, render_graph
+from cgt.io.mpl import OffScreenRender, render_intesities_graph
 from cgt.util.utils import make_report_file_names
 from cgt.util.scenegraphitems import get_rect_even_dimensions
 from cgt.util.markers import (hash_results, get_region)
@@ -68,6 +68,9 @@ class ReportMaker(qc.QObject):
             self.stage_completed.emit(next(stage))
             image_files = save_region_location_images(report_dir, data_source)
             self.stage_completed.emit(next(stage))
+
+            # TODO output the graphs as images
+
             region_files = save_region_start_images(report_dir, data_source)
             self.stage_completed.emit(next(stage))
             key_frame_files = save_region_keyframe_images(report_dir, data_source)
@@ -290,13 +293,19 @@ def write_html_region(fout, results, index, speeds_table_count, images, fps, sca
     calculator = VelocitiesCalculator(lines, points, fps, scale)
     counts = calculator.number_markers()
     if counts[0] > 0 or counts[1] > 0:
-        fout.write(make_html_speeds_table(calculator, units, speeds_table_count))
-
-        fig_number = 4 + index
+        fig_number = 4 + (index*2)
         fout.write("<figure>")
         for image in images:
             fout.write(f"<img src=\"{image}\" width=\"10%\">\n")
         fout.write(f"<br><figcaption>Fig {fig_number}. The region at each key frame.</figcaption>")
+        fout.write("</figure>")
+
+        fout.write(make_html_speeds_table(calculator, units, speeds_table_count))
+
+        fout.write("<figure>")
+        # TODO ouput the
+        fig_number += 1
+        fout.write(f"<br><figcaption>Fig {fig_number}. The advancment rates.</figcaption>")
         fout.write("</figure>")
     else:
         fout.write("<p>No markers defined in the region.")
@@ -349,7 +358,7 @@ def save_time_evolution_video_statistics(report_dir, data_source):
     file_name = images_dir.joinpath("video_statistics.png")
 
     canvas = OffScreenRender()
-    render_graph(statistics.get_frames(), canvas)
+    render_intesities_graph(statistics.get_frames(), canvas)
     canvas.print_png(str(file_name))
 
     return file_name
