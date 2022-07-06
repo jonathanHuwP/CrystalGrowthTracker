@@ -21,6 +21,7 @@ This work was funded by Joanna Leng's EPSRC funded RSE Fellowship (EP/R025819/1)
 # set up linting conditions
 # pylint: disable = c-extension-no-member
 # pylint: disable = too-few-public-methods
+# pylint: disable = too-many-arguments
 
 import json
 from datetime import datetime
@@ -31,8 +32,11 @@ import getpass
 import PyQt5.QtGui as qg
 import PyQt5.QtCore as qc
 
-from cgt.model.velocitiescalculator import VelocitiesCalculator
-from cgt.io.mpl import OffScreenRender, render_intesities_graph
+from cgt.model.velocitiescalculator import (VelocitiesCalculator,
+                                            calculate_speeds)
+from cgt.io.mpl import (OffScreenRender,
+                        render_intesities_graph,
+                        draw_displacements)
 from cgt.util.utils import make_report_file_names
 from cgt.util.scenegraphitems import get_rect_even_dimensions
 from cgt.util.markers import (hash_results, get_region)
@@ -68,10 +72,8 @@ class ReportMaker(qc.QObject):
             self.stage_completed.emit(next(stage))
             image_files = save_region_location_images(report_dir, data_source)
             self.stage_completed.emit(next(stage))
-
             graph_files = save_displacement_graph_files(report_dir, data_source)
             self.stage_completed.emit(next(stage))
-
             region_files = save_region_start_images(report_dir, data_source)
             self.stage_completed.emit(next(stage))
             key_frame_files = save_region_keyframe_images(report_dir, data_source)
@@ -81,7 +83,7 @@ class ReportMaker(qc.QObject):
             #write_html_overview(fout, image_files)
             write_html_stats(fout, report_dir)
             self.stage_completed.emit(next(stage))
-            write_html_regions(fout, project, image_files, region_files, key_frame_files)
+            write_html_regions(fout, project, image_files, region_files, graph_files, key_frame_files)
             self.stage_completed.emit(next(stage))
             write_html_report_end(fout)
             self.stage_completed.emit(next(stage))
@@ -218,13 +220,15 @@ def write_html_report_start(fout, project):
                 +"are changed in the video header when the video is being "
                 +"pre-processed.</p>\n")
 
-def write_html_regions(fout, project, image_files, region_image_files, frame_image_files):
+def write_html_regions(fout, project, image_files, region_image_files, graph_files, frame_image_files):
     """
     write out the results for the regions to file
         Args:
             fout (TextIOWrapper): output file stream
             project (CGTProject): The project data
+            image_files ([pathlib.Path]): path to images of first, middel and last frames in each regions
             region_image_files ([pathlib.Path]): paths to images of each region
+            graph_files ([pathlib.Path]): paths to the images of the displacement/time graphs
             frame_image_files ([pathlib.Path]): paths to images of each region at key frames
     """
     results = project["results"]
@@ -263,11 +267,12 @@ def write_html_regions(fout, project, image_files, region_image_files, frame_ima
                           index,
                           speeds_table_count,
                           frame_image_files[index],
+                          graph_files[index],
                           project["frame_rate"],
                           project["resolution"],
                           project["resolution_units"])
 
-def write_html_region(fout, results, index, speeds_table_count, images, fps, scale, units):
+def write_html_region(fout, results, index, speeds_table_count, images, speeds_graph, fps, scale, units):
     '''
     Creates the section for each region in the html report.
         Args:
@@ -276,8 +281,10 @@ def write_html_region(fout, results, index, speeds_table_count, images, fps, sca
             index (int): The index for the crystal that is being reported.
             speeds_table_count (itertools.count): counter for table number
             images ([pathlib.Path]): paths to images of region at each key frame
+            speeds_graph (pathlib.Path): path to image of speeds graph
             fps (np.float64): the number of frames per second
             scale (np.float64): the size of a pixel
+            units (str): the distance units
     '''
     fout.write(f"<h2 align=\"left\">Region {index}:</h3>\n")
 
@@ -304,9 +311,9 @@ def write_html_region(fout, results, index, speeds_table_count, images, fps, sca
         fout.write(make_html_speeds_table(calculator, units, speeds_table_count))
 
         fout.write("<figure>")
-        # TODO ouput the
+        fout.write(f"<img src=\"{speeds_graph}\" width=\"50%\">\n")
         fig_number += 1
-        fout.write(f"<br><figcaption>Fig {fig_number}. The advancment rates.</figcaption>")
+        fout.write(f"<br><figcaption>Fig {fig_number}. Marker displacements vs time.</figcaption>")
         fout.write("</figure>")
     else:
         fout.write("<p>No markers defined in the region.")
@@ -391,16 +398,30 @@ def save_displacement_graph_files(report_dir, data_source):
         Args:
             report_dir (libpath.Path): the directory to hold images
             data_source (CrystlGrowthTrackerMain): the holder of the data
+        Returns:
+            (list): the graph image file paths
     """
     print("Hi")
     images_dir = report_dir.joinpath("images")
-    files = {}
+
+    region_files = []
 
     results = data_source.get_results()
-    #for i, region in enumerate(results.get_regions()):
+    for i, _ in enumerate(results.get_regions()):
+        calc = calculate_speeds(i,
+                                data_source.get_results(),
+                                data_source.get_project()["frame_rate"],
+                                data_source.get_project()["resolution"])
+        lines = calc.get_line_displacements()
+        points = calc.get_point_displacements()
 
+        canvas = OffScreenRender()
+        draw_displacements(canvas, lines, points, i)
+        file_name = images_dir.joinpath(f"speeds_graph_region_{i}.png")
+        canvas.print_png(str(file_name))
+        region_files.append(file_name)
 
-
+    return region_files
 
 def save_region_location_images(report_dir, data_source):
     """
