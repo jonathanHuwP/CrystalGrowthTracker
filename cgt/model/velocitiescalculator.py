@@ -26,6 +26,32 @@ from cgt.util.markers import (MarkerTypes,
                               get_point_of_point,
                               get_frame)
 from cgt.util.scenegraphitems import perpendicular_dist_to_position
+from cgt.util.markers import get_region
+
+def calculate_speeds(index, results, fps, scale):
+    """
+    carry out speeds calculation
+        Args:
+            index (int) the region
+            results (VideoAnalysisResultsStore) the results object
+            fps (float) the number of frames per second
+            scale (float) the size of a pixel
+    """
+    #results = self._data_source.get_results()
+    lines = []
+    for marker in results.get_lines():
+        if get_region(marker[0]) == index:
+            lines.append(marker)
+
+    points = []
+    for marker in results.get_points():
+        if get_region(marker[0]) == index:
+            points.append(marker)
+
+    calculator = VelocitiesCalculator(lines, points, fps, scale)
+    calculator.process_latest_data()
+
+    return calculator
 
 class ScreenDisplacement():
     """data type for a single marker displacement"""

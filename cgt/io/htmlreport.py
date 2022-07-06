@@ -69,7 +69,8 @@ class ReportMaker(qc.QObject):
             image_files = save_region_location_images(report_dir, data_source)
             self.stage_completed.emit(next(stage))
 
-            # TODO output the graphs as images
+            graph_files = save_displacement_graph_files(report_dir, data_source)
+            self.stage_completed.emit(next(stage))
 
             region_files = save_region_start_images(report_dir, data_source)
             self.stage_completed.emit(next(stage))
@@ -383,6 +384,23 @@ def save_region_start_images(report_dir, data_source):
         files.append(out_file)
 
     return files
+
+def save_displacement_graph_files(report_dir, data_source):
+    """
+    save the graphs showing the displacements of the markers
+        Args:
+            report_dir (libpath.Path): the directory to hold images
+            data_source (CrystlGrowthTrackerMain): the holder of the data
+    """
+    print("Hi")
+    images_dir = report_dir.joinpath("images")
+    files = {}
+
+    results = data_source.get_results()
+    #for i, region in enumerate(results.get_regions()):
+
+
+
 
 def save_region_location_images(report_dir, data_source):
     """

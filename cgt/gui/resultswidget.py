@@ -25,7 +25,8 @@ import PyQt5.QtWidgets as qw
 import PyQt5.QtCore as qc
 import PyQt5.QtGui as qg
 
-from cgt.model.velocitiescalculator import VelocitiesCalculator
+from cgt.model.velocitiescalculator import calculate_speeds
+
 from cgt.io.mpl import make_mplcanvas, draw_displacements
 from cgt.util.markers import (ItemDataTypes,
                               MarkerTypes,
@@ -200,7 +201,10 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
 
         self._resultsTable.setRowCount(10)
 
-        calc = self.calculate_speeds(index)
+        calc = calculate_speeds(index,
+                                self._data_source.get_results(),
+                                self._data_source.get_project()["frame_rate"],
+                                self._data_source.get_project()["resolution"])
         lines = calc.get_line_displacements()
         points = calc.get_point_displacements()
 
@@ -235,34 +239,14 @@ class ResultsWidget(qw.QWidget, Ui_ResultsWidget):
             Args:
                 index (int): the array index of the region
         """
-        calc = self.calculate_speeds(index)
+        calc = calculate_speeds(index,
+                                self._data_source.get_results(),
+                                self._data_source.get_project()["frame_rate"],
+                                self._data_source.get_project()["resolution"])
+
         lines = calc.get_line_displacements()
         points = calc.get_point_displacements()
         draw_displacements(self._graph, lines, points, index)
-
-    def calculate_speeds(self, index):
-        """
-        carry out speeds calculation
-            Args:
-                index (int) the region
-        """
-        results = self._data_source.get_results()
-        lines = []
-        for marker in results.get_lines():
-            if get_region(marker[0]) == index:
-                lines.append(marker)
-
-        points = []
-        for marker in results.get_points():
-            if get_region(marker[0]) == index:
-                points.append(marker)
-
-        fps = self._data_source.get_project()["frame_rate"]
-        scale = self._data_source.get_project()["resolution"]
-        calculator = VelocitiesCalculator(lines, points, fps, scale)
-        calculator.process_latest_data()
-
-        return calculator
 
     def set_video_source(self, video_source):
         """
