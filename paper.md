@@ -68,6 +68,8 @@ The video is displayed using a QGraphicsView with an associated QGraphicsScene, 
 
 The user was able to add markers to image features in a single frame of the video, then advance to a new frame and drag clones of the markers to the features new locations.  The markers were graphics items augmented to hold their frame numbers and the identity of their parent.  Calculating the speeds of motion consisted of ordering the chains of cloned graphics items by frame number, finding the displacements in pixel coordinates, converting the pixel distances to real distances using the scaling factor. The pixels are assumed to be square as individual x-ray sensors in the array were square. Frame number intervals are converted to times and speeds calculated.
 
+For a full description of the installation and operation of the package see the videos https://youtu.be/tjmPqGec1vs and https://youtu.be/aYjkYWifw4Q.  The video sample used in these videos is avaliable via Zenodo using DOI: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6801296.svg)](https://doi.org/10.5281/zenodo.6801296).
+
 # Testing, Documentation and Linting
 
 A test suite is provided, that utilizes the Python unittest module. The Qt QTest object is used to simulate IO events, and the capture the resultant signals. The tests can be run using unittest from the command line or all tests can execute using the run_test tool, which can also save the results to a CSV file.  A separate test was developed for the VidoeSource, as unittest itself can only test the call and responce to a subprocess call by mocking the subprocess.
