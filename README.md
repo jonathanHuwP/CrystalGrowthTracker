@@ -85,7 +85,7 @@ If a project has already been created you can start and open from the command li
 
 `python cgt\main.py -p <path to project file>`
 
-Videos documenting the [install](https://youtu.be/tjmPqGec1vs), unintall and operation of the package are available on YouTube
+Videos documenting the [install](https://youtu.be/tjmPqGec1vs), [uninstall](https://youtu.be/aYjkYWifw4Q) and [operation](https://youtu.be/wYYFnPkVBrY) of the package are available on YouTube.  Sample video data is available via [Zenodo](https://doi.org/10.5281/zenodo.6801296).
 
 ### Install with Pip
 
