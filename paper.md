@@ -37,11 +37,13 @@ bibliography: paper.bib
 
 # Summary
 
-X-ray synchrotron radiation allows the investigation of many physical processes in unprecedented ways. One application, important to the fine chemicals industry, is charaterizing the early stages of crystallization.  To aid chemical engineers working in this area we developed the CrystalGrowthTracker package.  It allows crystals to be found in videos and their growth rates measured.  We hope that this work can provide the basis for further fully automated systems.
+X-ray synchrotron radiation allows the investigation of many physical processes in unprecedented ways. One application, important to the fine chemicals industry, is charaterizing the early stages of crystallization.  To aid chemical engineers working in this area we developed the CrystalGrowthTracker package.  It allows crystals to be found in videos and their growth rates measured.  We hope that this work can provide the basis for fully automated and 3D systems.
 
 # Statement of Need
 
-Much of the output of global fine chemicals industries consists of crystalline powders produced by precipitation from solution.  Since the geometry of a crystal is the result of differential growth rates on different crystal planes, there is great commercial interest in studying the growth rates of crystal faces in the early stages of crystallization.  One approach is to use the X-rays of synchrotron radiation [@Baruchel2013] to produce shadowgraphs of crystals precipitating onto a substrate.  Videos of the shadow graphs first need enhancement using the packages such as Euler’s Magnifier [@Wu12Eulerian] and some statistical analysis of the raw video is desirable to find regions of interest.  **CrystalGrowthTracker** has been developed to assist in the analysis of videos of the raw and enhanced videos.  The package was developed by Leng and Pickering, with specifications provided by Schroeder, and beta tested by Das, who prsented on the project [@das:bca21],[@das:isic21]. Details of the data collection can be found in [@10.1117/12.2530698].
+Much of the output of global fine chemicals industries consists of crystalline powders produced by precipitation from solution.  Since the geometry of a crystal is the result of differential growth rates on different crystal planes, there is great commercial interest in studying the growth rates of crystal faces in the early stages of crystallization.  One approach is to use the X-rays of synchrotron radiation [@Baruchel2013] to produce 2D shadowgraphs of crystals precipitating onto a substrate.
+
+Videos of the shadow graphs first need enhancement using packages such as Euler’s Magnifier [@Wu12Eulerian] and some statistical analysis of the raw video is desirable to find regions of interest.  **CrystalGrowthTracker** has been developed to assist in the analysis of videos of the raw and enhanced videos.  The package was developed by Leng and Pickering, with specifications provided by Schroeder, and beta tested by Das, who prsented on the project [@das:bca21],[@das:isic21]. Details of the data collection can be found in [@10.1117/12.2530698].
 
 # Design
 
