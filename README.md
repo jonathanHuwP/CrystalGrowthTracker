@@ -85,6 +85,8 @@ If a project has already been created you can start and open from the command li
 
 `python cgt\main.py -p <path to project file>`
 
+Videos documenting the [install](https://youtu.be/tjmPqGec1vs), unintall and operation of the package are available on YouTube
+
 ### Install with Pip
 
 The software can be installed using pip, if you are in Anaconda the installation will be in the current enviroment.  To install open a command tool navigate to the project home directory and run the following commands.
