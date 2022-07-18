@@ -781,13 +781,19 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 self._videoStatsWidget.display_stats()
 
         except ffmpeg.Error as error:
-            self.display_error(f"File {video_file} cannot be probed: {error}")
+            qw.QMessageBox.warning(self,
+                                   "FFMPEG Error",
+                                   f"File {video_file} cannot be probed: {error}");
             return False
         except StopIteration:
-            self.display_error(f"File {video_file} does not appear to contain video information")
+            qw.QMessageBox.warning(self,
+                                   "FFMPEG Error",
+                                   f"File {video_file} does not appear to contain video information");
             return False
         except KeyError as exception:
-            self.display_error(f"Probe video data error: unknown key {exception}")
+            qw.QMessageBox.warning(self,
+                                   "FFMPEG Error",
+                                   f"Probe video data error: unknown key {exception}");
             return False
 
         return True
