@@ -326,6 +326,9 @@ class MarkUpView(VideoBaseView):
             Args:
                 point (QPointF) the new end point (p2)
         """
+        # catch the case of the a mouse up without a mouse down
+        if self._draw_line is None:
+            return
         line = self._draw_line.line()
         new_line = qc.QLineF(line.p1(), point)
         self._draw_line.setLine(new_line)
