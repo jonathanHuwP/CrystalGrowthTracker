@@ -781,9 +781,11 @@ class CrystalGrowthTrackerMain(qw.QMainWindow, Ui_CrystalGrowthTrackerMain):
                 self._videoStatsWidget.display_stats()
 
         except ffmpeg.Error as error:
+            message = f"File {video_file} cannot be probed: {error}. "
+            message += "Run with USE_FFMPEG_LOG=True to save error log"
             qw.QMessageBox.warning(self,
                                    "FFMPEG Error",
-                                   f"File {video_file} cannot be probed: {error}");
+                                   message);
             return False
         except StopIteration:
             qw.QMessageBox.warning(self,
