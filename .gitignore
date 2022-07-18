@@ -1,8 +1,5 @@
 __pycache__/
 doc/
-cgt/temp/Grayscale*.png
-cgt/temp/Histogram*.png
-cgt/temp/Mean1.png
 Ui_*
 *.log
 .project
@@ -13,5 +10,7 @@ Ui_*
 .vscode
 LINT.txt
 *.jpg
+*.png
+*.avi
 tmp/
 *_log.txt
