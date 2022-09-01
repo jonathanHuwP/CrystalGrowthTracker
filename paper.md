@@ -37,7 +37,7 @@ bibliography: paper.bib
 
 # Summary
 
-X-ray synchrotron radiation allows the investigation of many physical processes in unprecedented ways. One application, important to the fine chemicals industry, is charaterizing the early stages of crystallization.  To aid chemical engineers working in this area we developed the CrystalGrowthTracker package.  It allows crystals to be found in videos and their growth rates measured.  We hope that this work can provide the basis for fully automated and 3D systems.
+X-ray synchrotron radiation allows the investigation of many physical processes in unprecedented ways. One application, important to the fine chemicals industry, is characterizing the early stages of crystallization.  To aid chemical engineers working in this area we developed the CrystalGrowthTracker package.  It allows crystals to be found in videos and their growth rates measured.  We hope that this work can provide the basis for fully automated and 3D systems.
 
 # Statement of Need
 
