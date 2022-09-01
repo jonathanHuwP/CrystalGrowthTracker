@@ -18,6 +18,12 @@ Unless required by applicable law or agreed to in writing, software distributed 
 | <b>Screenshot after statistical analysis a video file.</b>|
 |![Screenshot during region selection.](images/CGT_select_tab.png?raw=true)|
 | <b>Screenshot during region selection.</b>|
+|![Screenshot during markup.](images/CGT_drawing_tab.png?raw=true)|
+| <b>Screenshot during markup.</b>|
+|![Screenshot of results tab.](images/CGT_results_tab.png?raw=true)|
+| <b>Screenshot of results tab.</b>|
+|![Screenshot of report tab.](images/CGT_report_tab.png?raw=true)|
+| <b>Screenshot of report tab.</b>|
 
 ## Developed With:
 This was developed using Python 3.8/3.9/3.10 and Anaconda, on Windows 10 systems, and also successfully tested on Ubuntu 20. The software has not been tested under any other operating systems.
