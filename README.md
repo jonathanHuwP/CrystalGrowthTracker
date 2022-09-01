@@ -10,7 +10,9 @@ Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 
-![Screenshot of project details after loading a video file.](images/CGT_properties_tab.png?raw=true)
+|![Screenshot of project details after loading a video file.](images/CGT_properties_tab.png?raw=true)|
+|:--:|
+| <b>Fig.1 - Screenshot of project details after loading a video file.</b>|
 
 ## Developed With:
 This was developed using Python 3.8/3.9/3.10 and Anaconda, on Windows 10 systems, and also successfully tested on Ubuntu 20. The software has not been tested under any other operating systems.
