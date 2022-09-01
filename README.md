@@ -13,6 +13,10 @@ Unless required by applicable law or agreed to in writing, software distributed 
 |![Screenshot of project details after loading a video file.](images/CGT_properties_tab.png?raw=true)|
 |:--:|
 | <b>Fig.1 - Screenshot of project details after loading a video file.</b>|
+|:--:|
+|![Screenshot after statistical analysis a video file.](images/CGT_properties_tab.png?raw=true)|
+|:--:|
+| <b>Fig.2 - Screenshot after statistical analysis a video file.</b>|
 
 ## Developed With:
 This was developed using Python 3.8/3.9/3.10 and Anaconda, on Windows 10 systems, and also successfully tested on Ubuntu 20. The software has not been tested under any other operating systems.
