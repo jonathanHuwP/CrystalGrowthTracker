@@ -13,6 +13,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 |![Screenshot of project details after loading a video file.](images/CGT_properties_tab.png?raw=true)|
 |:--:|
 | <b>Screenshot of project details after loading a video file.</b>|
+|:--:|
 |![Screenshot after statistical analysis a video file.](images/CGT_stats_tab.png?raw=true)|
 |:--:|
 | <b>Screenshot after statistical analysis a video file.</b>|
