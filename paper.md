@@ -75,7 +75,7 @@ The user was able to add a marker to an image feature in a single key-frame of t
 
 # Testing, Documentation and Linting
 
-A test suite is provided, that utilizes the Python unittest module.  Because the Python unittest module cannot run the ffmpeg subprocess a separate test was developed for these interactions.  The Qt QTest object is used to simulate IO events, and the capture the resultant signals.  The tests can be executed by adding the '-t' flag to the main cgt command line. The Python script run_test executes all tests and saves the results to a CSV file.
+ A test suite based on the Python unittest module is provided.  Because the Python unittest module cannot run the ffmpeg subprocess a separate test was developed for these interactions.  The Qt QTest object is used to simulate IO events, and the capture the resultant signals.  The tests can be executed by adding the '-t' flag to the main cgt command line. The Python script run_test executes all tests and saves the results to a CSV file.
 
 Doxygen was used to generate documentation from source code comments.  The code was developed using the Pylint static code analysis tool, for which a runner script was developed. The script runs Pylint on all files, with the output displayed in the shell tool window or saved to CSV file.
 
