@@ -61,7 +61,7 @@ The package allows the user to load two videos, raw and enhanced, and provides t
 
 # Functionality
 
-Videos documenting the [install](@installVid), [uninstall](@uninstallVid) and [operation](@operateVid) of the package are available on YouTube.  Sample video data is available via [Zenodo](@zenodoSample).
+Videos documenting the [install](@installVid), [uninstall](@uninstallVid) and [operation](@operateVid) of the package are available on YouTube.  Sample video data is available via \htmladdnormallink{Zenodo}{https://doi.org/10.5281/zenodo.6801296}.
 
 A model-view-controller (MVC) software architecture [@mvc88krasne] was used, in which the view and the controller were merged into the main widget.  The video was accessed via a VideoSource object, which was held by the main window, together with project data, and results objects. These objects constitute a MVC architecture and were made available to the widgets carrying out user functions by getter methods.  These widgets were themselves held by the main window in a tab widget.
 
