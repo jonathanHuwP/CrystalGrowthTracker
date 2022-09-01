@@ -10,7 +10,6 @@ Ui_*
 .vscode
 LINT.txt
 *.jpg
-*.png
 *.avi
 tmp/
 *_log.txt
