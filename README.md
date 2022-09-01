@@ -15,7 +15,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 |:--:|
 | <b>Screenshot of project details after loading a video file.</b>|
 |![Screenshot after statistical analysis a video file.](images/CGT_stats_tab.png?raw=true)|
-| <b>Screenshot after statistical analysis a video file.</b>|
+| <b>Screenshot after statistical analysis of a video file.</b>|
 |![Screenshot during region selection.](images/CGT_select_tab.png?raw=true)|
 | <b>Screenshot during region selection.</b>|
 |![Screenshot during markup.](images/CGT_drawing_tab.png?raw=true)|
