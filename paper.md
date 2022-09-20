@@ -53,6 +53,10 @@ Videos of the shadow graphs first need enhancement using packages such as Eulerâ
 
 Although the obvious approach would be to use image analysis and machine learning, the relatively noisy data, the limited number of data sets and the need for verifiable results lead to a manual approach.  User analysis of video required the package to have a graphical user interface (GUI).  Finally the users needed to be able to download and run the package on any machine, so the package was developed using Python and PyQt5, from Riverbank Computing Limited [@web:riverbank], within the conda package management system.  The use of Qt naturally leads to an object orientated architecture.
 
+# Functionality
+
+Videos documenting the \href{https://youtu.be/tjmPqGec1vs}{install}, \href{https://youtu.be/aYjkYWifw4Q}{uninstall} and \href{https://youtu.be/wYYFnPkVBrY}{operation} of the package are available on YouTube.  Sample video data is available via \href{https://doi.org/10.5281/zenodo.6801296}{Zenodo}.
+
 The package allows the user to load two videos, raw and enhanced, and provides the following functionality:
 
 1.  Easy install and uninstall plus availablity of a translation package.
@@ -62,10 +66,6 @@ The package allows the user to load two videos, raw and enhanced, and provides t
 5.  Change the frame of a region of interest and move the markers to follow the underlying feature.
 6.  Use time and space calibration data to calculate the true speed of the marker motions.
 7.  Store the above data in an open human readable format and present a report in HTML.
-
-# Functionality
-
-Videos documenting the \href{https://youtu.be/tjmPqGec1vs}{install}, \href{https://youtu.be/aYjkYWifw4Q}{uninstall} and \href{https://youtu.be/wYYFnPkVBrY}{operation} of the package are available on YouTube.  Sample video data is available via \href{https://doi.org/10.5281/zenodo.6801296}{Zenodo}.
 
 A model-view-controller (MVC) software architecture [@mvc88krasne] was used, in which the view and the controller were merged into the main widget.  The video was accessed via a VideoSource object, which was held by the main window, together with project data, and results objects. These objects constitute a MVC architecture and were made available to the widgets carrying out user functions by getter methods.  These widgets were themselves held by the main window in a tab widget.
 
