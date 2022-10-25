@@ -17,7 +17,7 @@ authors:
   - name: Gunjan Das
     affiliation: "4,5,6,7"
 affiliations:
- - name: EPSRC Research Fellow in Software Engineering
+ - name: Senior Research Fellow in Software Engineering
    index: 1
  - name: Research Fellow in Software Engineering
    index: 2
@@ -45,7 +45,7 @@ X-ray synchrotron radiation allows the investigation of many physical processes 
 
 Much of the output of global fine chemicals industries consists of crystalline powders produced by precipitation from solution.  Since the geometry of a crystal is the result of differential growth rates on different crystal planes, there is great commercial interest in studying the growth rates of crystal faces in the early stages of crystallization.  One approach is to use the X-rays of synchrotron radiation [@Baruchel2013] to produce 2D shadowgraphs of crystals precipitating onto a substrate.
 
-Existing image analysis packages such as ImageJ, popular with scientific users, is designed for single images and does not handle video data well. For example, Das originally took eighteen months to annotate one video using ImageJ. Alternative video display and editing software is designed for entertainment and does not allow annotation and measurement of features, and some packages will not work with high resolution video.
+Existing image analysis packages such as ImageJ, popular with scientific users, are designed for single images and does not handle video data well. For example, Das originally took eighteen months to annotate one video using ImageJ. Alternative video display and editing software is designed for entertainment and does not allow annotation and measurement of features, and some packages will not work with high resolution video.
 
 Videos of the shadow graphs first need enhancement using packages such as Euler’s Magnifier [@Wu12Eulerian] and some statistical analysis of the raw video is desirable to find regions of interest.  **CrystalGrowthTracker** has been developed to assist in the analysis of videos of the raw and enhanced videos. The package was developed by Leng and Pickering, with specifications provided by Schroeder. Das beta tested and presented on the project [@das:bca21], [@das:isic21]. Details of the experiments can be found in [@10.1117/12.2530698], the resulting videos were shared with the developers so this data analysis software could be developed.
 
@@ -73,13 +73,13 @@ The package allows the user to load two videos, raw and enhanced, and provides t
 6.  Use time and space calibration data to calculate the true speed of the marker motions.
 7.  Store the above data in an open human readable format and present a report in HTML.
 
-Project data and results are saved in comma-separated value (CSV) files using the Python csv module. CSV is a text format, which can be viewed and edited in text editors or spreadsheets, such as Excel.  The results of a project can be saved in a HTML report, which included tables, graphs and anotated video frames.
+Project data and results are saved in comma-separated value (CSV) files using the Python csv module. CSV is a text format, which can be viewed and edited in text editors or spreadsheets, such as Excel.  The results of a project can be saved in a HTML or PDF report, which included tables, graphs and anotated video frames.
 
 # For Developers
 
 Some readers may wish to extend this package, for them we provide some further information on testing, source code style and documentation.
 
-A test suite is provided, because the Python unittest module cannot run the ffmpeg subprocess a separate test was developed for these interactions.  The Qt QTest object is used to simulate IO events, and the capture the resultant signals for tesing the GUI.  The tests can be executed by adding the '-t' flag to the main cgt command line. The Python script run_test executes all tests and saves the results to a CSV file.
+A test suite is provided, because the Python unittest module cannot run the ffmpeg subprocess a separate test was developed for these interactions.  The Qt QTest object is used to simulate IO events, and capture the resultant signals for tesing the GUI.  The tests can be executed by adding the '-t' flag to the main cgt command line. The Python script run_test executes all tests and saves the results to a CSV file.
 
 Doxygen is used to generate documentation from source code comments.  The code has been developed using the Pylint static code analysis tool, with a custom-made runner script. The script runs Pylint on all files, with the output displayed in the shell tool window or saved to CSV file.
 
