@@ -8,29 +8,25 @@ tags:
 authors:
   - name: Joanna Leng^[co-first author]
     orcid: 0000-0001-9790-162X
-    affiliation: "1,3"
+    affiliation: "1"
   - name: Jonathan H. Pickering^[co-first author]
-    affiliation: "2,3"
+    affiliation: "1"
     orcid: 0000-0001-5283-8065
   - name: Sven L. M. Schroeder
-    affiliation: "4,5,6,7"
+    affiliation: "2,3,4,5"
   - name: Gunjan Das
-    affiliation: "4,5,6,7"
+    affiliation: "2,3,4,5"
 affiliations:
- - name: Senior Research Fellow in Software Engineering
-   index: 1
- - name: Research Fellow in Software Engineering
-   index: 2
  - name: School of Computer Science, University of Leeds, Leeds, United Kingdom
-   index: 3
+   index: 1
  - name: School of Chemical and Process Engineering, University of Leeds, Leeds, United Kingdom
+   index: 2
+ - name: Diamond Light Source Ltd, Didcot, Oxfordshire, United Kingdom
+   index: 3
+ - name: Research Complex at Harwell, Didcot, Oxfordshire, United Kingdom
    index: 4
- - name: Diamond Light Source Ltd, Oxfordshire, United Kingdom
+ - name: EPSRC Centre for Innovative Manufacturing in Continuous Manufacturing and Advanced Crystallisation, University of Strathclyde, Glasgow, United Kingdom
    index: 5
- - name: Research Complex at Harwell, Oxfordshire, United Kingdom
-   index: 6
- - name: EPSRC Centre for Innovative Manufacturing in Continuous Manufacturing and Advanced Crystallisation, University of Strathclyde, United Kingdom
-   index: 7
 date: 15 October 2021
 bibliography: paper.bib
 ---
