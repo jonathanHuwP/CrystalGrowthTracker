@@ -17,20 +17,16 @@ authors:
   - name: Gunjan Das
     affiliation: "4,5,6,7"
 affiliations:
- - name: Senior Research Fellow in Software Engineering
-   index: 1
- - name: Research Fellow in Software Engineering
-   index: 2
  - name: School of Computer Science, University of Leeds, Leeds, United Kingdom
-   index: 3
+   index: 1
  - name: School of Chemical and Process Engineering, University of Leeds, Leeds, United Kingdom
-   index: 4
+   index: 2
  - name: Diamond Light Source Ltd, Oxfordshire, United Kingdom
-   index: 5
+   index: 3
  - name: Research Complex at Harwell, Oxfordshire, United Kingdom
-   index: 6
- - name: EPSRC Centre for Innovative Manufacturing in Continuous Manufacturing and Advanced Crystallisation, University of Strathclyde, United Kingdom
-   index: 7
+   index: 4
+ - name: EPSRC Centre for Innovative Manufacturing in Continuous Manufacturing and Advanced Crystallisation, University of Strathclyde, Glasgow, United Kingdom
+   index: 5
 date: 15 October 2021
 bibliography: paper.bib
 ---
@@ -79,7 +75,7 @@ Project data and results are saved in comma-separated value (CSV) files using th
 
 Some readers may wish to extend this package, for them we provide some further information on testing, source code style and documentation.
 
-A test suite is provided, because the Python unittest module cannot run the ffmpeg subprocess, a separate test was developed for these interactions.  The Qt QTest object is used to simulate IO events, and capture the resultant signals for tesing the GUI.  The tests can be executed by adding the '-t' flag to the main cgt command line. The Python script run_test executes all tests and saves the results to a CSV file.
+A test suite is provided, and because the Python unittest module cannot run the ffmpeg subprocess a separate test was developed for these interactions.  The Qt QTest object is used to simulate IO events, and capture the resultant signals for tesing the GUI.  The tests can be executed by adding the '-t' flag to the main cgt command line. The Python script run_test executes all tests and saves the results to a CSV file.
 
 Doxygen is used to generate documentation from source code comments.  The code has been developed using the Pylint static code analysis tool, with a custom-made runner script. The script runs Pylint on all files, with the output displayed in the shell tool window or saved to CSV file.
 
