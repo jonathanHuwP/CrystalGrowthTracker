@@ -21,9 +21,9 @@ affiliations:
    index: 1
  - name: School of Chemical and Process Engineering, University of Leeds, Leeds, United Kingdom
    index: 2
- - name: Diamond Light Source Ltd, Harwell Science and Innovation Campus, Oxon
+ - name: Diamond Light Source Ltd, Harwell Science and Innovation Campus, Harwell, United Kingdom
    index: 3
- - name: Research Complex at Harwell (RCaH), Rutherford Appleton Laboratory, Harwell
+ - name: Research Complex at Harwell (RCaH), Rutherford Appleton Laboratory, Harwell, United Kingdom
    index: 4
  - name: EPSRC Centre for Innovative Manufacturing in Continuous Manufacturing and Advanced Crystallisation, University of Strathclyde, Glasgow, United Kingdom
    index: 5
